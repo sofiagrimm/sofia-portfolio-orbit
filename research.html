@@ -15,7 +15,7 @@
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Inter:wght@300;400;500&display=swap');
     *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-    html,body{width:100%;height:100%;overflow:hidden;background:#020511;font-family:'Inter',sans-serif;color:#e9f0ff;}
+    html,body{width:100%;height:100%;overflow:hidden;background:#060d18;font-family:'Inter',sans-serif;color:#e9f0ff;}
     #c{display:block;position:fixed;top:0;left:0;width:100%;height:100%;z-index:1;cursor:grab;}
     #c:active{cursor:grabbing;}
     nav{position:fixed;top:0;left:0;right:0;z-index:30;
@@ -133,15 +133,16 @@
 
     const W=()=>window.innerWidth, H=()=>window.innerHeight;
 
+    /* ---- SINGLE RENDERER ---- */
     const canvas=document.getElementById('c');
     const renderer=new THREE.WebGLRenderer({canvas,antialias:true});
     renderer.setPixelRatio(Math.min(devicePixelRatio,2));
     renderer.setSize(W(),H());
-    renderer.setClearColor(0x020511,1);
+    renderer.setClearColor(0x060d18,1);
 
     const scene=new THREE.Scene();
-    const camera=new THREE.PerspectiveCamera(36,W()/H(),0.1,500);
-    camera.position.set(0,0,3.7);
+    const camera=new THREE.PerspectiveCamera(42,W()/H(),0.1,500);
+    camera.position.set(0,0,2.8);
     camera.lookAt(0,0,0);
 
     window.addEventListener('resize',()=>{
@@ -152,106 +153,89 @@
 
     /* ---- STARS ---- */
     {
-      const N=9000,p=new Float32Array(N*3),ph=new Float32Array(N),sp=new Float32Array(N),sz=new Float32Array(N);
+      const N=9000;
+      const p=new Float32Array(N*3),ph=new Float32Array(N),sp=new Float32Array(N),sz=new Float32Array(N);
       for(let i=0;i<N;i++){
-        const u=Math.random()*Math.PI*2,v=Math.acos(2*Math.random()-1),r=80+Math.random()*120;
-        p[i*3]=r*Math.sin(v)*Math.cos(u);p[i*3+1]=r*Math.sin(v)*Math.sin(u);p[i*3+2]=r*Math.cos(v);
-        ph[i]=Math.random()*Math.PI*2;sp[i]=.0015+Math.random()*.005;sz[i]=.7+Math.random()*2.0;
+        const u=Math.random()*Math.PI*2, v=Math.acos(2*Math.random()-1);
+        const r=80+Math.random()*120;
+        p[i*3]  =r*Math.sin(v)*Math.cos(u);
+        p[i*3+1]=r*Math.sin(v)*Math.sin(u);
+        p[i*3+2]=r*Math.cos(v);
+        ph[i]=Math.random()*Math.PI*2;
+        sp[i]=.0015+Math.random()*.005;
+        sz[i]=.6+Math.random()*1.6;
       }
       const g=new THREE.BufferGeometry();
       g.setAttribute('position',new THREE.BufferAttribute(p,3));
-      g.setAttribute('phase',new THREE.BufferAttribute(ph,1));
-      g.setAttribute('speed',new THREE.BufferAttribute(sp,1));
-      g.setAttribute('aSize',new THREE.BufferAttribute(sz,1));
+      g.setAttribute('phase',  new THREE.BufferAttribute(ph,1));
+      g.setAttribute('speed',  new THREE.BufferAttribute(sp,1));
+      g.setAttribute('aSize',  new THREE.BufferAttribute(sz,1));
       const sm=new THREE.ShaderMaterial({
         uniforms:{time:{value:0}},
-        vertexShader:`attribute float aSize,phase,speed;uniform float time;varying float vB;
-          void main(){float r=abs(sin(time*speed+phase));vB=.65+.35*pow(r,.3);
-          vec4 mv=modelViewMatrix*vec4(position,1.);float sb=1.+4.*max(0.,r-.72)/.28;
-          gl_PointSize=aSize*sb*(380./-mv.z);gl_Position=projectionMatrix*mv;}`,
-        fragmentShader:`varying float vB;void main(){
-          vec2 uv=gl_PointCoord-.5;float d=length(uv);if(d>.5)discard;
-          float c=1.-smoothstep(0.,.44,d);gl_FragColor=vec4(vec3(.9,.96,1.)*vB,c*vB);}`,
-        transparent:true,depthWrite:false});
-      scene.add(new THREE.Points(g,sm));window._sm=sm;
+        vertexShader:`
+          attribute float aSize,phase,speed;
+          uniform float time; varying float vB;
+          void main(){
+            float r=abs(sin(time*speed+phase));
+            vB=.65+.35*pow(r,.3);
+            vec4 mv=modelViewMatrix*vec4(position,1.);
+            float sb=1.+4.*max(0.,r-.72)/.28;
+            gl_PointSize=aSize*sb*(300./-mv.z);
+            gl_Position=projectionMatrix*mv;
+          }`,
+        fragmentShader:`
+          varying float vB;
+          void main(){
+            vec2 uv=gl_PointCoord-.5; float d=length(uv);
+            if(d>.5)discard;
+            float c=1.-smoothstep(0.,.44,d);
+            gl_FragColor=vec4(vec3(.76,.88,1.)*vB,c*vB);
+          }`,
+        transparent:true,depthWrite:false
+      });
+      scene.add(new THREE.Points(g,sm));
+      window._sm=sm;
     }
 
     /* ---- LIGHTING ---- */
-    scene.add(new THREE.AmbientLight(0x1a2a4a,2.5));
-    const sun=new THREE.DirectionalLight(0xfff0e0,3.0);
-    sun.position.set(4,2,3);scene.add(sun);
-    scene.add(Object.assign(new THREE.DirectionalLight(0x4466bb,0.8),{position:new THREE.Vector3(-4,1,-2)}));
+    scene.add(new THREE.AmbientLight(0x223355,1.2));
+    const sun=new THREE.DirectionalLight(0xfff5e8,2.4);
+    sun.position.set(5,2,4); scene.add(sun);
+    const rimL=new THREE.DirectionalLight(0x3366cc,0.6);
+    rimL.position.set(-5,1,-3); scene.add(rimL);
 
     /* ---- TEXTURES ---- */
     const TL=new THREE.TextureLoader();
     const dayTex  =TL.load('https://unpkg.com/three-globe/example/img/earth-blue-marble.jpg');
+    const nightTex=TL.load('https://unpkg.com/three-globe/example/img/earth-night.jpg');
     const cloudTex=TL.load('https://unpkg.com/three-globe/example/img/earth-clouds.png');
 
-    /* ---- STYLIZED GLOBE ---- */
+    /* ---- GLOBE ---- */
     const R=1.0;
     const globeMat=new THREE.ShaderMaterial({
       uniforms:{
-        dayMap:{value:dayTex},
-        sunDir:{value:sun.position.clone().normalize()},
-        time:  {value:0},
+        dayMap:  {value:dayTex},
+        nightMap:{value:nightTex},
+        sunDir:  {value:sun.position.clone().normalize()},
       },
       vertexShader:`
-        varying vec2 vUv;
-        varying vec3 vNorm;
-        varying vec3 vViewDir;
+        varying vec2 vUv; varying vec3 vNormal;
         void main(){
           vUv=uv;
-          vNorm=normalize(normalMatrix*normal);
-          vec4 mv=modelViewMatrix*vec4(position,1.);
-          vViewDir=normalize(-mv.xyz);
-          gl_Position=projectionMatrix*mv;
+          vNormal=normalize(normalMatrix*normal);
+          gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);
         }`,
       fragmentShader:`
-        uniform sampler2D dayMap;
+        uniform sampler2D dayMap,nightMap;
         uniform vec3 sunDir;
-        uniform float time;
-        varying vec2 vUv;
-        varying vec3 vNorm;
-        varying vec3 vViewDir;
-
-        float hash(vec2 p){return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5453);}
-        float noise(vec2 p){
-          vec2 i=floor(p),f=fract(p);
-          f=f*f*(3.-2.*f);
-          return mix(mix(hash(i),hash(i+vec2(1,0)),f.x),
-                     mix(hash(i+vec2(0,1)),hash(i+vec2(1,1)),f.x),f.y);
-        }
-
+        varying vec2 vUv; varying vec3 vNormal;
         void main(){
-          vec3 raw=texture2D(dayMap,vUv).rgb;
-          float isOcean=smoothstep(0.05,0.35, raw.b - max(raw.r,raw.g)*0.7);
-          float n=noise(vUv*18.)*0.08+noise(vUv*42.)*0.04;
-          float diff=clamp(dot(vNorm,normalize(sunDir)),0.,1.);
-          float cel=smoothstep(0.0,0.45,diff)*0.6+smoothstep(0.45,0.9,diff)*0.4;
-
-          vec3 oceanDark =vec3(0.04,0.06,0.22);
-          vec3 oceanMid  =vec3(0.08,0.25,0.62);
-          vec3 oceanLight=vec3(0.28,0.65,0.95);
-          vec3 ocean=mix(oceanDark, mix(oceanMid,oceanLight,smoothstep(0.4,1.0,cel)), cel);
-
-          vec3 landDark =vec3(0.07,0.07,0.18);
-          vec3 landMid  =vec3(0.22,0.38,0.24);
-          vec3 landLight=vec3(0.72,0.68,0.48);
-          vec3 land=mix(landDark, mix(landMid,landLight,smoothstep(0.3,0.95,cel)), cel);
-
-          float isIce=smoothstep(0.78,0.95, dot(raw,vec3(0.33)))*(1.-isOcean);
-          vec3 ice=mix(vec3(0.75,0.82,1.0),vec3(1.),cel);
-
-          vec3 col=mix(land,ocean,isOcean);
-          col=mix(col,ice,isIce);
-          col+=n*(isOcean*0.04+0.02);
-
-          float spec=pow(clamp(dot(normalize(vNorm),normalize(sunDir+vViewDir)),0.,1.),32.);
-          col+=isOcean*spec*0.22*vec3(0.6,0.8,1.0);
-
-          float rim=1.-clamp(dot(vNorm,vViewDir),0.,1.);
-          col=mix(col, vec3(0.04,0.06,0.24), pow(rim,3.5)*0.55);
-
+          vec3 day  =texture2D(dayMap,  vUv).rgb;
+          vec3 night=texture2D(nightMap,vUv).rgb*1.8;
+          float cosA=dot(vNormal,normalize(sunDir));
+          float blend=smoothstep(-0.18,0.18,cosA);
+          vec3 col=mix(night,day,blend);
+          col*=0.6+0.4*max(0.,cosA);
           gl_FragColor=vec4(col,1.);
         }`,
     });
@@ -260,34 +244,39 @@
 
     /* ---- CLOUDS ---- */
     const clouds=new THREE.Mesh(
-      new THREE.SphereGeometry(R*1.008,128,128),
+      new THREE.SphereGeometry(R*1.010,128,128),
       new THREE.MeshPhongMaterial({
-        map:cloudTex,transparent:true,opacity:0.22,
-        color:new THREE.Color(0xdde8ff),
+        map:cloudTex,transparent:true,opacity:0.35,
         blending:THREE.NormalBlending,depthWrite:false}));
     scene.add(clouds);
 
     /* ---- ATMOSPHERE ---- */
     scene.add(new THREE.Mesh(
-      new THREE.SphereGeometry(R*1.08,64,64),
+      new THREE.SphereGeometry(R*1.035,64,64),
       new THREE.ShaderMaterial({
-        uniforms:{c:{value:new THREE.Color(0x2255dd)}},
+        uniforms:{c:{value:new THREE.Color(0x1a55ee)}},
         vertexShader:`varying vec3 vN;
-          void main(){vN=normalize(normalMatrix*normal);
-          gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}`,
+          void main(){
+            vN=normalize(normalMatrix*normal);
+            gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);
+          }`,
         fragmentShader:`uniform vec3 c;varying vec3 vN;
           void main(){
             float edge=1.-clamp(dot(vN,vec3(0.,0.,1.)),0.,1.);
-            float f=pow(edge,2.8);
-            gl_FragColor=vec4(c,f*0.55);}`,
+            float f=pow(edge,3.5);
+            gl_FragColor=vec4(c,f*0.42);
+          }`,
         side:THREE.BackSide,blending:THREE.AdditiveBlending,
-        transparent:true,depthWrite:false})));
+        transparent:true,depthWrite:false
+      })));
 
     /* ---- lat/lon helper ---- */
     function ll2v(lat,lon,r){
       const phi=(90-lat)*Math.PI/180,theta=(lon+180)*Math.PI/180;
       return new THREE.Vector3(
-        -r*Math.sin(phi)*Math.cos(theta),r*Math.cos(phi),r*Math.sin(phi)*Math.sin(theta));
+        -r*Math.sin(phi)*Math.cos(theta),
+         r*Math.cos(phi),
+         r*Math.sin(phi)*Math.sin(theta));
     }
 
     /* ---- PINS ---- */
@@ -295,13 +284,19 @@
     scene.add(pinGroup);
     SITES.forEach((s,i)=>{
       const pos=ll2v(s.lat,s.lon,R);
-      const spike=new THREE.Mesh(new THREE.CylinderGeometry(0.003,0.010,0.085,8),new THREE.MeshBasicMaterial({color:s.color}));
-      const dot=new THREE.Mesh(new THREE.SphereGeometry(0.020,16,16),new THREE.MeshBasicMaterial({color:s.color}));
+      const spike=new THREE.Mesh(
+        new THREE.CylinderGeometry(0.003,0.010,0.085,8),
+        new THREE.MeshBasicMaterial({color:s.color}));
+      const dot=new THREE.Mesh(
+        new THREE.SphereGeometry(0.020,16,16),
+        new THREE.MeshBasicMaterial({color:s.color}));
       dot.position.y=0.052;
-      const halo=new THREE.Mesh(new THREE.RingGeometry(0.026,0.034,32),
+      const halo=new THREE.Mesh(
+        new THREE.RingGeometry(0.026,0.034,32),
         new THREE.MeshBasicMaterial({color:s.color,side:THREE.DoubleSide,transparent:true,opacity:.8,depthWrite:false}));
       halo.position.y=0.054;
-      const halo2=new THREE.Mesh(new THREE.RingGeometry(0.034,0.042,32),
+      const halo2=new THREE.Mesh(
+        new THREE.RingGeometry(0.034,0.042,32),
         new THREE.MeshBasicMaterial({color:s.color,side:THREE.DoubleSide,transparent:true,opacity:.3,depthWrite:false}));
       halo2.position.y=0.054;
       const grp=new THREE.Group();
@@ -362,7 +357,6 @@
     function animate(t){
       requestAnimationFrame(animate);
       if(window._sm)window._sm.uniforms.time.value=t*.001;
-      globeMat.uniforms.time.value=t*.001;
       if(autoSpin){globe.rotation.y+=.0006;pinGroup.rotation.y+=.0006;}
       else if(!dragging){
         vx*=.90;vy*=.90;
