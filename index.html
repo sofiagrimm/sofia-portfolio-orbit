@@ -47,7 +47,7 @@
       color:rgba(160,190,255,0.5);text-decoration:none;padding:7px 16px;border-radius:4px;
       transition:color .25s,background .25s;
     }
-    .nav-links a:hover{color:rgba(220,235,255,0.9);background:rgba(100,140,255,0.08);}
+    .nav-links a:hover,.nav-links a.active{color:rgba(220,235,255,0.9);background:rgba(100,140,255,0.08);}
     .nav-links .divider{color:rgba(100,130,200,0.2);font-size:13px;user-select:none;}
     .ui{position:fixed;inset:0;z-index:10;pointer-events:none}
     .center-card{
@@ -111,12 +111,12 @@
 <body>
   <div class="nebula"></div>
   <nav>
-    <a class="nav-name" href="#">Sofia Grimm</a>
+    <a class="nav-name" href="index.html">Sofia Grimm</a>
     <div class="nav-links">
-      <a href="#">Home</a><span class="divider">|</span>
-      <a href="#">About</a><span class="divider">|</span>
-      <a href="#">Research</a><span class="divider">|</span>
-      <a href="#">Projects</a>
+      <a href="index.html" class="active">Home</a><span class="divider">|</span>
+      <a href="about.html">About</a><span class="divider">|</span>
+      <a href="research.html">Research</a><span class="divider">|</span>
+      <a href="projects.html">Projects</a>
     </div>
   </nav>
   <div class="card-ring"></div>
@@ -128,32 +128,27 @@
       <div class="card-sub">universe of things i care about</div>
     </div>
   </div>
-  <div class="coords">41.3083° N &nbsp; 72.9279° W</div>
+  <div class="coords">41.3083&deg; N &nbsp; 72.9279&deg; W</div>
   <div class="tagline">exploring the edges of known things</div>
 
   <script type="module">
     import * as THREE from 'three';
-
     const renderer = new THREE.WebGLRenderer({antialias:true,alpha:false});
     renderer.setPixelRatio(Math.min(window.devicePixelRatio,2));
     renderer.setSize(window.innerWidth,window.innerHeight);
     renderer.setClearColor(0x060d18,1);
     document.body.appendChild(renderer.domElement);
-
     const scene = new THREE.Scene();
     const camera = new THREE.PerspectiveCamera(36,window.innerWidth/window.innerHeight,0.1,500);
     camera.position.set(0,0,46); camera.lookAt(0,0,0);
-
     window.addEventListener('resize',()=>{
       camera.aspect=window.innerWidth/window.innerHeight;
       camera.updateProjectionMatrix();
       renderer.setSize(window.innerWidth,window.innerHeight);
     });
-
     scene.add(new THREE.AmbientLight(0x0d1a33,1.4));
     const key=new THREE.DirectionalLight(0xffffff,1.1); key.position.set(18,24,18); scene.add(key);
     const rim=new THREE.DirectionalLight(0xaac4ff,1.2); rim.position.set(-24,4,-20); scene.add(rim);
-
     const STAR_COUNT=9000;
     const starPositions=new Float32Array(STAR_COUNT*3);
     const starPhase=new Float32Array(STAR_COUNT);
@@ -207,27 +202,26 @@
       transparent:true,depthWrite:false
     });
     scene.add(new THREE.Points(starGeo,starMat));
-
     const CZ=-90;
     const constellations=[
-      {name:'Orion',       offset:[-68, 12], stars:[[0,8],[3.5,8],[-1,5.5],[4.5,5.5],[0.8,4.2],[1.8,3.8],[2.8,3.4],[0.2,1.5],[3.5,1.5]], edges:[[0,2],[1,3],[2,4],[3,6],[4,5],[5,6],[7,4],[8,6],[2,3]]},
-      {name:'Ursa Major',  offset:[ 38, 42], stars:[[0,0],[2.5,-0.5],[5,1],[7,0],[9,2],[11,1],[13,2.5]],                                   edges:[[0,1],[1,2],[2,3],[3,4],[4,5],[5,6]]},
-      {name:'Cassiopeia',  offset:[ 55,-38], stars:[[0,0],[2.5,2],[5,1],[7.5,2.5],[10,0.5]],                                              edges:[[0,1],[1,2],[2,3],[3,4]]},
-      {name:'Scorpius',    offset:[-72,-32], stars:[[0,8],[-1,6.5],[1,6.5],[-0.5,5],[0.5,5],[0,3.5],[0.5,2],[1.5,1],[2,0],[1,-1],[2.5,-1.5]], edges:[[0,1],[0,2],[1,3],[2,4],[3,5],[4,5],[5,6],[6,7],[7,8],[8,9],[9,10]]},
-      {name:'Cygnus',      offset:[ 30, 30], stars:[[0,8],[0,4],[-4,4],[4,4],[0,0]],                                                       edges:[[0,1],[1,2],[1,3],[1,4]]},
-      {name:'Leo',         offset:[-30,-42], stars:[[0,0],[1.5,2],[3,4],[2,5.5],[5,5],[6,3],[4,1.5]],                                      edges:[[0,1],[1,2],[2,3],[3,4],[4,5],[5,6],[6,1]]},
-      {name:'Gemini',      offset:[ 60, 14], stars:[[0,8],[2,8],[0,6],[2,5.5],[0,4],[2,4],[0,2],[2,2],[0.5,0],[1.5,0]],                    edges:[[0,2],[2,4],[4,6],[6,8],[1,3],[3,5],[5,7],[7,9],[8,9]]},
-      {name:'Crux',        offset:[-42,-50], stars:[[0,3],[0,-3],[-3,0],[3,0]],                                                            edges:[[0,1],[2,3]]},
-      {name:'Aquila',      offset:[ 28,-28], stars:[[0,6],[0,4],[-2,2],[2,2],[0,2],[0,0]],                                                 edges:[[0,1],[1,2],[1,3],[1,4],[4,5]]},
-      {name:'Perseus',     offset:[ 76, 24], stars:[[0,0],[1,2],[2,4],[1,6],[3,7],[0,8],[-1,6],[-2,4]],                                    edges:[[0,1],[1,2],[2,3],[3,4],[3,5],[3,6],[6,7],[2,7]]},
-      {name:'Andromeda',   offset:[ 85, -8], stars:[[0,0],[2,1.5],[4,3],[6,3.5],[4,5],[4,1]],                                              edges:[[0,1],[1,2],[2,3],[2,4],[2,5]]},
-      {name:'Lyra',        offset:[-28, 36], stars:[[0,4],[0,2],[-1,0],[1,0],[-1.5,1.5],[1.5,1.5]],                                        edges:[[0,1],[1,2],[1,3],[2,4],[3,5],[4,5],[2,3]]},
-      {name:'Bootes',      offset:[-38, 30], stars:[[0,8],[0,6],[-2,4],[2,4],[-1,2],[1,2],[0,0]],                                          edges:[[0,1],[1,2],[1,3],[2,4],[3,5],[4,6],[5,6],[2,3]]},
-      {name:'Virgo',       offset:[-55,-14], stars:[[0,0],[2,2],[4,3],[6,2],[4,1],[3,4],[5,5],[2,5]],                                       edges:[[0,1],[1,2],[2,3],[3,4],[4,1],[2,5],[5,6],[5,7]]},
-      {name:'Taurus',      offset:[-82, 18], stars:[[0,0],[2,1],[4,2],[3,4],[5,4],[6,3],[7,4],[8,5],[3,0],[5,-1]],                          edges:[[0,1],[1,2],[2,3],[3,4],[4,5],[5,6],[6,7],[2,8],[8,9]]},
-      {name:'Pisces',      offset:[ 92,-24], stars:[[0,0],[2,1],[4,0],[5,2],[4,4],[2,4],[0,3],[3,-2],[5,-3],[4,-4]],                        edges:[[0,1],[1,2],[2,3],[3,4],[4,5],[5,6],[6,0],[7,8],[8,9],[2,7]]},
-      {name:'Hercules',    offset:[ 28, 38], stars:[[0,8],[0,6],[-2,5],[2,5],[-2,3],[2,3],[0,2],[0,0]],                                    edges:[[0,1],[1,2],[1,3],[2,4],[3,5],[4,5],[4,6],[5,6],[6,7]]},
-      {name:'Centaurus',   offset:[-90,-40], stars:[[0,0],[2,1],[4,2],[6,1],[5,3],[3,4],[7,3],[4,-1],[6,-2]],                               edges:[[0,1],[1,2],[2,3],[3,4],[4,5],[2,5],[3,6],[1,7],[7,8]]}
+      {name:'Orion',offset:[-68,12],stars:[[0,8],[3.5,8],[-1,5.5],[4.5,5.5],[0.8,4.2],[1.8,3.8],[2.8,3.4],[0.2,1.5],[3.5,1.5]],edges:[[0,2],[1,3],[2,4],[3,6],[4,5],[5,6],[7,4],[8,6],[2,3]]},
+      {name:'Ursa Major',offset:[38,42],stars:[[0,0],[2.5,-0.5],[5,1],[7,0],[9,2],[11,1],[13,2.5]],edges:[[0,1],[1,2],[2,3],[3,4],[4,5],[5,6]]},
+      {name:'Cassiopeia',offset:[55,-38],stars:[[0,0],[2.5,2],[5,1],[7.5,2.5],[10,0.5]],edges:[[0,1],[1,2],[2,3],[3,4]]},
+      {name:'Scorpius',offset:[-72,-32],stars:[[0,8],[-1,6.5],[1,6.5],[-0.5,5],[0.5,5],[0,3.5],[0.5,2],[1.5,1],[2,0],[1,-1],[2.5,-1.5]],edges:[[0,1],[0,2],[1,3],[2,4],[3,5],[4,5],[5,6],[6,7],[7,8],[8,9],[9,10]]},
+      {name:'Cygnus',offset:[30,30],stars:[[0,8],[0,4],[-4,4],[4,4],[0,0]],edges:[[0,1],[1,2],[1,3],[1,4]]},
+      {name:'Leo',offset:[-30,-42],stars:[[0,0],[1.5,2],[3,4],[2,5.5],[5,5],[6,3],[4,1.5]],edges:[[0,1],[1,2],[2,3],[3,4],[4,5],[5,6],[6,1]]},
+      {name:'Gemini',offset:[60,14],stars:[[0,8],[2,8],[0,6],[2,5.5],[0,4],[2,4],[0,2],[2,2],[0.5,0],[1.5,0]],edges:[[0,2],[2,4],[4,6],[6,8],[1,3],[3,5],[5,7],[7,9],[8,9]]},
+      {name:'Crux',offset:[-42,-50],stars:[[0,3],[0,-3],[-3,0],[3,0]],edges:[[0,1],[2,3]]},
+      {name:'Aquila',offset:[28,-28],stars:[[0,6],[0,4],[-2,2],[2,2],[0,2],[0,0]],edges:[[0,1],[1,2],[1,3],[1,4],[4,5]]},
+      {name:'Perseus',offset:[76,24],stars:[[0,0],[1,2],[2,4],[1,6],[3,7],[0,8],[-1,6],[-2,4]],edges:[[0,1],[1,2],[2,3],[3,4],[3,5],[3,6],[6,7],[2,7]]},
+      {name:'Andromeda',offset:[85,-8],stars:[[0,0],[2,1.5],[4,3],[6,3.5],[4,5],[4,1]],edges:[[0,1],[1,2],[2,3],[2,4],[2,5]]},
+      {name:'Lyra',offset:[-28,36],stars:[[0,4],[0,2],[-1,0],[1,0],[-1.5,1.5],[1.5,1.5]],edges:[[0,1],[1,2],[1,3],[2,4],[3,5],[4,5],[2,3]]},
+      {name:'Bootes',offset:[-38,30],stars:[[0,8],[0,6],[-2,4],[2,4],[-1,2],[1,2],[0,0]],edges:[[0,1],[1,2],[1,3],[2,4],[3,5],[4,6],[5,6],[2,3]]},
+      {name:'Virgo',offset:[-55,-14],stars:[[0,0],[2,2],[4,3],[6,2],[4,1],[3,4],[5,5],[2,5]],edges:[[0,1],[1,2],[2,3],[3,4],[4,1],[2,5],[5,6],[5,7]]},
+      {name:'Taurus',offset:[-82,18],stars:[[0,0],[2,1],[4,2],[3,4],[5,4],[6,3],[7,4],[8,5],[3,0],[5,-1]],edges:[[0,1],[1,2],[2,3],[3,4],[4,5],[5,6],[6,7],[2,8],[8,9]]},
+      {name:'Pisces',offset:[92,-24],stars:[[0,0],[2,1],[4,0],[5,2],[4,4],[2,4],[0,3],[3,-2],[5,-3],[4,-4]],edges:[[0,1],[1,2],[2,3],[3,4],[4,5],[5,6],[6,0],[7,8],[8,9],[2,7]]},
+      {name:'Hercules',offset:[28,38],stars:[[0,8],[0,6],[-2,5],[2,5],[-2,3],[2,3],[0,2],[0,0]],edges:[[0,1],[1,2],[1,3],[2,4],[3,5],[4,5],[4,6],[5,6],[6,7]]},
+      {name:'Centaurus',offset:[-90,-40],stars:[[0,0],[2,1],[4,2],[6,1],[5,3],[3,4],[7,3],[4,-1],[6,-2]],edges:[[0,1],[1,2],[2,3],[3,4],[4,5],[2,5],[3,6],[1,7],[7,8]]}
     ];
     constellations.forEach(con=>{
       const [ox,oy]=con.offset;
@@ -240,18 +234,10 @@
       const lp=[];con.edges.forEach(([a,b])=>{lp.push(pts[a],pts[b]);});
       scene.add(new THREE.LineSegments(new THREE.BufferGeometry().setFromPoints(lp),new THREE.LineBasicMaterial({color:0x3a5888,transparent:true,opacity:0.22})));
     });
-
-    const orbitRing=new THREE.Mesh(
-      new THREE.RingGeometry(15.8,16.4,180),
-      new THREE.MeshBasicMaterial({color:0x2a3a5a,side:THREE.DoubleSide,transparent:true,opacity:0.15})
-    );
+    const orbitRing=new THREE.Mesh(new THREE.RingGeometry(15.8,16.4,180),new THREE.MeshBasicMaterial({color:0x2a3a5a,side:THREE.DoubleSide,transparent:true,opacity:0.15}));
     orbitRing.position.set(0,0,-18); scene.add(orbitRing);
-    const outerRing=new THREE.Mesh(
-      new THREE.RingGeometry(20.0,20.2,180),
-      new THREE.MeshBasicMaterial({color:0x1e2e48,side:THREE.DoubleSide,transparent:true,opacity:0.08})
-    );
+    const outerRing=new THREE.Mesh(new THREE.RingGeometry(20.0,20.2,180),new THREE.MeshBasicMaterial({color:0x1e2e48,side:THREE.DoubleSide,transparent:true,opacity:0.08}));
     outerRing.position.set(0,0,-18); scene.add(outerRing);
-
     function makeRingTexture(glowBase){
       const c=document.createElement('canvas');c.width=256;c.height=1;
       const ctx=c.getContext('2d');
@@ -264,7 +250,6 @@
       ctx.fillStyle=grad;ctx.fillRect(0,0,256,1);
       return new THREE.CanvasTexture(c);
     }
-
     const configs=[
       {color:0xddeeff,emissive:0x0a1828,glow:'rgba(160,210,255,',ringColor:'rgba(160,210,255,1)',ringTilt:{x:0.42,z:0.18},spinAxis:new THREE.Vector3(0.2,1,0.1).normalize(),spinSpeed:0.008},
       {color:0xd8f0ff,emissive:0x081420,glow:'rgba(100,200,255,',ringColor:'rgba(100,200,255,1)',ringTilt:{x:0.50,z:-0.14},spinAxis:new THREE.Vector3(-0.1,1,0.3).normalize(),spinSpeed:0.012},
@@ -272,16 +257,13 @@
       {color:0xd8fce8,emissive:0x061810,glow:'rgba(100,240,160,',ringColor:'rgba(100,240,160,1)',ringTilt:{x:0.46,z:0.08},spinAxis:new THREE.Vector3(-0.2,1,0.15).normalize(),spinSpeed:0.010},
       {color:0xfff0cc,emissive:0x1e1005,glow:'rgba(255,210,100,',ringColor:'rgba(255,220,120,1)',ringTilt:{x:0.38,z:-0.22},spinAxis:new THREE.Vector3(0.15,0.95,0.25).normalize(),spinSpeed:0.007}
     ];
-
     const R=16.5,Z=-18,SPEED=0.0004;
     const sphereGeo=new THREE.SphereGeometry(1.9,64,64);
     const groups=[];
     const quat=new THREE.Quaternion();
-
     for(let i=0;i<5;i++){
       const cfg=configs[i];
       const mat=new THREE.MeshStandardMaterial({color:cfg.color,emissive:cfg.emissive,emissiveIntensity:0.18,metalness:0.18,roughness:0.3});
-
       const gc=document.createElement('canvas');gc.width=gc.height=128;
       const ctx=gc.getContext('2d');
       const grad=ctx.createRadialGradient(64,64,0,64,64,64);
@@ -289,17 +271,14 @@
       ctx.fillStyle=grad;ctx.fillRect(0,0,128,128);
       const sprite=new THREE.Sprite(new THREE.SpriteMaterial({map:new THREE.CanvasTexture(gc),transparent:true,depthWrite:false}));
       sprite.scale.set(4.8,4.8,1);
-
       const ringGeo=new THREE.RingGeometry(2.8,3.5,128);
       const pos=ringGeo.attributes.position,uv=ringGeo.attributes.uv,v3=new THREE.Vector3();
       for(let j=0;j<pos.count;j++){v3.fromBufferAttribute(pos,j);uv.setXY(j,(v3.length()-2.8)/(3.5-2.8),0.5);}
       const planetRing=new THREE.Mesh(ringGeo,new THREE.MeshBasicMaterial({map:makeRingTexture(cfg.ringColor),side:THREE.DoubleSide,transparent:true,opacity:0.55,depthWrite:false}));
       planetRing.rotation.x=cfg.ringTilt.x;planetRing.rotation.z=cfg.ringTilt.z;
-
       const innerGroup=new THREE.Group();
       innerGroup.add(new THREE.Mesh(sphereGeo,mat));
       innerGroup.add(sprite);
-
       const group=new THREE.Group();
       group.add(innerGroup);
       group.add(planetRing);
@@ -311,7 +290,6 @@
       scene.add(group);
       groups.push(group);
     }
-
     let lastTime=performance.now(),orbitAngle=0;
     function animate(time){
       requestAnimationFrame(animate);
