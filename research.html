@@ -55,11 +55,18 @@
     .plinks a{font-size:11px;letter-spacing:.1em;color:rgba(140,180,255,.5);text-decoration:none;
       border-bottom:1px solid rgba(140,180,255,.12);align-self:flex-start;transition:color .2s;}
     .plinks a:hover{color:rgba(210,225,255,.9);}
-    .hud{position:fixed;bottom:72px;left:50%;transform:translateX(-50%);
-      z-index:20;text-align:center;pointer-events:none;}
-    .hud h2{font-family:'Cormorant Garamond',serif;font-size:34px;font-weight:300;color:rgba(220,235,255,.7);}
+    .hud{
+      position:fixed;
+      left:48px;
+      top:50%;
+      transform:translateY(-50%);
+      z-index:20;
+      text-align:left;
+      pointer-events:none;
+    }
+    .hud h2{font-family:'Cormorant Garamond',serif;font-size:34px;font-weight:300;color:rgba(220,235,255,.7);line-height:1.2;}
     .hud h2 em{font-style:italic;color:rgba(190,210,255,.65);}
-    .hud p{font-size:10px;letter-spacing:.22em;text-transform:uppercase;color:rgba(140,165,220,.35);margin-top:4px;}
+    .hud p{font-size:10px;letter-spacing:.22em;text-transform:uppercase;color:rgba(140,165,220,.35);margin-top:8px;}
     .coords{position:fixed;bottom:28px;left:48px;z-index:20;
       font-size:10px;letter-spacing:.18em;color:rgba(110,130,190,.25);pointer-events:none;}
     .tagline{position:fixed;bottom:28px;right:48px;z-index:20;
@@ -94,7 +101,10 @@
     <div class="plinks" id="pLnk"></div>
   </div>
 
-  <div class="hud"><h2>Where the <em>work happened.</em></h2><p>drag to explore &nbsp;·&nbsp; click a pin</p></div>
+  <div class="hud">
+    <h2>Where the<br><em>work happened.</em></h2>
+    <p>drag to explore &nbsp;·&nbsp; click a pin</p>
+  </div>
   <div class="hint" id="hint">drag to rotate</div>
   <div class="coords">41.3083&deg; N &nbsp;72.9279&deg; W</div>
   <div class="tagline">science as an explorable universe</div>
