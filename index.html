@@ -24,19 +24,22 @@
     }
     canvas{display:block;position:fixed;inset:0;z-index:0}
 
+    /* nebula — warmer violet accent added */
     .nebula {
       position:fixed;inset:0;z-index:1;pointer-events:none;
       background:
-        radial-gradient(ellipse 60% 40% at 20% 60%, rgba(80,40,160,0.07) 0%, transparent 70%),
-        radial-gradient(ellipse 50% 35% at 80% 30%, rgba(30,80,180,0.08) 0%, transparent 70%),
-        radial-gradient(ellipse 40% 30% at 50% 80%, rgba(0,120,100,0.05) 0%, transparent 70%);
+        radial-gradient(ellipse 55% 38% at 15% 55%, rgba(100,50,200,0.10) 0%, transparent 70%),
+        radial-gradient(ellipse 45% 32% at 82% 28%, rgba(40,90,210,0.10) 0%, transparent 70%),
+        radial-gradient(ellipse 38% 28% at 50% 82%, rgba(0,130,110,0.07) 0%, transparent 70%),
+        radial-gradient(ellipse 50% 44% at 50% 50%, rgba(80,30,160,0.08) 0%, transparent 65%);
       animation: nebulaDrift 24s ease-in-out infinite alternate;
     }
     @keyframes nebulaDrift {
-      0%   { opacity: 0.7; transform: scale(1) translateY(0); }
-      100% { opacity: 1;   transform: scale(1.04) translateY(-12px); }
+      0%   { opacity: 0.75; transform: scale(1) translateY(0); }
+      100% { opacity: 1;    transform: scale(1.05) translateY(-14px); }
     }
 
+    /* nav */
     nav {
       position:fixed;top:0;left:0;right:0;z-index:20;
       display:flex;align-items:center;justify-content:space-between;
@@ -46,103 +49,94 @@
     }
     .nav-name {
       font-family:'Cormorant Garamond',serif;
-      font-size:28px;
-      font-weight:300;
-      font-style:italic;
+      font-size:28px;font-weight:300;font-style:italic;
       letter-spacing:0.06em;
       color:rgba(220,232,255,0.9);
       text-decoration:none;
     }
-    .nav-links {
-      display:flex;align-items:center;gap:4px;
-    }
+    .nav-links { display:flex;align-items:center;gap:4px; }
     .nav-links a {
-      font-size:13px;
-      font-weight:400;
-      letter-spacing:0.13em;
+      font-size:13px;font-weight:400;letter-spacing:0.13em;
       text-transform:uppercase;
       color:rgba(160,190,255,0.5);
-      text-decoration:none;
-      padding:7px 16px;
-      border-radius:4px;
-      transition:color 0.25s, background 0.25s;
+      text-decoration:none;padding:7px 16px;border-radius:4px;
+      transition:color 0.25s,background 0.25s;
     }
-    .nav-links a:hover {
-      color:rgba(220,235,255,0.9);
-      background:rgba(120,160,255,0.07);
-    }
-    .nav-links .divider {
-      color:rgba(120,150,220,0.2);
-      font-size:13px;
-      user-select:none;
-    }
+    .nav-links a:hover { color:rgba(220,235,255,0.9); background:rgba(120,160,255,0.08); }
+    .nav-links .divider { color:rgba(120,150,220,0.2);font-size:13px;user-select:none; }
 
     .ui{position:fixed;inset:0;z-index:10;pointer-events:none}
 
+    /* frosted glass card box */
     .center-card {
       position:absolute;left:50%;top:50%;
       transform:translate(-50%,-50%);
       pointer-events:auto;
       display:flex;flex-direction:column;align-items:center;
       text-align:center;
-      gap:0;
+      padding:44px 56px 40px;
+      border-radius:28px;
+      background: linear-gradient(
+        135deg,
+        rgba(30,20,70,0.55) 0%,
+        rgba(10,18,50,0.62) 60%,
+        rgba(20,10,55,0.50) 100%
+      );
+      border:1px solid rgba(160,130,255,0.15);
+      box-shadow:
+        0 0 0 1px rgba(100,80,220,0.08),
+        0 8px 40px rgba(0,0,0,0.55),
+        0 0 60px rgba(90,50,200,0.08),
+        inset 0 1px 0 rgba(200,180,255,0.08);
+      backdrop-filter:blur(28px);
+      -webkit-backdrop-filter:blur(28px);
     }
     .card-eyebrow {
-      font-size:13px;
-      font-weight:400;
-      letter-spacing:0.2em;
+      font-size:13px;font-weight:400;letter-spacing:0.2em;
       text-transform:uppercase;
-      color:rgba(140,180,255,0.55);
+      color:rgba(180,160,255,0.65);
       margin-bottom:18px;
     }
     .card-title {
       font-family:'Cormorant Garamond',serif;
-      font-size:52px;
-      font-weight:300;
-      line-height:1.1;
-      letter-spacing:0.01em;
-      color:#eef3ff;
+      font-size:52px;font-weight:300;line-height:1.1;
+      letter-spacing:0.01em;color:#eef3ff;
     }
-    .card-title em {
-      font-style:italic;
-      color:rgba(180,210,255,0.75);
-    }
+    .card-title em { font-style:italic; color:rgba(200,180,255,0.85); }
     .card-rule {
-      width:48px;height:1px;
-      background:linear-gradient(90deg,transparent,rgba(140,180,255,0.4),transparent);
-      margin:20px auto;
+      width:52px;height:1px;
+      background:linear-gradient(90deg,transparent,rgba(180,150,255,0.45),transparent);
+      margin:22px auto;
     }
     .card-sub {
-      font-size:12px;
-      font-weight:300;
-      letter-spacing:0.18em;
+      font-size:12px;font-weight:300;letter-spacing:0.18em;
       text-transform:uppercase;
-      color:rgba(160,195,255,0.4);
+      color:rgba(180,165,255,0.45);
     }
+
+    /* spinning decorative ring — larger */
     .card-ring {
-      position:absolute;left:50%;top:50%;
+      position:fixed;left:50%;top:50%;
       transform:translate(-50%,-50%);
-      width:420px;height:420px;
+      width:540px;height:540px;
       border-radius:50%;
-      border:1px solid rgba(100,140,255,0.06);
+      border:1px solid rgba(140,110,255,0.09);
       pointer-events:none;
-      animation:cardRingSpin 60s linear infinite;
+      z-index:9;
+      animation:cardRingSpin 70s linear infinite;
     }
     .card-ring::before {
       content:'';
-      position:absolute;inset:-1px;
-      border-radius:50%;
-      border:1px solid rgba(100,140,255,0.04);
-      transform:scale(1.18);
+      position:absolute;inset:-1px;border-radius:50%;
+      border:1px solid rgba(120,90,220,0.05);
+      transform:scale(1.14);
     }
     .card-ring::after {
       content:'';
-      position:absolute;
-      top:-3px;left:50%;transform:translateX(-50%);
-      width:6px;height:6px;
-      border-radius:50%;
-      background:rgba(140,180,255,0.35);
-      box-shadow:0 0 8px rgba(140,180,255,0.4);
+      position:absolute;top:-4px;left:50%;transform:translateX(-50%);
+      width:8px;height:8px;border-radius:50%;
+      background:rgba(180,150,255,0.45);
+      box-shadow:0 0 12px rgba(160,120,255,0.55);
     }
     @keyframes cardRingSpin {
       from{transform:translate(-50%,-50%) rotate(0deg)}
@@ -152,16 +146,12 @@
     .coords {
       position:fixed;bottom:32px;left:48px;z-index:20;
       font-size:10px;letter-spacing:0.18em;
-      color:rgba(120,155,220,0.3);
-      font-weight:300;
-      pointer-events:none;
+      color:rgba(140,120,220,0.3);font-weight:300;pointer-events:none;
     }
     .tagline {
       position:fixed;bottom:32px;right:48px;z-index:20;
       font-size:10px;letter-spacing:0.18em;text-transform:uppercase;
-      color:rgba(120,155,220,0.3);
-      font-weight:300;
-      pointer-events:none;
+      color:rgba(140,120,220,0.3);font-weight:300;pointer-events:none;
     }
   </style>
 </head>
@@ -171,12 +161,9 @@
   <nav>
     <a class="nav-name" href="#">Sofia Grimm</a>
     <div class="nav-links">
-      <a href="#">Home</a>
-      <span class="divider">|</span>
-      <a href="#">About</a>
-      <span class="divider">|</span>
-      <a href="#">Research</a>
-      <span class="divider">|</span>
+      <a href="#">Home</a><span class="divider">|</span>
+      <a href="#">About</a><span class="divider">|</span>
+      <a href="#">Research</a><span class="divider">|</span>
       <a href="#">Projects</a>
     </div>
   </nav>
