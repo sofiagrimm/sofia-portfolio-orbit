@@ -45,10 +45,13 @@
     .card-scene.floating{
       animation:idleFloat 4.5s ease-in-out infinite;
     }
-    /* When popped-out, hide in grid (ghost placeholder keeps space) */
-    .card-scene.popped-out{
-      opacity:0 !important;
-      pointer-events:none;
+    /* Permanently revealed cards: dim slightly, no cursor action */
+    .card-scene.revealed{
+      cursor:default;
+      opacity:0.88;
+    }
+    .card-scene.revealed:hover .card-flipper{
+      transform:none !important;
     }
 
     /* ═══ FLIPPER ═══ */
@@ -78,7 +81,7 @@
       display:flex;align-items:center;justify-content:center;
       transition:box-shadow .22s, border-color .22s;
     }
-    .card-scene:not(.flipped):not(.popped-out):hover .card-back{
+    .card-scene:not(.flipped):not(.revealed):hover .card-back{
       box-shadow:0 14px 44px rgba(100,130,255,.30), 0 0 0 1px rgba(160,185,255,.20);
       border-color:rgba(160,185,255,.38);
     }
@@ -123,7 +126,7 @@
       pointer-events:none;z-index:3;
       opacity:0;
     }
-    .card-scene.bursting .cb-burst{
+    .bursting .cb-burst{
       animation:burstRing .55s cubic-bezier(.22,1,.36,1) forwards;
     }
     @keyframes suitPulse   { 0%,100%{opacity:.55;transform:scale(1);}     50%{opacity:.82;transform:scale(1.08);} }
@@ -158,52 +161,66 @@
       background:rgba(4,8,28,0);
       display:flex;align-items:center;justify-content:center;
       pointer-events:none;
-      transition:background .4s;
+      transition:background .35s ease;
     }
     #cardPopupOverlay.visible{
-      background:rgba(4,8,28,0.6);
+      background:rgba(4,8,28,0.72);
       pointer-events:auto;
+      backdrop-filter:blur(4px);
+      -webkit-backdrop-filter:blur(4px);
     }
 
-    /* The floating card clone in the popup */
+    /* ═══ POPUP CARD WRAPPER ═══ */
     #cardPopupInner{
       position:relative;
-      width:min(340px,82vw);
+      width:min(320px,78vw);
       aspect-ratio:3/4;
       perspective:900px;
+      /* hidden state */
       opacity:0;
-      transform:scale(0.55);
+      transform:scale(0.45) translateY(30px);
+      filter:blur(6px);
       transition:
-        opacity   .45s cubic-bezier(.22,1,.36,1),
-        transform .45s cubic-bezier(.22,1,.36,1);
+        opacity   .50s cubic-bezier(.22,1,.36,1),
+        transform .50s cubic-bezier(.22,1,.36,1),
+        filter    .50s cubic-bezier(.22,1,.36,1);
     }
     #cardPopupOverlay.visible #cardPopupInner{
       opacity:1;
-      transform:scale(1);
+      transform:scale(1) translateY(0);
+      filter:blur(0px);
+    }
+    /* dismiss state */
+    #cardPopupInner.dismissing{
+      opacity:0;
+      transform:scale(0.45) translateY(30px);
+      filter:blur(6px);
     }
 
-    /* Close button sits outside the card, top-right of the inner wrapper */
+    /* Close button */
     #cardPopupClose{
       position:absolute;
-      top:-14px;right:-14px;
-      width:34px;height:34px;
-      background:rgba(20,35,100,0.85);
-      border:1px solid rgba(140,165,255,0.30);
+      top:-16px;right:-16px;
+      width:36px;height:36px;
+      background:rgba(12,22,80,0.90);
+      border:1px solid rgba(150,175,255,0.35);
       border-radius:50%;
-      color:rgba(200,215,255,0.85);
-      font-size:15px;
+      color:rgba(210,225,255,0.90);
+      font-size:14px;
       display:flex;align-items:center;justify-content:center;
       cursor:pointer;z-index:10;
-      transition:background .18s,color .18s,transform .18s;
-      backdrop-filter:blur(8px);
+      transition:background .18s,color .18s,transform .18s,box-shadow .18s;
+      backdrop-filter:blur(10px);
+      box-shadow:0 4px 20px rgba(0,0,0,.5);
     }
     #cardPopupClose:hover{
-      background:rgba(80,100,220,0.55);
+      background:rgba(80,100,220,0.60);
       color:#fff;
-      transform:scale(1.12);
+      transform:scale(1.15) rotate(90deg);
+      box-shadow:0 6px 28px rgba(80,120,255,.4);
     }
 
-    /* The flipper inside the popup — same mechanics */
+    /* The flipper inside the popup */
     #cardPopupFlipper{
       width:100%;height:100%;
       transform-style:preserve-3d;
@@ -239,7 +256,7 @@
   <!-- Card popup overlay -->
   <div id="cardPopupOverlay">
     <div id="cardPopupInner">
-      <button id="cardPopupClose" aria-label="Close">&#x2715;</button>
+      <button id="cardPopupClose" aria-label="Close card">&#x2715;</button>
       <div id="cardPopupFlipper">
         <!-- back and front injected by JS -->
       </div>
@@ -325,157 +342,184 @@
       `;
     }
 
-    const grid=document.getElementById('memoryGrid');
-    const sceneEls=[];
+    // ── Popup elements ──────────────────────────────────────────────────────
+    const popupOverlay  = document.getElementById('cardPopupOverlay');
+    const popupInner    = document.getElementById('cardPopupInner');
+    const popupFlipper  = document.getElementById('cardPopupFlipper');
+    const popupClose    = document.getElementById('cardPopupClose');
 
-    // Popup elements
-    const popupOverlay=document.getElementById('cardPopupOverlay');
-    const popupInner=document.getElementById('cardPopupInner');
-    const popupFlipper=document.getElementById('cardPopupFlipper');
-    const popupClose=document.getElementById('cardPopupClose');
+    // Track which grid scene is currently in the popup
+    let activeSceneEl = null;
+    let activeIdx     = -1;
+    let popupLocked   = false; // prevent double-clicks during animation
 
-    let activeSceneEl=null;
-
-    function openPopup(sceneEl, idx) {
-      activeSceneEl=sceneEl;
-
-      // Build back + front inside popup flipper
-      popupFlipper.innerHTML='';
+    function buildPopupCard(idx) {
+      popupFlipper.innerHTML = '';
       popupFlipper.classList.remove('flipped');
 
-      const back=document.createElement('div');
-      back.className='card-face card-back';
-      back.innerHTML=makeCardBackSVG(idx);
-      const aurora=document.createElement('div');
-      aurora.className='cb-aurora';
-      aurora.style.animationDelay=(idx*0.55)+'s';
+      // Back face
+      const back = document.createElement('div');
+      back.className = 'card-face card-back';
+      back.innerHTML = makeCardBackSVG(idx);
+      const aurora = document.createElement('div');
+      aurora.className = 'cb-aurora';
+      aurora.style.animationDelay = (idx * 0.55) + 's';
       back.appendChild(aurora);
-      const shimmer=document.createElement('div');
-      shimmer.className='cb-shimmer';
-      shimmer.style.animationDelay=(idx*0.60)+'s';
+      const shimmer = document.createElement('div');
+      shimmer.className = 'cb-shimmer';
+      shimmer.style.animationDelay = (idx * 0.60) + 's';
       back.appendChild(shimmer);
-      const burst=document.createElement('div');
-      burst.className='cb-burst';
+      const burst = document.createElement('div');
+      burst.className = 'cb-burst';
       back.appendChild(burst);
 
-      const front=document.createElement('div');
-      front.className='card-face card-front';
-      front.innerHTML=makeFrontHTML(PROJECTS[idx]);
+      // Front face
+      const front = document.createElement('div');
+      front.className = 'card-face card-front';
+      front.innerHTML = makeFrontHTML(PROJECTS[idx]);
 
       popupFlipper.appendChild(back);
       popupFlipper.appendChild(front);
+      return { burst };
+    }
 
-      // Hide original in grid
-      sceneEl.classList.add('popped-out');
+    function openPopup(sceneEl, idx) {
+      if (popupLocked) return;
+      popupLocked = true;
+      activeSceneEl = sceneEl;
+      activeIdx = idx;
 
-      // Show overlay (triggers CSS transition)
+      const { burst } = buildPopupCard(idx);
+
+      // Remove dismissing class if lingering
+      popupInner.classList.remove('dismissing');
+
+      // Show overlay — triggers CSS scale-in transition on popupInner
       popupOverlay.classList.add('visible');
 
-      // After card scales in, flip it to front face
-      setTimeout(()=>{
+      // After card scales in (~500ms), flip to front
+      setTimeout(() => {
         popupFlipper.classList.add('flipped');
-        // burst ring
+
+        // Burst ring
         popupInner.classList.add('bursting');
-        burst.addEventListener('animationend',()=>{
+        burst.addEventListener('animationend', () => {
           popupInner.classList.remove('bursting');
-        },{once:true});
-      }, 420);
+        }, { once: true });
+
+        // Unlock after flip settles
+        setTimeout(() => { popupLocked = false; }, 700);
+      }, 480);
     }
 
     function closePopup() {
-      if(!activeSceneEl) return;
+      if (popupLocked || !activeSceneEl) return;
+      popupLocked = true;
 
-      // Flip popup back to back face first
+      // Flip back to back face in popup
       popupFlipper.classList.remove('flipped');
 
-      // After flip completes, shrink & hide overlay, then show grid card flipped
-      setTimeout(()=>{
-        popupOverlay.classList.remove('visible');
-        // Mark the original card as flipped so it shows front face
-        activeSceneEl.classList.remove('popped-out');
-        activeSceneEl.classList.add('flipped');
-        activeSceneEl=null;
-      }, 680);
+      // After flip: add dismissing class to trigger scale-out
+      setTimeout(() => {
+        popupInner.classList.add('dismissing');
+
+        // After scale-out: hide overlay, flip grid card to front permanently
+        setTimeout(() => {
+          popupOverlay.classList.remove('visible');
+          popupInner.classList.remove('dismissing');
+
+          // Mark grid card as permanently flipped & revealed
+          activeSceneEl.classList.add('flipped', 'revealed');
+
+          activeSceneEl = null;
+          activeIdx = -1;
+          popupLocked = false;
+        }, 460);
+      }, 640);
     }
 
-    popupClose.addEventListener('click',closePopup);
-    popupOverlay.addEventListener('click',(e)=>{
-      if(e.target===popupOverlay) closePopup();
+    popupClose.addEventListener('click', closePopup);
+
+    popupOverlay.addEventListener('click', (e) => {
+      if (e.target === popupOverlay) closePopup();
     });
-    document.addEventListener('keydown',(e)=>{ if(e.key==='Escape') closePopup(); });
 
-    PROJECTS.forEach((p,i)=>{
-      const scene=document.createElement('div');
-      scene.className='card-scene';
-      scene.style.animationDelay=(i*0.07)+'s';
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') closePopup();
+    });
 
-      const flipper=document.createElement('div');
-      flipper.className='card-flipper';
+    // ── Build grid ───────────────────────────────────────────────────────────
+    const grid = document.getElementById('memoryGrid');
 
-      const back=document.createElement('div');
-      back.className='card-face card-back';
-      back.innerHTML=makeCardBackSVG(i);
-      const aurora=document.createElement('div');
-      aurora.className='cb-aurora';
-      aurora.style.animationDelay=(i*0.55)+'s';
+    PROJECTS.forEach((p, i) => {
+      const scene = document.createElement('div');
+      scene.className = 'card-scene';
+      scene.style.animationDelay = (i * 0.07) + 's';
+
+      const flipper = document.createElement('div');
+      flipper.className = 'card-flipper';
+
+      // Back face
+      const back = document.createElement('div');
+      back.className = 'card-face card-back';
+      back.innerHTML = makeCardBackSVG(i);
+      const aurora = document.createElement('div');
+      aurora.className = 'cb-aurora';
+      aurora.style.animationDelay = (i * 0.55) + 's';
       back.appendChild(aurora);
-      const shimmer=document.createElement('div');
-      shimmer.className='cb-shimmer';
-      shimmer.style.animationDelay=(i*0.60)+'s';
+      const shimmer = document.createElement('div');
+      shimmer.className = 'cb-shimmer';
+      shimmer.style.animationDelay = (i * 0.60) + 's';
       back.appendChild(shimmer);
-      const burst=document.createElement('div');
-      burst.className='cb-burst';
+      const burst = document.createElement('div');
+      burst.className = 'cb-burst';
       back.appendChild(burst);
 
-      const front=document.createElement('div');
-      front.className='card-face card-front';
-      front.innerHTML=makeFrontHTML(p);
+      // Front face
+      const front = document.createElement('div');
+      front.className = 'card-face card-front';
+      front.innerHTML = makeFrontHTML(p);
 
       flipper.appendChild(back);
       flipper.appendChild(front);
       scene.appendChild(flipper);
       grid.appendChild(scene);
-      sceneEls.push(scene);
 
       // Entrance → idle float
-      scene.addEventListener('animationend',(e)=>{
-        if(e.animationName==='cardEntrance'){
-          scene.style.opacity='1';
-          scene.style.animation='none';
-          requestAnimationFrame(()=>{
-            scene.style.animationDelay=(i*0.38)+'s';
+      scene.addEventListener('animationend', (e) => {
+        if (e.animationName === 'cardEntrance') {
+          scene.style.opacity = '1';
+          scene.style.animation = 'none';
+          requestAnimationFrame(() => {
+            scene.style.animationDelay = (i * 0.38) + 's';
             scene.classList.add('floating');
           });
         }
-      },{once:true});
+      }, { once: true });
 
-      // Hover tilt (only when not flipped / popped-out)
-      scene.addEventListener('mousemove',(e)=>{
-        if(scene.classList.contains('flipped')||scene.classList.contains('popped-out')) return;
-        const r=scene.getBoundingClientRect();
-        const mx=(e.clientX-r.left)/r.width-0.5;
-        const my=(e.clientY-r.top)/r.height-0.5;
-        flipper.style.transform=`rotateY(${mx*18}deg) rotateX(${-my*14}deg)`;
+      // Hover tilt — only on unflipped, unrevealed cards
+      scene.addEventListener('mousemove', (e) => {
+        if (scene.classList.contains('flipped') || scene.classList.contains('revealed')) return;
+        const r = scene.getBoundingClientRect();
+        const mx = (e.clientX - r.left) / r.width - 0.5;
+        const my = (e.clientY - r.top)  / r.height - 0.5;
+        flipper.style.transform = `rotateY(${mx * 18}deg) rotateX(${-my * 14}deg)`;
       });
-      scene.addEventListener('mouseleave',()=>{
-        if(scene.classList.contains('flipped')) return;
-        flipper.style.transform='';
+      scene.addEventListener('mouseleave', () => {
+        if (scene.classList.contains('flipped')) return;
+        flipper.style.transform = '';
       });
 
-      // Click: if already flipped (revealed in grid), flip back to back face
-      // If back face showing and not popped, open popup
-      scene.addEventListener('click',(e)=>{
-        if(e.target.classList.contains('fr-link')) return;
-        if(scene.classList.contains('popped-out')) return;
+      // Click handler
+      scene.addEventListener('click', (e) => {
+        // Don't intercept link clicks
+        if (e.target.closest('.fr-link')) return;
+        // Already permanently revealed — do nothing
+        if (scene.classList.contains('revealed')) return;
+        // Don't open while popup animation in flight
+        if (popupLocked) return;
 
-        if(scene.classList.contains('flipped')){
-          // Flip back to back face in grid
-          scene.classList.remove('flipped');
-          return;
-        }
-
-        // Open popup
-        flipper.style.transform='';
+        flipper.style.transform = '';
         openPopup(scene, i);
       });
     });
