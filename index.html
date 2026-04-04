@@ -90,49 +90,66 @@
       starPositions[i*3+1] = (Math.random() - 0.5) * 160;
       starPositions[i*3+2] = -Math.random() * 260;
       starPhase[i] = Math.random() * Math.PI * 2;
-      starSpeed[i] = 0.0008 + Math.random() * 0.002;
-      starSize[i]  = 0.02 + Math.random() * 0.05;
+      starSpeed[i] = 0.0006 + Math.random() * 0.0015;
+      starSize[i]  = 0.06 + Math.random() * 0.12;
     }
 
     const starGeo = new THREE.BufferGeometry();
     starGeo.setAttribute('position', new THREE.BufferAttribute(starPositions, 3));
-    const starSizes = new THREE.BufferAttribute(new Float32Array(STAR_COUNT), 1);
-    starGeo.setAttribute('size', starSizes);
+    starGeo.setAttribute('phase',    new THREE.BufferAttribute(starPhase, 1));
+    starGeo.setAttribute('speed',    new THREE.BufferAttribute(starSpeed, 1));
+    starGeo.setAttribute('aSize',    new THREE.BufferAttribute(starSize,  1));
 
     const starMat = new THREE.ShaderMaterial({
       uniforms: { time: { value: 0 } },
       vertexShader: `
-        attribute float size;
-        varying float vAlpha;
-        uniform float time;
+        attribute float aSize;
         attribute float phase;
         attribute float speed;
+        uniform float time;
+        varying float vBright;
         void main() {
-          vAlpha = 0.4 + 0.6 * abs(sin(time * speed + phase));
+          float raw = abs(sin(time * speed + phase));
+          // bias strongly toward bright — power < 1 spreads values toward 1
+          vBright = 0.55 + 0.45 * pow(raw, 0.4);
           vec4 mvPos = modelViewMatrix * vec4(position, 1.0);
-          gl_PointSize = size * (300.0 / -mvPos.z);
+          // scale point size up when bright (spike moment)
+          float sizeBoost = 1.0 + 1.8 * max(0.0, raw - 0.85) / 0.15;
+          gl_PointSize = aSize * sizeBoost * (320.0 / -mvPos.z);
           gl_Position = projectionMatrix * mvPos;
         }
       `,
       fragmentShader: `
-        varying float vAlpha;
+        varying float vBright;
         void main() {
-          float d = length(gl_PointCoord - vec2(0.5));
+          vec2 uv = gl_PointCoord - vec2(0.5);
+          float d = length(uv);
           if (d > 0.5) discard;
-          gl_FragColor = vec4(0.75, 0.85, 1.0, vAlpha * (1.0 - d * 1.6));
+
+          // soft glow core
+          float core = 1.0 - smoothstep(0.0, 0.45, d);
+
+          // diffraction spikes — 4-point star cross
+          float spike = 0.0;
+          float spikeThresh = 0.75; // only visible when bright
+          if (vBright > spikeThresh) {
+            float spikeStr = (vBright - spikeThresh) / (1.0 - spikeThresh);
+            float ax = abs(uv.x);
+            float ay = abs(uv.y);
+            float hSpike = exp(-ay * 28.0) * exp(-ax * 5.0) * (1.0 - d * 1.5);
+            float vSpike = exp(-ax * 28.0) * exp(-ay * 5.0) * (1.0 - d * 1.5);
+            spike = max(hSpike, vSpike) * spikeStr * 0.9;
+          }
+
+          float alpha = clamp(core + spike, 0.0, 1.0) * vBright;
+          // slight blue-white tint, spikes go warmer white
+          vec3 col = mix(vec3(0.72, 0.84, 1.0), vec3(1.0, 0.97, 0.88), spike);
+          gl_FragColor = vec4(col, alpha);
         }
       `,
       transparent: true,
       depthWrite: false
     });
-
-    // pass per-star phase and speed as attributes
-    starGeo.setAttribute('phase', new THREE.BufferAttribute(starPhase, 1));
-    starGeo.setAttribute('speed', new THREE.BufferAttribute(starSpeed, 1));
-
-    // initialize sizes
-    for (let i = 0; i < STAR_COUNT; i++) starSizes.array[i] = starSize[i];
-    starSizes.needsUpdate = true;
 
     scene.add(new THREE.Points(starGeo, starMat));
 
