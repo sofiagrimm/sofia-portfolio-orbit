@@ -55,10 +55,26 @@
     .plinks a{font-size:11px;letter-spacing:.1em;color:rgba(160,150,255,.5);text-decoration:none;
       border-bottom:1px solid rgba(160,150,255,.12);align-self:flex-start;transition:color .2s;}
     .plinks a:hover{color:rgba(220,215,255,.9);}
-    .hud{position:fixed;left:48px;top:50%;transform:translateY(-50%);z-index:20;text-align:left;pointer-events:none;}
-    .hud h2{font-family:'Cormorant Garamond',serif;font-size:34px;font-weight:300;color:rgba(220,215,255,.7);line-height:1.2;}
-    .hud h2 em{font-style:italic;color:rgba(200,190,255,.65);}
-    .hud p{font-size:10px;letter-spacing:.22em;text-transform:uppercase;color:rgba(150,140,220,.35);margin-top:8px;}
+    .hud{
+      position:fixed;
+      left:48px;
+      top:50%;
+      transform:translateY(-50%);
+      z-index:20;
+      text-align:left;
+      pointer-events:none;
+      padding:22px 28px 20px;
+      border-radius:16px;
+      background:linear-gradient(135deg,rgba(10,8,40,.55) 0%,rgba(7,6,28,.60) 100%);
+      border:1px solid rgba(160,140,255,.14);
+      box-shadow:0 4px 32px rgba(0,0,0,.45),inset 0 1px 0 rgba(200,185,255,.07);
+      backdrop-filter:blur(14px);
+      -webkit-backdrop-filter:blur(14px);
+    }
+    .hud h2{font-family:'Cormorant Garamond',serif;font-size:34px;font-weight:300;color:rgba(225,218,255,.82);line-height:1.2;}
+    .hud h2 em{font-style:italic;color:rgba(200,190,255,.70);}
+    .hud p{font-size:10px;letter-spacing:.22em;text-transform:uppercase;color:rgba(160,148,220,.45);margin-top:10px;
+      padding-top:10px;border-top:1px solid rgba(160,140,255,.10);}
     .coords{position:fixed;bottom:28px;left:48px;z-index:20;
       font-size:10px;letter-spacing:.18em;color:rgba(120,110,190,.25);pointer-events:none;}
     .tagline{position:fixed;bottom:28px;right:48px;z-index:20;
@@ -155,14 +171,12 @@
       const nebCanvas=document.createElement('canvas');
       nebCanvas.width=512; nebCanvas.height=512;
       const ctx=nebCanvas.getContext('2d');
-      // deep radial nebula — indigo/violet wash behind globe
       const g1=ctx.createRadialGradient(256,256,0,256,256,256);
       g1.addColorStop(0,'rgba(80,50,160,0.18)');
       g1.addColorStop(0.4,'rgba(50,30,120,0.10)');
       g1.addColorStop(0.75,'rgba(20,10,60,0.05)');
       g1.addColorStop(1,'rgba(0,0,0,0)');
       ctx.fillStyle=g1; ctx.fillRect(0,0,512,512);
-      // soft secondary bloom slightly offset
       const g2=ctx.createRadialGradient(280,230,0,280,230,180);
       g2.addColorStop(0,'rgba(120,80,200,0.10)');
       g2.addColorStop(0.5,'rgba(60,30,140,0.05)');
@@ -235,7 +249,6 @@
     sun.position.set(5,2,4); scene.add(sun);
     const rimL=new THREE.DirectionalLight(0x6644cc,0.8);
     rimL.position.set(-5,1,-3); scene.add(rimL);
-    // soft fill from below
     const fillL=new THREE.DirectionalLight(0x221144,0.4);
     fillL.position.set(0,-4,-2); scene.add(fillL);
 
@@ -245,14 +258,7 @@
     const nightTex=TL.load('https://unpkg.com/three-globe/example/img/earth-night.jpg');
     const cloudTex=TL.load('https://unpkg.com/three-globe/example/img/earth-clouds.png');
 
-    // generate a simple specular/ocean mask via canvas (white=ocean, black=land approx)
-    const specCanvas=document.createElement('canvas');
-    specCanvas.width=2; specCanvas.height=1;
-    const sctx=specCanvas.getContext('2d');
-    sctx.fillStyle='#ffffff'; sctx.fillRect(0,0,2,1);
-    const specTex=new THREE.CanvasTexture(specCanvas);
-
-    /* ---- GLOBE — day/night + specular shimmer ---- */
+    /* ---- GLOBE ---- */
     const R=1.0;
     const globeMat=new THREE.ShaderMaterial({
       uniforms:{
@@ -276,47 +282,37 @@
         uniform vec3 sunDir,camPos;
         uniform float time;
         varying vec2 vUv; varying vec3 vNormal; varying vec3 vWorldPos;
-
         float hash(vec2 p){return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5453);}
         float noise(vec2 p){
           vec2 i=floor(p); vec2 f=fract(p); f=f*f*(3.-2.*f);
           return mix(mix(hash(i),hash(i+vec2(1,0)),f.x),
                      mix(hash(i+vec2(0,1)),hash(i+vec2(1,1)),f.x),f.y);
         }
-
         void main(){
           vec3 day  =texture2D(dayMap,  vUv).rgb;
           vec3 night=texture2D(nightMap,vUv).rgb*2.0;
-
           vec3 sDir=normalize(sunDir);
           float cosA=dot(vNormal,sDir);
           float blend=smoothstep(-0.14,0.20,cosA);
           vec3 col=mix(night,day,blend);
           col*=0.55+0.45*max(0.,cosA);
-
-          // specular shimmer on oceans — detect blue-ish pixels as water
           float rch=day.r; float bch=day.b;
           float isOcean=smoothstep(0.0,0.18,bch-rch)*smoothstep(0.05,0.25,bch);
           vec3 viewDir=normalize(camPos-vWorldPos);
           vec3 halfV=normalize(sDir+viewDir);
           float spec=pow(max(0.,dot(vNormal,halfV)),120.)*isOcean*max(0.,cosA);
-          // animated shimmer ripple
           float shimmer=noise(vUv*80.+vec2(time*.18,time*.12));
           shimmer=smoothstep(.55,.75,shimmer)*isOcean*max(0.,cosA)*.06;
-
           col+=vec3(.8,.88,1.)*spec*.55;
           col+=vec3(.9,.95,1.)*shimmer;
-
-          // soft lavender tint on lit faces
           col=mix(col, col+vec3(.04,.02,.10)*blend, .35);
-
           gl_FragColor=vec4(col,1.);
         }`,
     });
     const globe=new THREE.Mesh(new THREE.SphereGeometry(R,128,128),globeMat);
     scene.add(globe);
 
-    /* ---- CLOUDS — warmer, thicker, animated shimmer ---- */
+    /* ---- CLOUDS ---- */
     const cloudMat=new THREE.ShaderMaterial({
       uniforms:{
         cloudMap:{value:cloudTex},
@@ -334,75 +330,33 @@
         uniform float time; uniform vec3 sunDir;
         varying vec2 vUv; varying vec3 vNormal;
         void main(){
-          // slight UV drift for living clouds
           vec2 uv2=vUv+vec2(time*.0003,0.);
           float alpha=texture2D(cloudMap,uv2).r;
           float cosA=dot(vNormal,normalize(sunDir));
-          // warm lit side, cool dark side
           vec3 litCol =vec3(1.0,0.97,0.92);
           vec3 darkCol =vec3(.55,.58,.72);
           vec3 col=mix(darkCol,litCol,smoothstep(-.1,.4,cosA));
-          // shimmer pulse
           float pulse=.92+.08*sin(time*.0008+vUv.x*40.);
           gl_FragColor=vec4(col*pulse,alpha*.62);
         }`,
-      transparent:true,depthWrite:false,blending:THREE.NormalBlending,
-      side:THREE.FrontSide
+      transparent:true,depthWrite:false,blending:THREE.NormalBlending,side:THREE.FrontSide
     });
     const clouds=new THREE.Mesh(new THREE.SphereGeometry(R*1.012,128,128),cloudMat);
     scene.add(clouds);
 
-    /* ---- ATMOSPHERE — multi-layer lavender-blue limb glow ---- */
-    // Layer 1: wide outer halo (additive, very soft)
-    scene.add(new THREE.Mesh(
-      new THREE.SphereGeometry(R*1.12,64,64),
-      new THREE.ShaderMaterial({
-        vertexShader:`varying vec3 vN;
-          void main(){ vN=normalize(normalMatrix*normal);
-            gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.); }`,
-        fragmentShader:`varying vec3 vN;
-          void main(){
-            float edge=1.-clamp(dot(vN,vec3(0.,0.,1.)),0.,1.);
-            float f=pow(edge,4.5);
-            gl_FragColor=vec4(.55,.42,1.,f*0.18);
-          }`,
-        side:THREE.BackSide,blending:THREE.AdditiveBlending,
-        transparent:true,depthWrite:false
-      })));
-
-    // Layer 2: mid atmosphere (thicker, blue-violet)
-    scene.add(new THREE.Mesh(
-      new THREE.SphereGeometry(R*1.048,64,64),
-      new THREE.ShaderMaterial({
-        vertexShader:`varying vec3 vN;
-          void main(){ vN=normalize(normalMatrix*normal);
-            gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.); }`,
-        fragmentShader:`varying vec3 vN;
-          void main(){
-            float edge=1.-clamp(dot(vN,vec3(0.,0.,1.)),0.,1.);
-            float f=pow(edge,3.0);
-            gl_FragColor=vec4(.28,.48,1.,f*0.38);
-          }`,
-        side:THREE.BackSide,blending:THREE.AdditiveBlending,
-        transparent:true,depthWrite:false
-      })));
-
-    // Layer 3: inner corona (tighter, brighter cyan-white)
-    scene.add(new THREE.Mesh(
-      new THREE.SphereGeometry(R*1.022,64,64),
-      new THREE.ShaderMaterial({
-        vertexShader:`varying vec3 vN;
-          void main(){ vN=normalize(normalMatrix*normal);
-            gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.); }`,
-        fragmentShader:`varying vec3 vN;
-          void main(){
-            float edge=1.-clamp(dot(vN,vec3(0.,0.,1.)),0.,1.);
-            float f=pow(edge,6.0);
-            gl_FragColor=vec4(.72,.84,1.,f*0.55);
-          }`,
-        side:THREE.BackSide,blending:THREE.AdditiveBlending,
-        transparent:true,depthWrite:false
-      })));
+    /* ---- ATMOSPHERE ---- */
+    scene.add(new THREE.Mesh(new THREE.SphereGeometry(R*1.12,64,64),new THREE.ShaderMaterial({
+      vertexShader:`varying vec3 vN;void main(){vN=normalize(normalMatrix*normal);gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}`,
+      fragmentShader:`varying vec3 vN;void main(){float e=1.-clamp(dot(vN,vec3(0.,0.,1.)),0.,1.);float f=pow(e,4.5);gl_FragColor=vec4(.55,.42,1.,f*0.18);}`,
+      side:THREE.BackSide,blending:THREE.AdditiveBlending,transparent:true,depthWrite:false})));
+    scene.add(new THREE.Mesh(new THREE.SphereGeometry(R*1.048,64,64),new THREE.ShaderMaterial({
+      vertexShader:`varying vec3 vN;void main(){vN=normalize(normalMatrix*normal);gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}`,
+      fragmentShader:`varying vec3 vN;void main(){float e=1.-clamp(dot(vN,vec3(0.,0.,1.)),0.,1.);float f=pow(e,3.0);gl_FragColor=vec4(.28,.48,1.,f*0.38);}`,
+      side:THREE.BackSide,blending:THREE.AdditiveBlending,transparent:true,depthWrite:false})));
+    scene.add(new THREE.Mesh(new THREE.SphereGeometry(R*1.022,64,64),new THREE.ShaderMaterial({
+      vertexShader:`varying vec3 vN;void main(){vN=normalize(normalMatrix*normal);gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}`,
+      fragmentShader:`varying vec3 vN;void main(){float e=1.-clamp(dot(vN,vec3(0.,0.,1.)),0.,1.);float f=pow(e,6.0);gl_FragColor=vec4(.72,.84,1.,f*0.55);}`,
+      side:THREE.BackSide,blending:THREE.AdditiveBlending,transparent:true,depthWrite:false})));
 
     /* ---- lat/lon helper ---- */
     function ll2v(lat,lon,r){
@@ -434,36 +388,25 @@
     SITES.forEach((s,i)=>{
       const pos=ll2v(s.lat,s.lon,R);
       const norm=pos.clone().normalize();
-
-      // tapered spike (thinner, more elegant)
       const spike=new THREE.Mesh(
         new THREE.CylinderGeometry(0.0015,0.007,0.07,6),
         new THREE.MeshBasicMaterial({color:s.color}));
-
-      // core dot
       const dot=new THREE.Mesh(
         new THREE.SphereGeometry(0.018,16,16),
         new THREE.MeshBasicMaterial({color:s.color}));
       dot.position.y=0.046;
-
-      // billboard glow sprite
       const glowTex=makeGlowTex(s.color.getHex());
       const glowSprite=new THREE.Sprite(new THREE.SpriteMaterial({
         map:glowTex,transparent:true,blending:THREE.AdditiveBlending,depthWrite:false,opacity:.9}));
       glowSprite.scale.set(0.16,0.16,1);
-      // offset in world space to float above surface — done via group position
-
       const grp=new THREE.Group();
       grp.add(spike,dot);
       grp.position.copy(pos);
       grp.quaternion.setFromUnitVectors(new THREE.Vector3(0,1,0),norm);
       pinGroup.add(grp);
-
-      // glow sprite placed in world at pin head position
       const glowWorld=pos.clone().add(norm.clone().multiplyScalar(0.08));
       glowSprite.position.copy(glowWorld);
-      scene.add(glowSprite); // add to scene so it always faces camera
-
+      scene.add(glowSprite);
       pinMeshes.push({grp,dot,glowSprite,site:s,phase:i*1.4});
     });
 
@@ -492,7 +435,6 @@
       vx=dy*.005;vy=dx*.005;
       globe.rotation.y+=vy;pinGroup.rotation.y+=vy;
       globe.rotation.x+=vx;pinGroup.rotation.x+=vx;
-      // sync glow sprites with globe rotation
       syncGlowSprites();
     }
     function endDrag(){dragging=false;}
@@ -503,15 +445,14 @@
     window.addEventListener('touchmove',e=>{if(dragging)moveDrag(e.touches[0].clientX,e.touches[0].clientY);});
     window.addEventListener('touchend',endDrag);
 
-    /* ---- sync glow sprite positions with globe rotation ---- */
+    /* ---- sync glow sprites ---- */
     function syncGlowSprites(){
       const euler=new THREE.Euler(globe.rotation.x,globe.rotation.y,globe.rotation.z,'XYZ');
       const quat=new THREE.Quaternion().setFromEuler(euler);
-      pinMeshes.forEach(({glowSprite,site},i)=>{
+      pinMeshes.forEach(({glowSprite,site})=>{
         const base=ll2v(site.lat,site.lon,R);
         const norm=base.clone().normalize();
-        const offset=norm.clone().multiplyScalar(0.08);
-        const wp=base.clone().add(offset).applyQuaternion(quat);
+        const wp=base.clone().add(norm.clone().multiplyScalar(0.08)).applyQuaternion(quat);
         glowSprite.position.copy(wp);
       });
     }
@@ -528,7 +469,7 @@
     });
 
     /* ---- ANIMATE ---- */
-    const SPIN=0.00035; // softer autospin
+    const SPIN=0.00035;
     function animate(t){
       requestAnimationFrame(animate);
       const ts=t*.001;
@@ -536,12 +477,8 @@
       globeMat.uniforms.time.value=ts;
       cloudMat.uniforms.time.value=ts;
       globeMat.uniforms.camPos.value.copy(camera.position);
-
-      if(autoSpin){
-        globe.rotation.y+=SPIN;
-        pinGroup.rotation.y+=SPIN;
-        syncGlowSprites();
-      } else if(!dragging){
+      if(autoSpin){globe.rotation.y+=SPIN;pinGroup.rotation.y+=SPIN;syncGlowSprites();}
+      else if(!dragging){
         vx*=.92;vy*=.92;
         globe.rotation.y+=vy;pinGroup.rotation.y+=vy;
         globe.rotation.x+=vx;pinGroup.rotation.x+=vx;
@@ -549,15 +486,12 @@
         if(Math.abs(vx)<.00008&&Math.abs(vy)<.00008)autoSpin=true;
       }
       clouds.rotation.y+=SPIN*.8;
-
-      // pulse glow sprites
       pinMeshes.forEach(({glowSprite,phase})=>{
         const pulse=0.75+0.35*Math.abs(Math.sin(ts*.55+phase));
         glowSprite.material.opacity=pulse*0.85;
         const sc=0.13+0.05*Math.abs(Math.sin(ts*.4+phase));
         glowSprite.scale.set(sc,sc,1);
       });
-
       renderer.render(scene,camera);
     }
     requestAnimationFrame(animate);
