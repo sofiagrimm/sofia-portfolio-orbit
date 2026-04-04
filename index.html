@@ -1,1 +1,168 @@
-placeholder
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sofia Grimm</title>
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "https://unpkg.com/three@0.160.0/build/three.module.js"
+    }
+  }
+  </script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      margin: 0;
+      overflow: hidden;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, 'SF Pro Text', sans-serif;
+      background: radial-gradient(circle at 10% 0%, #28344f 0, #050816 55%, #01020a 100%);
+      color: #e9f0ff;
+    }
+    canvas { display: block; }
+    .center-title {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      padding: 14px 26px;
+      border-radius: 999px;
+      background: radial-gradient(circle at 0% 0%, #353f63 0, #101728 65%, #070b16 100%);
+      box-shadow: 0 24px 60px rgba(1, 4, 14, 0.95);
+      backdrop-filter: blur(18px);
+      border: 1px solid rgba(157, 183, 255, 0.72);
+      display: inline-flex;
+      align-items: center;
+      gap: 14px;
+      white-space: nowrap;
+    }
+    .center-title-dot {
+      width: 11px;
+      height: 11px;
+      border-radius: 999px;
+      background: radial-gradient(circle at 20% 10%, #dff7ff 0, #7ad2ff 35%, #4565ff 100%);
+      box-shadow: 0 0 15px rgba(95, 206, 255, 0.95);
+      flex-shrink: 0;
+    }
+    .center-title-text { display: flex; flex-direction: column; }
+    .center-title h1 {
+      margin: 0;
+      font-size: 20px;
+      letter-spacing: 0.02em;
+      font-weight: 600;
+      color: #f5f7ff;
+    }
+    .center-title p {
+      margin: 3px 0 0;
+      font-size: 12px;
+      opacity: 0.75;
+      color: #c8d4ff;
+    }
+  </style>
+</head>
+<body>
+  <div class="center-title">
+    <div class="center-title-dot"></div>
+    <div class="center-title-text">
+      <h1>welcome to sofia's world</h1>
+      <p>a tiny solar system of things i care about</p>
+    </div>
+  </div>
+
+  <script type="module">
+    import * as THREE from 'three';
+
+    const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+    renderer.setPixelRatio(window.devicePixelRatio);
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    document.body.appendChild(renderer.domElement);
+    renderer.domElement.style.position = 'fixed';
+    renderer.domElement.style.inset = '0';
+    renderer.domElement.style.zIndex = '-1';
+
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(36, window.innerWidth / window.innerHeight, 0.1, 500);
+    camera.position.set(0, 0, 46);
+    camera.lookAt(0, 0, 0);
+
+    window.addEventListener('resize', () => {
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+    });
+
+    // lighting
+    const keyLight = new THREE.DirectionalLight(0xffffff, 0.9);
+    keyLight.position.set(18, 24, 18);
+    scene.add(keyLight);
+    const rimLight = new THREE.DirectionalLight(0xb4d0ff, 1.05);
+    rimLight.position.set(-26, 6, -22);
+    scene.add(rimLight);
+    const ambient = new THREE.AmbientLight(0x151c33, 1.1);
+    scene.add(ambient);
+
+    // stars
+    {
+      const count = 9000;
+      const pos = new Float32Array(count * 3);
+      for (let i = 0; i < count; i++) {
+        pos[i*3]   = (Math.random() - 0.5) * 220;
+        pos[i*3+1] = (Math.random() - 0.5) * 160;
+        pos[i*3+2] = -Math.random() * 260;
+      }
+      const geo = new THREE.BufferGeometry();
+      geo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+      const mat = new THREE.PointsMaterial({ color: 0xbfd5ff, size: 0.028, transparent: true, opacity: 0.82 });
+      scene.add(new THREE.Points(geo, mat));
+    }
+
+    // orbit ring
+    const ring = new THREE.Mesh(
+      new THREE.RingGeometry(21.4, 22.0, 180),
+      new THREE.MeshBasicMaterial({ color: 0x56627f, side: THREE.DoubleSide, transparent: true, opacity: 0.22 })
+    );
+    ring.position.set(0, 0, -18);
+    scene.add(ring);
+
+    // planet materials — each unique
+    const mats = [
+      new THREE.MeshStandardMaterial({ color: 0xf5fbff, metalness: 0.25, roughness: 0.32, emissive: 0x111827, emissiveIntensity: 0.14 }),
+      new THREE.MeshStandardMaterial({ color: 0xccf0ff, metalness: 0.24, roughness: 0.33, emissive: 0x0f172a, emissiveIntensity: 0.16 }),
+      new THREE.MeshStandardMaterial({ color: 0xf3e4ff, metalness: 0.24, roughness: 0.34, emissive: 0x160f2a, emissiveIntensity: 0.15 }),
+      new THREE.MeshStandardMaterial({ color: 0xe3ffe9, metalness: 0.23, roughness: 0.33, emissive: 0x071b10, emissiveIntensity: 0.15 }),
+      new THREE.MeshStandardMaterial({ color: 0xfff2de, metalness: 0.24, roughness: 0.34, emissive: 0x201107, emissiveIntensity: 0.14 })
+    ];
+
+    // 5 planets at 72-degree intervals on a perfect circle
+    const R = 22.0;
+    const Z = -18;
+    const groups = [];
+    for (let i = 0; i < 5; i++) {
+      const angle = i * (2 * Math.PI / 5);
+      const x = Math.cos(angle) * R;
+      const y = Math.sin(angle) * R;
+
+      const group = new THREE.Group();
+      group.position.set(x, y, Z);
+
+      const core = new THREE.Mesh(
+        new THREE.SphereGeometry(1.2, 64, 64),
+        mats[i]
+      );
+      group.add(core);
+
+      scene.add(group);
+      groups.push(group);
+    }
+
+    function animate() {
+      requestAnimationFrame(animate);
+      camera.position.set(0, 0, 46);
+      camera.lookAt(0, 0, 0);
+      renderer.render(scene, camera);
+    }
+    animate();
+  </script>
+</body>
+</html>
