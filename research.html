@@ -16,9 +16,8 @@
     @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Inter:wght@300;400;500&display=swap');
     *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
     html,body{width:100%;height:100%;overflow:hidden;background:#060d18;font-family:'Inter',sans-serif;color:#e9f0ff;}
-    canvas.bg{display:block;position:fixed;inset:0;z-index:0}
-    #gc{display:block;position:fixed;inset:0;z-index:5;cursor:grab;}
-    #gc:active{cursor:grabbing;}
+    #c{display:block;position:fixed;top:0;left:0;width:100%;height:100%;z-index:1;cursor:grab;}
+    #c:active{cursor:grabbing;}
     nav{position:fixed;top:0;left:0;right:0;z-index:30;
       display:flex;align-items:center;justify-content:space-between;
       padding:0 48px;height:68px;pointer-events:auto;}
@@ -71,6 +70,8 @@
   </style>
 </head>
 <body>
+  <canvas id="c"></canvas>
+
   <nav>
     <a class="nav-name" href="index.html">Sofia Grimm</a>
     <div class="nav-links">
@@ -132,58 +133,85 @@
 
     const W=()=>window.innerWidth, H=()=>window.innerHeight;
 
-    /* ---- STAR BG ---- */
-    const bgR=new THREE.WebGLRenderer({antialias:true});
-    bgR.setPixelRatio(Math.min(devicePixelRatio,2));bgR.setSize(W(),H());
-    bgR.setClearColor(0x060d18,1);bgR.domElement.classList.add('bg');
-    document.body.insertBefore(bgR.domElement,document.body.firstChild);
-    const bgS=new THREE.Scene(),bgC=new THREE.PerspectiveCamera(36,W()/H(),.1,500);
-    bgC.position.set(0,0,46);
-    {const N=9000,p=new Float32Array(N*3),ph=new Float32Array(N),sp=new Float32Array(N),sz=new Float32Array(N);
-     for(let i=0;i<N;i++){p[i*3]=(Math.random()-.5)*260;p[i*3+1]=(Math.random()-.5)*200;p[i*3+2]=-Math.random()*300;
-       ph[i]=Math.random()*Math.PI*2;sp[i]=.0015+Math.random()*.005;sz[i]=.08+Math.random()*.28;}
-     const g=new THREE.BufferGeometry();
-     g.setAttribute('position',new THREE.BufferAttribute(p,3));
-     g.setAttribute('phase',new THREE.BufferAttribute(ph,1));
-     g.setAttribute('speed',new THREE.BufferAttribute(sp,1));
-     g.setAttribute('aSize',new THREE.BufferAttribute(sz,1));
-     const m=new THREE.ShaderMaterial({uniforms:{time:{value:0}},
-       vertexShader:`attribute float aSize;attribute float phase;attribute float speed;uniform float time;varying float vB;
-         void main(){float r=abs(sin(time*speed+phase));vB=.65+.35*pow(r,.3);
-         vec4 mv=modelViewMatrix*vec4(position,1.);float sb=1.+4.*max(0.,r-.72)/.28;
-         gl_PointSize=aSize*sb*(360./-mv.z);gl_Position=projectionMatrix*mv;}`,
-       fragmentShader:`varying float vB;void main(){
-         vec2 uv=gl_PointCoord-vec2(.5);float d=length(uv);if(d>.5)discard;
-         float c=1.-smoothstep(0.,.44,d);gl_FragColor=vec4(vec3(.76,.88,1.)*vB,c*vB);}`,
-       transparent:true,depthWrite:false});
-     bgS.add(new THREE.Points(g,m));window._sm=m;}
+    /* ---- SINGLE RENDERER ---- */
+    const canvas=document.getElementById('c');
+    const renderer=new THREE.WebGLRenderer({canvas,antialias:true});
+    renderer.setPixelRatio(Math.min(devicePixelRatio,2));
+    renderer.setSize(W(),H());
+    renderer.setClearColor(0x060d18,1);
 
-    /* ---- MAIN RENDERER ---- */
-    const renderer=new THREE.WebGLRenderer({antialias:true,alpha:true});
-    renderer.setPixelRatio(Math.min(devicePixelRatio,2));renderer.setSize(W(),H());
-    renderer.setClearColor(0,0);renderer.domElement.id='gc';
-    document.body.appendChild(renderer.domElement);
     const scene=new THREE.Scene();
-    const camera=new THREE.PerspectiveCamera(40,W()/H(),.1,200);
-    camera.position.set(0,0,3.0);
+    const camera=new THREE.PerspectiveCamera(42,W()/H(),0.1,500);
+    camera.position.set(0,0,2.8);
+    camera.lookAt(0,0,0);
 
     window.addEventListener('resize',()=>{
-      camera.aspect=W()/H();camera.updateProjectionMatrix();renderer.setSize(W(),H());
-      bgC.aspect=W()/H();bgC.updateProjectionMatrix();bgR.setSize(W(),H());});
+      camera.aspect=W()/H();
+      camera.updateProjectionMatrix();
+      renderer.setSize(W(),H());
+    });
+
+    /* ---- STARS (same scene, far back) ---- */
+    {
+      const N=9000;
+      const p=new Float32Array(N*3),ph=new Float32Array(N),sp=new Float32Array(N),sz=new Float32Array(N);
+      for(let i=0;i<N;i++){
+        // distribute on a large sphere shell around origin
+        const u=Math.random()*Math.PI*2, v=Math.acos(2*Math.random()-1);
+        const r=80+Math.random()*120;
+        p[i*3]  =r*Math.sin(v)*Math.cos(u);
+        p[i*3+1]=r*Math.sin(v)*Math.sin(u);
+        p[i*3+2]=r*Math.cos(v);
+        ph[i]=Math.random()*Math.PI*2;
+        sp[i]=.0015+Math.random()*.005;
+        sz[i]=.6+Math.random()*1.6;
+      }
+      const g=new THREE.BufferGeometry();
+      g.setAttribute('position',new THREE.BufferAttribute(p,3));
+      g.setAttribute('phase',  new THREE.BufferAttribute(ph,1));
+      g.setAttribute('speed',  new THREE.BufferAttribute(sp,1));
+      g.setAttribute('aSize',  new THREE.BufferAttribute(sz,1));
+      const sm=new THREE.ShaderMaterial({
+        uniforms:{time:{value:0}},
+        vertexShader:`
+          attribute float aSize,phase,speed;
+          uniform float time; varying float vB;
+          void main(){
+            float r=abs(sin(time*speed+phase));
+            vB=.65+.35*pow(r,.3);
+            vec4 mv=modelViewMatrix*vec4(position,1.);
+            float sb=1.+4.*max(0.,r-.72)/.28;
+            gl_PointSize=aSize*sb*(300./-mv.z);
+            gl_Position=projectionMatrix*mv;
+          }`,
+        fragmentShader:`
+          varying float vB;
+          void main(){
+            vec2 uv=gl_PointCoord-.5; float d=length(uv);
+            if(d>.5)discard;
+            float c=1.-smoothstep(0.,.44,d);
+            gl_FragColor=vec4(vec3(.76,.88,1.)*vB,c*vB);
+          }`,
+        transparent:true,depthWrite:false
+      });
+      scene.add(new THREE.Points(g,sm));
+      window._sm=sm;
+    }
 
     /* ---- LIGHTING ---- */
     scene.add(new THREE.AmbientLight(0x223355,1.2));
     const sun=new THREE.DirectionalLight(0xfff5e8,2.4);
-    sun.position.set(5,2,4);scene.add(sun);
-    scene.add(new THREE.DirectionalLight(0x3366cc,0.6)).position.set(-5,1,-3);
+    sun.position.set(5,2,4); scene.add(sun);
+    const rimL=new THREE.DirectionalLight(0x3366cc,0.6);
+    rimL.position.set(-5,1,-3); scene.add(rimL);
 
     /* ---- TEXTURES ---- */
     const TL=new THREE.TextureLoader();
-    const dayTex   =TL.load('https://unpkg.com/three-globe/example/img/earth-blue-marble.jpg');
-    const nightTex =TL.load('https://unpkg.com/three-globe/example/img/earth-night.jpg');
-    const cloudTex =TL.load('https://unpkg.com/three-globe/example/img/earth-clouds.png');
+    const dayTex  =TL.load('https://unpkg.com/three-globe/example/img/earth-blue-marble.jpg');
+    const nightTex=TL.load('https://unpkg.com/three-globe/example/img/earth-night.jpg');
+    const cloudTex=TL.load('https://unpkg.com/three-globe/example/img/earth-clouds.png');
 
-    /* ---- GLOBE (day/night shader) ---- */
+    /* ---- GLOBE ---- */
     const R=1.0;
     const globeMat=new THREE.ShaderMaterial({
       uniforms:{
@@ -216,35 +244,32 @@
     scene.add(globe);
 
     /* ---- CLOUDS ---- */
-    const cloudMat=new THREE.MeshPhongMaterial({
-      map:cloudTex,transparent:true,opacity:0.35,
-      blending:THREE.NormalBlending,depthWrite:false});
-    const clouds=new THREE.Mesh(new THREE.SphereGeometry(R*1.010,128,128),cloudMat);
+    const clouds=new THREE.Mesh(
+      new THREE.SphereGeometry(R*1.010,128,128),
+      new THREE.MeshPhongMaterial({
+        map:cloudTex,transparent:true,opacity:0.35,
+        blending:THREE.NormalBlending,depthWrite:false}));
     scene.add(clouds);
 
-    /* ---- ATMOSPHERE GLOW
-         Key fix: use BackSide so the shell is only visible
-         peeking past the limb edge — no front-face ring.
-         Use (1 - ndotv) WITHOUT abs() so only grazing angles glow.
-    ---- */
-    const atmosMat=new THREE.ShaderMaterial({
-      uniforms:{c:{value:new THREE.Color(0x1a55ee)}},
-      vertexShader:`varying vec3 vN;
-        void main(){
-          vN=normalize(normalMatrix*normal);
-          gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);
-        }`,
-      fragmentShader:`uniform vec3 c;varying vec3 vN;
-        void main(){
-          float edge=1.0-clamp(dot(vN,vec3(0.,0.,1.)),0.,1.);
-          float f=pow(edge,3.5);
-          gl_FragColor=vec4(c,f*0.42);
-        }`,
-      side:THREE.BackSide,
-      blending:THREE.AdditiveBlending,
-      transparent:true,depthWrite:false
-    });
-    scene.add(new THREE.Mesh(new THREE.SphereGeometry(R*1.035,64,64),atmosMat));
+    /* ---- ATMOSPHERE ---- */
+    scene.add(new THREE.Mesh(
+      new THREE.SphereGeometry(R*1.035,64,64),
+      new THREE.ShaderMaterial({
+        uniforms:{c:{value:new THREE.Color(0x1a55ee)}},
+        vertexShader:`varying vec3 vN;
+          void main(){
+            vN=normalize(normalMatrix*normal);
+            gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);
+          }`,
+        fragmentShader:`uniform vec3 c;varying vec3 vN;
+          void main(){
+            float edge=1.-clamp(dot(vN,vec3(0.,0.,1.)),0.,1.);
+            float f=pow(edge,3.5);
+            gl_FragColor=vec4(c,f*0.42);
+          }`,
+        side:THREE.BackSide,blending:THREE.AdditiveBlending,
+        transparent:true,depthWrite:false
+      })));
 
     /* ---- lat/lon helper ---- */
     function ll2v(lat,lon,r){
@@ -256,10 +281,8 @@
     }
 
     /* ---- PINS ---- */
-    const pinMeshes=[];
-    const pinGroup=new THREE.Group();
+    const pinMeshes=[],pinGroup=new THREE.Group();
     scene.add(pinGroup);
-
     SITES.forEach((s,i)=>{
       const pos=ll2v(s.lat,s.lon,R);
       const spike=new THREE.Mesh(
@@ -313,19 +336,19 @@
       globe.rotation.y+=vy;pinGroup.rotation.y+=vy;
       globe.rotation.x+=vx;pinGroup.rotation.x+=vx;}
     function endDrag(){dragging=false;}
-    renderer.domElement.addEventListener('mousedown',e=>startDrag(e.clientX,e.clientY));
+    canvas.addEventListener('mousedown',e=>startDrag(e.clientX,e.clientY));
     window.addEventListener('mousemove',e=>{if(dragging)moveDrag(e.clientX,e.clientY);});
     window.addEventListener('mouseup',endDrag);
-    renderer.domElement.addEventListener('touchstart',e=>{e.preventDefault();startDrag(e.touches[0].clientX,e.touches[0].clientY);},{passive:false});
+    canvas.addEventListener('touchstart',e=>{e.preventDefault();startDrag(e.touches[0].clientX,e.touches[0].clientY);},{passive:false});
     window.addEventListener('touchmove',e=>{if(dragging)moveDrag(e.touches[0].clientX,e.touches[0].clientY);});
     window.addEventListener('touchend',endDrag);
 
-    /* ---- RAYCAST CLICKS ---- */
-    const rc=new THREE.Raycaster(),mv=new THREE.Vector2();
-    renderer.domElement.addEventListener('mouseup',e=>{
+    /* ---- RAYCAST ---- */
+    const rc=new THREE.Raycaster(),mv2=new THREE.Vector2();
+    canvas.addEventListener('mouseup',e=>{
       if(moved)return;
-      mv.x=(e.clientX/W())*2-1;mv.y=-(e.clientY/H())*2+1;
-      rc.setFromCamera(mv,camera);
+      mv2.x=(e.clientX/W())*2-1;mv2.y=-(e.clientY/H())*2+1;
+      rc.setFromCamera(mv2,camera);
       const hits=rc.intersectObjects(pinMeshes.map(p=>p.dot),false);
       if(hits.length){const pm=pinMeshes.find(p=>p.dot===hits[0].object);if(pm)openPanel(pm.site);}
       else if(!panel.contains(e.target))panel.classList.remove('open');
@@ -334,8 +357,7 @@
     /* ---- ANIMATE ---- */
     function animate(t){
       requestAnimationFrame(animate);
-      window._sm.uniforms.time.value=t*.001;
-      bgR.render(bgS,bgC);
+      if(window._sm)window._sm.uniforms.time.value=t*.001;
       if(autoSpin){globe.rotation.y+=.0006;pinGroup.rotation.y+=.0006;}
       else if(!dragging){
         vx*=.90;vy*=.90;
