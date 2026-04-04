@@ -71,9 +71,6 @@
       font-size:10px;letter-spacing:.18em;color:rgba(110,130,190,.25);pointer-events:none;}
     .tagline{position:fixed;bottom:28px;right:48px;z-index:20;
       font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:rgba(110,130,190,.25);pointer-events:none;}
-    .hint{position:fixed;top:calc(68px + 18px);left:50%;transform:translateX(-50%);
-      font-size:10px;letter-spacing:.2em;text-transform:uppercase;
-      color:rgba(160,185,255,.3);z-index:20;pointer-events:none;transition:opacity 1.2s;}
   </style>
 </head>
 <body>
@@ -105,7 +102,6 @@
     <h2>Where the<br><em>work happened.</em></h2>
     <p>drag to explore &nbsp;·&nbsp; click a pin</p>
   </div>
-  <div class="hint" id="hint">drag to rotate</div>
   <div class="coords">41.3083&deg; N &nbsp;72.9279&deg; W</div>
   <div class="tagline">science as an explorable universe</div>
 
@@ -335,9 +331,7 @@
 
     /* ---- DRAG / INERTIA ---- */
     let dragging=false,px=0,py=0,vx=0,vy=0,autoSpin=true,moved=false;
-    const hintEl=document.getElementById('hint');let hintGone=false;
-    function startDrag(x,y){dragging=true;px=x;py=y;autoSpin=false;moved=false;
-      if(!hintGone){hintEl.style.opacity='0';hintGone=true;}}
+    function startDrag(x,y){dragging=true;px=x;py=y;autoSpin=false;moved=false;}
     function moveDrag(x,y){if(!dragging)return;moved=true;
       const dx=x-px,dy=y-py;px=x;py=y;
       vx=dy*.006;vy=dx*.006;
