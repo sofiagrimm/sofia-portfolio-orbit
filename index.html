@@ -27,7 +27,7 @@
       transform:translate(-50%,-50%);
       pointer-events:auto;
       display:inline-flex;align-items:center;
-      padding:13px 28px;
+      padding:18px 36px;
       border-radius:999px;
       background:radial-gradient(circle at 20% 10%,rgba(40,58,100,0.92) 0,rgba(6,12,26,0.97) 100%);
       border:1px solid rgba(140,175,255,0.18);
@@ -36,8 +36,8 @@
       white-space:nowrap;
     }
     .pill-text{display:flex;flex-direction:column}
-    .pill-text h1{font-size:19px;font-weight:600;letter-spacing:.02em;color:#f4f7ff}
-    .pill-text p{font-size:11.5px;margin-top:3px;color:rgba(190,210,255,0.65)}
+    .pill-text h1{font-size:28px;font-weight:600;letter-spacing:.02em;color:#f4f7ff}
+    .pill-text p{font-size:14px;margin-top:5px;color:rgba(190,210,255,0.65)}
   </style>
 </head>
 <body>
@@ -97,13 +97,12 @@
 
     // orbit ring
     const ringMesh = new THREE.Mesh(
-      new THREE.RingGeometry(21.4, 22.0, 180),
+      new THREE.RingGeometry(13.4, 14.0, 180),
       new THREE.MeshBasicMaterial({ color: 0x4a5878, side: THREE.DoubleSide, transparent: true, opacity: 0.22 })
     );
     ringMesh.position.set(0, 0, -18);
     scene.add(ringMesh);
 
-    // planet colors: pastel tints
     const configs = [
       { color: 0xddeeff, emissive: 0x0a1828, glow: 'rgba(160,210,255,' },
       { color: 0xd8f0ff, emissive: 0x081420, glow: 'rgba(100,200,255,' },
@@ -112,9 +111,9 @@
       { color: 0xfff0cc, emissive: 0x1e1005, glow: 'rgba(255,210,100,' }
     ];
 
-    const R = 22.0;
+    const R = 14.0;
     const Z = -18;
-    const sphereGeo = new THREE.SphereGeometry(1.2, 64, 64);
+    const sphereGeo = new THREE.SphereGeometry(1.0, 64, 64);
 
     for (let i = 0; i < 5; i++) {
       const angle = i * (2 * Math.PI / 5);
@@ -129,7 +128,6 @@
         roughness: 0.3
       });
 
-      // per-planet colored glow
       const gc = document.createElement('canvas');
       gc.width = gc.height = 128;
       const ctx = gc.getContext('2d');
@@ -142,7 +140,7 @@
       const sprite = new THREE.Sprite(
         new THREE.SpriteMaterial({ map: new THREE.CanvasTexture(gc), transparent: true, depthWrite: false })
       );
-      sprite.scale.set(4.2, 4.2, 1);
+      sprite.scale.set(3.6, 3.6, 1);
 
       const group = new THREE.Group();
       group.position.set(x, y, Z);
