@@ -78,21 +78,63 @@
     rim.position.set(-24, 4, -20);
     scene.add(rim);
 
-    // starfield
-    {
-      const n = 9000;
-      const p = new Float32Array(n * 3);
-      for (let i = 0; i < n; i++) {
-        p[i*3]   = (Math.random() - 0.5) * 220;
-        p[i*3+1] = (Math.random() - 0.5) * 160;
-        p[i*3+2] = -Math.random() * 260;
-      }
-      const g = new THREE.BufferGeometry();
-      g.setAttribute('position', new THREE.BufferAttribute(p, 3));
-      scene.add(new THREE.Points(g, new THREE.PointsMaterial({
-        color: 0xbfd5ff, size: 0.03, transparent: true, opacity: 0.85
-      })));
+    // twinkling starfield
+    const STAR_COUNT = 9000;
+    const starPositions = new Float32Array(STAR_COUNT * 3);
+    const starPhase     = new Float32Array(STAR_COUNT);
+    const starSpeed     = new Float32Array(STAR_COUNT);
+    const starSize      = new Float32Array(STAR_COUNT);
+
+    for (let i = 0; i < STAR_COUNT; i++) {
+      starPositions[i*3]   = (Math.random() - 0.5) * 220;
+      starPositions[i*3+1] = (Math.random() - 0.5) * 160;
+      starPositions[i*3+2] = -Math.random() * 260;
+      starPhase[i] = Math.random() * Math.PI * 2;
+      starSpeed[i] = 0.0008 + Math.random() * 0.002;
+      starSize[i]  = 0.02 + Math.random() * 0.05;
     }
+
+    const starGeo = new THREE.BufferGeometry();
+    starGeo.setAttribute('position', new THREE.BufferAttribute(starPositions, 3));
+    const starSizes = new THREE.BufferAttribute(new Float32Array(STAR_COUNT), 1);
+    starGeo.setAttribute('size', starSizes);
+
+    const starMat = new THREE.ShaderMaterial({
+      uniforms: { time: { value: 0 } },
+      vertexShader: `
+        attribute float size;
+        varying float vAlpha;
+        uniform float time;
+        attribute float phase;
+        attribute float speed;
+        void main() {
+          vAlpha = 0.4 + 0.6 * abs(sin(time * speed + phase));
+          vec4 mvPos = modelViewMatrix * vec4(position, 1.0);
+          gl_PointSize = size * (300.0 / -mvPos.z);
+          gl_Position = projectionMatrix * mvPos;
+        }
+      `,
+      fragmentShader: `
+        varying float vAlpha;
+        void main() {
+          float d = length(gl_PointCoord - vec2(0.5));
+          if (d > 0.5) discard;
+          gl_FragColor = vec4(0.75, 0.85, 1.0, vAlpha * (1.0 - d * 1.6));
+        }
+      `,
+      transparent: true,
+      depthWrite: false
+    });
+
+    // pass per-star phase and speed as attributes
+    starGeo.setAttribute('phase', new THREE.BufferAttribute(starPhase, 1));
+    starGeo.setAttribute('speed', new THREE.BufferAttribute(starSpeed, 1));
+
+    // initialize sizes
+    for (let i = 0; i < STAR_COUNT; i++) starSizes.array[i] = starSize[i];
+    starSizes.needsUpdate = true;
+
+    scene.add(new THREE.Points(starGeo, starMat));
 
     // orbit ring
     const orbitRing = new THREE.Mesh(
@@ -180,7 +222,6 @@
       group.add(planetRing);
       group.userData.angleOffset = i * (2 * Math.PI / 5);
 
-      // set initial position immediately so planets show on first frame
       const initAngle = group.userData.angleOffset;
       group.position.set(Math.cos(initAngle) * R, Math.sin(initAngle) * R, Z);
 
@@ -194,8 +235,11 @@
     function animate(time) {
       requestAnimationFrame(animate);
       const t = time ?? performance.now();
-      orbitAngle += SPEED * (t - lastTime);
+      const dt = t - lastTime;
       lastTime = t;
+
+      orbitAngle += SPEED * dt;
+      starMat.uniforms.time.value = t * 0.001;
 
       for (const group of groups) {
         const a = orbitAngle + group.userData.angleOffset;
