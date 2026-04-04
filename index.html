@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Sofia Grimm — Science as an Explorable Landscape</title>
+  <title>Sofia Grimm</title>
   <script type="importmap">
   {
     "imports": {
@@ -13,82 +13,170 @@
   }
   </script>
   <style>
+    @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Inter:wght@300;400;500&display=swap');
+
     *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
     html,body{width:100%;height:100%;overflow:hidden}
     body{
-      background:#07111b;
-      font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text','Helvetica Neue',sans-serif;
+      background:#060d18;
+      font-family:'Inter',sans-serif;
       color:#e9f0ff;
     }
     canvas{display:block;position:fixed;inset:0;z-index:0}
-    .ui{position:fixed;inset:0;z-index:10;pointer-events:none}
+
+    /* nebula overlay */
+    .nebula {
+      position:fixed;inset:0;z-index:1;pointer-events:none;
+      background:
+        radial-gradient(ellipse 60% 40% at 20% 60%, rgba(80,40,160,0.07) 0%, transparent 70%),
+        radial-gradient(ellipse 50% 35% at 80% 30%, rgba(30,80,180,0.08) 0%, transparent 70%),
+        radial-gradient(ellipse 40% 30% at 50% 80%, rgba(0,120,100,0.05) 0%, transparent 70%);
+      animation: nebulaDrift 24s ease-in-out infinite alternate;
+    }
+    @keyframes nebulaDrift {
+      0%   { opacity: 0.7; transform: scale(1) translateY(0); }
+      100% { opacity: 1;   transform: scale(1.04) translateY(-12px); }
+    }
 
     /* nav */
     nav {
-      position: fixed;
-      top: 0; left: 0; right: 0;
-      z-index: 20;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 0 40px;
-      height: 56px;
-      background: rgba(6, 12, 26, 0.72);
-      backdrop-filter: blur(18px);
-      border-bottom: 1px solid rgba(140, 175, 255, 0.1);
-      pointer-events: auto;
+      position:fixed;top:0;left:0;right:0;z-index:20;
+      display:flex;align-items:center;justify-content:space-between;
+      padding:0 48px;
+      height:60px;
+      pointer-events:auto;
     }
     .nav-name {
-      font-size: 15px;
-      font-weight: 600;
-      letter-spacing: 0.04em;
-      color: #f4f7ff;
-      text-decoration: none;
+      font-family:'Cormorant Garamond',serif;
+      font-size:20px;
+      font-weight:300;
+      font-style:italic;
+      letter-spacing:0.06em;
+      color:rgba(220,232,255,0.9);
+      text-decoration:none;
     }
     .nav-links {
-      display: flex;
-      align-items: center;
-      gap: 6px;
+      display:flex;align-items:center;gap:4px;
     }
     .nav-links a {
-      font-size: 13px;
-      font-weight: 400;
-      letter-spacing: 0.03em;
-      color: rgba(190, 210, 255, 0.7);
-      text-decoration: none;
-      padding: 6px 12px;
-      border-radius: 6px;
-      transition: color 0.2s, background 0.2s;
+      font-size:11px;
+      font-weight:400;
+      letter-spacing:0.14em;
+      text-transform:uppercase;
+      color:rgba(160,190,255,0.5);
+      text-decoration:none;
+      padding:6px 14px;
+      border-radius:4px;
+      transition:color 0.25s, background 0.25s;
     }
     .nav-links a:hover {
-      color: #f4f7ff;
-      background: rgba(140, 175, 255, 0.1);
+      color:rgba(220,235,255,0.9);
+      background:rgba(120,160,255,0.07);
     }
     .nav-links .divider {
-      color: rgba(140, 175, 255, 0.25);
-      font-size: 13px;
-      user-select: none;
+      color:rgba(120,150,220,0.2);
+      font-size:11px;
+      user-select:none;
     }
 
-    .center-pill{
+    /* ui layer */
+    .ui{position:fixed;inset:0;z-index:10;pointer-events:none}
+
+    /* center card */
+    .center-card {
       position:absolute;left:50%;top:50%;
       transform:translate(-50%,-50%);
       pointer-events:auto;
-      display:inline-flex;align-items:center;
-      padding:18px 36px;
-      border-radius:999px;
-      background:radial-gradient(circle at 20% 10%,rgba(40,58,100,0.92) 0,rgba(6,12,26,0.97) 100%);
-      border:1px solid rgba(140,175,255,0.18);
-      box-shadow:0 0 0 1px rgba(100,140,255,0.06),0 24px 64px rgba(0,0,0,0.9);
-      backdrop-filter:blur(22px);
+      display:flex;flex-direction:column;align-items:center;
+      text-align:center;
+      gap:0;
+    }
+    .card-eyebrow {
+      font-size:10px;
+      font-weight:400;
+      letter-spacing:0.22em;
+      text-transform:uppercase;
+      color:rgba(140,180,255,0.45);
+      margin-bottom:16px;
+    }
+    .card-title {
+      font-family:'Cormorant Garamond',serif;
+      font-size:52px;
+      font-weight:300;
+      line-height:1.05;
+      letter-spacing:0.01em;
+      color:#eef3ff;
       white-space:nowrap;
     }
-    .pill-text{display:flex;flex-direction:column}
-    .pill-text h1{font-size:28px;font-weight:600;letter-spacing:.02em;color:#f4f7ff}
-    .pill-text p{font-size:14px;margin-top:5px;color:rgba(190,210,255,0.65)}
+    .card-title em {
+      font-style:italic;
+      color:rgba(180,210,255,0.75);
+    }
+    .card-rule {
+      width:48px;height:1px;
+      background:linear-gradient(90deg,transparent,rgba(140,180,255,0.4),transparent);
+      margin:20px auto;
+    }
+    .card-sub {
+      font-size:12px;
+      font-weight:300;
+      letter-spacing:0.18em;
+      text-transform:uppercase;
+      color:rgba(160,195,255,0.4);
+    }
+    /* faint decorative circle around the card */
+    .card-ring {
+      position:absolute;left:50%;top:50%;
+      transform:translate(-50%,-50%);
+      width:420px;height:420px;
+      border-radius:50%;
+      border:1px solid rgba(100,140,255,0.06);
+      pointer-events:none;
+      animation:cardRingSpin 60s linear infinite;
+    }
+    .card-ring::before {
+      content:'';
+      position:absolute;inset:-1px;
+      border-radius:50%;
+      border:1px solid rgba(100,140,255,0.04);
+      transform:scale(1.18);
+    }
+    /* tiny tick marks on the ring */
+    .card-ring::after {
+      content:'';
+      position:absolute;
+      top:-3px;left:50%;transform:translateX(-50%);
+      width:6px;height:6px;
+      border-radius:50%;
+      background:rgba(140,180,255,0.35);
+      box-shadow:0 0 8px rgba(140,180,255,0.4);
+    }
+    @keyframes cardRingSpin {
+      from{transform:translate(-50%,-50%) rotate(0deg)}
+      to  {transform:translate(-50%,-50%) rotate(360deg)}
+    }
+
+    /* bottom left coords flourish */
+    .coords {
+      position:fixed;bottom:32px;left:48px;z-index:20;
+      font-size:10px;letter-spacing:0.18em;
+      color:rgba(120,155,220,0.3);
+      font-weight:300;
+      pointer-events:none;
+    }
+    /* bottom right tagline */
+    .tagline {
+      position:fixed;bottom:32px;right:48px;z-index:20;
+      font-size:10px;letter-spacing:0.18em;text-transform:uppercase;
+      color:rgba(120,155,220,0.3);
+      font-weight:300;
+      pointer-events:none;
+    }
   </style>
 </head>
 <body>
+  <div class="nebula"></div>
+
   <nav>
     <a class="nav-name" href="#">Sofia Grimm</a>
     <div class="nav-links">
@@ -102,14 +190,19 @@
     </div>
   </nav>
 
+  <div class="card-ring"></div>
+
   <div class="ui">
-    <div class="center-pill">
-      <div class="pill-text">
-        <h1>welcome to sofia's world</h1>
-        <p>a tiny solar system of things i care about</p>
-      </div>
+    <div class="center-card">
+      <div class="card-eyebrow">Yale &nbsp;&middot;&nbsp; Chemistry &nbsp;&middot;&nbsp; 2026</div>
+      <h1 class="card-title">a universe of<br><em>things i care about</em></h1>
+      <div class="card-rule"></div>
+      <div class="card-sub">Science &nbsp;&middot;&nbsp; Design &nbsp;&middot;&nbsp; Longevity</div>
     </div>
   </div>
+
+  <div class="coords">41.3083° N &nbsp; 72.9279° W</div>
+  <div class="tagline">exploring the edges of known things</div>
 
   <script type="module">
     import * as THREE from 'three';
@@ -117,7 +210,7 @@
     const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false });
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     renderer.setSize(window.innerWidth, window.innerHeight);
-    renderer.setClearColor(0x07111b, 1);
+    renderer.setClearColor(0x060d18, 1);
     document.body.appendChild(renderer.domElement);
 
     const scene = new THREE.Scene();
@@ -133,180 +226,169 @@
 
     scene.add(new THREE.AmbientLight(0x0d1a33, 1.4));
     const key = new THREE.DirectionalLight(0xffffff, 1.1);
-    key.position.set(18, 24, 18);
-    scene.add(key);
+    key.position.set(18, 24, 18); scene.add(key);
     const rim = new THREE.DirectionalLight(0xaac4ff, 1.2);
-    rim.position.set(-24, 4, -20);
-    scene.add(rim);
+    rim.position.set(-24, 4, -20); scene.add(rim);
 
     const STAR_COUNT = 9000;
     const starPositions = new Float32Array(STAR_COUNT * 3);
-    const starPhase     = new Float32Array(STAR_COUNT);
-    const starSpeed     = new Float32Array(STAR_COUNT);
-    const starSize      = new Float32Array(STAR_COUNT);
+    const starPhase = new Float32Array(STAR_COUNT);
+    const starSpeed = new Float32Array(STAR_COUNT);
+    const starSize  = new Float32Array(STAR_COUNT);
     for (let i = 0; i < STAR_COUNT; i++) {
-      starPositions[i*3]   = (Math.random() - 0.5) * 220;
-      starPositions[i*3+1] = (Math.random() - 0.5) * 160;
-      starPositions[i*3+2] = -Math.random() * 260;
-      starPhase[i] = Math.random() * Math.PI * 2;
-      starSpeed[i] = 0.002 + Math.random() * 0.005;
-      starSize[i]  = 0.12 + Math.random() * 0.22;
+      starPositions[i*3]   = (Math.random()-0.5)*220;
+      starPositions[i*3+1] = (Math.random()-0.5)*160;
+      starPositions[i*3+2] = -Math.random()*260;
+      starPhase[i] = Math.random()*Math.PI*2;
+      starSpeed[i] = 0.002 + Math.random()*0.005;
+      starSize[i]  = 0.12 + Math.random()*0.22;
     }
     const starGeo = new THREE.BufferGeometry();
-    starGeo.setAttribute('position', new THREE.BufferAttribute(starPositions, 3));
-    starGeo.setAttribute('phase',    new THREE.BufferAttribute(starPhase, 1));
-    starGeo.setAttribute('speed',    new THREE.BufferAttribute(starSpeed, 1));
-    starGeo.setAttribute('aSize',    new THREE.BufferAttribute(starSize,  1));
+    starGeo.setAttribute('position', new THREE.BufferAttribute(starPositions,3));
+    starGeo.setAttribute('phase',    new THREE.BufferAttribute(starPhase,1));
+    starGeo.setAttribute('speed',    new THREE.BufferAttribute(starSpeed,1));
+    starGeo.setAttribute('aSize',    new THREE.BufferAttribute(starSize,1));
     const starMat = new THREE.ShaderMaterial({
-      uniforms: { time: { value: 0 } },
-      vertexShader: `
-        attribute float aSize;
-        attribute float phase;
-        attribute float speed;
-        uniform float time;
-        varying float vBright;
-        varying float vRaw;
-        void main() {
-          float raw = abs(sin(time * speed + phase));
-          vRaw = raw;
-          vBright = 0.7 + 0.3 * pow(raw, 0.3);
-          vec4 mvPos = modelViewMatrix * vec4(position, 1.0);
-          float spikeBoost = 1.0 + 3.5 * max(0.0, raw - 0.75) / 0.25;
-          gl_PointSize = aSize * spikeBoost * (340.0 / -mvPos.z);
-          gl_Position = projectionMatrix * mvPos;
-        }
-      `,
-      fragmentShader: `
-        varying float vBright;
-        varying float vRaw;
-        void main() {
-          vec2 uv = gl_PointCoord - vec2(0.5);
-          float d = length(uv);
-          if (d > 0.5) discard;
-          float core = 1.0 - smoothstep(0.0, 0.42, d);
-          float halo = 0.35 * exp(-d * 7.0);
-          float spike = 0.0;
-          if (vRaw > 0.6) {
-            float spikeStr = (vRaw - 0.6) / 0.4;
-            float ax = abs(uv.x); float ay = abs(uv.y);
-            float hSpike = exp(-ay * 20.0) * exp(-ax * 4.0) * max(0.0, 1.0 - d * 1.8);
-            float vSpike = exp(-ax * 20.0) * exp(-ay * 4.0) * max(0.0, 1.0 - d * 1.8);
-            spike = max(hSpike, vSpike) * spikeStr * 1.2;
+      uniforms:{time:{value:0}},
+      vertexShader:`
+        attribute float aSize;attribute float phase;attribute float speed;
+        uniform float time;varying float vBright;varying float vRaw;
+        void main(){
+          float raw=abs(sin(time*speed+phase));vRaw=raw;
+          vBright=0.7+0.3*pow(raw,0.3);
+          vec4 mvPos=modelViewMatrix*vec4(position,1.0);
+          float sb=1.0+3.5*max(0.0,raw-0.75)/0.25;
+          gl_PointSize=aSize*sb*(340.0/-mvPos.z);
+          gl_Position=projectionMatrix*mvPos;
+        }`,
+      fragmentShader:`
+        varying float vBright;varying float vRaw;
+        void main(){
+          vec2 uv=gl_PointCoord-vec2(0.5);float d=length(uv);
+          if(d>0.5)discard;
+          float core=1.0-smoothstep(0.0,0.42,d);
+          float halo=0.35*exp(-d*7.0);
+          float spike=0.0;
+          if(vRaw>0.6){
+            float ss=(vRaw-0.6)/0.4;
+            float ax=abs(uv.x);float ay=abs(uv.y);
+            float h=exp(-ay*20.0)*exp(-ax*4.0)*max(0.0,1.0-d*1.8);
+            float v=exp(-ax*20.0)*exp(-ay*4.0)*max(0.0,1.0-d*1.8);
+            spike=max(h,v)*ss*1.2;
           }
-          float alpha = clamp(core + halo + spike, 0.0, 1.0) * vBright;
-          vec3 col = mix(vec3(0.75, 0.88, 1.0), vec3(1.0, 0.98, 0.85), spike * 0.8);
-          gl_FragColor = vec4(col, alpha);
-        }
-      `,
-      transparent: true,
-      depthWrite: false
+          float alpha=clamp(core+halo+spike,0.0,1.0)*vBright;
+          vec3 col=mix(vec3(0.75,0.88,1.0),vec3(1.0,0.98,0.85),spike*0.8);
+          gl_FragColor=vec4(col,alpha);
+        }`,
+      transparent:true,depthWrite:false
     });
-    scene.add(new THREE.Points(starGeo, starMat));
+    scene.add(new THREE.Points(starGeo,starMat));
 
-    const CZ = -90;
-    const constellations = [
-      { name: 'Orion', offset: [-55, 10], stars: [[0,8],[3.5,8],[-1,5.5],[4.5,5.5],[0.8,4.2],[1.8,3.8],[2.8,3.4],[0.2,1.5],[3.5,1.5]], edges: [[0,2],[1,3],[2,4],[3,6],[4,5],[5,6],[7,4],[8,6],[2,3]] },
-      { name: 'Ursa Major', offset: [30, 35], stars: [[0,0],[2.5,-0.5],[5,1],[7,0],[9,2],[11,1],[13,2.5]], edges: [[0,1],[1,2],[2,3],[3,4],[4,5],[5,6]] },
-      { name: 'Cassiopeia', offset: [50, -30], stars: [[0,0],[2.5,2],[5,1],[7.5,2.5],[10,0.5]], edges: [[0,1],[1,2],[2,3],[3,4]] },
-      { name: 'Scorpius', offset: [-60, -30], stars: [[0,8],[-1,6.5],[1,6.5],[-0.5,5],[0.5,5],[0,3.5],[0.5,2],[1.5,1],[2,0],[1,-1],[2.5,-1.5]], edges: [[0,1],[0,2],[1,3],[2,4],[3,5],[4,5],[5,6],[6,7],[7,8],[8,9],[9,10]] },
-      { name: 'Cygnus', offset: [20, -10], stars: [[0,8],[0,4],[-4,4],[4,4],[0,0]], edges: [[0,1],[1,2],[1,3],[1,4]] },
-      { name: 'Leo', offset: [-20, -28], stars: [[0,0],[1.5,2],[3,4],[2,5.5],[5,5],[6,3],[4,1.5]], edges: [[0,1],[1,2],[2,3],[3,4],[4,5],[5,6],[6,1]] },
-      { name: 'Gemini', offset: [55, 10], stars: [[0,8],[2,8],[0,6],[2,5.5],[0,4],[2,4],[0,2],[2,2],[0.5,0],[1.5,0]], edges: [[0,2],[2,4],[4,6],[6,8],[1,3],[3,5],[5,7],[7,9],[8,9]] },
-      { name: 'Crux', offset: [-30, -40], stars: [[0,3],[0,-3],[-3,0],[3,0]], edges: [[0,1],[2,3]] },
-      { name: 'Aquila', offset: [5, 5], stars: [[0,6],[0,4],[-2,2],[2,2],[0,2],[0,0]], edges: [[0,1],[1,2],[1,3],[1,4],[4,5]] },
-      { name: 'Perseus', offset: [70, 20], stars: [[0,0],[1,2],[2,4],[1,6],[3,7],[0,8],[-1,6],[-2,4]], edges: [[0,1],[1,2],[2,3],[3,4],[3,5],[3,6],[6,7],[2,7]] },
-      { name: 'Andromeda', offset: [80, -5], stars: [[0,0],[2,1.5],[4,3],[6,3.5],[4,5],[4,1]], edges: [[0,1],[1,2],[2,3],[2,4],[2,5]] },
-      { name: 'Lyra', offset: [10, 22], stars: [[0,4],[0,2],[-1,0],[1,0],[-1.5,1.5],[1.5,1.5]], edges: [[0,1],[1,2],[1,3],[2,4],[3,5],[4,5],[2,3]] },
-      { name: 'Bootes', offset: [-5, 18], stars: [[0,8],[0,6],[-2,4],[2,4],[-1,2],[1,2],[0,0]], edges: [[0,1],[1,2],[1,3],[2,4],[3,5],[4,6],[5,6],[2,3]] },
-      { name: 'Virgo', offset: [-40, -10], stars: [[0,0],[2,2],[4,3],[6,2],[4,1],[3,4],[5,5],[2,5]], edges: [[0,1],[1,2],[2,3],[3,4],[4,1],[2,5],[5,6],[5,7]] },
-      { name: 'Taurus', offset: [-75, 15], stars: [[0,0],[2,1],[4,2],[3,4],[5,4],[6,3],[7,4],[8,5],[3,0],[5,-1]], edges: [[0,1],[1,2],[2,3],[3,4],[4,5],[5,6],[6,7],[2,8],[8,9]] },
-      { name: 'Pisces', offset: [90, -20], stars: [[0,0],[2,1],[4,0],[5,2],[4,4],[2,4],[0,3],[3,-2],[5,-3],[4,-4]], edges: [[0,1],[1,2],[2,3],[3,4],[4,5],[5,6],[6,0],[7,8],[8,9],[2,7]] },
-      { name: 'Hercules', offset: [-10, 30], stars: [[0,8],[0,6],[-2,5],[2,5],[-2,3],[2,3],[0,2],[0,0]], edges: [[0,1],[1,2],[1,3],[2,4],[3,5],[4,5],[4,6],[5,6],[6,7]] },
-      { name: 'Centaurus', offset: [-85, -35], stars: [[0,0],[2,1],[4,2],[6,1],[5,3],[3,4],[7,3],[4,-1],[6,-2]], edges: [[0,1],[1,2],[2,3],[3,4],[4,5],[2,5],[3,6],[1,7],[7,8]] }
+    const CZ=-90;
+    const constellations=[
+      {name:'Orion',offset:[-55,10],stars:[[0,8],[3.5,8],[-1,5.5],[4.5,5.5],[0.8,4.2],[1.8,3.8],[2.8,3.4],[0.2,1.5],[3.5,1.5]],edges:[[0,2],[1,3],[2,4],[3,6],[4,5],[5,6],[7,4],[8,6],[2,3]]},
+      {name:'Ursa Major',offset:[30,35],stars:[[0,0],[2.5,-0.5],[5,1],[7,0],[9,2],[11,1],[13,2.5]],edges:[[0,1],[1,2],[2,3],[3,4],[4,5],[5,6]]},
+      {name:'Cassiopeia',offset:[50,-30],stars:[[0,0],[2.5,2],[5,1],[7.5,2.5],[10,0.5]],edges:[[0,1],[1,2],[2,3],[3,4]]},
+      {name:'Scorpius',offset:[-60,-30],stars:[[0,8],[-1,6.5],[1,6.5],[-0.5,5],[0.5,5],[0,3.5],[0.5,2],[1.5,1],[2,0],[1,-1],[2.5,-1.5]],edges:[[0,1],[0,2],[1,3],[2,4],[3,5],[4,5],[5,6],[6,7],[7,8],[8,9],[9,10]]},
+      {name:'Cygnus',offset:[20,-10],stars:[[0,8],[0,4],[-4,4],[4,4],[0,0]],edges:[[0,1],[1,2],[1,3],[1,4]]},
+      {name:'Leo',offset:[-20,-28],stars:[[0,0],[1.5,2],[3,4],[2,5.5],[5,5],[6,3],[4,1.5]],edges:[[0,1],[1,2],[2,3],[3,4],[4,5],[5,6],[6,1]]},
+      {name:'Gemini',offset:[55,10],stars:[[0,8],[2,8],[0,6],[2,5.5],[0,4],[2,4],[0,2],[2,2],[0.5,0],[1.5,0]],edges:[[0,2],[2,4],[4,6],[6,8],[1,3],[3,5],[5,7],[7,9],[8,9]]},
+      {name:'Crux',offset:[-30,-40],stars:[[0,3],[0,-3],[-3,0],[3,0]],edges:[[0,1],[2,3]]},
+      {name:'Aquila',offset:[5,5],stars:[[0,6],[0,4],[-2,2],[2,2],[0,2],[0,0]],edges:[[0,1],[1,2],[1,3],[1,4],[4,5]]},
+      {name:'Perseus',offset:[70,20],stars:[[0,0],[1,2],[2,4],[1,6],[3,7],[0,8],[-1,6],[-2,4]],edges:[[0,1],[1,2],[2,3],[3,4],[3,5],[3,6],[6,7],[2,7]]},
+      {name:'Andromeda',offset:[80,-5],stars:[[0,0],[2,1.5],[4,3],[6,3.5],[4,5],[4,1]],edges:[[0,1],[1,2],[2,3],[2,4],[2,5]]},
+      {name:'Lyra',offset:[10,22],stars:[[0,4],[0,2],[-1,0],[1,0],[-1.5,1.5],[1.5,1.5]],edges:[[0,1],[1,2],[1,3],[2,4],[3,5],[4,5],[2,3]]},
+      {name:'Bootes',offset:[-5,18],stars:[[0,8],[0,6],[-2,4],[2,4],[-1,2],[1,2],[0,0]],edges:[[0,1],[1,2],[1,3],[2,4],[3,5],[4,6],[5,6],[2,3]]},
+      {name:'Virgo',offset:[-40,-10],stars:[[0,0],[2,2],[4,3],[6,2],[4,1],[3,4],[5,5],[2,5]],edges:[[0,1],[1,2],[2,3],[3,4],[4,1],[2,5],[5,6],[5,7]]},
+      {name:'Taurus',offset:[-75,15],stars:[[0,0],[2,1],[4,2],[3,4],[5,4],[6,3],[7,4],[8,5],[3,0],[5,-1]],edges:[[0,1],[1,2],[2,3],[3,4],[4,5],[5,6],[6,7],[2,8],[8,9]]},
+      {name:'Pisces',offset:[90,-20],stars:[[0,0],[2,1],[4,0],[5,2],[4,4],[2,4],[0,3],[3,-2],[5,-3],[4,-4]],edges:[[0,1],[1,2],[2,3],[3,4],[4,5],[5,6],[6,0],[7,8],[8,9],[2,7]]},
+      {name:'Hercules',offset:[-10,30],stars:[[0,8],[0,6],[-2,5],[2,5],[-2,3],[2,3],[0,2],[0,0]],edges:[[0,1],[1,2],[1,3],[2,4],[3,5],[4,5],[4,6],[5,6],[6,7]]},
+      {name:'Centaurus',offset:[-85,-35],stars:[[0,0],[2,1],[4,2],[6,1],[5,3],[3,4],[7,3],[4,-1],[6,-2]],edges:[[0,1],[1,2],[2,3],[3,4],[4,5],[2,5],[3,6],[1,7],[7,8]]}
     ];
-
-    constellations.forEach(con => {
-      const [ox, oy] = con.offset;
-      const pts = con.stars.map(([x,y]) => new THREE.Vector3(ox+x, oy+y, CZ));
-      const csPos = new Float32Array(pts.length * 3);
-      pts.forEach((p, i) => { csPos[i*3]=p.x; csPos[i*3+1]=p.y; csPos[i*3+2]=p.z; });
-      const csGeo = new THREE.BufferGeometry();
-      csGeo.setAttribute('position', new THREE.BufferAttribute(csPos, 3));
-      scene.add(new THREE.Points(csGeo, new THREE.PointsMaterial({ color: 0xd0e8ff, size: 0.55, transparent: true, opacity: 0.95, sizeAttenuation: true })));
-      const linePoints = [];
-      con.edges.forEach(([a,b]) => { linePoints.push(pts[a], pts[b]); });
-      const lineGeo = new THREE.BufferGeometry().setFromPoints(linePoints);
-      scene.add(new THREE.LineSegments(lineGeo, new THREE.LineBasicMaterial({ color: 0x4a6fa8, transparent: true, opacity: 0.28 })));
+    constellations.forEach(con=>{
+      const [ox,oy]=con.offset;
+      const pts=con.stars.map(([x,y])=>new THREE.Vector3(ox+x,oy+y,CZ));
+      const csPos=new Float32Array(pts.length*3);
+      pts.forEach((p,i)=>{csPos[i*3]=p.x;csPos[i*3+1]=p.y;csPos[i*3+2]=p.z;});
+      const csGeo=new THREE.BufferGeometry();
+      csGeo.setAttribute('position',new THREE.BufferAttribute(csPos,3));
+      scene.add(new THREE.Points(csGeo,new THREE.PointsMaterial({color:0xd0e8ff,size:0.55,transparent:true,opacity:0.95,sizeAttenuation:true})));
+      const lp=[];con.edges.forEach(([a,b])=>{lp.push(pts[a],pts[b]);});
+      scene.add(new THREE.LineSegments(new THREE.BufferGeometry().setFromPoints(lp),new THREE.LineBasicMaterial({color:0x4a6fa8,transparent:true,opacity:0.28})));
     });
 
-    const orbitRing = new THREE.Mesh(
-      new THREE.RingGeometry(13.4, 14.0, 180),
-      new THREE.MeshBasicMaterial({ color: 0x4a5878, side: THREE.DoubleSide, transparent: true, opacity: 0.22 })
+    const orbitRing=new THREE.Mesh(
+      new THREE.RingGeometry(13.4,14.0,180),
+      new THREE.MeshBasicMaterial({color:0x3a4868,side:THREE.DoubleSide,transparent:true,opacity:0.18})
     );
-    orbitRing.position.set(0, 0, -18);
-    scene.add(orbitRing);
+    orbitRing.position.set(0,0,-18);scene.add(orbitRing);
 
-    function makeRingTexture(glowBase) {
-      const c = document.createElement('canvas'); c.width = 256; c.height = 1;
-      const ctx = c.getContext('2d');
-      const grad = ctx.createLinearGradient(0,0,256,0);
-      grad.addColorStop(0,    glowBase.replace('1)', '0.0)'));
-      grad.addColorStop(0.08, glowBase.replace('1)', '0.7)'));
-      grad.addColorStop(0.4,  glowBase.replace('1)', '0.5)'));
-      grad.addColorStop(0.65, glowBase.replace('1)', '0.3)'));
-      grad.addColorStop(1,    glowBase.replace('1)', '0.0)'));
-      ctx.fillStyle = grad; ctx.fillRect(0,0,256,1);
+    // second faint outer decorative ring
+    const outerRing=new THREE.Mesh(
+      new THREE.RingGeometry(17.5,17.7,180),
+      new THREE.MeshBasicMaterial({color:0x2a3858,side:THREE.DoubleSide,transparent:true,opacity:0.1})
+    );
+    outerRing.position.set(0,0,-18);scene.add(outerRing);
+
+    function makeRingTexture(glowBase){
+      const c=document.createElement('canvas');c.width=256;c.height=1;
+      const ctx=c.getContext('2d');
+      const grad=ctx.createLinearGradient(0,0,256,0);
+      grad.addColorStop(0,glowBase.replace('1)','0.0)'));
+      grad.addColorStop(0.08,glowBase.replace('1)','0.7)'));
+      grad.addColorStop(0.4,glowBase.replace('1)','0.5)'));
+      grad.addColorStop(0.65,glowBase.replace('1)','0.3)'));
+      grad.addColorStop(1,glowBase.replace('1)','0.0)'));
+      ctx.fillStyle=grad;ctx.fillRect(0,0,256,1);
       return new THREE.CanvasTexture(c);
     }
 
-    const configs = [
-      { color: 0xddeeff, emissive: 0x0a1828, glow: 'rgba(160,210,255,', ringColor: 'rgba(160,210,255,1)', ringTilt: { x: 0.42, z:  0.18 } },
-      { color: 0xd8f0ff, emissive: 0x081420, glow: 'rgba(100,200,255,', ringColor: 'rgba(100,200,255,1)', ringTilt: { x: 0.50, z: -0.14 } },
-      { color: 0xeeddff, emissive: 0x120d26, glow: 'rgba(180,140,255,', ringColor: 'rgba(200,160,255,1)', ringTilt: { x: 0.32, z:  0.28 } },
-      { color: 0xd8fce8, emissive: 0x061810, glow: 'rgba(100,240,160,', ringColor: 'rgba(100,240,160,1)', ringTilt: { x: 0.46, z:  0.08 } },
-      { color: 0xfff0cc, emissive: 0x1e1005, glow: 'rgba(255,210,100,', ringColor: 'rgba(255,220,120,1)', ringTilt: { x: 0.38, z: -0.22 } }
+    const configs=[
+      {color:0xddeeff,emissive:0x0a1828,glow:'rgba(160,210,255,',ringColor:'rgba(160,210,255,1)',ringTilt:{x:0.42,z:0.18}},
+      {color:0xd8f0ff,emissive:0x081420,glow:'rgba(100,200,255,',ringColor:'rgba(100,200,255,1)',ringTilt:{x:0.50,z:-0.14}},
+      {color:0xeeddff,emissive:0x120d26,glow:'rgba(180,140,255,',ringColor:'rgba(200,160,255,1)',ringTilt:{x:0.32,z:0.28}},
+      {color:0xd8fce8,emissive:0x061810,glow:'rgba(100,240,160,',ringColor:'rgba(100,240,160,1)',ringTilt:{x:0.46,z:0.08}},
+      {color:0xfff0cc,emissive:0x1e1005,glow:'rgba(255,210,100,',ringColor:'rgba(255,220,120,1)',ringTilt:{x:0.38,z:-0.22}}
     ];
 
-    const R = 14.0, Z = -18, SPEED = 0.0004;
-    const sphereGeo = new THREE.SphereGeometry(1.9, 64, 64);
-    const groups = [];
+    const R=14.0,Z=-18,SPEED=0.0004;
+    const sphereGeo=new THREE.SphereGeometry(1.9,64,64);
+    const groups=[];
 
-    for (let i = 0; i < 5; i++) {
-      const cfg = configs[i];
-      const mat = new THREE.MeshStandardMaterial({ color: cfg.color, emissive: cfg.emissive, emissiveIntensity: 0.18, metalness: 0.18, roughness: 0.3 });
-      const gc = document.createElement('canvas'); gc.width = gc.height = 128;
-      const ctx = gc.getContext('2d');
-      const grad = ctx.createRadialGradient(64,64,0,64,64,64);
-      grad.addColorStop(0,   cfg.glow + '0.6)');
-      grad.addColorStop(0.4, cfg.glow + '0.18)');
-      grad.addColorStop(1,   cfg.glow + '0)');
-      ctx.fillStyle = grad; ctx.fillRect(0,0,128,128);
-      const sprite = new THREE.Sprite(new THREE.SpriteMaterial({ map: new THREE.CanvasTexture(gc), transparent: true, depthWrite: false }));
-      sprite.scale.set(5.8, 5.8, 1);
-      const ringGeo = new THREE.RingGeometry(2.6, 4.0, 128);
-      const pos = ringGeo.attributes.position, uv = ringGeo.attributes.uv, v3 = new THREE.Vector3();
-      for (let j = 0; j < pos.count; j++) { v3.fromBufferAttribute(pos, j); uv.setXY(j, (v3.length() - 2.6) / (4.0 - 2.6), 0.5); }
-      const planetRing = new THREE.Mesh(ringGeo, new THREE.MeshBasicMaterial({ map: makeRingTexture(cfg.ringColor), side: THREE.DoubleSide, transparent: true, opacity: 0.78, depthWrite: false }));
-      planetRing.rotation.x = cfg.ringTilt.x; planetRing.rotation.z = cfg.ringTilt.z;
-      const group = new THREE.Group();
-      group.add(new THREE.Mesh(sphereGeo, mat)); group.add(sprite); group.add(planetRing);
-      group.userData.angleOffset = i * (2 * Math.PI / 5);
-      group.position.set(Math.cos(group.userData.angleOffset) * R, Math.sin(group.userData.angleOffset) * R, Z);
-      scene.add(group); groups.push(group);
+    for(let i=0;i<5;i++){
+      const cfg=configs[i];
+      const mat=new THREE.MeshStandardMaterial({color:cfg.color,emissive:cfg.emissive,emissiveIntensity:0.18,metalness:0.18,roughness:0.3});
+      const gc=document.createElement('canvas');gc.width=gc.height=128;
+      const ctx=gc.getContext('2d');
+      const grad=ctx.createRadialGradient(64,64,0,64,64,64);
+      grad.addColorStop(0,cfg.glow+'0.6)');grad.addColorStop(0.4,cfg.glow+'0.18)');grad.addColorStop(1,cfg.glow+'0)');
+      ctx.fillStyle=grad;ctx.fillRect(0,0,128,128);
+      const sprite=new THREE.Sprite(new THREE.SpriteMaterial({map:new THREE.CanvasTexture(gc),transparent:true,depthWrite:false}));
+      sprite.scale.set(5.8,5.8,1);
+      const ringGeo=new THREE.RingGeometry(2.6,4.0,128);
+      const pos=ringGeo.attributes.position,uv=ringGeo.attributes.uv,v3=new THREE.Vector3();
+      for(let j=0;j<pos.count;j++){v3.fromBufferAttribute(pos,j);uv.setXY(j,(v3.length()-2.6)/(4.0-2.6),0.5);}
+      const planetRing=new THREE.Mesh(ringGeo,new THREE.MeshBasicMaterial({map:makeRingTexture(cfg.ringColor),side:THREE.DoubleSide,transparent:true,opacity:0.78,depthWrite:false}));
+      planetRing.rotation.x=cfg.ringTilt.x;planetRing.rotation.z=cfg.ringTilt.z;
+      const group=new THREE.Group();
+      group.add(new THREE.Mesh(sphereGeo,mat));group.add(sprite);group.add(planetRing);
+      group.userData.angleOffset=i*(2*Math.PI/5);
+      group.position.set(Math.cos(group.userData.angleOffset)*R,Math.sin(group.userData.angleOffset)*R,Z);
+      scene.add(group);groups.push(group);
     }
 
-    let lastTime = performance.now(), orbitAngle = 0;
-    function animate(time) {
+    let lastTime=performance.now(),orbitAngle=0;
+    function animate(time){
       requestAnimationFrame(animate);
-      const t = time ?? performance.now();
-      const dt = t - lastTime; lastTime = t;
-      orbitAngle += SPEED * dt;
-      starMat.uniforms.time.value = t * 0.001;
-      for (const group of groups) {
-        const a = orbitAngle + group.userData.angleOffset;
-        group.position.set(Math.cos(a) * R, Math.sin(a) * R, Z);
+      const t=time??performance.now();
+      const dt=t-lastTime;lastTime=t;
+      orbitAngle+=SPEED*dt;
+      starMat.uniforms.time.value=t*0.001;
+      for(const group of groups){
+        const a=orbitAngle+group.userData.angleOffset;
+        group.position.set(Math.cos(a)*R,Math.sin(a)*R,Z);
       }
-      renderer.render(scene, camera);
+      renderer.render(scene,camera);
     }
     requestAnimationFrame(animate);
   </script>
