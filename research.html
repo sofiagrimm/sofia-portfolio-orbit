@@ -58,15 +58,13 @@
     .plinks a:hover{color:rgba(210,225,255,.9);}
     .hud{position:fixed;bottom:72px;left:50%;transform:translateX(-50%);
       z-index:20;text-align:center;pointer-events:none;}
-    .hud h2{font-family:'Cormorant Garamond',serif;font-size:34px;font-weight:300;
-      color:rgba(220,235,255,.7);}
+    .hud h2{font-family:'Cormorant Garamond',serif;font-size:34px;font-weight:300;color:rgba(220,235,255,.7);}
     .hud h2 em{font-style:italic;color:rgba(190,210,255,.65);}
     .hud p{font-size:10px;letter-spacing:.22em;text-transform:uppercase;color:rgba(140,165,220,.35);margin-top:4px;}
     .coords{position:fixed;bottom:28px;left:48px;z-index:20;
       font-size:10px;letter-spacing:.18em;color:rgba(110,130,190,.25);pointer-events:none;}
     .tagline{position:fixed;bottom:28px;right:48px;z-index:20;
-      font-size:10px;letter-spacing:.18em;text-transform:uppercase;
-      color:rgba(110,130,190,.25);pointer-events:none;}
+      font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:rgba(110,130,190,.25);pointer-events:none;}
     .hint{position:fixed;top:calc(68px + 18px);left:50%;transform:translateX(-50%);
       font-size:10px;letter-spacing:.2em;text-transform:uppercase;
       color:rgba(160,185,255,.3);z-index:20;pointer-events:none;transition:opacity 1.2s;}
@@ -97,7 +95,7 @@
 
   <div class="hud"><h2>Where the <em>work happened.</em></h2><p>drag to explore &nbsp;·&nbsp; click a pin</p></div>
   <div class="hint" id="hint">drag to rotate</div>
-  <div class="coords" id="coordEl">41.3083&deg; N &nbsp;72.9279&deg; W</div>
+  <div class="coords">41.3083&deg; N &nbsp;72.9279&deg; W</div>
   <div class="tagline">science as an explorable universe</div>
 
   <script type="module">
@@ -134,12 +132,12 @@
 
     const W=()=>window.innerWidth, H=()=>window.innerHeight;
 
-    /* ---- STAR BG RENDERER ---- */
+    /* ---- STAR BG ---- */
     const bgR=new THREE.WebGLRenderer({antialias:true});
-    bgR.setPixelRatio(Math.min(devicePixelRatio,2)); bgR.setSize(W(),H());
-    bgR.setClearColor(0x060d18,1); bgR.domElement.classList.add('bg');
+    bgR.setPixelRatio(Math.min(devicePixelRatio,2));bgR.setSize(W(),H());
+    bgR.setClearColor(0x060d18,1);bgR.domElement.classList.add('bg');
     document.body.insertBefore(bgR.domElement,document.body.firstChild);
-    const bgS=new THREE.Scene(), bgC=new THREE.PerspectiveCamera(36,W()/H(),.1,500);
+    const bgS=new THREE.Scene(),bgC=new THREE.PerspectiveCamera(36,W()/H(),.1,500);
     bgC.position.set(0,0,46);
     {const N=9000,p=new Float32Array(N*3),ph=new Float32Array(N),sp=new Float32Array(N),sz=new Float32Array(N);
      for(let i=0;i<N;i++){p[i*3]=(Math.random()-.5)*260;p[i*3+1]=(Math.random()-.5)*200;p[i*3+2]=-Math.random()*300;
@@ -158,12 +156,12 @@
          vec2 uv=gl_PointCoord-vec2(.5);float d=length(uv);if(d>.5)discard;
          float c=1.-smoothstep(0.,.44,d);gl_FragColor=vec4(vec3(.76,.88,1.)*vB,c*vB);}`,
        transparent:true,depthWrite:false});
-     bgS.add(new THREE.Points(g,m)); window._sm=m;}
+     bgS.add(new THREE.Points(g,m));window._sm=m;}
 
     /* ---- MAIN RENDERER ---- */
     const renderer=new THREE.WebGLRenderer({antialias:true,alpha:true});
-    renderer.setPixelRatio(Math.min(devicePixelRatio,2)); renderer.setSize(W(),H());
-    renderer.setClearColor(0,0); renderer.domElement.id='gc';
+    renderer.setPixelRatio(Math.min(devicePixelRatio,2));renderer.setSize(W(),H());
+    renderer.setClearColor(0,0);renderer.domElement.id='gc';
     document.body.appendChild(renderer.domElement);
     const scene=new THREE.Scene();
     const camera=new THREE.PerspectiveCamera(40,W()/H(),.1,200);
@@ -174,109 +172,83 @@
       bgC.aspect=W()/H();bgC.updateProjectionMatrix();bgR.setSize(W(),H());});
 
     /* ---- LIGHTING ---- */
-    // Ambient: dim blue-dark so night side isn't pitch black
     scene.add(new THREE.AmbientLight(0x223355,1.2));
-    // Sun: warm directional from upper-right
     const sun=new THREE.DirectionalLight(0xfff5e8,2.4);
-    sun.position.set(5,2,4); scene.add(sun);
-    // Rim: cool fill from back-left for edge interest
-    const rim=new THREE.DirectionalLight(0x3366cc,0.6);
-    rim.position.set(-5,1,-3); scene.add(rim);
+    sun.position.set(5,2,4);scene.add(sun);
+    scene.add(new THREE.DirectionalLight(0x3366cc,0.6)).position.set(-5,1,-3);
 
-    /* ---- TEXTURES (public domain NASA / Natural Earth) ---- */
+    /* ---- TEXTURES ---- */
     const TL=new THREE.TextureLoader();
-    // Day texture – NASA Blue Marble (2048px, hosted on a reliable CORS-open CDN)
-    const dayTex   = TL.load('https://unpkg.com/three-globe/example/img/earth-blue-marble.jpg');
-    const bumpTex  = TL.load('https://unpkg.com/three-globe/example/img/earth-topology.png');
-    const specTex  = TL.load('https://unpkg.com/three-globe/example/img/earth-water.png');
-    const cloudTex = TL.load('https://unpkg.com/three-globe/example/img/earth-clouds.png');
-    const nightTex = TL.load('https://unpkg.com/three-globe/example/img/earth-night.jpg');
+    const dayTex   =TL.load('https://unpkg.com/three-globe/example/img/earth-blue-marble.jpg');
+    const nightTex =TL.load('https://unpkg.com/three-globe/example/img/earth-night.jpg');
+    const cloudTex =TL.load('https://unpkg.com/three-globe/example/img/earth-clouds.png');
 
-    /* ---- GLOBE ---- */
+    /* ---- GLOBE (day/night shader) ---- */
     const R=1.0;
-    const globeGeo=new THREE.SphereGeometry(R,128,128);
-
-    // Custom shader: blends day/night based on sun angle
     const globeMat=new THREE.ShaderMaterial({
       uniforms:{
-        dayMap:   {value:dayTex},
-        nightMap: {value:nightTex},
-        bumpMap:  {value:bumpTex},
-        bumpScale:{value:0.08},
-        sunDir:   {value:sun.position.clone().normalize()},
+        dayMap:  {value:dayTex},
+        nightMap:{value:nightTex},
+        sunDir:  {value:sun.position.clone().normalize()},
       },
       vertexShader:`
-        varying vec2 vUv;
-        varying vec3 vNormal;
-        varying vec3 vPosition;
+        varying vec2 vUv; varying vec3 vNormal;
         void main(){
           vUv=uv;
           vNormal=normalize(normalMatrix*normal);
-          vPosition=(modelViewMatrix*vec4(position,1.)).xyz;
           gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);
         }`,
       fragmentShader:`
-        uniform sampler2D dayMap;
-        uniform sampler2D nightMap;
+        uniform sampler2D dayMap,nightMap;
         uniform vec3 sunDir;
-        varying vec2 vUv;
-        varying vec3 vNormal;
-        // simple day/night blend
+        varying vec2 vUv; varying vec3 vNormal;
         void main(){
-          vec3 day   = texture2D(dayMap,   vUv).rgb;
-          vec3 night = texture2D(nightMap, vUv).rgb * 1.8;
-          // world-space normal approximated from vNormal (already in view space)
-          float cosA = dot(vNormal, normalize(sunDir));
-          float blend = smoothstep(-0.18, 0.18, cosA);
-          vec3 col = mix(night, day, blend);
-          // diffuse shading on day side
-          float diff = max(0., cosA);
-          col *= 0.6 + 0.4*diff;
-          gl_FragColor = vec4(col, 1.);
+          vec3 day  =texture2D(dayMap,  vUv).rgb;
+          vec3 night=texture2D(nightMap,vUv).rgb*1.8;
+          float cosA=dot(vNormal,normalize(sunDir));
+          float blend=smoothstep(-0.18,0.18,cosA);
+          vec3 col=mix(night,day,blend);
+          col*=0.6+0.4*max(0.,cosA);
+          gl_FragColor=vec4(col,1.);
         }`,
     });
-
-    const globe=new THREE.Mesh(globeGeo,globeMat);
+    const globe=new THREE.Mesh(new THREE.SphereGeometry(R,128,128),globeMat);
     scene.add(globe);
 
-    /* ---- SPECULAR OCEAN OVERLAY ---- */
-    const specGeo=new THREE.SphereGeometry(R*1.001,128,128);
-    const specMat=new THREE.MeshPhongMaterial({
-      map:specTex,
-      transparent:true,opacity:0.18,
-      shininess:120,specular:new THREE.Color(0xaaccff),
-      blending:THREE.AdditiveBlending,depthWrite:false
-    });
-    scene.add(new THREE.Mesh(specGeo,specMat));
-
     /* ---- CLOUDS ---- */
-    const cloudGeo=new THREE.SphereGeometry(R*1.012,128,128);
     const cloudMat=new THREE.MeshPhongMaterial({
-      map:cloudTex,
-      transparent:true,opacity:0.38,
-      blending:THREE.NormalBlending,depthWrite:false
-    });
-    const clouds=new THREE.Mesh(cloudGeo,cloudMat);
+      map:cloudTex,transparent:true,opacity:0.35,
+      blending:THREE.NormalBlending,depthWrite:false});
+    const clouds=new THREE.Mesh(new THREE.SphereGeometry(R*1.010,128,128),cloudMat);
     scene.add(clouds);
 
-    /* ---- ATMOSPHERE GLOW ---- */
-    const atmosGeo=new THREE.SphereGeometry(R*1.06,64,64);
+    /* ---- ATMOSPHERE GLOW
+         Key fix: use BackSide so the shell is only visible
+         peeking past the limb edge — no front-face ring.
+         Use (1 - ndotv) WITHOUT abs() so only grazing angles glow.
+    ---- */
     const atmosMat=new THREE.ShaderMaterial({
-      uniforms:{c:{value:new THREE.Color(0x2266ff)}},
+      uniforms:{c:{value:new THREE.Color(0x1a55ee)}},
       vertexShader:`varying vec3 vN;
-        void main(){vN=normalize(normalMatrix*normal);
-        gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}`,
+        void main(){
+          vN=normalize(normalMatrix*normal);
+          gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);
+        }`,
       fragmentShader:`uniform vec3 c;varying vec3 vN;
-        void main(){float f=pow(1.-abs(dot(vN,vec3(0,0,1))),4.);
-        gl_FragColor=vec4(c,f*.6);}`,
-      side:THREE.FrontSide,blending:THREE.AdditiveBlending,
-      transparent:true,depthWrite:false});
-    scene.add(new THREE.Mesh(atmosGeo,atmosMat));
+        void main(){
+          float edge=1.0-clamp(dot(vN,vec3(0.,0.,1.)),0.,1.);
+          float f=pow(edge,3.5);
+          gl_FragColor=vec4(c,f*0.42);
+        }`,
+      side:THREE.BackSide,
+      blending:THREE.AdditiveBlending,
+      transparent:true,depthWrite:false
+    });
+    scene.add(new THREE.Mesh(new THREE.SphereGeometry(R*1.035,64,64),atmosMat));
 
     /* ---- lat/lon helper ---- */
     function ll2v(lat,lon,r){
-      const phi=(90-lat)*Math.PI/180;
-      const theta=(lon+180)*Math.PI/180;
+      const phi=(90-lat)*Math.PI/180,theta=(lon+180)*Math.PI/180;
       return new THREE.Vector3(
         -r*Math.sin(phi)*Math.cos(theta),
          r*Math.cos(phi),
@@ -290,36 +262,23 @@
 
     SITES.forEach((s,i)=>{
       const pos=ll2v(s.lat,s.lon,R);
-
-      // spike
       const spike=new THREE.Mesh(
         new THREE.CylinderGeometry(0.003,0.010,0.085,8),
         new THREE.MeshBasicMaterial({color:s.color}));
-
-      // glow dot
       const dot=new THREE.Mesh(
         new THREE.SphereGeometry(0.020,16,16),
         new THREE.MeshBasicMaterial({color:s.color}));
       dot.position.y=0.052;
-
-      // outer halo ring
       const halo=new THREE.Mesh(
         new THREE.RingGeometry(0.026,0.034,32),
-        new THREE.MeshBasicMaterial({
-          color:s.color,side:THREE.DoubleSide,
-          transparent:true,opacity:.8,depthWrite:false}));
+        new THREE.MeshBasicMaterial({color:s.color,side:THREE.DoubleSide,transparent:true,opacity:.8,depthWrite:false}));
       halo.position.y=0.054;
-
-      // second halo (slower pulse)
       const halo2=new THREE.Mesh(
-        new THREE.RingGeometry(0.034,0.040,32),
-        new THREE.MeshBasicMaterial({
-          color:s.color,side:THREE.DoubleSide,
-          transparent:true,opacity:.35,depthWrite:false}));
+        new THREE.RingGeometry(0.034,0.042,32),
+        new THREE.MeshBasicMaterial({color:s.color,side:THREE.DoubleSide,transparent:true,opacity:.3,depthWrite:false}));
       halo2.position.y=0.054;
-
       const grp=new THREE.Group();
-      grp.add(spike); grp.add(dot); grp.add(halo); grp.add(halo2);
+      grp.add(spike,dot,halo,halo2);
       grp.position.copy(pos);
       grp.quaternion.setFromUnitVectors(new THREE.Vector3(0,1,0),pos.clone().normalize());
       pinGroup.add(grp);
@@ -329,7 +288,6 @@
     /* ---- PANEL ---- */
     const panel=document.getElementById('panel');
     document.getElementById('pClose').addEventListener('click',()=>panel.classList.remove('open'));
-
     function openPanel(s){
       document.getElementById('pBar').style.background='#'+s.color.getHexString();
       document.getElementById('pEye').textContent=s.eyebrow;
@@ -346,22 +304,15 @@
 
     /* ---- DRAG / INERTIA ---- */
     let dragging=false,px=0,py=0,vx=0,vy=0,autoSpin=true,moved=false;
-    const hintEl=document.getElementById('hint');
-    let hintGone=false;
-
-    function startDrag(x,y){
-      dragging=true;px=x;py=y;autoSpin=false;moved=false;
-      if(!hintGone){hintEl.style.opacity='0';hintGone=true;}
-    }
-    function moveDrag(x,y){
-      if(!dragging)return; moved=true;
-      const dx=x-px,dy=y-py; px=x;py=y;
-      vx=dy*.006; vy=dx*.006;
-      globe.rotation.y+=vy; pinGroup.rotation.y+=vy;
-      globe.rotation.x+=vx; pinGroup.rotation.x+=vx;
-    }
+    const hintEl=document.getElementById('hint');let hintGone=false;
+    function startDrag(x,y){dragging=true;px=x;py=y;autoSpin=false;moved=false;
+      if(!hintGone){hintEl.style.opacity='0';hintGone=true;}}
+    function moveDrag(x,y){if(!dragging)return;moved=true;
+      const dx=x-px,dy=y-py;px=x;py=y;
+      vx=dy*.006;vy=dx*.006;
+      globe.rotation.y+=vy;pinGroup.rotation.y+=vy;
+      globe.rotation.x+=vx;pinGroup.rotation.x+=vx;}
     function endDrag(){dragging=false;}
-
     renderer.domElement.addEventListener('mousedown',e=>startDrag(e.clientX,e.clientY));
     window.addEventListener('mousemove',e=>{if(dragging)moveDrag(e.clientX,e.clientY);});
     window.addEventListener('mouseup',endDrag);
@@ -370,15 +321,14 @@
     window.addEventListener('touchend',endDrag);
 
     /* ---- RAYCAST CLICKS ---- */
-    const rc=new THREE.Raycaster();
-    const mv=new THREE.Vector2();
+    const rc=new THREE.Raycaster(),mv=new THREE.Vector2();
     renderer.domElement.addEventListener('mouseup',e=>{
       if(moved)return;
-      mv.x=(e.clientX/W())*2-1; mv.y=-(e.clientY/H())*2+1;
+      mv.x=(e.clientX/W())*2-1;mv.y=-(e.clientY/H())*2+1;
       rc.setFromCamera(mv,camera);
       const hits=rc.intersectObjects(pinMeshes.map(p=>p.dot),false);
       if(hits.length){const pm=pinMeshes.find(p=>p.dot===hits[0].object);if(pm)openPanel(pm.site);}
-      else if(!panel.contains(e.target)){panel.classList.remove('open');}
+      else if(!panel.contains(e.target))panel.classList.remove('open');
     });
 
     /* ---- ANIMATE ---- */
@@ -386,8 +336,7 @@
       requestAnimationFrame(animate);
       window._sm.uniforms.time.value=t*.001;
       bgR.render(bgS,bgC);
-
-      if(autoSpin){globe.rotation.y+=.0006;pinGroup.rotation.y+=.0006;clouds.rotation.y+=.00008;}
+      if(autoSpin){globe.rotation.y+=.0006;pinGroup.rotation.y+=.0006;}
       else if(!dragging){
         vx*=.90;vy*=.90;
         globe.rotation.y+=vy;pinGroup.rotation.y+=vy;
@@ -395,16 +344,14 @@
         if(Math.abs(vx)<.0001&&Math.abs(vy)<.0001)autoSpin=true;
       }
       clouds.rotation.y+=.00006;
-
       pinMeshes.forEach(({halo,halo2,phase})=>{
         const s1=0.85+0.55*Math.abs(Math.sin(t*.0022+phase));
         halo.scale.setScalar(s1);
         halo.material.opacity=0.35+0.45*Math.abs(Math.sin(t*.0022+phase));
         const s2=1.0+0.6*Math.abs(Math.sin(t*.0014+phase+1.0));
         halo2.scale.setScalar(s2);
-        halo2.material.opacity=0.15+0.2*Math.abs(Math.sin(t*.0014+phase+1.0));
+        halo2.material.opacity=0.12+0.18*Math.abs(Math.sin(t*.0014+phase+1.0));
       });
-
       renderer.render(scene,camera);
     }
     requestAnimationFrame(animate);
