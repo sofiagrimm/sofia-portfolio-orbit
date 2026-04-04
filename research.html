@@ -29,9 +29,32 @@
       transition:color .25s,background .25s;}
     .nav-links a:hover,.nav-links a.active{color:rgba(220,235,255,.9);background:rgba(100,140,255,.08);}
     .nav-links .divider{color:rgba(100,130,200,.2);font-size:13px;user-select:none;}
+
+    /* ---- RESEARCH DESCRIPTION BOX (right side) ---- */
+    .research-desc{
+      position:fixed;right:3vw;bottom:72px;
+      z-index:40;width:300px;
+      padding:22px 24px 20px;border-radius:14px;
+      background:linear-gradient(135deg,rgba(10,8,40,.88) 0%,rgba(7,6,28,.93) 100%);
+      border:1px solid rgba(140,120,255,.13);
+      box-shadow:0 8px 40px rgba(0,0,0,.75),inset 0 1px 0 rgba(180,170,255,.05);
+      backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+    }
+    .research-desc-rule{width:28px;height:1px;background:linear-gradient(90deg,rgba(160,140,255,.4),transparent);margin-bottom:14px;}
+    .research-desc p{
+      font-family:'Cormorant Garamond',serif;
+      font-size:15px;font-weight:300;font-style:italic;
+      line-height:1.72;color:rgba(210,202,255,.72);
+      letter-spacing:.015em;
+    }
+    .research-desc p em{
+      font-style:normal;color:rgba(230,225,255,.88);
+    }
+
+    /* ---- PANEL ---- */
     .panel{position:fixed;top:50%;right:3vw;
       transform:translateY(-50%) translateX(calc(100% + 40px));
-      z-index:40;width:340px;padding:28px 30px 26px;border-radius:18px;
+      z-index:50;width:340px;padding:28px 30px 26px;border-radius:18px;
       background:linear-gradient(135deg,rgba(10,8,40,.92) 0%,rgba(7,6,28,.96) 100%);
       border:1px solid rgba(140,120,255,.15);
       box-shadow:0 8px 48px rgba(0,0,0,.85),inset 0 1px 0 rgba(180,170,255,.06);
@@ -55,6 +78,8 @@
     .plinks a{font-size:11px;letter-spacing:.1em;color:rgba(160,150,255,.5);text-decoration:none;
       border-bottom:1px solid rgba(160,150,255,.12);align-self:flex-start;transition:color .2s;}
     .plinks a:hover{color:rgba(220,215,255,.9);}
+
+    /* ---- HUD (left) ---- */
     .hud{
       position:fixed;left:48px;top:50%;transform:translateY(-50%);
       z-index:20;text-align:left;pointer-events:none;
@@ -85,6 +110,13 @@
       <a href="projects.html">Projects</a>
     </div>
   </nav>
+
+  <!-- Research description text box -->
+  <div class="research-desc">
+    <div class="research-desc-rule"></div>
+    <p>On my first day in a research lab, I quickly learned two things: <em>nothing works the first time,</em> and the most interesting problems are those in which there is uncertainty.</p>
+  </div>
+
   <div class="panel" id="panel">
     <button class="panel-close" id="pClose">&times;</button>
     <div class="pcb" id="pBar"></div>
@@ -210,33 +242,23 @@
       og.addColorStop(1,   '#081630');
       ctx.fillStyle=og; ctx.fillRect(0,0,S,S);
 
-      /* ── Land definitions: [cx%, cy%, rx%, ry%, baseColor, highlight?] ──
-         Equirectangular: x=longitude 0→360 mapped 0→S, y=lat 90→-90 mapped 0→S */
       const L=[
         // ── North America ──
-        // Main landmass (broad brush)
         [0.155,0.195,0.080,0.055,'#2a5e26',true],
         [0.152,0.250,0.075,0.070,'#2e6628',true],
         [0.148,0.310,0.065,0.065,'#337030',true],
         [0.155,0.368,0.060,0.058,'#306830',true],
         [0.162,0.418,0.052,0.050,'#347534',true],
-        // Western highlands (darker green-brown)
         [0.132,0.230,0.028,0.055,'#4a6030',true],
         [0.128,0.290,0.024,0.060,'#4a5c28'],
-        // Eastern seaboard
         [0.188,0.270,0.022,0.060,'#2a6028'],
-        // Mexico / Central America
         [0.172,0.430,0.030,0.035,'#3a7432'],
         [0.178,0.456,0.022,0.022,'#3a6e30'],
-        // Florida peninsula
         [0.186,0.382,0.012,0.025,'#2e6828'],
-        // Greenland
         [0.152,0.108,0.032,0.052,'#c8d8e6'],
         [0.148,0.092,0.024,0.030,'#dce8f0'],
-        // Caribbean islands (dots)
         [0.200,0.430,0.008,0.006,'#348030'],
         [0.192,0.436,0.006,0.005,'#308030'],
-
         // ── South America ──
         [0.196,0.470,0.046,0.048,'#267028'],
         [0.190,0.518,0.050,0.055,'#206820'],
@@ -244,27 +266,19 @@
         [0.196,0.630,0.044,0.055,'#1a5818'],
         [0.200,0.680,0.038,0.040,'#1c5c1a'],
         [0.194,0.706,0.032,0.028,'#1e6018'],
-        // Andes (brown strip)
         [0.172,0.530,0.012,0.090,'#6a5030'],
         [0.170,0.620,0.010,0.060,'#604828'],
-
         // ── Europe ──
         [0.462,0.200,0.032,0.042,'#4a7030'],
         [0.480,0.222,0.034,0.044,'#507838'],
         [0.468,0.252,0.028,0.038,'#4e7432'],
         [0.450,0.228,0.022,0.035,'#486830'],
-        // Iberian Peninsula
         [0.448,0.268,0.020,0.028,'#8a7438'],
-        // Italy boot
         [0.482,0.272,0.010,0.030,'#608040'],
-        // UK/Ireland
         [0.462,0.188,0.012,0.018,'#487040'],
-        // Scandinavia
         [0.480,0.155,0.020,0.042,'#406835'],
         [0.490,0.132,0.014,0.030,'#3c6030'],
-        // Iceland
         [0.430,0.152,0.016,0.014,'#b0c4d0'],
-
         // ── Africa ──
         [0.488,0.322,0.044,0.042,'#907840'],
         [0.490,0.368,0.050,0.052,'#886e38'],
@@ -274,91 +288,62 @@
         [0.488,0.582,0.040,0.045,'#645025'],
         [0.488,0.626,0.032,0.036,'#5a4820'],
         [0.490,0.658,0.026,0.026,'#50401c'],
-        // Sahara highlight
         [0.488,0.352,0.048,0.028,'#c8a860'],
         [0.488,0.378,0.044,0.025,'#c0a058'],
-        // Congo rainforest
         [0.492,0.468,0.030,0.030,'#206018'],
-        // Madagascar
         [0.540,0.546,0.012,0.024,'#6a5c30'],
-
         // ── Middle East / Arabia ──
         [0.545,0.300,0.036,0.040,'#b09840'],
         [0.558,0.330,0.030,0.038,'#a89038'],
         [0.550,0.358,0.028,0.030,'#a08830'],
-
         // ── Asia ──
-        // Anatolia / Turkey
         [0.535,0.248,0.030,0.022,'#8a7a38'],
-        // Russia/Siberia (huge)
         [0.555,0.145,0.080,0.060,'#5a7030'],
         [0.620,0.120,0.090,0.058,'#527028'],
         [0.680,0.110,0.085,0.055,'#4e6828'],
         [0.740,0.118,0.075,0.058,'#4a6428'],
-        // Central Asia
         [0.575,0.220,0.055,0.048,'#8a8038'],
         [0.625,0.218,0.055,0.048,'#809038'],
         [0.665,0.215,0.050,0.046,'#788838'],
-        // Indian subcontinent
         [0.598,0.330,0.038,0.040,'#7a8040'],
         [0.602,0.368,0.034,0.040,'#6e7838'],
         [0.608,0.408,0.028,0.038,'#608030'],
         [0.608,0.440,0.022,0.030,'#587828'],
-        // Sri Lanka
         [0.612,0.470,0.006,0.008,'#508028'],
-        // China / East Asia
         [0.660,0.222,0.068,0.058,'#5a7030'],
         [0.688,0.240,0.058,0.050,'#527030'],
         [0.708,0.268,0.048,0.045,'#4a6828'],
         [0.715,0.295,0.040,0.040,'#486028'],
-        // Korea
         [0.730,0.262,0.012,0.018,'#4e7030'],
-        // Japan
         [0.742,0.246,0.010,0.028,'#507838'],
         [0.748,0.228,0.008,0.020,'#4e7035'],
-        // Taiwan
         [0.730,0.320,0.006,0.010,'#488038'],
-        // Southeast Asia / Indochina
         [0.690,0.368,0.028,0.038,'#407c30'],
         [0.700,0.400,0.022,0.030,'#387828'],
         [0.706,0.428,0.018,0.025,'#307420'],
-        // Malay peninsula
         [0.704,0.450,0.010,0.020,'#2a7020'],
-        // Borneo
         [0.720,0.452,0.020,0.022,'#207818'],
-        // Sumatra
         [0.700,0.458,0.022,0.015,'#257820'],
-        // Java
         [0.718,0.470,0.018,0.008,'#228020'],
-        // Philippines
         [0.740,0.400,0.010,0.030,'#287830'],
-        // New Guinea
         [0.758,0.490,0.025,0.018,'#307830'],
-
         // ── Australia ──
         [0.728,0.592,0.050,0.045,'#a07040'],
         [0.738,0.630,0.048,0.048,'#986838'],
         [0.728,0.660,0.042,0.038,'#906030'],
         [0.718,0.620,0.028,0.038,'#7a5828'],
-        // NW coast greenery
         [0.710,0.592,0.018,0.020,'#507830'],
-        // SE coast
         [0.748,0.660,0.018,0.025,'#608030'],
-        // New Zealand
         [0.780,0.668,0.010,0.022,'#4a7840'],
         [0.784,0.692,0.008,0.016,'#487040'],
-
         // ── Polar ──
-        // Antarctica
         [0.500,0.940,0.340,0.062,'#d8e8f4'],
         [0.500,0.968,0.360,0.036,'#e4eef8'],
         [0.500,0.984,0.340,0.020,'#eef4fc'],
-        // Arctic ocean ice
         [0.500,0.024,0.280,0.045,'#c4d8ea'],
         [0.500,0.010,0.250,0.025,'#d0e0f0'],
       ];
 
-      /* Draw each land mass */
       L.forEach(([cfx,cfy,rfx,rfy,baseCol,highlight])=>{
         const cx=cfx*S,cy=cfy*S,rx=rfx*S,ry=rfy*S;
         ctx.save();
@@ -374,7 +359,6 @@
         ctx.restore();
       });
 
-      /* Coastal shallow water glow */
       L.slice(0,-5).forEach(([cfx,cfy,rfx,rfy])=>{
         const cx=cfx*S,cy=cfy*S,rx=(rfx+.008)*S,ry=(rfy+.008)*S;
         ctx.save();
@@ -388,7 +372,6 @@
         ctx.restore();
       });
 
-      /* Subtle per-pixel noise for grain */
       const id=ctx.getImageData(0,0,S,S);
       for(let i=0;i<id.data.length;i+=4){
         const n=(Math.random()-.5)*10;
@@ -398,7 +381,6 @@
       }
       ctx.putImageData(id,0,0);
 
-      /* Polar latitude vignette */
       const lbg=ctx.createLinearGradient(0,0,0,S);
       lbg.addColorStop(0,  'rgba(160,195,235,0.13)');
       lbg.addColorStop(0.14,'rgba(0,0,0,0)');
@@ -409,14 +391,11 @@
       return new THREE.CanvasTexture(cv);
     }
 
-    /* Specular map: ocean=bright, land=dark, ice=bright */
     function makeSpecTex(){
       const S=1024;
       const cv=document.createElement('canvas');cv.width=S;cv.height=S;
       const ctx=cv.getContext('2d');
-      /* Ocean: medium-high specular */
       ctx.fillStyle='#8899aa'; ctx.fillRect(0,0,S,S);
-      /* Land matte patches */
       const matte=[
         [0.155,0.280,0.13,0.18],[0.190,0.560,0.11,0.18],[0.194,0.650,0.09,0.14],
         [0.465,0.230,0.07,0.10],[0.490,0.480,0.11,0.16],[0.550,0.320,0.07,0.08],
@@ -429,7 +408,6 @@
         ctx.save();ctx.beginPath();ctx.ellipse(cx,cy,rx,ry,0,0,Math.PI*2);
         ctx.fill();ctx.restore();
       });
-      /* Polar ice caps: very bright specular */
       ctx.fillStyle='rgba(230,242,255,0.95)';
       ctx.beginPath();ctx.ellipse(S/2,S*.025,S*.30,S*.046,0,0,Math.PI*2);ctx.fill();
       ctx.beginPath();ctx.ellipse(S/2,S*.960,S*.36,S*.055,0,0,Math.PI*2);ctx.fill();
@@ -469,24 +447,18 @@
           float NdL=dot(vNormal,sDir);
           float diff=max(0.,NdL);
 
-          /* Soft hemisphere ambient */
           vec3 amb=mix(vec3(.012,.018,.040),vec3(.035,.040,.055),diff);
-
-          /* Day lighting: warm sunlight */
           vec3 dayCol=baseCol*(amb+vec3(.98,.93,.86)*diff*1.05);
 
-          /* Night side: almost black with faint blue glow */
           float nightT=smoothstep(.10,-.10,NdL);
           vec3 nightCol=baseCol*vec3(.03,.035,.06)+vec3(.000,.001,.004)*spec;
           vec3 col=mix(dayCol,nightCol,nightT);
 
-          /* Specular highlight — ocean only */
           vec3 viewDir=normalize(camPos-vWorldPos);
           vec3 halfV=normalize(sDir+viewDir);
           float sh=pow(max(0.,dot(vNormal,halfV)),180.)*spec*max(0.,NdL);
           col+=vec3(.80,.88,1.0)*sh*0.65;
 
-          /* Terminator colour shift — limb goes cool blue */
           float term=smoothstep(-.04,.06,NdL);
           col=mix(col*vec3(.60,.70,.90),col,term);
 
@@ -502,7 +474,6 @@
       const s=1024,cv=document.createElement('canvas');cv.width=s;cv.height=s;
       const ctx=cv.getContext('2d');
       ctx.clearRect(0,0,s,s);
-      /* Realistic cloud bands */
       const bands=[
         {y:.18,spread:.10,alpha:.22},
         {y:.30,spread:.08,alpha:.16},
@@ -517,7 +488,6 @@
         bg.addColorStop(1,'rgba(255,255,255,0)');
         ctx.fillStyle=bg;ctx.fillRect(0,0,s,s);
       });
-      /* Scattered cumulus */
       for(let i=0;i<140;i++){
         const x=Math.random()*s,y=Math.random()*s,r=20+Math.random()*60;
         const grd=ctx.createRadialGradient(x,y,0,x,y,r);
@@ -546,7 +516,7 @@
     const clouds=new THREE.Mesh(new THREE.SphereGeometry(R*1.008,96,96),cloudMat);
     scene.add(clouds);
 
-    /* ---- ATMOSPHERE — thin realistic limb glow ---- */
+    /* ---- ATMOSPHERE ---- */
     scene.add(new THREE.Mesh(new THREE.SphereGeometry(R*1.072,64,64),new THREE.ShaderMaterial({
       vertexShader:`varying vec3 vN;void main(){vN=normalize(normalMatrix*normal);gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}`,
       fragmentShader:`varying vec3 vN;void main(){float e=1.-clamp(dot(vN,vec3(0.,0.,1.)),0.,1.);gl_FragColor=vec4(.35,.58,.95,pow(e,6.0)*.14);}`,
