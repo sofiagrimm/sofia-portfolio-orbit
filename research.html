@@ -133,7 +133,6 @@
 
     const W=()=>window.innerWidth, H=()=>window.innerHeight;
 
-    /* ---- SINGLE RENDERER ---- */
     const canvas=document.getElementById('c');
     const renderer=new THREE.WebGLRenderer({canvas,antialias:true});
     renderer.setPixelRatio(Math.min(devicePixelRatio,2));
@@ -141,8 +140,8 @@
     renderer.setClearColor(0x060d18,1);
 
     const scene=new THREE.Scene();
-    const camera=new THREE.PerspectiveCamera(42,W()/H(),0.1,500);
-    camera.position.set(0,0,2.8);
+    const camera=new THREE.PerspectiveCamera(38,W()/H(),0.1,500);
+    camera.position.set(0,0,3.6);
     camera.lookAt(0,0,0);
 
     window.addEventListener('resize',()=>{
