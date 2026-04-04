@@ -30,56 +30,60 @@
     .nav-links a:hover,.nav-links a.active{color:rgba(220,235,255,0.9);background:rgba(100,140,255,0.08);}
     .nav-links .divider{color:rgba(100,130,200,0.2);font-size:13px;user-select:none;}
 
-    /* ---- PHOTOBOOTH STRIPS ---- */
-    /* Strips are fixed to the left/right edges, start below nav (80px), end above footer (80px) */
+    /* ─────────────────────────────────────────
+       PHOTOBOOTH STRIPS
+       Width sized so frames brush the text area.
+       Page content is max-width:720px centred,
+       so at 1200px viewport the text starts at
+       (1200-720)/2 = 240px from left edge.
+       Strip width = 210px → frames reach ~210px
+       from edge, brushing the 240px text boundary.
+    ───────────────────────────────────────────── */
     .strip-wrap{
       position:fixed;
       top:80px;
       bottom:80px;
       z-index:15;
       pointer-events:none;
-      width:96px;
+      width:210px;   /* large enough to brush text */
       overflow:hidden;
     }
-    .strip-wrap.left {left:0;}
-    .strip-wrap.right{right:0;}
+    .strip-wrap.left  { left:0; }
+    .strip-wrap.right { right:0; }
 
-    /* The scrolling inner track */
     .strip-track{
       position:absolute;
-      top:0;
-      left:0;
+      top:0; left:0;
       width:100%;
       display:flex;
       flex-direction:column;
       align-items:center;
       gap:0;
-      /* will-change for GPU compositing */
       will-change:transform;
     }
 
-    /* Film strip rail background */
+    /* Film rail background — slightly transparent so stars show through */
     .strip-rail{
       position:absolute;
       inset:0;
-      background:rgba(6,4,22,0.80);
-      border-right:1px solid rgba(140,120,255,0.10);
-      backdrop-filter:blur(6px);
-      -webkit-backdrop-filter:blur(6px);
+      background:rgba(5,3,18,0.72);
+      border-right:1px solid rgba(140,120,255,0.09);
+      backdrop-filter:blur(5px);
+      -webkit-backdrop-filter:blur(5px);
     }
     .strip-wrap.right .strip-rail{
       border-right:none;
-      border-left:1px solid rgba(140,120,255,0.10);
+      border-left:1px solid rgba(140,120,255,0.09);
     }
 
-    /* Each photo frame */
+    /* Frame: large enough to be clearly readable */
     .pb-frame{
-      width:80px;
-      height:108px;
-      border-radius:4px;
+      width:174px;
+      height:230px;
+      border-radius:5px;
       overflow:hidden;
       flex-shrink:0;
-      border:1px solid rgba(160,140,255,0.14);
+      border:1px solid rgba(160,140,255,0.16);
       position:relative;
       margin:0 auto;
     }
@@ -90,23 +94,24 @@
       height:100%!important;
     }
 
-    /* Sprocket strip row between frames */
+    /* Sprocket gap between frames */
     .pb-sprocket{
       width:100%;
-      height:22px;
+      height:26px;
       display:flex;
       align-items:center;
       justify-content:space-around;
-      padding:0 8px;
+      padding:0 12px;
       flex-shrink:0;
     }
     .pb-hole{
-      width:9px;height:9px;
+      width:10px; height:10px;
       border-radius:2px;
-      background:rgba(0,0,0,0.85);
-      border:1px solid rgba(130,110,240,0.22);
+      background:rgba(0,0,0,0.88);
+      border:1px solid rgba(130,110,240,0.20);
     }
 
+    /* ── Main content ── */
     .page{position:relative;z-index:10;max-width:720px;margin:0 auto;padding:130px 32px 80px;}
     .page-eyebrow{font-size:11px;letter-spacing:0.22em;text-transform:uppercase;color:rgba(160,185,255,0.45);margin-bottom:20px;}
     .page-title{font-family:'Cormorant Garamond',serif;font-size:54px;font-weight:300;line-height:1.08;color:#eef3ff;margin-bottom:40px;}
@@ -188,10 +193,11 @@
   <div class="coords">41.3083&deg; N &nbsp; 72.9279&deg; W</div>
 
   <script>
-  // ---- PHOTOBOOTH STRIP LOGIC ----
-  const FRAME_W = 80;
-  const FRAME_H = 108;
-  const FRAME_COUNT = 8; // frames per loop (fewer, larger)
+  // ── PHOTOBOOTH STRIP LOGIC ──
+  // 3 frames per loop, large (174×230px), with 3 sprocket holes per gap
+  const FRAME_W = 174;
+  const FRAME_H = 230;
+  const FRAME_COUNT = 3;
 
   const PALETTES = [
     ['#c4b0ff','#7ecfff','#aaf0d0','#e0d0ff'],
@@ -200,107 +206,69 @@
     ['#ffe4b0','#ffd0c4','#e4b0ff','#fff0d0'],
     ['#ccf0c4','#b0d8ff','#f0d8c4','#d4fce4'],
     ['#f0c4d8','#c4ccff','#d4f0c4','#ffe4f0'],
-    ['#b8e0ff','#d8b8ff','#b8ffd8','#ffd8b8'],
-    ['#ffd4e8','#b8d4ff','#d4ffb8','#e8b8ff'],
   ];
 
   function drawFrame(canvas, palette, seed) {
     const w = canvas.width, h = canvas.height;
     const ctx = canvas.getContext('2d');
-    // gradient bg
     const g = ctx.createLinearGradient(0, 0, w, h);
     g.addColorStop(0, palette[0]);
     g.addColorStop(0.6, palette[1]);
     g.addColorStop(1, palette[2]);
     ctx.fillStyle = g;
     ctx.fillRect(0, 0, w, h);
-
-    // 2-3 soft blobs
     const rng = n => Math.abs(Math.sin(seed * 23.9 + n * 14.7));
-    for (let i = 0; i < 3; i++) {
-      const bx = rng(i*4) * w;
-      const by = rng(i*4+1) * h;
-      const br = 14 + rng(i*4+2) * 28;
-      const bg = ctx.createRadialGradient(bx, by, 0, bx, by, br);
-      bg.addColorStop(0, palette[(i+2) % palette.length] + 'bb');
-      bg.addColorStop(1, 'rgba(255,255,255,0)');
-      ctx.fillStyle = bg;
-      ctx.fillRect(0, 0, w, h);
+    for (let i = 0; i < 4; i++) {
+      const bx = rng(i*4)*w, by = rng(i*4+1)*h, br = 28+rng(i*4+2)*60;
+      const bg = ctx.createRadialGradient(bx,by,0,bx,by,br);
+      bg.addColorStop(0, palette[(i+2)%palette.length]+'bb');
+      bg.addColorStop(1,'rgba(255,255,255,0)');
+      ctx.fillStyle=bg; ctx.fillRect(0,0,w,h);
     }
-
-    // subtle geometric mark
-    ctx.save();
-    ctx.globalAlpha = 0.22;
-    ctx.strokeStyle = '#ffffff';
-    ctx.lineWidth = 1.0;
-    const mx = rng(20)*w*0.5 + w*0.2;
-    const my = rng(21)*h*0.5 + h*0.2;
-    const mr = 8 + rng(22)*16;
-    const sides = 3 + Math.floor(rng(23)*4);
+    // geometric mark
+    ctx.save(); ctx.globalAlpha=0.20; ctx.strokeStyle='#ffffff'; ctx.lineWidth=1.2;
+    const mx=rng(20)*w*.5+w*.2, my=rng(21)*h*.5+h*.2, mr=14+rng(22)*28;
+    const sides=3+Math.floor(rng(23)*4);
     ctx.beginPath();
-    for (let i = 0; i <= sides; i++) {
-      const angle = (i / sides) * Math.PI * 2 - Math.PI/2;
-      const x = mx + mr * Math.cos(angle);
-      const y = my + mr * Math.sin(angle);
-      i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
-    }
-    ctx.stroke();
-    ctx.restore();
-
-    // tiny star dots
-    ctx.fillStyle = 'rgba(255,255,255,0.55)';
-    for (let i = 0; i < 8; i++) {
-      const sx = rng(30+i)*w, sy = rng(31+i)*h, sr = 0.6 + rng(32+i)*1.2;
-      ctx.beginPath(); ctx.arc(sx, sy, sr, 0, Math.PI*2); ctx.fill();
-    }
-
-    // soft vignette
-    const vig = ctx.createRadialGradient(w/2, h/2, 0, w/2, h/2, Math.max(w,h)*0.75);
-    vig.addColorStop(0, 'rgba(0,0,0,0)');
-    vig.addColorStop(1, 'rgba(0,0,0,0.28)');
-    ctx.fillStyle = vig;
-    ctx.fillRect(0, 0, w, h);
+    for(let i=0;i<=sides;i++){const a=(i/sides)*Math.PI*2-Math.PI/2;ctx.lineTo(mx+mr*Math.cos(a),my+mr*Math.sin(a));}
+    ctx.stroke(); ctx.restore();
+    // star dots
+    ctx.fillStyle='rgba(255,255,255,0.55)';
+    for(let i=0;i<12;i++){const sx=rng(30+i)*w,sy=rng(31+i)*h,sr=0.7+rng(32+i)*1.6;ctx.beginPath();ctx.arc(sx,sy,sr,0,Math.PI*2);ctx.fill();}
+    // vignette
+    const vig=ctx.createRadialGradient(w/2,h/2,0,w/2,h/2,Math.max(w,h)*.75);
+    vig.addColorStop(0,'rgba(0,0,0,0)'); vig.addColorStop(1,'rgba(0,0,0,0.32)');
+    ctx.fillStyle=vig; ctx.fillRect(0,0,w,h);
   }
 
   function buildTrack(trackId, direction, speed) {
     const track = document.getElementById(trackId);
-
-    // Build one full set of frames + spacers
     function makeSet(seedOffset) {
       const frag = document.createDocumentFragment();
       for (let i = 0; i < FRAME_COUNT; i++) {
-        // sprocket row above each frame
         const sp = document.createElement('div');
         sp.className = 'pb-sprocket';
         sp.innerHTML = '<div class="pb-hole"></div><div class="pb-hole"></div><div class="pb-hole"></div>';
         frag.appendChild(sp);
-
         const frame = document.createElement('div');
         frame.className = 'pb-frame';
         const c = document.createElement('canvas');
-        c.width = FRAME_W;
-        c.height = FRAME_H;
-        drawFrame(c, PALETTES[(i + seedOffset) % PALETTES.length], i * 11 + seedOffset * 7);
+        c.width = FRAME_W; c.height = FRAME_H;
+        drawFrame(c, PALETTES[(i+seedOffset) % PALETTES.length], i*11+seedOffset*7);
         frame.appendChild(c);
         frag.appendChild(frame);
       }
-      // final sprocket
       const sp = document.createElement('div');
       sp.className = 'pb-sprocket';
       sp.innerHTML = '<div class="pb-hole"></div><div class="pb-hole"></div><div class="pb-hole"></div>';
       frag.appendChild(sp);
       return frag;
     }
-
-    // Two copies for seamless loop
     track.appendChild(makeSet(0));
-    track.appendChild(makeSet(4));
-
-    // Measure one set height after render
+    track.appendChild(makeSet(3));
     requestAnimationFrame(() => {
-      const totalH = track.scrollHeight / 2; // half = one loop
+      const totalH = track.scrollHeight / 2;
       let offset = direction === 'up' ? 0 : -totalH;
-
       function tick() {
         offset += direction === 'up' ? -speed : speed;
         if (direction === 'up'  && offset <= -totalH) offset = 0;
@@ -312,8 +280,8 @@
     });
   }
 
-  buildTrack('trackLeft',  'up',   0.18);
-  buildTrack('trackRight', 'down', 0.14);
+  buildTrack('trackLeft',  'up',   0.15);
+  buildTrack('trackRight', 'down', 0.12);
   </script>
 
   <script type="module">
