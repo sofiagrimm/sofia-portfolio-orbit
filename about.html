@@ -29,6 +29,8 @@
       transition:color .25s,background .25s;}
     .nav-links a:hover,.nav-links a.active{color:rgba(220,235,255,0.9);background:rgba(100,140,255,0.08);}
     .nav-links .divider{color:rgba(100,130,200,0.2);font-size:13px;user-select:none;}
+
+    /* ── Film strips ── */
     .strip-wrap{
       position:fixed;top:80px;bottom:80px;z-index:15;pointer-events:none;width:316px;overflow:hidden;
     }
@@ -59,6 +61,8 @@
       width:11px;height:11px;border-radius:2px;
       background:rgba(0,0,0,0.90);border:1px solid rgba(130,110,240,0.22);
     }
+
+    /* ── Page layout ── */
     .page{position:relative;z-index:10;max-width:720px;margin:0 auto;padding:130px 32px 80px;}
     .page-eyebrow{font-size:11px;letter-spacing:0.22em;text-transform:uppercase;color:rgba(160,185,255,0.45);margin-bottom:20px;}
     .page-title{font-family:'Cormorant Garamond',serif;font-size:54px;font-weight:300;line-height:1.08;color:#eef3ff;margin-bottom:40px;}
@@ -78,103 +82,238 @@
       background:linear-gradient(90deg,rgba(100,130,200,0.18),transparent);
     }
 
-    /* ── At a Glance cards ── */
+    /* ═══════════════════════════════════════════
+       AT A GLANCE — redesigned cards
+    ═══════════════════════════════════════════ */
     .glance-grid{
       display:grid;
       grid-template-columns:1fr 1fr;
       gap:14px;
     }
+
     .glance-card{
       position:relative;overflow:hidden;
-      border-radius:14px;
-      padding:20px 22px 18px;
-      background:rgba(8,14,42,0.55);
-      border:1px solid rgba(100,130,220,0.12);
-      backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
-      transition:border-color .3s, transform .3s, box-shadow .3s;
+      border-radius:16px;
+      padding:24px 22px 20px;
+      background:rgba(8,14,46,0.62);
+      border:1px solid rgba(100,130,220,0.13);
+      backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
+      transition:border-color .32s, transform .32s, box-shadow .32s;
       cursor:default;
     }
-    .glance-card::before{
-      content:'';
-      position:absolute;inset:0;border-radius:14px;
-      background:var(--card-glow,rgba(100,140,255,0.04));
-      opacity:0;transition:opacity .3s;
-      pointer-events:none;
-    }
-    .glance-card:hover{
-      border-color:var(--card-border, rgba(120,160,255,0.32));
-      transform:translateY(-2px);
-      box-shadow:0 8px 36px rgba(0,0,0,0.45), 0 0 28px var(--card-shadow,rgba(80,120,255,0.10));
-    }
-    .glance-card:hover::before{opacity:1;}
 
-    /* accent stripe top */
+    /* top accent stripe */
     .glance-card::after{
       content:'';
-      position:absolute;top:0;left:18px;right:18px;height:1px;
-      background:var(--card-stripe,linear-gradient(90deg,transparent,rgba(140,170,255,0.4),transparent));
-      border-radius:1px;
+      position:absolute;top:0;left:0;right:0;height:2px;
+      background:var(--card-stripe);
+      border-radius:16px 16px 0 0;
     }
 
-    .gc-icon{
-      width:34px;height:34px;border-radius:9px;
-      background:var(--card-icon-bg,rgba(80,110,200,0.18));
-      border:1px solid var(--card-icon-border,rgba(100,140,255,0.22));
-      display:flex;align-items:center;justify-content:center;
-      margin-bottom:13px;
-      font-size:16px;line-height:1;
+    /* ambient glow layer */
+    .glance-card::before{
+      content:'';
+      position:absolute;inset:0;
+      background:radial-gradient(ellipse 60% 50% at 20% 0%, var(--card-glow-color) 0%, transparent 70%);
+      opacity:0;transition:opacity .35s;
+      pointer-events:none;border-radius:16px;
+    }
+    .glance-card:hover::before{opacity:1;}
+    .glance-card:hover{
+      border-color:var(--card-border);
+      transform:translateY(-3px);
+      box-shadow:0 12px 48px rgba(0,0,0,0.5), 0 0 0 1px var(--card-border), 0 0 40px var(--card-outer-glow);
+    }
+
+    /* ── Card header row ── */
+    .gc-header{
+      display:flex;align-items:center;justify-content:space-between;
+      margin-bottom:14px;
     }
     .gc-label{
       font-size:9px;font-weight:500;letter-spacing:0.22em;text-transform:uppercase;
-      color:var(--card-accent,rgba(160,185,255,0.55));
-      margin-bottom:8px;
+      color:var(--card-accent);
     }
+    .gc-icon-wrap{
+      width:32px;height:32px;border-radius:8px;
+      background:var(--card-icon-bg);
+      border:1px solid var(--card-icon-border);
+      display:flex;align-items:center;justify-content:center;
+      flex-shrink:0;
+    }
+    .gc-icon-wrap svg{width:16px;height:16px;stroke:var(--card-accent);fill:none;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round;}
+
+    /* ── Big stat number ── */
+    .gc-stat{
+      font-family:'Cormorant Garamond',serif;
+      font-size:38px;font-weight:300;line-height:1;
+      color:var(--card-accent);
+      margin-bottom:4px;
+      letter-spacing:-0.01em;
+    }
+    .gc-stat-label{
+      font-size:10px;font-weight:400;letter-spacing:0.14em;text-transform:uppercase;
+      color:rgba(180,200,255,0.42);margin-bottom:12px;
+    }
+
+    /* ── Body text ── */
     .gc-value{
-      font-size:13.5px;font-weight:300;line-height:1.65;
-      color:rgba(210,226,255,0.82);
+      font-size:13px;font-weight:300;line-height:1.7;
+      color:rgba(210,226,255,0.80);
     }
     .gc-value strong{
       font-weight:500;
-      color:rgba(230,240,255,0.96);
+      color:rgba(232,242,255,0.98);
     }
-    .gc-value .dot{
-      color:var(--card-accent,rgba(140,170,255,0.5));
-      margin:0 4px;
-      font-size:10px;
+    .gc-value .muted{
+      color:var(--card-accent);
+      font-size:11px;opacity:0.65;
     }
-    /* pill-style inline tags inside a card */
-    .gc-pills{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px;}
+
+    /* ── Pill tags ── */
+    .gc-pills{display:flex;flex-wrap:wrap;gap:7px;margin-top:8px;}
     .gc-pill{
       font-size:10px;letter-spacing:0.10em;text-transform:uppercase;
-      color:var(--card-accent,rgba(160,190,255,0.7));
-      border:1px solid var(--card-icon-border,rgba(100,140,255,0.22));
-      padding:3px 10px;border-radius:20px;
-      background:var(--card-icon-bg,rgba(80,110,200,0.12));
+      color:var(--card-accent);
+      border:1px solid var(--card-icon-border);
+      padding:4px 11px;border-radius:20px;
+      background:var(--card-icon-bg);
+      transition:border-color .2s, background .2s;
+    }
+    .gc-pill:hover{
+      border-color:var(--card-border);
+      background:rgba(255,255,255,0.06);
     }
 
-    /* color themes per card */
-    .gc--blue   {--card-glow:rgba(80,140,255,0.07);--card-border:rgba(100,160,255,0.35);--card-shadow:rgba(80,140,255,0.14);--card-stripe:linear-gradient(90deg,transparent,rgba(100,160,255,0.45),transparent);--card-accent:rgba(140,185,255,0.70);--card-icon-bg:rgba(60,100,220,0.18);--card-icon-border:rgba(100,150,255,0.28);}
-    .gc--purple {--card-glow:rgba(180,100,255,0.07);--card-border:rgba(190,120,255,0.35);--card-shadow:rgba(160,80,255,0.14);--card-stripe:linear-gradient(90deg,transparent,rgba(190,130,255,0.45),transparent);--card-accent:rgba(200,160,255,0.75);--card-icon-bg:rgba(140,60,220,0.18);--card-icon-border:rgba(180,110,255,0.28);}
-    .gc--cyan   {--card-glow:rgba(40,210,255,0.07);--card-border:rgba(60,220,255,0.30);--card-shadow:rgba(40,200,255,0.12);--card-stripe:linear-gradient(90deg,transparent,rgba(60,220,255,0.40),transparent);--card-accent:rgba(100,220,255,0.72);--card-icon-bg:rgba(20,160,200,0.18);--card-icon-border:rgba(40,200,255,0.28);}
-    .gc--green  {--card-glow:rgba(40,220,140,0.07);--card-border:rgba(60,230,150,0.30);--card-shadow:rgba(40,200,120,0.12);--card-stripe:linear-gradient(90deg,transparent,rgba(60,220,150,0.40),transparent);--card-accent:rgba(80,230,160,0.72);--card-icon-bg:rgba(20,160,90,0.18);--card-icon-border:rgba(40,200,120,0.28);}
-    .gc--gold   {--card-glow:rgba(255,200,60,0.07);--card-border:rgba(255,210,80,0.30);--card-shadow:rgba(240,180,40,0.12);--card-stripe:linear-gradient(90deg,transparent,rgba(255,210,80,0.40),transparent);--card-accent:rgba(255,215,90,0.75);--card-icon-bg:rgba(180,130,10,0.20);--card-icon-border:rgba(240,190,50,0.28);}
-    .gc--rose   {--card-glow:rgba(255,100,160,0.07);--card-border:rgba(255,120,170,0.30);--card-shadow:rgba(240,80,140,0.12);--card-stripe:linear-gradient(90deg,transparent,rgba(255,130,175,0.40),transparent);--card-accent:rgba(255,150,185,0.75);--card-icon-bg:rgba(180,40,90,0.20);--card-icon-border:rgba(240,100,150,0.28);}
+    /* ── Language rows ── */
+    .gc-lang-row{
+      display:flex;align-items:center;justify-content:space-between;
+      padding:5px 0;
+      border-bottom:1px solid rgba(255,255,255,0.04);
+    }
+    .gc-lang-row:last-child{border-bottom:none;}
+    .gc-lang-name{font-size:13px;font-weight:500;color:rgba(230,240,255,0.92);}
+    .gc-lang-level{
+      font-size:9px;letter-spacing:0.14em;text-transform:uppercase;
+      color:var(--card-accent);opacity:0.75;
+    }
+    .gc-lang-dots{
+      display:flex;gap:3px;margin-left:10px;
+    }
+    .gc-lang-dot{
+      width:5px;height:5px;border-radius:50%;
+      background:var(--card-accent);opacity:0.22;
+    }
+    .gc-lang-dot.filled{opacity:0.85;}
 
-    /* ── Awards ── */
-    .awards{display:flex;flex-direction:column;gap:8px;margin-top:4px;}
+    /* ── Cert rows ── */
+    .gc-cert-row{
+      display:flex;align-items:flex-start;gap:10px;
+      padding:6px 0;
+      border-bottom:1px solid rgba(255,255,255,0.04);
+    }
+    .gc-cert-row:last-child{border-bottom:none;}
+    .gc-cert-dot{
+      width:6px;height:6px;border-radius:50%;
+      background:var(--card-accent);flex-shrink:0;margin-top:5px;
+    }
+    .gc-cert-text{font-size:12.5px;font-weight:300;color:rgba(220,234,255,0.80);line-height:1.5;}
+    .gc-cert-text strong{font-weight:500;color:rgba(235,244,255,0.96);}
+
+    /* ── Activity rows ── */
+    .gc-act-row{
+      display:flex;flex-direction:column;
+      padding:7px 0;
+      border-bottom:1px solid rgba(255,255,255,0.04);
+    }
+    .gc-act-row:last-child{border-bottom:none;}
+    .gc-act-name{font-size:13px;font-weight:500;color:rgba(232,242,255,0.94);}
+    .gc-act-role{font-size:11px;color:var(--card-accent);opacity:0.75;margin-top:1px;letter-spacing:0.06em;}
+
+    /* ── Color themes ── */
+    .gc--blue   {--card-glow-color:rgba(80,140,255,0.12);--card-border:rgba(100,160,255,0.40);--card-outer-glow:rgba(80,140,255,0.08);--card-stripe:linear-gradient(90deg,rgba(80,140,255,0.8),rgba(120,180,255,0.5),rgba(80,140,255,0.1));--card-accent:rgba(140,190,255,0.88);--card-icon-bg:rgba(60,100,220,0.20);--card-icon-border:rgba(100,150,255,0.30);}
+    .gc--purple {--card-glow-color:rgba(180,100,255,0.12);--card-border:rgba(190,120,255,0.40);--card-outer-glow:rgba(160,80,255,0.08);--card-stripe:linear-gradient(90deg,rgba(180,100,255,0.8),rgba(210,150,255,0.5),rgba(180,100,255,0.1));--card-accent:rgba(210,165,255,0.88);--card-icon-bg:rgba(140,60,220,0.20);--card-icon-border:rgba(180,110,255,0.30);}
+    .gc--cyan   {--card-glow-color:rgba(40,210,255,0.10);--card-border:rgba(60,220,255,0.36);--card-outer-glow:rgba(40,200,255,0.07);--card-stripe:linear-gradient(90deg,rgba(40,210,255,0.8),rgba(80,230,255,0.5),rgba(40,210,255,0.1));--card-accent:rgba(100,225,255,0.88);--card-icon-bg:rgba(20,160,200,0.20);--card-icon-border:rgba(40,200,255,0.30);}
+    .gc--green  {--card-glow-color:rgba(40,220,140,0.10);--card-border:rgba(60,230,150,0.36);--card-outer-glow:rgba(40,200,120,0.07);--card-stripe:linear-gradient(90deg,rgba(40,220,140,0.8),rgba(80,240,170,0.5),rgba(40,220,140,0.1));--card-accent:rgba(80,235,165,0.88);--card-icon-bg:rgba(20,160,90,0.20);--card-icon-border:rgba(40,200,120,0.30);}
+    .gc--gold   {--card-glow-color:rgba(255,200,60,0.10);--card-border:rgba(255,215,90,0.36);--card-outer-glow:rgba(240,180,40,0.08);--card-stripe:linear-gradient(90deg,rgba(255,200,60,0.8),rgba(255,225,110,0.5),rgba(255,200,60,0.1));--card-accent:rgba(255,220,100,0.90);--card-icon-bg:rgba(180,130,10,0.22);--card-icon-border:rgba(240,190,50,0.30);}
+    .gc--rose   {--card-glow-color:rgba(255,100,160,0.10);--card-border:rgba(255,130,175,0.36);--card-outer-glow:rgba(240,80,140,0.07);--card-stripe:linear-gradient(90deg,rgba(255,100,160,0.8),rgba(255,150,195,0.5),rgba(255,100,160,0.1));--card-accent:rgba(255,155,190,0.88);--card-icon-bg:rgba(180,40,90,0.22);--card-icon-border:rgba(240,100,150,0.30);}
+
+    /* ═══════════════════════════════════════════
+       HONORS & AWARDS — redesigned
+    ═══════════════════════════════════════════ */
+    .awards{
+      display:flex;flex-direction:column;gap:10px;
+      margin-top:4px;
+    }
     .award{
-      display:flex;align-items:baseline;justify-content:space-between;
-      font-size:13px;font-weight:300;color:rgba(190,210,255,0.68);line-height:1.5;
-      padding:10px 14px;border-radius:10px;
-      background:rgba(8,14,42,0.40);border:1px solid rgba(100,130,200,0.10);
-      transition:border-color .25s, background .25s;
+      position:relative;overflow:hidden;
+      display:flex;align-items:center;gap:16px;
+      padding:16px 20px;
+      border-radius:14px;
+      background:rgba(8,14,46,0.55);
+      border:1px solid rgba(100,130,220,0.12);
+      backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
+      transition:border-color .28s, transform .28s, box-shadow .28s, background .28s;
     }
-    .award:hover{background:rgba(12,20,58,0.60);border-color:rgba(120,155,255,0.22);}
-    .award-name{flex:1;}
+    .award::before{
+      content:'';
+      position:absolute;left:0;top:0;bottom:0;width:2px;
+      background:var(--award-stripe, linear-gradient(180deg, rgba(140,170,255,0.6), rgba(100,130,220,0.2)));
+      border-radius:14px 0 0 14px;
+    }
+    .award:hover{
+      transform:translateX(3px);
+      background:rgba(12,20,58,0.70);
+      border-color:var(--award-border, rgba(140,170,255,0.28));
+      box-shadow:0 8px 36px rgba(0,0,0,0.38), -4px 0 28px var(--award-glow, rgba(120,150,255,0.06));
+    }
+
+    /* rank badge */
+    .award-rank{
+      flex-shrink:0;
+      width:36px;height:36px;
+      border-radius:10px;
+      background:var(--award-badge-bg, rgba(60,80,180,0.20));
+      border:1px solid var(--award-badge-border, rgba(100,130,220,0.25));
+      display:flex;align-items:center;justify-content:center;
+      font-family:'Cormorant Garamond',serif;
+      font-size:16px;font-weight:300;
+      color:var(--award-badge-color, rgba(160,190,255,0.85));
+      transition:box-shadow .28s;
+    }
+    .award:hover .award-rank{
+      box-shadow:0 0 14px var(--award-glow, rgba(120,150,255,0.20));
+    }
+
+    /* content */
+    .award-content{flex:1;min-width:0;}
+    .award-name{
+      font-size:13.5px;font-weight:400;
+      color:rgba(220,234,255,0.90);
+      line-height:1.4;
+      white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+    }
+    .award-org{
+      font-size:10px;letter-spacing:0.10em;
+      color:rgba(150,175,255,0.42);margin-top:2px;
+    }
+
+    /* year badge */
     .award-year{
-      font-size:10px;letter-spacing:0.14em;font-weight:400;
-      color:rgba(140,165,255,0.45);margin-left:12px;white-space:nowrap;
+      flex-shrink:0;
+      font-size:10px;letter-spacing:0.14em;font-weight:500;
+      color:var(--award-badge-color, rgba(160,190,255,0.70));
+      background:var(--award-badge-bg, rgba(60,80,180,0.20));
+      border:1px solid var(--award-badge-border, rgba(100,130,220,0.20));
+      padding:4px 10px;border-radius:20px;
+      white-space:nowrap;
     }
+
+    /* tier color themes */
+    .award--gold   {--award-stripe:linear-gradient(180deg,rgba(255,215,80,0.9),rgba(255,180,40,0.3));--award-border:rgba(255,215,80,0.35);--award-glow:rgba(255,200,60,0.10);--award-badge-bg:rgba(140,100,0,0.25);--award-badge-border:rgba(255,200,60,0.35);--award-badge-color:rgba(255,220,100,0.95);}
+    .award--silver {--award-stripe:linear-gradient(180deg,rgba(180,200,255,0.8),rgba(140,165,220,0.25));--award-border:rgba(180,210,255,0.30);--award-glow:rgba(160,190,255,0.08);--award-badge-bg:rgba(80,100,180,0.22);--award-badge-border:rgba(160,190,255,0.28);--award-badge-color:rgba(190,215,255,0.92);}
+    .award--teal   {--award-stripe:linear-gradient(180deg,rgba(60,220,200,0.8),rgba(40,180,160,0.25));--award-border:rgba(60,220,200,0.28);--award-glow:rgba(40,200,180,0.08);--award-badge-bg:rgba(20,120,110,0.22);--award-badge-border:rgba(40,200,180,0.28);--award-badge-color:rgba(80,230,210,0.92);}
+    .award--rose   {--award-stripe:linear-gradient(180deg,rgba(255,130,175,0.8),rgba(220,80,140,0.25));--award-border:rgba(255,130,175,0.28);--award-glow:rgba(240,80,140,0.08);--award-badge-bg:rgba(140,30,80,0.22);--award-badge-border:rgba(240,100,150,0.28);--award-badge-color:rgba(255,155,190,0.92);}
 
     /* ── Skills tags ── */
     .tags{display:flex;flex-wrap:wrap;gap:9px;margin-top:44px;margin-bottom:60px;}
@@ -224,96 +363,219 @@
 
       <!-- Education -->
       <div class="glance-card gc--blue">
-        <div class="gc-icon">🎓</div>
-        <div class="gc-label">Education</div>
+        <div class="gc-header">
+          <span class="gc-label">Education</span>
+          <div class="gc-icon-wrap">
+            <svg viewBox="0 0 24 24"><path d="M22 10v6M2 10l10-5 10 5-10 5-10-5z"/><path d="M6 12v5c3.33 1.67 8.67 1.67 12 0v-5"/></svg>
+          </div>
+        </div>
+        <div class="gc-stat">3.83</div>
+        <div class="gc-stat-label">GPA &middot; Class of 2029</div>
         <div class="gc-value">
           <strong>Yale University</strong><br>
-          B.S. Chemistry &amp; EPE<br>
-          <span style="color:rgba(140,185,255,0.55);font-size:12px;">Class of 2029 &nbsp;&middot;&nbsp; GPA 3.83</span>
+          B.S. Chemistry &amp; EPE
         </div>
       </div>
 
       <!-- Locations -->
       <div class="glance-card gc--cyan">
-        <div class="gc-icon">🌏</div>
-        <div class="gc-label">Locations</div>
-        <div class="gc-value">
-          <div class="gc-pills">
-            <span class="gc-pill">New Haven, CT</span>
-            <span class="gc-pill">Chicago, IL</span>
-            <span class="gc-pill">Hong Kong SAR</span>
+        <div class="gc-header">
+          <span class="gc-label">Locations</span>
+          <div class="gc-icon-wrap">
+            <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
           </div>
+        </div>
+        <div class="gc-stat">3</div>
+        <div class="gc-stat-label">Cities called home</div>
+        <div class="gc-pills">
+          <span class="gc-pill">New Haven, CT</span>
+          <span class="gc-pill">Chicago, IL</span>
+          <span class="gc-pill">Hong Kong SAR</span>
         </div>
       </div>
 
       <!-- Languages -->
       <div class="glance-card gc--purple">
-        <div class="gc-icon">💬</div>
-        <div class="gc-label">Languages</div>
-        <div class="gc-value">
-          <div style="display:flex;flex-direction:column;gap:4px;margin-top:2px;">
-            <div><strong>English</strong> <span style="font-size:11px;color:rgba(190,160,255,0.5);">Native</span></div>
-            <div><strong>Chinese</strong> <span style="font-size:11px;color:rgba(190,160,255,0.5);">Fluent</span></div>
-            <div><strong>Spanish</strong> <span style="font-size:11px;color:rgba(190,160,255,0.5);">Heritage</span></div>
-            <div><strong>Latin</strong> <span style="font-size:11px;color:rgba(190,160,255,0.5);">Working</span></div>
+        <div class="gc-header">
+          <span class="gc-label">Languages</span>
+          <div class="gc-icon-wrap">
+            <svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+          </div>
+        </div>
+        <div class="gc-stat">4</div>
+        <div class="gc-stat-label">Languages spoken</div>
+        <div style="margin-top:2px;">
+          <div class="gc-lang-row">
+            <span class="gc-lang-name">English</span>
+            <div style="display:flex;align-items:center;gap:6px;">
+              <div class="gc-lang-dots"><div class="gc-lang-dot filled"></div><div class="gc-lang-dot filled"></div><div class="gc-lang-dot filled"></div><div class="gc-lang-dot filled"></div></div>
+              <span class="gc-lang-level">Native</span>
+            </div>
+          </div>
+          <div class="gc-lang-row">
+            <span class="gc-lang-name">Chinese</span>
+            <div style="display:flex;align-items:center;gap:6px;">
+              <div class="gc-lang-dots"><div class="gc-lang-dot filled"></div><div class="gc-lang-dot filled"></div><div class="gc-lang-dot filled"></div><div class="gc-lang-dot filled"></div></div>
+              <span class="gc-lang-level">Fluent</span>
+            </div>
+          </div>
+          <div class="gc-lang-row">
+            <span class="gc-lang-name">Spanish</span>
+            <div style="display:flex;align-items:center;gap:6px;">
+              <div class="gc-lang-dots"><div class="gc-lang-dot filled"></div><div class="gc-lang-dot filled"></div><div class="gc-lang-dot filled"></div><div class="gc-lang-dot"></div></div>
+              <span class="gc-lang-level">Heritage</span>
+            </div>
+          </div>
+          <div class="gc-lang-row">
+            <span class="gc-lang-name">Latin</span>
+            <div style="display:flex;align-items:center;gap:6px;">
+              <div class="gc-lang-dots"><div class="gc-lang-dot filled"></div><div class="gc-lang-dot filled"></div><div class="gc-lang-dot"></div><div class="gc-lang-dot"></div></div>
+              <span class="gc-lang-level">Working</span>
+            </div>
           </div>
         </div>
       </div>
 
       <!-- Programming -->
       <div class="glance-card gc--green">
-        <div class="gc-icon">⌨️</div>
-        <div class="gc-label">Programming</div>
-        <div class="gc-value">
-          <div class="gc-pills">
-            <span class="gc-pill">Python</span>
-            <span class="gc-pill">PyTorch</span>
-            <span class="gc-pill">TensorFlow</span>
-            <span class="gc-pill">SQL</span>
-            <span class="gc-pill">JavaScript</span>
-            <span class="gc-pill">NetLogo</span>
+        <div class="gc-header">
+          <span class="gc-label">Programming</span>
+          <div class="gc-icon-wrap">
+            <svg viewBox="0 0 24 24"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
           </div>
+        </div>
+        <div class="gc-stat">6</div>
+        <div class="gc-stat-label">Languages &amp; frameworks</div>
+        <div class="gc-pills">
+          <span class="gc-pill">Python</span>
+          <span class="gc-pill">PyTorch</span>
+          <span class="gc-pill">TensorFlow</span>
+          <span class="gc-pill">SQL</span>
+          <span class="gc-pill">JavaScript</span>
+          <span class="gc-pill">NetLogo</span>
         </div>
       </div>
 
       <!-- Certifications -->
       <div class="glance-card gc--gold">
-        <div class="gc-icon">🏅</div>
-        <div class="gc-label">Certifications</div>
-        <div class="gc-value">
-          <div style="display:flex;flex-direction:column;gap:5px;margin-top:2px;">
-            <div><strong>IBM</strong> Data Science Professional</div>
-            <div><strong>QubitxQubit</strong> Quantum Winter School</div>
-            <div><strong>Microsoft</strong> Intensive Quantum</div>
+        <div class="gc-header">
+          <span class="gc-label">Certifications</span>
+          <div class="gc-icon-wrap">
+            <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89L17 22l-5-3-5 3 1.523-9.11"/></svg>
           </div>
+        </div>
+        <div class="gc-stat">3</div>
+        <div class="gc-stat-label">Professional certifications</div>
+        <div style="margin-top:4px;">
+          <div class="gc-cert-row"><div class="gc-cert-dot"></div><div class="gc-cert-text"><strong>IBM</strong> Data Science Professional</div></div>
+          <div class="gc-cert-row"><div class="gc-cert-dot"></div><div class="gc-cert-text"><strong>QubitxQubit</strong> Quantum Winter School</div></div>
+          <div class="gc-cert-row"><div class="gc-cert-dot"></div><div class="gc-cert-text"><strong>Microsoft</strong> Intensive Quantum</div></div>
         </div>
       </div>
 
       <!-- Activities -->
       <div class="glance-card gc--rose">
-        <div class="gc-icon">✦</div>
-        <div class="gc-label">Activities</div>
-        <div class="gc-value">
-          <div style="display:flex;flex-direction:column;gap:5px;margin-top:2px;">
-            <div><strong>Yale College Council</strong><br><span style="font-size:12px;color:rgba(255,150,185,0.55);">Director of Social Events</span></div>
-            <div><strong>Yale Undergraduate Law Journal</strong><br><span style="font-size:12px;color:rgba(255,150,185,0.55);">Online Editor</span></div>
+        <div class="gc-header">
+          <span class="gc-label">Activities</span>
+          <div class="gc-icon-wrap">
+            <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          </div>
+        </div>
+        <div class="gc-stat">2</div>
+        <div class="gc-stat-label">Leadership roles</div>
+        <div style="margin-top:4px;">
+          <div class="gc-act-row">
+            <span class="gc-act-name">Yale College Council</span>
+            <span class="gc-act-role">Director of Social Events</span>
+          </div>
+          <div class="gc-act-row">
+            <span class="gc-act-name">Yale Undergraduate Law Journal</span>
+            <span class="gc-act-role">Online Editor</span>
           </div>
         </div>
       </div>
 
     </div><!-- /glance-grid -->
 
+    <!-- ══════════════════════════════════════
+         HONORS & AWARDS
+    ══════════════════════════════════════ -->
     <div class="section-label">Honors &amp; Awards</div>
     <div class="awards">
-      <div class="award"><span class="award-name">Best Solo Hack, YHack</span><span class="award-year">2026</span></div>
-      <div class="award"><span class="award-name">Gold, Hispanic Heritage Youth Award</span><span class="award-year">2025</span></div>
-      <div class="award"><span class="award-name">National Merit Finalist</span><span class="award-year">2025</span></div>
-      <div class="award"><span class="award-name">National Honorable Mention, NCWIT Award for Aspirations in Computing</span><span class="award-year">2024 &amp; 2025</span></div>
-      <div class="award"><span class="award-name">Gold, Presidential Service Award</span><span class="award-year">2024</span></div>
-      <div class="award"><span class="award-name">RISE Finalist, Schmidt Futures &amp; Rhodes Trust</span><span class="award-year">2023</span></div>
-      <div class="award"><span class="award-name">Fan Favorite, Chicago Cubs STEAM Fair</span><span class="award-year">2023</span></div>
-      <div class="award"><span class="award-name">CCIR STEM Scholarship &amp; Spotlight Scholar Nomination</span><span class="award-year">2023</span></div>
-    </div>
+
+      <div class="award award--gold">
+        <div class="award-rank">I</div>
+        <div class="award-content">
+          <div class="award-name">Best Solo Hack, YHack</div>
+          <div class="award-org">Yale University Annual Hackathon</div>
+        </div>
+        <div class="award-year">2026</div>
+      </div>
+
+      <div class="award award--gold">
+        <div class="award-rank">I</div>
+        <div class="award-content">
+          <div class="award-name">Gold &mdash; Hispanic Heritage Youth Award</div>
+          <div class="award-org">National recognition</div>
+        </div>
+        <div class="award-year">2025</div>
+      </div>
+
+      <div class="award award--silver">
+        <div class="award-rank">II</div>
+        <div class="award-content">
+          <div class="award-name">National Merit Finalist</div>
+          <div class="award-org">National Merit Scholarship Corporation</div>
+        </div>
+        <div class="award-year">2025</div>
+      </div>
+
+      <div class="award award--silver">
+        <div class="award-rank">II</div>
+        <div class="award-content">
+          <div class="award-name">National Honorable Mention &mdash; NCWIT Aspirations in Computing</div>
+          <div class="award-org">National Center for Women &amp; IT</div>
+        </div>
+        <div class="award-year">2024 &amp; 2025</div>
+      </div>
+
+      <div class="award award--gold">
+        <div class="award-rank">I</div>
+        <div class="award-content">
+          <div class="award-name">Gold &mdash; Presidential Service Award</div>
+          <div class="award-org">The White House</div>
+        </div>
+        <div class="award-year">2024</div>
+      </div>
+
+      <div class="award award--teal">
+        <div class="award-rank">F</div>
+        <div class="award-content">
+          <div class="award-name">RISE Global Finalist</div>
+          <div class="award-org">Schmidt Futures &amp; Rhodes Trust</div>
+        </div>
+        <div class="award-year">2023</div>
+      </div>
+
+      <div class="award award--rose">
+        <div class="award-rank">&#9733;</div>
+        <div class="award-content">
+          <div class="award-name">Fan Favorite &mdash; Chicago Cubs STEAM Fair</div>
+          <div class="award-org">Wrigley Field, Chicago</div>
+        </div>
+        <div class="award-year">2023</div>
+      </div>
+
+      <div class="award award--teal">
+        <div class="award-rank">S</div>
+        <div class="award-content">
+          <div class="award-name">CCIR STEM Scholarship &amp; Spotlight Scholar</div>
+          <div class="award-org">Cambridge Centre for International Research</div>
+        </div>
+        <div class="award-year">2023</div>
+      </div>
+
+    </div><!-- /awards -->
 
     <div class="section-label">Skills</div>
     <div class="tags">
@@ -334,6 +596,8 @@
     </div>
   </main>
   <div class="coords">41.3083&deg; N &nbsp; 72.9279&deg; W</div>
+
+  <!-- Film strip script -->
   <script>
   const FRAME_W = 280, FRAME_H = 360, FRAME_COUNT = 3;
   const PALETTES = [
@@ -370,6 +634,8 @@
   buildTrack('trackLeft','up',0.15);
   buildTrack('trackRight','down',0.12);
   </script>
+
+  <!-- Stars background -->
   <script type="module">
     import('https://unpkg.com/three@0.161.0/build/three.module.js').then(THREE=>{
       const renderer=new THREE.WebGLRenderer({antialias:true,alpha:false});
