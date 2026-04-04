@@ -30,22 +30,20 @@
     .nav-links a:hover,.nav-links a.active{color:rgba(220,235,255,0.9);background:rgba(100,140,255,0.08);}
     .nav-links .divider{color:rgba(100,130,200,0.2);font-size:13px;user-select:none;}
 
-    /* ─────────────────────────────────────────
-       PHOTOBOOTH STRIPS
-       Width sized so frames brush the text area.
-       Page content is max-width:720px centred,
-       so at 1200px viewport the text starts at
-       (1200-720)/2 = 240px from left edge.
-       Strip width = 210px → frames reach ~210px
-       from edge, brushing the 240px text boundary.
-    ───────────────────────────────────────────── */
+    /*
+      PHOTOBOOTH STRIPS
+      Text column: max-width 720px centred.
+      At 1280px viewport: text starts at (1280-720)/2 = 280px from edge.
+      Strip width 272px → frames reach right to that 280px boundary, brushing text.
+      At smaller viewports, strips shrink gracefully behind the content via pointer-events:none.
+    */
     .strip-wrap{
       position:fixed;
       top:80px;
       bottom:80px;
       z-index:15;
       pointer-events:none;
-      width:210px;   /* large enough to brush text */
+      width:272px;
       overflow:hidden;
     }
     .strip-wrap.left  { left:0; }
@@ -62,7 +60,7 @@
       will-change:transform;
     }
 
-    /* Film rail background — slightly transparent so stars show through */
+    /* Film rail background */
     .strip-rail{
       position:absolute;
       inset:0;
@@ -76,14 +74,14 @@
       border-left:1px solid rgba(140,120,255,0.09);
     }
 
-    /* Frame: large enough to be clearly readable */
+    /* Frame: wide to brush text */
     .pb-frame{
-      width:174px;
-      height:230px;
-      border-radius:5px;
+      width:232px;
+      height:300px;
+      border-radius:6px;
       overflow:hidden;
       flex-shrink:0;
-      border:1px solid rgba(160,140,255,0.16);
+      border:1px solid rgba(160,140,255,0.18);
       position:relative;
       margin:0 auto;
     }
@@ -97,18 +95,18 @@
     /* Sprocket gap between frames */
     .pb-sprocket{
       width:100%;
-      height:26px;
+      height:28px;
       display:flex;
       align-items:center;
       justify-content:space-around;
-      padding:0 12px;
+      padding:0 14px;
       flex-shrink:0;
     }
     .pb-hole{
-      width:10px; height:10px;
+      width:11px; height:11px;
       border-radius:2px;
-      background:rgba(0,0,0,0.88);
-      border:1px solid rgba(130,110,240,0.20);
+      background:rgba(0,0,0,0.90);
+      border:1px solid rgba(130,110,240,0.22);
     }
 
     /* ── Main content ── */
@@ -193,10 +191,8 @@
   <div class="coords">41.3083&deg; N &nbsp; 72.9279&deg; W</div>
 
   <script>
-  // ── PHOTOBOOTH STRIP LOGIC ──
-  // 3 frames per loop, large (174×230px), with 3 sprocket holes per gap
-  const FRAME_W = 174;
-  const FRAME_H = 230;
+  const FRAME_W = 232;
+  const FRAME_H = 300;
   const FRAME_COUNT = 3;
 
   const PALETTES = [
@@ -219,23 +215,20 @@
     ctx.fillRect(0, 0, w, h);
     const rng = n => Math.abs(Math.sin(seed * 23.9 + n * 14.7));
     for (let i = 0; i < 4; i++) {
-      const bx = rng(i*4)*w, by = rng(i*4+1)*h, br = 28+rng(i*4+2)*60;
+      const bx = rng(i*4)*w, by = rng(i*4+1)*h, br = 32+rng(i*4+2)*72;
       const bg = ctx.createRadialGradient(bx,by,0,bx,by,br);
       bg.addColorStop(0, palette[(i+2)%palette.length]+'bb');
       bg.addColorStop(1,'rgba(255,255,255,0)');
       ctx.fillStyle=bg; ctx.fillRect(0,0,w,h);
     }
-    // geometric mark
     ctx.save(); ctx.globalAlpha=0.20; ctx.strokeStyle='#ffffff'; ctx.lineWidth=1.2;
-    const mx=rng(20)*w*.5+w*.2, my=rng(21)*h*.5+h*.2, mr=14+rng(22)*28;
+    const mx=rng(20)*w*.5+w*.2, my=rng(21)*h*.5+h*.2, mr=16+rng(22)*34;
     const sides=3+Math.floor(rng(23)*4);
     ctx.beginPath();
     for(let i=0;i<=sides;i++){const a=(i/sides)*Math.PI*2-Math.PI/2;ctx.lineTo(mx+mr*Math.cos(a),my+mr*Math.sin(a));}
     ctx.stroke(); ctx.restore();
-    // star dots
     ctx.fillStyle='rgba(255,255,255,0.55)';
-    for(let i=0;i<12;i++){const sx=rng(30+i)*w,sy=rng(31+i)*h,sr=0.7+rng(32+i)*1.6;ctx.beginPath();ctx.arc(sx,sy,sr,0,Math.PI*2);ctx.fill();}
-    // vignette
+    for(let i=0;i<14;i++){const sx=rng(30+i)*w,sy=rng(31+i)*h,sr=0.8+rng(32+i)*1.8;ctx.beginPath();ctx.arc(sx,sy,sr,0,Math.PI*2);ctx.fill();}
     const vig=ctx.createRadialGradient(w/2,h/2,0,w/2,h/2,Math.max(w,h)*.75);
     vig.addColorStop(0,'rgba(0,0,0,0)'); vig.addColorStop(1,'rgba(0,0,0,0.32)');
     ctx.fillStyle=vig; ctx.fillRect(0,0,w,h);
