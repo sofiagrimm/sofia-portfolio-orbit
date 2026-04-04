@@ -66,21 +66,127 @@
     .rule{width:48px;height:1px;background:linear-gradient(90deg,rgba(140,170,255,0.4),transparent);margin-bottom:40px;}
     .bio{font-size:15px;font-weight:300;line-height:1.85;color:rgba(210,225,255,0.72);display:flex;flex-direction:column;gap:20px;}
     .bio strong{font-weight:500;color:rgba(220,232,255,0.92);}
-    .section-label{font-size:10px;letter-spacing:0.22em;text-transform:uppercase;color:rgba(140,170,255,0.45);margin-top:44px;margin-bottom:18px;}
-    .two-col{display:grid;grid-template-columns:1fr 1fr;gap:14px 32px;}
-    .fact{font-size:13px;font-weight:300;line-height:1.6;color:rgba(190,210,255,0.60);}
-    .fact strong{display:block;font-size:11px;font-weight:400;letter-spacing:0.12em;text-transform:uppercase;color:rgba(160,185,255,0.50);margin-bottom:3px;}
-    .tags{display:flex;flex-wrap:wrap;gap:10px;margin-top:44px;margin-bottom:60px;}
+
+    /* ── Section label ── */
+    .section-label{
+      font-size:10px;letter-spacing:0.22em;text-transform:uppercase;
+      color:rgba(140,170,255,0.45);margin-top:52px;margin-bottom:22px;
+      display:flex;align-items:center;gap:12px;
+    }
+    .section-label::after{
+      content:'';flex:1;height:1px;
+      background:linear-gradient(90deg,rgba(100,130,200,0.18),transparent);
+    }
+
+    /* ── At a Glance cards ── */
+    .glance-grid{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:14px;
+    }
+    .glance-card{
+      position:relative;overflow:hidden;
+      border-radius:14px;
+      padding:20px 22px 18px;
+      background:rgba(8,14,42,0.55);
+      border:1px solid rgba(100,130,220,0.12);
+      backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
+      transition:border-color .3s, transform .3s, box-shadow .3s;
+      cursor:default;
+    }
+    .glance-card::before{
+      content:'';
+      position:absolute;inset:0;border-radius:14px;
+      background:var(--card-glow,rgba(100,140,255,0.04));
+      opacity:0;transition:opacity .3s;
+      pointer-events:none;
+    }
+    .glance-card:hover{
+      border-color:var(--card-border, rgba(120,160,255,0.32));
+      transform:translateY(-2px);
+      box-shadow:0 8px 36px rgba(0,0,0,0.45), 0 0 28px var(--card-shadow,rgba(80,120,255,0.10));
+    }
+    .glance-card:hover::before{opacity:1;}
+
+    /* accent stripe top */
+    .glance-card::after{
+      content:'';
+      position:absolute;top:0;left:18px;right:18px;height:1px;
+      background:var(--card-stripe,linear-gradient(90deg,transparent,rgba(140,170,255,0.4),transparent));
+      border-radius:1px;
+    }
+
+    .gc-icon{
+      width:34px;height:34px;border-radius:9px;
+      background:var(--card-icon-bg,rgba(80,110,200,0.18));
+      border:1px solid var(--card-icon-border,rgba(100,140,255,0.22));
+      display:flex;align-items:center;justify-content:center;
+      margin-bottom:13px;
+      font-size:16px;line-height:1;
+    }
+    .gc-label{
+      font-size:9px;font-weight:500;letter-spacing:0.22em;text-transform:uppercase;
+      color:var(--card-accent,rgba(160,185,255,0.55));
+      margin-bottom:8px;
+    }
+    .gc-value{
+      font-size:13.5px;font-weight:300;line-height:1.65;
+      color:rgba(210,226,255,0.82);
+    }
+    .gc-value strong{
+      font-weight:500;
+      color:rgba(230,240,255,0.96);
+    }
+    .gc-value .dot{
+      color:var(--card-accent,rgba(140,170,255,0.5));
+      margin:0 4px;
+      font-size:10px;
+    }
+    /* pill-style inline tags inside a card */
+    .gc-pills{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px;}
+    .gc-pill{
+      font-size:10px;letter-spacing:0.10em;text-transform:uppercase;
+      color:var(--card-accent,rgba(160,190,255,0.7));
+      border:1px solid var(--card-icon-border,rgba(100,140,255,0.22));
+      padding:3px 10px;border-radius:20px;
+      background:var(--card-icon-bg,rgba(80,110,200,0.12));
+    }
+
+    /* color themes per card */
+    .gc--blue   {--card-glow:rgba(80,140,255,0.07);--card-border:rgba(100,160,255,0.35);--card-shadow:rgba(80,140,255,0.14);--card-stripe:linear-gradient(90deg,transparent,rgba(100,160,255,0.45),transparent);--card-accent:rgba(140,185,255,0.70);--card-icon-bg:rgba(60,100,220,0.18);--card-icon-border:rgba(100,150,255,0.28);}
+    .gc--purple {--card-glow:rgba(180,100,255,0.07);--card-border:rgba(190,120,255,0.35);--card-shadow:rgba(160,80,255,0.14);--card-stripe:linear-gradient(90deg,transparent,rgba(190,130,255,0.45),transparent);--card-accent:rgba(200,160,255,0.75);--card-icon-bg:rgba(140,60,220,0.18);--card-icon-border:rgba(180,110,255,0.28);}
+    .gc--cyan   {--card-glow:rgba(40,210,255,0.07);--card-border:rgba(60,220,255,0.30);--card-shadow:rgba(40,200,255,0.12);--card-stripe:linear-gradient(90deg,transparent,rgba(60,220,255,0.40),transparent);--card-accent:rgba(100,220,255,0.72);--card-icon-bg:rgba(20,160,200,0.18);--card-icon-border:rgba(40,200,255,0.28);}
+    .gc--green  {--card-glow:rgba(40,220,140,0.07);--card-border:rgba(60,230,150,0.30);--card-shadow:rgba(40,200,120,0.12);--card-stripe:linear-gradient(90deg,transparent,rgba(60,220,150,0.40),transparent);--card-accent:rgba(80,230,160,0.72);--card-icon-bg:rgba(20,160,90,0.18);--card-icon-border:rgba(40,200,120,0.28);}
+    .gc--gold   {--card-glow:rgba(255,200,60,0.07);--card-border:rgba(255,210,80,0.30);--card-shadow:rgba(240,180,40,0.12);--card-stripe:linear-gradient(90deg,transparent,rgba(255,210,80,0.40),transparent);--card-accent:rgba(255,215,90,0.75);--card-icon-bg:rgba(180,130,10,0.20);--card-icon-border:rgba(240,190,50,0.28);}
+    .gc--rose   {--card-glow:rgba(255,100,160,0.07);--card-border:rgba(255,120,170,0.30);--card-shadow:rgba(240,80,140,0.12);--card-stripe:linear-gradient(90deg,transparent,rgba(255,130,175,0.40),transparent);--card-accent:rgba(255,150,185,0.75);--card-icon-bg:rgba(180,40,90,0.20);--card-icon-border:rgba(240,100,150,0.28);}
+
+    /* ── Awards ── */
+    .awards{display:flex;flex-direction:column;gap:8px;margin-top:4px;}
+    .award{
+      display:flex;align-items:baseline;justify-content:space-between;
+      font-size:13px;font-weight:300;color:rgba(190,210,255,0.68);line-height:1.5;
+      padding:10px 14px;border-radius:10px;
+      background:rgba(8,14,42,0.40);border:1px solid rgba(100,130,200,0.10);
+      transition:border-color .25s, background .25s;
+    }
+    .award:hover{background:rgba(12,20,58,0.60);border-color:rgba(120,155,255,0.22);}
+    .award-name{flex:1;}
+    .award-year{
+      font-size:10px;letter-spacing:0.14em;font-weight:400;
+      color:rgba(140,165,255,0.45);margin-left:12px;white-space:nowrap;
+    }
+
+    /* ── Skills tags ── */
+    .tags{display:flex;flex-wrap:wrap;gap:9px;margin-top:44px;margin-bottom:60px;}
     .tag{
-      font-size:11px;letter-spacing:0.14em;text-transform:uppercase;
+      font-size:11px;letter-spacing:0.13em;text-transform:uppercase;
       color:rgba(160,190,255,0.6);
       border:1px solid rgba(100,130,200,0.18);
       padding:6px 14px;border-radius:20px;
       background:rgba(20,35,80,0.35);
+      transition:color .22s, border-color .22s, background .22s;
     }
-    .awards{display:flex;flex-direction:column;gap:8px;margin-top:4px;}
-    .award{font-size:13px;font-weight:300;color:rgba(190,210,255,0.60);line-height:1.5;}
-    .award span{color:rgba(160,185,255,0.45);font-size:11px;letter-spacing:0.08em;margin-left:6px;}
+    .tag:hover{color:rgba(210,228,255,0.9);border-color:rgba(140,170,255,0.38);background:rgba(30,55,130,0.40);}
     .coords{position:fixed;bottom:32px;left:48px;z-index:20;font-size:10px;letter-spacing:0.18em;color:rgba(110,130,190,0.28);font-weight:300;pointer-events:none;}
   </style>
 </head>
@@ -112,26 +218,103 @@
       <p>My research spans <strong>computational</strong> and <strong>wet labs</strong>, focusing on a broad range of subjects including <strong>neurodegenerative diseases</strong>, <strong>genetics</strong>, <strong>astrophysics</strong>, <strong>proteomics</strong>, <strong>machine learning</strong>, and <strong>mathematical optimization</strong>. Currently I'm at the <strong>Higley Lab</strong> at Yale School of Medicine, where I'm characterizing <strong>locus coeruleus axon degeneration</strong> in PPT1-deficient mice to investigate <strong>norepinephrine dysfunction</strong> in <strong>Parkinson's disease</strong>. I also work on the <strong>PCDD startup</strong> at Yale Engineering, developing business strategy for a patent-pending medication dispenser device.</p>
       <p>Outside the lab I consult, build, and write. I'm a <strong>Client Lead</strong> at <strong>Yale Healthcare Consulting Collective</strong>, an <strong>Associate Consultant</strong> at <strong>Global Strategy Consulting</strong>, and an <strong>Online Editor</strong> at the <strong>Yale Undergraduate Law Journal</strong>. I speak <strong>English</strong>, <strong>Chinese</strong>, <strong>Spanish</strong>, and <strong>Latin</strong>.</p>
     </div>
+
     <div class="section-label">At a glance</div>
-    <div class="two-col">
-      <div class="fact"><strong>Education</strong>Yale University, B.S. Chemistry &amp; EPE<br>May 2029 &middot; GPA 3.83</div>
-      <div class="fact"><strong>Locations</strong>New Haven, CT &middot; Chicago, IL &middot; Hong Kong SAR</div>
-      <div class="fact"><strong>Languages</strong>English (Native) &middot; Chinese (Fluent) &middot; Spanish (Heritage) &middot; Latin (Working)</div>
-      <div class="fact"><strong>Programming Languages</strong>Python (PyTorch, TensorFlow) &middot; NetLogo &middot; SQL &middot; Javascript &middot; CSS &middot; HTML</div>
-      <div class="fact"><strong>Certifications</strong>IBM Data Science Professional &middot; QubitxQubit Quantum Winter School &middot; Microsoft Intensive Quantum</div>
-      <div class="fact"><strong>Activities</strong>Yale College Council (Director of Social Events) &middot; Yale Undergraduate Law Journal (Online Editor)</div>
-    </div>
+    <div class="glance-grid">
+
+      <!-- Education -->
+      <div class="glance-card gc--blue">
+        <div class="gc-icon">🎓</div>
+        <div class="gc-label">Education</div>
+        <div class="gc-value">
+          <strong>Yale University</strong><br>
+          B.S. Chemistry &amp; EPE<br>
+          <span style="color:rgba(140,185,255,0.55);font-size:12px;">Class of 2029 &nbsp;&middot;&nbsp; GPA 3.83</span>
+        </div>
+      </div>
+
+      <!-- Locations -->
+      <div class="glance-card gc--cyan">
+        <div class="gc-icon">🌏</div>
+        <div class="gc-label">Locations</div>
+        <div class="gc-value">
+          <div class="gc-pills">
+            <span class="gc-pill">New Haven, CT</span>
+            <span class="gc-pill">Chicago, IL</span>
+            <span class="gc-pill">Hong Kong SAR</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Languages -->
+      <div class="glance-card gc--purple">
+        <div class="gc-icon">💬</div>
+        <div class="gc-label">Languages</div>
+        <div class="gc-value">
+          <div style="display:flex;flex-direction:column;gap:4px;margin-top:2px;">
+            <div><strong>English</strong> <span style="font-size:11px;color:rgba(190,160,255,0.5);">Native</span></div>
+            <div><strong>Chinese</strong> <span style="font-size:11px;color:rgba(190,160,255,0.5);">Fluent</span></div>
+            <div><strong>Spanish</strong> <span style="font-size:11px;color:rgba(190,160,255,0.5);">Heritage</span></div>
+            <div><strong>Latin</strong> <span style="font-size:11px;color:rgba(190,160,255,0.5);">Working</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Programming -->
+      <div class="glance-card gc--green">
+        <div class="gc-icon">⌨️</div>
+        <div class="gc-label">Programming</div>
+        <div class="gc-value">
+          <div class="gc-pills">
+            <span class="gc-pill">Python</span>
+            <span class="gc-pill">PyTorch</span>
+            <span class="gc-pill">TensorFlow</span>
+            <span class="gc-pill">SQL</span>
+            <span class="gc-pill">JavaScript</span>
+            <span class="gc-pill">NetLogo</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Certifications -->
+      <div class="glance-card gc--gold">
+        <div class="gc-icon">🏅</div>
+        <div class="gc-label">Certifications</div>
+        <div class="gc-value">
+          <div style="display:flex;flex-direction:column;gap:5px;margin-top:2px;">
+            <div><strong>IBM</strong> Data Science Professional</div>
+            <div><strong>QubitxQubit</strong> Quantum Winter School</div>
+            <div><strong>Microsoft</strong> Intensive Quantum</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Activities -->
+      <div class="glance-card gc--rose">
+        <div class="gc-icon">✦</div>
+        <div class="gc-label">Activities</div>
+        <div class="gc-value">
+          <div style="display:flex;flex-direction:column;gap:5px;margin-top:2px;">
+            <div><strong>Yale College Council</strong><br><span style="font-size:12px;color:rgba(255,150,185,0.55);">Director of Social Events</span></div>
+            <div><strong>Yale Undergraduate Law Journal</strong><br><span style="font-size:12px;color:rgba(255,150,185,0.55);">Online Editor</span></div>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /glance-grid -->
+
     <div class="section-label">Honors &amp; Awards</div>
     <div class="awards">
-      <div class="award">Best Solo Hack, YHack <span>2026</span></div>
-      <div class="award">Gold, Hispanic Heritage Youth Award <span>2025</span></div>
-      <div class="award">National Merit Finalist <span>2025</span></div>
-      <div class="award">National Honorable Mention, NCWIT Award for Aspirations in Computing <span>2024 &amp; 2025</span></div>
-      <div class="award">Gold, Presidential Service Award <span>2024</span></div>
-      <div class="award">RISE Finalist, Schmidt Futures &amp; Rhodes Trust <span>2023</span></div>
-      <div class="award">Fan Favorite, Chicago Cubs STEAM Fair <span>2023</span></div>
-      <div class="award">CCIR STEM Scholarship &amp; Spotlight Scholar Nomination <span>2023</span></div>
+      <div class="award"><span class="award-name">Best Solo Hack, YHack</span><span class="award-year">2026</span></div>
+      <div class="award"><span class="award-name">Gold, Hispanic Heritage Youth Award</span><span class="award-year">2025</span></div>
+      <div class="award"><span class="award-name">National Merit Finalist</span><span class="award-year">2025</span></div>
+      <div class="award"><span class="award-name">National Honorable Mention, NCWIT Award for Aspirations in Computing</span><span class="award-year">2024 &amp; 2025</span></div>
+      <div class="award"><span class="award-name">Gold, Presidential Service Award</span><span class="award-year">2024</span></div>
+      <div class="award"><span class="award-name">RISE Finalist, Schmidt Futures &amp; Rhodes Trust</span><span class="award-year">2023</span></div>
+      <div class="award"><span class="award-name">Fan Favorite, Chicago Cubs STEAM Fair</span><span class="award-year">2023</span></div>
+      <div class="award"><span class="award-name">CCIR STEM Scholarship &amp; Spotlight Scholar Nomination</span><span class="award-year">2023</span></div>
     </div>
+
     <div class="section-label">Skills</div>
     <div class="tags">
       <span class="tag">Proteomics</span>
