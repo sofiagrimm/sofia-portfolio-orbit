@@ -92,9 +92,7 @@
       border:1px solid rgba(120,90,220,0.05);transform:scale(1.14);
     }
     .card-ring::after{
-      content:'';position:absolute;top:-4px;left:50%;transform:translateX(-50%);
-      width:8px;height:8px;border-radius:50%;
-      background:rgba(180,150,255,0.45);box-shadow:0 0 12px rgba(160,120,255,0.55);
+      display:none;
     }
     @keyframes cardRingSpin{
       from{transform:translate(-50%,-50%) rotate(0deg)}
@@ -294,7 +292,6 @@
       const sprite=new THREE.Sprite(new THREE.SpriteMaterial({map:new THREE.CanvasTexture(gc),transparent:true,depthWrite:false}));
       sprite.scale.set(4.8,4.8,1);
 
-      // thinner ring: inner 2.8, outer 3.5
       const ringGeo=new THREE.RingGeometry(2.8,3.5,128);
       const pos=ringGeo.attributes.position,uv=ringGeo.attributes.uv,v3=new THREE.Vector3();
       for(let j=0;j<pos.count;j++){v3.fromBufferAttribute(pos,j);uv.setXY(j,(v3.length()-2.8)/(3.5-2.8),0.5);}
@@ -302,8 +299,7 @@
       planetRing.rotation.x=cfg.ringTilt.x;planetRing.rotation.z=cfg.ringTilt.z;
 
       const innerGroup=new THREE.Group();
-      const planetMesh=new THREE.Mesh(sphereGeo,mat);
-      innerGroup.add(planetMesh);
+      innerGroup.add(new THREE.Mesh(sphereGeo,mat));
       innerGroup.add(sprite);
 
       const group=new THREE.Group();
