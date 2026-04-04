@@ -8,7 +8,6 @@
     @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Inter:wght@300;400;500&display=swap');
     *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
     html,body{width:100%;min-height:100%;background:#060d18;font-family:'Inter',sans-serif;color:#e9f0ff;}
-    /* star canvas */
     canvas{display:block;position:fixed;inset:0;z-index:0}
     .nebula{
       position:fixed;inset:0;z-index:1;pointer-events:none;
@@ -56,12 +55,25 @@
       margin-bottom:40px;
     }
     .bio{
-      font-size:16px;font-weight:300;line-height:1.8;
-      color:rgba(210,225,255,0.75);
-      display:flex;flex-direction:column;gap:22px;
+      font-size:15px;font-weight:300;line-height:1.85;
+      color:rgba(210,225,255,0.72);
+      display:flex;flex-direction:column;gap:20px;
     }
-    .bio p a{color:rgba(160,200,255,0.7);text-decoration:none;border-bottom:1px solid rgba(160,200,255,0.2);transition:color .2s;}
-    .bio p a:hover{color:rgba(200,225,255,0.95);}
+    .section-label{
+      font-size:10px;letter-spacing:0.22em;text-transform:uppercase;
+      color:rgba(140,170,255,0.45);margin-top:44px;margin-bottom:18px;
+    }
+    .two-col{
+      display:grid;grid-template-columns:1fr 1fr;gap:14px 32px;
+    }
+    .fact{
+      font-size:13px;font-weight:300;line-height:1.6;
+      color:rgba(190,210,255,0.60);
+    }
+    .fact strong{
+      display:block;font-size:11px;font-weight:400;letter-spacing:0.12em;text-transform:uppercase;
+      color:rgba(160,185,255,0.50);margin-bottom:3px;
+    }
     .tags{
       display:flex;flex-wrap:wrap;gap:10px;margin-top:44px;
     }
@@ -71,6 +83,17 @@
       border:1px solid rgba(100,130,200,0.18);
       padding:6px 14px;border-radius:20px;
       background:rgba(20,35,80,0.35);
+    }
+    .awards{
+      display:flex;flex-direction:column;gap:8px;margin-top:4px;
+    }
+    .award{
+      font-size:13px;font-weight:300;
+      color:rgba(190,210,255,0.60);line-height:1.5;
+    }
+    .award span{
+      color:rgba(160,185,255,0.45);font-size:11px;letter-spacing:0.08em;
+      margin-left:6px;
     }
     .coords{
       position:fixed;bottom:32px;left:48px;z-index:20;
@@ -95,19 +118,43 @@
     <h1 class="page-title">Hi, I'm <em>Sofia.</em></h1>
     <div class="rule"></div>
     <div class="bio">
-      <p>I'm a Chemistry student at Yale University (Class of 2029), concentrating in Environmental Policy and Ethics. I'm drawn to the places where molecules meet medicine — where a protein's shape might unlock a new therapy, or where data from a mass spectrometer tells a story about aging.</p>
-      <p>My research background spans proteomics and mass spectrometry, antibody engineering, immunohistochemistry, and cell culture. I've worked at the intersection of translational science and longevity, and I'm always looking for the next question worth asking.</p>
-      <p>Outside the lab, I think about design, sustainability, and the ethics of emerging technologies. I build things — software, ideas, arguments — and I try to make them beautiful as well as useful.</p>
+      <p>I'm a student at Yale University pursuing a B.S. in Chemistry and Ethics, Politics &amp; Economics (Class of 2029), with a GPA of 3.83. I grew up in Chicago and I'm drawn to the places where science meets systems — whether that's a protein's folding behavior, a disease mechanism, or a policy question about emerging technology.</p>
+      <p>My research spans neurodegenerative disease, top-down proteomics, and Drosophila genetics. Currently I'm at the Higley Lab at Yale School of Medicine, where I'm characterizing locus coeruleus axon degeneration in PPT1-deficient mice to investigate norepinephrine dysfunction in Parkinson's disease. I also work on the PCDD startup at Yale Engineering, developing business strategy for a patent-pending medication disposal device.</p>
+      <p>Outside the lab I consult, build, and write. I'm a Client Lead at Yale Healthcare Consulting Collective, an Associate Consultant at Global Strategy Consulting, and an Online Editor at the Yale Undergraduate Law Journal. I speak English, Chinese, Spanish, and Latin.</p>
     </div>
+
+    <div class="section-label">At a glance</div>
+    <div class="two-col">
+      <div class="fact"><strong>Education</strong>Yale University, B.S. Chemistry &amp; EPE, May 2029 · GPA 3.83</div>
+      <div class="fact"><strong>Location</strong>New Haven, CT (from Chicago, IL)</div>
+      <div class="fact"><strong>Technical Skills</strong>Python (PyTorch, TensorFlow), Mass Spectrometry, Proteomics, NetLogo</div>
+      <div class="fact"><strong>Certifications</strong>IBM Data Science Professional · QubitxQubit Quantum Winter School · Microsoft Intensive Quantum</div>
+      <div class="fact"><strong>Languages</strong>English (Native) · Chinese (Fluent) · Spanish (Heritage) · Latin (Working)</div>
+      <div class="fact"><strong>Activities</strong>Yale College Council (Director of Social Events) · Yale Undergraduate Law Journal (Online Editor)</div>
+    </div>
+
+    <div class="section-label">Honors &amp; Awards</div>
+    <div class="awards">
+      <div class="award">Best Solo Hack, YHack <span>2026</span></div>
+      <div class="award">Gold, Hispanic Heritage Youth Award <span>2025</span></div>
+      <div class="award">National Merit Finalist <span>2025</span></div>
+      <div class="award">National Honorable Mention, NCWIT Award for Aspirations in Computing <span>2024 &amp; 2025</span></div>
+      <div class="award">Gold, Presidential Service Award <span>2024</span></div>
+      <div class="award">RISE Finalist, Schmidt Futures &amp; Rhodes Trust <span>2023</span></div>
+      <div class="award">Fan Favorite, Chicago Cubs STEAM Fair <span>2023</span></div>
+      <div class="award">CCIR STEM Scholarship &amp; Spotlight Scholar Nomination <span>2023</span></div>
+    </div>
+
     <div class="tags">
       <span class="tag">Proteomics</span>
       <span class="tag">Mass Spectrometry</span>
-      <span class="tag">Longevity</span>
-      <span class="tag">Antibody Engineering</span>
-      <span class="tag">Environmental Policy</span>
-      <span class="tag">Biotech</span>
-      <span class="tag">Ethics</span>
-      <span class="tag">Product Design</span>
+      <span class="tag">Neuroscience</span>
+      <span class="tag">Parkinson's Disease</span>
+      <span class="tag">Drosophila Genetics</span>
+      <span class="tag">Python / ML</span>
+      <span class="tag">Ethics &amp; Policy</span>
+      <span class="tag">Healthcare Consulting</span>
+      <span class="tag">Chinese · Spanish · Latin</span>
     </div>
   </main>
   <div class="coords">41.3083&deg; N &nbsp; 72.9279&deg; W</div>

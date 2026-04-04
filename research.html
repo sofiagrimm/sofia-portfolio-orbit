@@ -50,7 +50,7 @@
     }
     .page-title em{font-style:italic;color:rgba(190,210,255,0.85);}
     .rule{width:48px;height:1px;background:linear-gradient(90deg,rgba(140,170,255,0.4),transparent);margin-bottom:48px;}
-    .research-list{display:flex;flex-direction:column;gap:32px;}
+    .research-list{display:flex;flex-direction:column;gap:28px;}
     .research-item{
       padding:28px 32px;border-radius:16px;
       background:rgba(8,16,45,0.50);
@@ -59,19 +59,55 @@
       transition:border-color .25s;
     }
     .research-item:hover{border-color:rgba(120,160,255,0.2);}
+    .ri-meta{
+      display:flex;justify-content:space-between;align-items:baseline;
+      margin-bottom:8px;
+    }
     .ri-label{
       font-size:10px;letter-spacing:0.2em;text-transform:uppercase;
-      color:rgba(140,170,255,0.45);margin-bottom:10px;
+      color:rgba(140,170,255,0.45);
+    }
+    .ri-date{
+      font-size:10px;letter-spacing:0.12em;
+      color:rgba(130,155,220,0.35);
     }
     .ri-title{
       font-family:'Cormorant Garamond',serif;
       font-size:24px;font-weight:300;color:#ddeeff;
       margin-bottom:10px;
     }
-    .ri-body{
-      font-size:14px;font-weight:300;line-height:1.75;
-      color:rgba(190,210,255,0.60);
+    .ri-org{
+      font-size:11px;letter-spacing:0.1em;text-transform:uppercase;
+      color:rgba(140,170,220,0.40);margin-bottom:12px;
     }
+    .ri-body{
+      font-size:13px;font-weight:300;line-height:1.75;
+      color:rgba(190,210,255,0.58);
+    }
+    .ri-body ul{list-style:none;padding:0;display:flex;flex-direction:column;gap:6px;}
+    .ri-body ul li::before{content:'— ';color:rgba(140,170,255,0.3);}
+    .publication{
+      margin-top:40px;padding:24px 28px;border-radius:14px;
+      background:rgba(6,12,36,0.45);
+      border:1px solid rgba(80,110,190,0.09);
+    }
+    .pub-label{
+      font-size:10px;letter-spacing:0.2em;text-transform:uppercase;
+      color:rgba(140,170,255,0.4);margin-bottom:12px;
+    }
+    .pub-title{
+      font-size:13px;font-weight:300;line-height:1.7;
+      color:rgba(200,215,255,0.65);margin-bottom:10px;
+    }
+    .pub-venues{display:flex;flex-direction:column;gap:4px;}
+    .pub-venues a{
+      font-size:12px;font-weight:300;
+      color:rgba(140,180,255,0.50);text-decoration:none;
+      border-bottom:1px solid rgba(140,180,255,0.12);
+      align-self:flex-start;
+      transition:color .2s;
+    }
+    .pub-venues a:hover{color:rgba(200,220,255,0.85);}
     .coords{
       position:fixed;bottom:32px;left:48px;z-index:20;
       font-size:10px;letter-spacing:0.18em;
@@ -95,27 +131,72 @@
     <h1 class="page-title">Work in the <em>lab.</em></h1>
     <div class="rule"></div>
     <div class="research-list">
+
       <div class="research-item">
-        <div class="ri-label">Proteomics &amp; Mass Spectrometry</div>
-        <div class="ri-title">Protein Identification &amp; Quantification</div>
-        <div class="ri-body">Hands-on experience designing and executing proteomics workflows using mass spectrometry platforms. Work spans sample preparation, data acquisition, and downstream analysis of complex biological mixtures — with applications in aging and disease biomarker discovery.</div>
+        <div class="ri-meta">
+          <div class="ri-label">Neuroscience &amp; Neurodegeneration</div>
+          <div class="ri-date">Feb 2026 – Present</div>
+        </div>
+        <div class="ri-title">Locus Coeruleus Degeneration in Parkinson's Disease</div>
+        <div class="ri-org">Higley Lab · Yale School of Medicine</div>
+        <div class="ri-body"><ul>
+          <li>Characterizing locus coeruleus (LC) axon degeneration in PPT1-deficient mice via immunohistochemistry.</li>
+          <li>Investigating LC vulnerability and norepinephrine dysfunction as early markers in Parkinson's disease pathology.</li>
+        </ul></div>
       </div>
+
       <div class="research-item">
-        <div class="ri-label">Longevity Science</div>
-        <div class="ri-title">Translational Aging Research</div>
-        <div class="ri-body">Engaged in research at the intersection of molecular biology and longevity medicine. Interested in how cellular and proteome-level changes inform our understanding of aging trajectories and therapeutic intervention points.</div>
+        <div class="ri-meta">
+          <div class="ri-label">Top-Down Proteomics &amp; Mass Spectrometry</div>
+          <div class="ri-date">Jun – Aug 2024</div>
+        </div>
+        <div class="ri-title">Novel SPME-CZE-MS System for Mass-Limited Proteomics</div>
+        <div class="ri-org">Sun Lab · Michigan State University (High School Honors Science Program)</div>
+        <div class="ri-body"><ul>
+          <li>Established a novel solid-phase microextraction (SPME)–capillary zone electrophoresis–tandem mass spectrometry (CZE-MS) system for top-down proteomics of mass-limited samples.</li>
+          <li>The SPME system increased injection capacity by ~30× compared to typical CZE-MS workflows.</li>
+        </ul></div>
       </div>
+
       <div class="research-item">
-        <div class="ri-label">Antibody Engineering</div>
-        <div class="ri-title">Antibody Development &amp; IHC</div>
-        <div class="ri-body">Experience with antibody engineering techniques and immunohistochemistry (IHC) for tissue-level protein localization. Applied in oncology-adjacent research contexts examining protein expression patterns across cell types.</div>
+        <div class="ri-meta">
+          <div class="ri-label">Drosophila Genetics &amp; Molecular Biology</div>
+          <div class="ri-date">Aug 2024 – Jun 2025</div>
+        </div>
+        <div class="ri-title">Enhancer-Trap Line Development &amp; P-Element Mapping</div>
+        <div class="ri-org">Stan-X Lab · Stanford University</div>
+        <div class="ri-body"><ul>
+          <li>Developed an enhancer-trapped line of Drosophila using the LexA-LexAop binary expression system.</li>
+          <li>Executed ligation and PCR protocols; dissected fly brains to detect GFP fluorescence.</li>
+          <li>Used inverse PCR and FlyBase BLAST to map P-element insertion to the CG11050 gene.</li>
+        </ul></div>
       </div>
+
       <div class="research-item">
-        <div class="ri-label">Cell Biology</div>
-        <div class="ri-title">In Vitro Cell Culture</div>
-        <div class="ri-body">Proficient in mammalian cell culture techniques including passaging, transfection, viability assays, and fluorescence microscopy. Used to model disease states and validate molecular targets in vitro.</div>
+        <div class="ri-meta">
+          <div class="ri-label">Astrophysics &amp; Machine Learning</div>
+          <div class="ri-date">Jun – Aug 2023</div>
+        </div>
+        <div class="ri-title">CNN Classification of Double-Source Plane Gravitational Lenses</div>
+        <div class="ri-org">Fermi National Accelerator Laboratory · Quarknet Summer Research Program</div>
+        <div class="ri-body"><ul>
+          <li>Generated two simulated benchmark datasets of 40,000 images each of double-source plane lenses and Einstein rings.</li>
+          <li>Analyzed morphological differences and trained convolutional neural networks for automated lens classification.</li>
+        </ul></div>
+      </div>
+
+    </div>
+
+    <div class="publication">
+      <div class="pub-label">Publication &amp; Presentations</div>
+      <div class="pub-title">Grimm, S., Zhou, J., Nord, B., Ciprijanovic, A. (2023). <em>"Identifying Double-Source Plane Lenses for cosmological studies using simulated images."</em></div>
+      <div class="pub-venues">
+        <a href="https://agu.confex.com/agu/fm23/meetingapp.cgi/Paper/1438256" target="_blank">American Geophysical Union Annual Meeting →</a>
+        <a href="https://doi.org/10.2172/2006481" target="_blank">Fermilab/Quarknet Teachers' Workshop →</a>
+        <a href="#">DeepSkies Symposium →</a>
       </div>
     </div>
+
   </main>
   <div class="coords">41.3083&deg; N &nbsp; 72.9279&deg; W</div>
   <script type="module">

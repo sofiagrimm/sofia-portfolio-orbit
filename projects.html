@@ -52,25 +52,30 @@
     .rule{width:48px;height:1px;background:linear-gradient(90deg,rgba(140,170,255,0.4),transparent);margin-bottom:48px;}
     .projects-grid{
       display:grid;
-      grid-template-columns:repeat(auto-fill,minmax(320px,1fr));
-      gap:24px;
+      grid-template-columns:repeat(auto-fill,minmax(330px,1fr));
+      gap:22px;
     }
     .project-card{
-      padding:28px;border-radius:16px;
+      padding:26px 28px;border-radius:16px;
       background:rgba(8,16,45,0.50);
       border:1px solid rgba(100,130,220,0.10);
       backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
       transition:border-color .25s,transform .25s;
-      display:flex;flex-direction:column;gap:12px;
+      display:flex;flex-direction:column;gap:10px;
     }
     .project-card:hover{border-color:rgba(120,160,255,0.22);transform:translateY(-2px);}
+    .pc-meta{display:flex;justify-content:space-between;align-items:baseline;}
     .pc-tag{
       font-size:10px;letter-spacing:0.18em;text-transform:uppercase;
       color:rgba(140,170,255,0.45);
     }
+    .pc-date{
+      font-size:10px;letter-spacing:0.1em;
+      color:rgba(120,150,210,0.30);
+    }
     .pc-title{
       font-family:'Cormorant Garamond',serif;
-      font-size:22px;font-weight:300;color:#ddeeff;
+      font-size:21px;font-weight:300;color:#ddeeff;
     }
     .pc-body{
       font-size:13px;font-weight:300;line-height:1.7;
@@ -108,30 +113,87 @@
     <h1 class="page-title">Things I've <em>built.</em></h1>
     <div class="rule"></div>
     <div class="projects-grid">
+
       <div class="project-card">
-        <div class="pc-tag">Web &nbsp;&middot;&nbsp; Design</div>
+        <div class="pc-meta">
+          <div class="pc-tag">Startup &nbsp;&middot;&nbsp; MedTech</div>
+          <div class="pc-date">Mar 2026 – Present</div>
+        </div>
+        <div class="pc-title">PCDD — Patient Controlled Dispenser &amp; Deactivator</div>
+        <div class="pc-body">Developing business strategy for a patent-pending medication disposal device at Yale School of Engineering under Dr. Wiznia. Work spans establishing ingress mechanisms, activated charcoal deactivation protocols, and go-to-market planning.</div>
+        <a class="pc-link" href="#">In progress →</a>
+      </div>
+
+      <div class="project-card">
+        <div class="pc-meta">
+          <div class="pc-tag">Hackathon &nbsp;&middot;&nbsp; Best Solo Hack</div>
+          <div class="pc-date">2026</div>
+        </div>
+        <div class="pc-title">YHack 2026 — Best Solo Hack</div>
+        <div class="pc-body">Won Best Solo Hack at YHack 2026, Yale's annual hackathon. Built and shipped a complete project independently under time constraints.</div>
+        <a class="pc-link" href="#">Details coming →</a>
+      </div>
+
+      <div class="project-card">
+        <div class="pc-meta">
+          <div class="pc-tag">Healthcare &nbsp;&middot;&nbsp; Consulting</div>
+          <div class="pc-date">Jan 2026 – Present</div>
+        </div>
+        <div class="pc-title">Decision Support Tool — American Red Cross</div>
+        <div class="pc-body">Configuring a decision support tool for the American Red Cross to assist in annual resource planning. Benchmarks required vehicle counts against live inventory, quantifying regional surplus to inform fleet allocation. Also leading data-driven improvements to Mental Health CT's Art of Wellbeing program.</div>
+        <a class="pc-link" href="#">In progress →</a>
+      </div>
+
+      <div class="project-card">
+        <div class="pc-meta">
+          <div class="pc-tag">Strategy &nbsp;&middot;&nbsp; Consulting</div>
+          <div class="pc-date">Feb 2026 – Present</div>
+        </div>
+        <div class="pc-title">ASEAN Market Expansion Strategy</div>
+        <div class="pc-body">Advising a Malaysian non-profit on expansion across ASEAN markets as an Associate Consultant at Global Strategy Consulting. Developing a market readiness framework and analyzing regional youth ecosystems to prioritize pilot launch markets.</div>
+        <a class="pc-link" href="#">In progress →</a>
+      </div>
+
+      <div class="project-card">
+        <div class="pc-meta">
+          <div class="pc-tag">ML &nbsp;&middot;&nbsp; Astrophysics</div>
+          <div class="pc-date">2023</div>
+        </div>
+        <div class="pc-title">Gravitational Lens CNN Classifier — Fermilab</div>
+        <div class="pc-body">Generated two 40,000-image benchmark datasets of double-source plane lenses and Einstein rings at Fermi National Accelerator Laboratory. Trained convolutional neural networks (PyTorch) for automated morphological classification. Published at AGU Annual Meeting and Fermilab/Quarknet Workshop.</div>
+        <a class="pc-link" href="https://agu.confex.com/agu/fm23/meetingapp.cgi/Paper/1438256" target="_blank">View publication →</a>
+      </div>
+
+      <div class="project-card">
+        <div class="pc-meta">
+          <div class="pc-tag">Operations Research &nbsp;&middot;&nbsp; Policy</div>
+          <div class="pc-date">2022 – 2023</div>
+        </div>
+        <div class="pc-title">Green Vehicle Routing — CCIR</div>
+        <div class="pc-body">Used a mixed-integer linear programming framework to optimize transportation routes for the Green Vehicle problem through the Cambridge Center for International Research Future Scholar Program. Awarded the CCIR STEM Scholarship and nominated as a Spotlight Scholar.</div>
+        <a class="pc-link" href="#">CCIR Spotlight Scholar →</a>
+      </div>
+
+      <div class="project-card">
+        <div class="pc-meta">
+          <div class="pc-tag">Web &nbsp;&middot;&nbsp; 3D Design</div>
+          <div class="pc-date">2026</div>
+        </div>
         <div class="pc-title">This Portfolio</div>
-        <div class="pc-body">An interactive 3D orbital homepage built with Three.js — featuring twinkling constellations, self-rotating planets, and a frosted glass center card. Designed and iterated entirely from scratch.</div>
-        <a class="pc-link" href="index.html">View &rarr;</a>
+        <div class="pc-body">An interactive 3D orbital homepage built with Three.js — twinkling constellations, self-rotating ringed planets, and a frosted-glass center card. Designed and iterated entirely from scratch.</div>
+        <a class="pc-link" href="index.html">View live →</a>
       </div>
+
       <div class="project-card">
-        <div class="pc-tag">iOS &nbsp;&middot;&nbsp; Swift</div>
-        <div class="pc-title">iOS App Development</div>
-        <div class="pc-body">Building native iOS applications with SwiftUI. Focused on clean UI patterns, smooth animations, and intuitive user flows that feel at home on Apple platforms.</div>
-        <a class="pc-link" href="#">Coming soon &rarr;</a>
+        <div class="pc-meta">
+          <div class="pc-tag">Finance &nbsp;&middot;&nbsp; Investing</div>
+          <div class="pc-date">2022 – 2025</div>
+        </div>
+        <div class="pc-title">Latin School Investment Fund</div>
+        <div class="pc-body">Board member managing a $100,000 student-run stock portfolio as one of eleven voting members. Gave weekly portfolio stock reports and pitched new investments to the Board.</div>
+        <a class="pc-link" href="#">Details →</a>
       </div>
-      <div class="project-card">
-        <div class="pc-tag">Data &nbsp;&middot;&nbsp; Science</div>
-        <div class="pc-title">Proteomics Analysis</div>
-        <div class="pc-body">Computational pipelines for processing and visualizing mass spectrometry data — including protein quantification, differential expression, and pathway enrichment workflows.</div>
-        <a class="pc-link" href="#">Coming soon &rarr;</a>
-      </div>
-      <div class="project-card">
-        <div class="pc-tag">Policy &nbsp;&middot;&nbsp; Writing</div>
-        <div class="pc-title">AI in Healthcare</div>
-        <div class="pc-body">Research and writing on regulatory frameworks for AI-assisted diagnostics and drug discovery. Examines the ethical and legal landscape of deploying machine learning models in clinical settings.</div>
-        <a class="pc-link" href="#">Coming soon &rarr;</a>
-      </div>
+
     </div>
   </main>
   <div class="coords">41.3083&deg; N &nbsp; 72.9279&deg; W</div>
