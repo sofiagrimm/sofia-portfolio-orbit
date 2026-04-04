@@ -91,7 +91,6 @@
       content:'';position:absolute;inset:-1px;border-radius:50%;
       border:1px solid rgba(80,100,180,0.04);transform:scale(1.14);
     }
-    .card-ring::after{display:none;}
     @keyframes cardRingSpin{
       from{transform:translate(-50%,-50%) rotate(0deg)}
       to{transform:translate(-50%,-50%) rotate(360deg)}
@@ -106,6 +105,79 @@
       font-size:10px;letter-spacing:0.18em;text-transform:uppercase;
       color:rgba(110,130,190,0.28);font-weight:300;pointer-events:none;
     }
+
+    /* ── Planet cursor hint ── */
+    #planetHint{
+      position:fixed;z-index:30;pointer-events:none;
+      font-size:11px;letter-spacing:.12em;text-transform:uppercase;
+      color:rgba(200,220,255,0.75);
+      background:rgba(8,14,40,0.72);backdrop-filter:blur(8px);
+      border:1px solid rgba(120,150,255,0.18);
+      padding:6px 12px;border-radius:20px;
+      opacity:0;transition:opacity .18s;
+      white-space:nowrap;
+    }
+
+    /* ── Planet popup overlay ── */
+    #popupOverlay{
+      position:fixed;inset:0;z-index:40;
+      background:rgba(4,8,28,0);
+      display:flex;align-items:center;justify-content:center;
+      pointer-events:none;
+      transition:background .35s;
+    }
+    #popupOverlay.visible{
+      background:rgba(4,8,28,0.55);
+      pointer-events:auto;
+    }
+    #popupBox{
+      position:relative;
+      width:min(480px,90vw);
+      background:linear-gradient(135deg,rgba(8,16,52,0.92) 0%,rgba(6,12,38,0.96) 100%);
+      border:1px solid rgba(120,150,255,0.20);
+      border-radius:22px;
+      padding:40px 36px 36px;
+      box-shadow:0 24px 80px rgba(0,0,0,0.7),0 0 60px rgba(60,100,255,0.08),inset 0 1px 0 rgba(180,200,255,0.06);
+      backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);
+      opacity:0;
+      transform:scale(0.82) translateY(22px);
+      transition:opacity .38s cubic-bezier(.22,1,.36,1), transform .38s cubic-bezier(.22,1,.36,1);
+    }
+    #popupOverlay.visible #popupBox{
+      opacity:1;
+      transform:scale(1) translateY(0);
+    }
+    #popupClose{
+      position:absolute;top:16px;right:16px;
+      width:32px;height:32px;border-radius:50%;
+      background:rgba(100,130,220,0.12);border:1px solid rgba(120,150,255,0.18);
+      color:rgba(180,200,255,0.7);font-size:16px;line-height:32px;text-align:center;
+      cursor:pointer;transition:background .18s,color .18s;
+      display:flex;align-items:center;justify-content:center;
+    }
+    #popupClose:hover{background:rgba(100,130,220,0.28);color:#fff;}
+    .popup-accent{
+      display:inline-block;width:8px;height:8px;border-radius:50%;
+      margin-bottom:14px;
+    }
+    .popup-label{
+      font-size:10px;letter-spacing:.22em;text-transform:uppercase;
+      color:rgba(150,175,255,0.45);margin-bottom:10px;
+    }
+    .popup-title{
+      font-family:'Cormorant Garamond',serif;
+      font-size:32px;font-weight:300;line-height:1.15;color:#eef3ff;
+      margin-bottom:16px;
+    }
+    .popup-rule{
+      width:36px;height:1px;
+      background:linear-gradient(90deg,rgba(140,170,255,0.4),transparent);
+      margin-bottom:16px;
+    }
+    .popup-body{
+      font-size:13px;font-weight:300;line-height:1.8;color:rgba(200,218,255,0.62);
+    }
+    .popup-body strong{font-weight:500;color:rgba(220,232,255,0.88);}
   </style>
 </head>
 <body>
@@ -131,6 +203,21 @@
   <div class="coords">41.3083&deg; N &nbsp; 72.9279&deg; W</div>
   <div class="tagline">science as an explorable universe</div>
 
+  <!-- cursor hint -->
+  <div id="planetHint"></div>
+
+  <!-- planet popup -->
+  <div id="popupOverlay">
+    <div id="popupBox">
+      <button id="popupClose" aria-label="Close">&#x2715;</button>
+      <div class="popup-accent" id="popupAccent"></div>
+      <div class="popup-label" id="popupLabel"></div>
+      <div class="popup-title" id="popupTitle"></div>
+      <div class="popup-rule"></div>
+      <div class="popup-body" id="popupBody"></div>
+    </div>
+  </div>
+
   <script type="module">
     import * as THREE from 'three';
     const renderer = new THREE.WebGLRenderer({antialias:true,alpha:false});
@@ -149,6 +236,8 @@
     scene.add(new THREE.AmbientLight(0x0d1a33,1.4));
     const key=new THREE.DirectionalLight(0xffffff,1.1); key.position.set(18,24,18); scene.add(key);
     const rim=new THREE.DirectionalLight(0xaac4ff,1.2); rim.position.set(-24,4,-20); scene.add(rim);
+
+    // ── Stars ──
     const STAR_COUNT=9000;
     const starPositions=new Float32Array(STAR_COUNT*3);
     const starPhase=new Float32Array(STAR_COUNT);
@@ -202,6 +291,8 @@
       transparent:true,depthWrite:false
     });
     scene.add(new THREE.Points(starGeo,starMat));
+
+    // ── Constellations ──
     const CZ=-90;
     const constellations=[
       {name:'Orion',offset:[-68,12],stars:[[0,8],[3.5,8],[-1,5.5],[4.5,5.5],[0.8,4.2],[1.8,3.8],[2.8,3.4],[0.2,1.5],[3.5,1.5]],edges:[[0,2],[1,3],[2,4],[3,6],[4,5],[5,6],[7,4],[8,6],[2,3]]},
@@ -234,6 +325,8 @@
       const lp=[];con.edges.forEach(([a,b])=>{lp.push(pts[a],pts[b]);});
       scene.add(new THREE.LineSegments(new THREE.BufferGeometry().setFromPoints(lp),new THREE.LineBasicMaterial({color:0x3a5888,transparent:true,opacity:0.22})));
     });
+
+    // ── Orbit rings ──
     const orbitRing=new THREE.Mesh(new THREE.RingGeometry(15.8,16.4,180),new THREE.MeshBasicMaterial({color:0x2a3a5a,side:THREE.DoubleSide,transparent:true,opacity:0.15}));
     orbitRing.position.set(0,0,-18); scene.add(orbitRing);
     const outerRing=new THREE.Mesh(new THREE.RingGeometry(20.0,20.2,180),new THREE.MeshBasicMaterial({color:0x1e2e48,side:THREE.DoubleSide,transparent:true,opacity:0.08}));
@@ -250,21 +343,52 @@
       ctx.fillStyle=grad;ctx.fillRect(0,0,256,1);
       return new THREE.CanvasTexture(c);
     }
+
+    // ── Planet data ──
+    const PLANET_INFO = [
+      {
+        label: 'Research · Neuroscience',
+        title: 'Higley Lab — Locus Coeruleus',
+        body: 'Characterizing <strong>locus coeruleus axon degeneration</strong> in PPT1-deficient mice to investigate <strong>norepinephrine dysfunction</strong> in Parkinson's disease at Yale School of Medicine. Work spans confocal microscopy, IHC, and perfusion protocols.',
+        accentHex: '#44ccff'
+      },
+      {
+        label: 'Research · Astrophysics',
+        title: 'Gravitational Lens CNN — Fermilab',
+        body: 'Generated 40,000-image benchmark datasets of <strong>double-source plane gravitational lenses</strong> and Einstein rings at Fermi National Accelerator Laboratory. Trained PyTorch CNNs for automated morphological classification. <strong>Published at AGU Annual Meeting 2023.</strong>',
+        accentHex: '#5588ff'
+      },
+      {
+        label: 'Consulting · Strategy',
+        title: 'Yale Healthcare Consulting Collective',
+        body: 'Client Lead on healthcare strategy engagements. Current project: configuring a <strong>decision support tool for the American Red Cross</strong> to benchmark vehicle counts against live inventory and quantify regional fleet surplus.',
+        accentHex: '#cc88ff'
+      },
+      {
+        label: 'Startup · MedTech',
+        title: 'PCDD — Yale Engineering',
+        body: 'Developing business strategy for a <strong>patent-pending medication dispenser & deactivator</strong> device under Dr. Wiznia at Yale School of Engineering. Work spans ingress mechanisms, activated charcoal deactivation protocols, and go-to-market planning.',
+        accentHex: '#44eeaa'
+      },
+      {
+        label: 'Research · Proteomics',
+        title: 'Mass Spectrometry & Proteomics',
+        body: 'Research spanning <strong>computational and wet-lab proteomics</strong>, including capillary zone electrophoresis, liquid chromatography, and antibody engineering. Prior work at Stanford on mass spectrometry workflows and cell culture.',
+        accentHex: '#ffcc44'
+      }
+    ];
+
     const configs=[
-      // vivid cyan-blue
       {color:0x44ccff,emissive:0x0a2a44,glow:'rgba(60,200,255,',ringColor:'rgba(60,200,255,1)',ringTilt:{x:0.42,z:0.18},spinAxis:new THREE.Vector3(0.2,1,0.1).normalize(),spinSpeed:0.008},
-      // electric indigo-blue
       {color:0x5588ff,emissive:0x080e38,glow:'rgba(80,120,255,',ringColor:'rgba(80,120,255,1)',ringTilt:{x:0.50,z:-0.14},spinAxis:new THREE.Vector3(-0.1,1,0.3).normalize(),spinSpeed:0.012},
-      // bright lavender-pink
       {color:0xcc88ff,emissive:0x1a0830,glow:'rgba(200,120,255,',ringColor:'rgba(200,120,255,1)',ringTilt:{x:0.32,z:0.28},spinAxis:new THREE.Vector3(0.3,0.9,-0.2).normalize(),spinSpeed:0.006},
-      // vivid emerald green
       {color:0x44eeaa,emissive:0x042818,glow:'rgba(40,220,140,',ringColor:'rgba(40,220,140,1)',ringTilt:{x:0.46,z:0.08},spinAxis:new THREE.Vector3(-0.2,1,0.15).normalize(),spinSpeed:0.010},
-      // warm golden amber
       {color:0xffcc44,emissive:0x281a00,glow:'rgba(255,200,50,',ringColor:'rgba(255,200,60,1)',ringTilt:{x:0.38,z:-0.22},spinAxis:new THREE.Vector3(0.15,0.95,0.25).normalize(),spinSpeed:0.007}
     ];
     const R=16.5,Z=-18,SPEED=0.0004;
     const sphereGeo=new THREE.SphereGeometry(1.9,64,64);
     const groups=[];
+    const meshes=[];
     const quat=new THREE.Quaternion();
     for(let i=0;i<5;i++){
       const cfg=configs[i];
@@ -281,8 +405,9 @@
       for(let j=0;j<pos.count;j++){v3.fromBufferAttribute(pos,j);uv.setXY(j,(v3.length()-2.8)/(3.5-2.8),0.5);}
       const planetRing=new THREE.Mesh(ringGeo,new THREE.MeshBasicMaterial({map:makeRingTexture(cfg.ringColor),side:THREE.DoubleSide,transparent:true,opacity:0.7,depthWrite:false}));
       planetRing.rotation.x=cfg.ringTilt.x;planetRing.rotation.z=cfg.ringTilt.z;
+      const sphere=new THREE.Mesh(sphereGeo,mat);
       const innerGroup=new THREE.Group();
-      innerGroup.add(new THREE.Mesh(sphereGeo,mat));
+      innerGroup.add(sphere);
       innerGroup.add(sprite);
       const group=new THREE.Group();
       group.add(innerGroup);
@@ -291,10 +416,82 @@
       group.userData.spinAxis=cfg.spinAxis;
       group.userData.spinSpeed=cfg.spinSpeed;
       group.userData.innerGroup=innerGroup;
+      group.userData.planetIndex=i;
       group.position.set(Math.cos(group.userData.angleOffset)*R,Math.sin(group.userData.angleOffset)*R,Z);
       scene.add(group);
       groups.push(group);
+      meshes.push(sphere); // for raycasting
     }
+
+    // ── Raycaster for planet clicks ──
+    const raycaster=new THREE.Raycaster();
+    const mouse=new THREE.Vector2();
+    const hint=document.getElementById('planetHint');
+    const overlay=document.getElementById('popupOverlay');
+    const popupClose=document.getElementById('popupClose');
+    const popupAccent=document.getElementById('popupAccent');
+    const popupLabel=document.getElementById('popupLabel');
+    const popupTitle=document.getElementById('popupTitle');
+    const popupBody=document.getElementById('popupBody');
+
+    let hoveredPlanetIdx=-1;
+
+    function getNDC(e){
+      return new THREE.Vector2(
+        (e.clientX/window.innerWidth)*2-1,
+        -(e.clientY/window.innerHeight)*2+1
+      );
+    }
+
+    function getPlanetUnder(e){
+      raycaster.setFromCamera(getNDC(e),camera);
+      const hits=raycaster.intersectObjects(meshes,false);
+      if(hits.length){
+        return meshes.indexOf(hits[0].object);
+      }
+      return -1;
+    }
+
+    renderer.domElement.addEventListener('mousemove',(e)=>{
+      const idx=getPlanetUnder(e);
+      if(idx>=0){
+        hoveredPlanetIdx=idx;
+        renderer.domElement.style.cursor='pointer';
+        hint.textContent=PLANET_INFO[idx].label;
+        hint.style.left=(e.clientX+16)+'px';
+        hint.style.top=(e.clientY-10)+'px';
+        hint.style.opacity='1';
+      } else {
+        hoveredPlanetIdx=-1;
+        renderer.domElement.style.cursor='default';
+        hint.style.opacity='0';
+      }
+    });
+
+    renderer.domElement.addEventListener('click',(e)=>{
+      const idx=getPlanetUnder(e);
+      if(idx<0) return;
+      const info=PLANET_INFO[idx];
+      const cfg=configs[idx];
+      const hex=info.accentHex;
+      popupAccent.style.background=hex;
+      popupAccent.style.boxShadow='0 0 10px '+hex+'88';
+      popupLabel.textContent=info.label;
+      popupTitle.textContent=info.title;
+      popupBody.innerHTML=info.body;
+      overlay.classList.add('visible');
+    });
+
+    function closePopup(){
+      overlay.classList.remove('visible');
+    }
+    popupClose.addEventListener('click',closePopup);
+    overlay.addEventListener('click',(e)=>{
+      if(e.target===overlay) closePopup();
+    });
+    document.addEventListener('keydown',(e)=>{ if(e.key==='Escape') closePopup(); });
+
+    // ── Animate ──
     let lastTime=performance.now(),orbitAngle=0;
     function animate(time){
       requestAnimationFrame(animate);
