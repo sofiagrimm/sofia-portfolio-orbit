@@ -243,19 +243,24 @@
       const ctx=c.getContext('2d');
       const grad=ctx.createLinearGradient(0,0,256,0);
       grad.addColorStop(0,glowBase.replace('1)','0.0)'));
-      grad.addColorStop(0.08,glowBase.replace('1)','0.6)'));
-      grad.addColorStop(0.4,glowBase.replace('1)','0.4)'));
-      grad.addColorStop(0.65,glowBase.replace('1)','0.2)'));
+      grad.addColorStop(0.08,glowBase.replace('1)','0.8)'));
+      grad.addColorStop(0.4,glowBase.replace('1)','0.55)'));
+      grad.addColorStop(0.65,glowBase.replace('1)','0.25)'));
       grad.addColorStop(1,glowBase.replace('1)','0.0)'));
       ctx.fillStyle=grad;ctx.fillRect(0,0,256,1);
       return new THREE.CanvasTexture(c);
     }
     const configs=[
-      {color:0xddeeff,emissive:0x0a1828,glow:'rgba(160,210,255,',ringColor:'rgba(160,210,255,1)',ringTilt:{x:0.42,z:0.18},spinAxis:new THREE.Vector3(0.2,1,0.1).normalize(),spinSpeed:0.008},
-      {color:0xd8f0ff,emissive:0x081420,glow:'rgba(100,200,255,',ringColor:'rgba(100,200,255,1)',ringTilt:{x:0.50,z:-0.14},spinAxis:new THREE.Vector3(-0.1,1,0.3).normalize(),spinSpeed:0.012},
-      {color:0xe8e8ff,emissive:0x0e0e20,glow:'rgba(160,170,255,',ringColor:'rgba(160,170,255,1)',ringTilt:{x:0.32,z:0.28},spinAxis:new THREE.Vector3(0.3,0.9,-0.2).normalize(),spinSpeed:0.006},
-      {color:0xd8fce8,emissive:0x061810,glow:'rgba(100,240,160,',ringColor:'rgba(100,240,160,1)',ringTilt:{x:0.46,z:0.08},spinAxis:new THREE.Vector3(-0.2,1,0.15).normalize(),spinSpeed:0.010},
-      {color:0xfff0cc,emissive:0x1e1005,glow:'rgba(255,210,100,',ringColor:'rgba(255,220,120,1)',ringTilt:{x:0.38,z:-0.22},spinAxis:new THREE.Vector3(0.15,0.95,0.25).normalize(),spinSpeed:0.007}
+      // vivid cyan-blue
+      {color:0x44ccff,emissive:0x0a2a44,glow:'rgba(60,200,255,',ringColor:'rgba(60,200,255,1)',ringTilt:{x:0.42,z:0.18},spinAxis:new THREE.Vector3(0.2,1,0.1).normalize(),spinSpeed:0.008},
+      // electric indigo-blue
+      {color:0x5588ff,emissive:0x080e38,glow:'rgba(80,120,255,',ringColor:'rgba(80,120,255,1)',ringTilt:{x:0.50,z:-0.14},spinAxis:new THREE.Vector3(-0.1,1,0.3).normalize(),spinSpeed:0.012},
+      // bright lavender-pink
+      {color:0xcc88ff,emissive:0x1a0830,glow:'rgba(200,120,255,',ringColor:'rgba(200,120,255,1)',ringTilt:{x:0.32,z:0.28},spinAxis:new THREE.Vector3(0.3,0.9,-0.2).normalize(),spinSpeed:0.006},
+      // vivid emerald green
+      {color:0x44eeaa,emissive:0x042818,glow:'rgba(40,220,140,',ringColor:'rgba(40,220,140,1)',ringTilt:{x:0.46,z:0.08},spinAxis:new THREE.Vector3(-0.2,1,0.15).normalize(),spinSpeed:0.010},
+      // warm golden amber
+      {color:0xffcc44,emissive:0x281a00,glow:'rgba(255,200,50,',ringColor:'rgba(255,200,60,1)',ringTilt:{x:0.38,z:-0.22},spinAxis:new THREE.Vector3(0.15,0.95,0.25).normalize(),spinSpeed:0.007}
     ];
     const R=16.5,Z=-18,SPEED=0.0004;
     const sphereGeo=new THREE.SphereGeometry(1.9,64,64);
@@ -263,18 +268,18 @@
     const quat=new THREE.Quaternion();
     for(let i=0;i<5;i++){
       const cfg=configs[i];
-      const mat=new THREE.MeshStandardMaterial({color:cfg.color,emissive:cfg.emissive,emissiveIntensity:0.18,metalness:0.18,roughness:0.3});
+      const mat=new THREE.MeshStandardMaterial({color:cfg.color,emissive:cfg.emissive,emissiveIntensity:0.35,metalness:0.18,roughness:0.3});
       const gc=document.createElement('canvas');gc.width=gc.height=128;
       const ctx=gc.getContext('2d');
       const grad=ctx.createRadialGradient(64,64,0,64,64,64);
-      grad.addColorStop(0,cfg.glow+'0.5)');grad.addColorStop(0.4,cfg.glow+'0.14)');grad.addColorStop(1,cfg.glow+'0)');
+      grad.addColorStop(0,cfg.glow+'0.7)');grad.addColorStop(0.4,cfg.glow+'0.22)');grad.addColorStop(1,cfg.glow+'0)');
       ctx.fillStyle=grad;ctx.fillRect(0,0,128,128);
       const sprite=new THREE.Sprite(new THREE.SpriteMaterial({map:new THREE.CanvasTexture(gc),transparent:true,depthWrite:false}));
       sprite.scale.set(4.8,4.8,1);
       const ringGeo=new THREE.RingGeometry(2.8,3.5,128);
       const pos=ringGeo.attributes.position,uv=ringGeo.attributes.uv,v3=new THREE.Vector3();
       for(let j=0;j<pos.count;j++){v3.fromBufferAttribute(pos,j);uv.setXY(j,(v3.length()-2.8)/(3.5-2.8),0.5);}
-      const planetRing=new THREE.Mesh(ringGeo,new THREE.MeshBasicMaterial({map:makeRingTexture(cfg.ringColor),side:THREE.DoubleSide,transparent:true,opacity:0.55,depthWrite:false}));
+      const planetRing=new THREE.Mesh(ringGeo,new THREE.MeshBasicMaterial({map:makeRingTexture(cfg.ringColor),side:THREE.DoubleSide,transparent:true,opacity:0.7,depthWrite:false}));
       planetRing.rotation.x=cfg.ringTilt.x;planetRing.rotation.z=cfg.ringTilt.z;
       const innerGroup=new THREE.Group();
       innerGroup.add(new THREE.Mesh(sphereGeo,mat));
