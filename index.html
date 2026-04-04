@@ -70,7 +70,6 @@
       renderer.setSize(window.innerWidth, window.innerHeight);
     });
 
-    // lighting
     scene.add(new THREE.AmbientLight(0x0d1a33, 1.4));
     const key = new THREE.DirectionalLight(0xffffff, 1.1);
     key.position.set(18, 24, 18);
@@ -103,12 +102,82 @@
     ringMesh.position.set(0, 0, -18);
     scene.add(ringMesh);
 
+    // helper: procedural planet texture
+    function makePlanetTexture(baseColor, stripeColor, size = 256) {
+      const c = document.createElement('canvas');
+      c.width = c.height = size;
+      const ctx = c.getContext('2d');
+      ctx.fillStyle = baseColor;
+      ctx.fillRect(0, 0, size, size);
+      // horizontal bands
+      for (let b = 0; b < 7; b++) {
+        const y = (b / 7) * size;
+        const h = size / 14;
+        ctx.globalAlpha = 0.18 + Math.random() * 0.14;
+        ctx.fillStyle = stripeColor;
+        ctx.fillRect(0, y, size, h);
+      }
+      ctx.globalAlpha = 1;
+      // subtle noise dots
+      for (let d = 0; d < 400; d++) {
+        ctx.globalAlpha = Math.random() * 0.08;
+        ctx.fillStyle = '#ffffff';
+        ctx.beginPath();
+        ctx.arc(Math.random()*size, Math.random()*size, Math.random()*1.5, 0, Math.PI*2);
+        ctx.fill();
+      }
+      ctx.globalAlpha = 1;
+      return new THREE.CanvasTexture(c);
+    }
+
+    // helper: ring texture (radial fade with gaps)
+    function makeRingTexture(innerCol, outerCol) {
+      const c = document.createElement('canvas');
+      c.width = 256; c.height = 1;
+      const ctx = c.getContext('2d');
+      const grad = ctx.createLinearGradient(0,0,256,0);
+      grad.addColorStop(0,    innerCol.replace('1)', '0.0)'));
+      grad.addColorStop(0.05, innerCol);
+      grad.addColorStop(0.3,  outerCol);
+      grad.addColorStop(0.55, innerCol.replace('1)', '0.5)'));
+      grad.addColorStop(0.75, outerCol.replace('1)', '0.7)'));
+      grad.addColorStop(1,    outerCol.replace('1)', '0.0)'));
+      ctx.fillStyle = grad;
+      ctx.fillRect(0,0,256,1);
+      return new THREE.CanvasTexture(c);
+    }
+
     const configs = [
-      { color: 0xddeeff, emissive: 0x0a1828, glow: 'rgba(160,210,255,' },
-      { color: 0xd8f0ff, emissive: 0x081420, glow: 'rgba(100,200,255,' },
-      { color: 0xeeddff, emissive: 0x120d26, glow: 'rgba(180,140,255,' },
-      { color: 0xd8fce8, emissive: 0x061810, glow: 'rgba(100,240,160,' },
-      { color: 0xfff0cc, emissive: 0x1e1005, glow: 'rgba(255,210,100,' }
+      {
+        color: 0xddeeff, emissive: 0x0a1828, glow: 'rgba(160,210,255,',
+        texBase: '#b8d4f0', texStripe: '#7aaad8',
+        ringInner: 'rgba(160,210,255,1)', ringOuter: 'rgba(100,160,220,1)',
+        ringTilt: { x: 0.4, z: 0.2 }, hasRing: true
+      },
+      {
+        color: 0xd8f0ff, emissive: 0x081420, glow: 'rgba(100,200,255,',
+        texBase: '#a0c8e8', texStripe: '#5588bb',
+        ringInner: 'rgba(120,190,255,1)', ringOuter: 'rgba(80,140,200,1)',
+        ringTilt: { x: 0.5, z: -0.15 }, hasRing: false
+      },
+      {
+        color: 0xeeddff, emissive: 0x120d26, glow: 'rgba(180,140,255,',
+        texBase: '#c8a8e8', texStripe: '#9060c0',
+        ringInner: 'rgba(200,160,255,1)', ringOuter: 'rgba(140,90,220,1)',
+        ringTilt: { x: 0.3, z: 0.3 }, hasRing: true
+      },
+      {
+        color: 0xd8fce8, emissive: 0x061810, glow: 'rgba(100,240,160,',
+        texBase: '#90d8a8', texStripe: '#44aa70',
+        ringInner: 'rgba(120,240,170,1)', ringOuter: 'rgba(60,180,110,1)',
+        ringTilt: { x: 0.45, z: 0.1 }, hasRing: false
+      },
+      {
+        color: 0xfff0cc, emissive: 0x1e1005, glow: 'rgba(255,210,100,',
+        texBase: '#f0d890', texStripe: '#c8a040',
+        ringInner: 'rgba(255,220,120,1)', ringOuter: 'rgba(200,160,60,1)',
+        ringTilt: { x: 0.38, z: -0.22 }, hasRing: true
+      }
     ];
 
     const R = 14.0;
@@ -119,24 +188,26 @@
       const angle = i * (2 * Math.PI / 5);
       const x = Math.cos(angle) * R;
       const y = Math.sin(angle) * R;
+      const cfg = configs[i];
 
       const mat = new THREE.MeshStandardMaterial({
-        color: configs[i].color,
-        emissive: configs[i].emissive,
-        emissiveIntensity: 0.18,
-        metalness: 0.18,
-        roughness: 0.3
+        map: makePlanetTexture(cfg.texBase, cfg.texStripe),
+        emissive: new THREE.Color(cfg.emissive),
+        emissiveIntensity: 0.12,
+        metalness: 0.1,
+        roughness: 0.75
       });
 
+      // glow sprite
       const gc = document.createElement('canvas');
       gc.width = gc.height = 128;
       const ctx = gc.getContext('2d');
-      const grad = ctx.createRadialGradient(64, 64, 0, 64, 64, 64);
-      grad.addColorStop(0,   configs[i].glow + '0.6)');
-      grad.addColorStop(0.4, configs[i].glow + '0.18)');
-      grad.addColorStop(1,   configs[i].glow + '0)');
+      const grad = ctx.createRadialGradient(64,64,0,64,64,64);
+      grad.addColorStop(0,   cfg.glow + '0.5)');
+      grad.addColorStop(0.4, cfg.glow + '0.15)');
+      grad.addColorStop(1,   cfg.glow + '0)');
       ctx.fillStyle = grad;
-      ctx.fillRect(0, 0, 128, 128);
+      ctx.fillRect(0,0,128,128);
       const sprite = new THREE.Sprite(
         new THREE.SpriteMaterial({ map: new THREE.CanvasTexture(gc), transparent: true, depthWrite: false })
       );
@@ -146,6 +217,32 @@
       group.position.set(x, y, Z);
       group.add(new THREE.Mesh(sphereGeo, mat));
       group.add(sprite);
+
+      // rings
+      if (cfg.hasRing) {
+        const ringGeo = new THREE.RingGeometry(2.5, 4.2, 128);
+        // remap UVs so texture spreads radially
+        const pos = ringGeo.attributes.position;
+        const uv  = ringGeo.attributes.uv;
+        const v3  = new THREE.Vector3();
+        for (let j = 0; j < pos.count; j++) {
+          v3.fromBufferAttribute(pos, j);
+          const len = v3.length();
+          uv.setXY(j, (len - 2.5) / (4.2 - 2.5), 0.5);
+        }
+        const ringMat = new THREE.MeshBasicMaterial({
+          map: makeRingTexture(cfg.ringInner, cfg.ringOuter),
+          side: THREE.DoubleSide,
+          transparent: true,
+          opacity: 0.82,
+          depthWrite: false
+        });
+        const ring = new THREE.Mesh(ringGeo, ringMat);
+        ring.rotation.x = cfg.ringTilt.x;
+        ring.rotation.z = cfg.ringTilt.z;
+        group.add(ring);
+      }
+
       scene.add(group);
     }
 
