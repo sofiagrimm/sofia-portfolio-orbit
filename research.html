@@ -142,7 +142,7 @@
     renderer.setSize(W(),H());
     renderer.setClearColor(0x07061a,1);
     renderer.toneMapping=THREE.ACESFilmicToneMapping;
-    renderer.toneMappingExposure=1.05;
+    renderer.toneMappingExposure=1.1;
 
     const scene=new THREE.Scene();
     const camera=new THREE.PerspectiveCamera(38,W()/H(),0.1,500);
@@ -150,20 +150,20 @@
     camera.lookAt(0,0,0);
     window.addEventListener('resize',()=>{camera.aspect=W()/H();camera.updateProjectionMatrix();renderer.setSize(W(),H());});
 
-    /* ---- NEBULA ---- */
+    /* ---- NEBULA BG ---- */
     {
-      const nc=document.createElement('canvas'); nc.width=512; nc.height=512;
+      const nc=document.createElement('canvas');nc.width=512;nc.height=512;
       const ctx=nc.getContext('2d');
       const g1=ctx.createRadialGradient(256,256,0,256,256,256);
-      g1.addColorStop(0,'rgba(80,50,160,0.22)'); g1.addColorStop(0.4,'rgba(50,30,120,0.12)');
-      g1.addColorStop(0.75,'rgba(20,10,60,0.06)'); g1.addColorStop(1,'rgba(0,0,0,0)');
-      ctx.fillStyle=g1; ctx.fillRect(0,0,512,512);
+      g1.addColorStop(0,'rgba(80,50,160,0.22)');g1.addColorStop(.4,'rgba(50,30,120,0.12)');
+      g1.addColorStop(.75,'rgba(20,10,60,0.06)');g1.addColorStop(1,'rgba(0,0,0,0)');
+      ctx.fillStyle=g1;ctx.fillRect(0,0,512,512);
       const g2=ctx.createRadialGradient(290,220,0,290,220,190);
-      g2.addColorStop(0,'rgba(140,90,210,0.12)'); g2.addColorStop(0.5,'rgba(70,35,150,0.06)');
+      g2.addColorStop(0,'rgba(140,90,210,0.12)');g2.addColorStop(.5,'rgba(70,35,150,0.06)');
       g2.addColorStop(1,'rgba(0,0,0,0)');
-      ctx.fillStyle=g2; ctx.fillRect(0,0,512,512);
+      ctx.fillStyle=g2;ctx.fillRect(0,0,512,512);
       const nsp=new THREE.Sprite(new THREE.SpriteMaterial({map:new THREE.CanvasTexture(nc),transparent:true,depthWrite:false,blending:THREE.AdditiveBlending}));
-      nsp.scale.set(9,9,1); nsp.position.set(0,0,-2); scene.add(nsp);
+      nsp.scale.set(9,9,1);nsp.position.set(0,0,-2);scene.add(nsp);
     }
 
     /* ---- STARS ---- */
@@ -199,149 +199,223 @@
     }
 
     /* ---- LIGHTING ---- */
-    scene.add(new THREE.AmbientLight(0x3a2870,1.8));
-    const sun=new THREE.DirectionalLight(0xffd0f0,2.2);
+    scene.add(new THREE.AmbientLight(0x112244,0.9));
+    const sun=new THREE.DirectionalLight(0xfff8f0,3.2);
     sun.position.set(5,2,4); scene.add(sun);
-    const rimL=new THREE.DirectionalLight(0x8855ee,1.0);
-    rimL.position.set(-4,1,-3); scene.add(rimL);
-    const fillL=new THREE.DirectionalLight(0x223366,0.5);
-    fillL.position.set(0,-4,-2); scene.add(fillL);
+    const rimL=new THREE.DirectionalLight(0x1a3a88,0.5);
+    rimL.position.set(-5,0,-3); scene.add(rimL);
 
-    /* ---- STYLIZED GLOBE ---- */
+    /* ---- REALISTIC GLOBE ---- */
     const R=1.0;
 
-    // Build a procedural land/ocean palette texture
-    function makeGlobeTex(){
-      const size=512;
-      const c=document.createElement('canvas'); c.width=size; c.height=size;
+    /* Build a realistic-looking Earth colour texture procedurally:
+       - Deep blue oceans (real Pacific/Atlantic hue)
+       - Green/brown continents approximating real shapes
+       - White polar caps
+       - Subtle specular map channel stored in alpha
+    */
+    function makeEarthTex(){
+      const S=1024;
+      const c=document.createElement('canvas');c.width=S;c.height=S;
       const ctx=c.getContext('2d');
-      // base: deep violet ocean
-      const oceanGrad=ctx.createLinearGradient(0,0,0,size);
-      oceanGrad.addColorStop(0,'#1a1060');
-      oceanGrad.addColorStop(0.5,'#1e2278');
-      oceanGrad.addColorStop(1,'#0e0a3c');
-      ctx.fillStyle=oceanGrad; ctx.fillRect(0,0,size,size);
-      // continents as soft blobs via multiple radial gradients (approx)
-      const landColor='rgba(80,180,160,0.72)';
-      const landBlobs=[
-        [170,200,90,70],[300,160,60,50],[380,200,50,40], // americas rough
-        [310,170,40,30],[340,240,30,24],
-        [390,180,70,55],[430,230,55,42], // eurasia
-        [400,290,40,30],[420,310,28,22], // africa
-        [460,280,35,25],                  // asia SE
-        [480,340,30,22],                  // aus
+
+      // Ocean base: realistic deep navy-blue
+      const og=ctx.createLinearGradient(0,0,0,S);
+      og.addColorStop(0,  '#0a1f4a');
+      og.addColorStop(0.25,'#0d2a5e');
+      og.addColorStop(0.5, '#0e2f68');
+      og.addColorStop(0.75,'#0d2a5e');
+      og.addColorStop(1,  '#0a1f4a');
+      ctx.fillStyle=og; ctx.fillRect(0,0,S,S);
+
+      // Shallow coastal tint
+      const shallowColor='rgba(20,80,160,0.18)';
+
+      // Land shapes (equirectangular approximations, longitude 0-360 mapped to 0-S, lat 90 to -90 mapped to 0-S)
+      // Each entry: [cx_frac, cy_frac, rx_frac, ry_frac, color]
+      const lands=[
+        // North America
+        [0.155,0.22, 0.075,0.10, '#2d6a2f'],
+        [0.160,0.31, 0.068,0.095,'#2e7030'],
+        [0.148,0.38, 0.055,0.07, '#3a7a2a'],
+        // Central America / Caribbean
+        [0.175,0.44, 0.025,0.025,'#2f7028'],
+        // South America
+        [0.195,0.49, 0.048,0.055,'#2a8030'],
+        [0.188,0.58, 0.052,0.075,'#226820'],
+        [0.198,0.67, 0.042,0.06, '#1e6020'],
+        // Greenland
+        [0.155,0.13, 0.030,0.045,'#d0dce8'],
+        // Europe
+        [0.468,0.23, 0.038,0.06, '#5a7a30'],
+        [0.488,0.27, 0.030,0.05, '#4e7028'],
+        // Africa
+        [0.490,0.38, 0.048,0.055,'#8a7040'],
+        [0.492,0.48, 0.050,0.070,'#7a6838'],
+        [0.484,0.57, 0.044,0.055,'#6a5c30'],
+        [0.490,0.65, 0.030,0.040,'#5e5028'],
+        // Asia (west)
+        [0.560,0.22, 0.055,0.065,'#6a7a38'],
+        [0.580,0.28, 0.060,0.070,'#5a7030'],
+        // Asia (central / siberia)
+        [0.610,0.18, 0.070,0.065,'#5a7035'],
+        [0.650,0.16, 0.060,0.055,'#527028'],
+        [0.680,0.20, 0.055,0.060,'#4e6c28'],
+        // Asia (south)
+        [0.600,0.36, 0.048,0.055,'#7a8040'],
+        [0.620,0.40, 0.040,0.045,'#6e7838'],
+        [0.660,0.38, 0.042,0.050,'#607030'],
+        // Southeast Asia / Indonesia
+        [0.690,0.42, 0.038,0.035,'#4a7c30'],
+        [0.720,0.44, 0.028,0.025,'#427828'],
+        [0.745,0.46, 0.022,0.020,'#3a7020'],
+        // Japan / Korea
+        [0.730,0.28, 0.016,0.025,'#507830'],
+        // Australia
+        [0.730,0.60, 0.052,0.055,'#a07040'],
+        [0.740,0.68, 0.040,0.040,'#906838'],
+        // New Zealand
+        [0.778,0.68, 0.012,0.018,'#507840'],
+        // Antarctica
+        [0.500,0.94, 0.280,0.06, '#dce8f0'],
+        [0.500,0.97, 0.320,0.035,'#e4eef8'],
+        // Arctic
+        [0.500,0.03, 0.280,0.05, '#c8daea'],
+        // Madagascar
+        [0.538,0.56, 0.012,0.022,'#6a5c30'],
+        // UK / Ireland
+        [0.468,0.21, 0.012,0.016,'#4a6c30'],
+        // Iceland
+        [0.430,0.17, 0.015,0.012,'#b8ccd8'],
       ];
-      landBlobs.forEach(([cx,cy,rx,ry])=>{
-        const grd=ctx.createRadialGradient(cx,cy,0,cx,cy,Math.max(rx,ry));
-        grd.addColorStop(0,'rgba(72,195,162,0.85)');
-        grd.addColorStop(0.5,'rgba(55,160,130,0.55)');
-        grd.addColorStop(1,'rgba(0,0,0,0)');
-        ctx.save(); ctx.scale(rx/Math.max(rx,ry),ry/Math.max(rx,ry)); ctx.translate(cx*(Math.max(rx,ry)/rx)-cx,cy*(Math.max(rx,ry)/ry)-cy);
-        ctx.fillStyle=grd; ctx.fillRect(0,0,size*(Math.max(rx,ry)/rx),size*(Math.max(rx,ry)/ry));
-        ctx.restore();
-        // simpler version — just ellipse fills
-      });
-      // redo with ellipses
-      ctx.clearRect(0,0,size,size);
-      ctx.fillStyle=oceanGrad; ctx.fillRect(0,0,size,size);
-      landBlobs.forEach(([cx,cy,rx,ry])=>{
+
+      lands.forEach(([cfx,cfy,rfx,rfy,col])=>{
+        const cx=cfx*S, cy=cfy*S, rx=rfx*S, ry=rfy*S;
         ctx.save();
         ctx.beginPath();
         ctx.ellipse(cx,cy,rx,ry,0,0,Math.PI*2);
         const grd=ctx.createRadialGradient(cx,cy,0,cx,cy,Math.max(rx,ry));
-        grd.addColorStop(0,'rgba(72,210,170,0.88)');
-        grd.addColorStop(0.55,'rgba(50,175,138,0.60)');
-        grd.addColorStop(1,'rgba(30,120,100,0)');
+        // lighten at center, add natural variation
+        const base=col;
+        grd.addColorStop(0,  base+'ff');
+        grd.addColorStop(0.5,base+'cc');
+        grd.addColorStop(1,  base+'00');
         ctx.fillStyle=grd;
         ctx.fill();
         ctx.restore();
       });
-      // soft noise overlay for texture
-      const id=ctx.getImageData(0,0,size,size);
+
+      // Coastal shallow water glow around continents
+      lands.slice(0,-4).forEach(([cfx,cfy,rfx,rfy])=>{
+        const cx=cfx*S,cy=cfy*S,rx=(rfx+.012)*S,ry=(rfy+.012)*S;
+        ctx.save();ctx.beginPath();ctx.ellipse(cx,cy,rx,ry,0,0,Math.PI*2);
+        const g=ctx.createRadialGradient(cx,cy,Math.min(rfx,rfy)*.8*S,cx,cy,Math.max(rx,ry));
+        g.addColorStop(0,'rgba(0,0,0,0)');g.addColorStop(1,'rgba(20,90,180,0.12)');
+        ctx.fillStyle=g;ctx.fill();ctx.restore();
+      });
+
+      // Fine noise for surface texture
+      const id=ctx.getImageData(0,0,S,S);
       for(let i=0;i<id.data.length;i+=4){
-        const n=(Math.random()-.5)*18;
+        const n=(Math.random()-.5)*14;
         id.data[i]  =Math.min(255,Math.max(0,id.data[i]+n));
         id.data[i+1]=Math.min(255,Math.max(0,id.data[i+1]+n));
         id.data[i+2]=Math.min(255,Math.max(0,id.data[i+2]+n));
       }
       ctx.putImageData(id,0,0);
-      // polar ice caps
-      const iceN=ctx.createRadialGradient(256,0,0,256,0,80);
-      iceN.addColorStop(0,'rgba(200,210,255,0.7)');iceN.addColorStop(1,'rgba(0,0,0,0)');
-      ctx.fillStyle=iceN;ctx.fillRect(0,0,size,size);
-      const iceS=ctx.createRadialGradient(256,512,0,256,512,70);
-      iceS.addColorStop(0,'rgba(200,210,255,0.65)');iceS.addColorStop(1,'rgba(0,0,0,0)');
-      ctx.fillStyle=iceS;ctx.fillRect(0,0,size,size);
+
+      // Latitude bands tint: equatorial warmth, polar blue
+      const lbg=ctx.createLinearGradient(0,0,0,S);
+      lbg.addColorStop(0,'rgba(180,210,255,0.10)');
+      lbg.addColorStop(0.18,'rgba(0,0,0,0)');
+      lbg.addColorStop(0.82,'rgba(0,0,0,0)');
+      lbg.addColorStop(1,'rgba(180,210,255,0.10)');
+      ctx.fillStyle=lbg;ctx.fillRect(0,0,S,S);
+
       return new THREE.CanvasTexture(c);
     }
-    const globeTex=makeGlobeTex();
+
+    /* Specular map: bright on ocean (high specularity), dark on land */
+    function makeSpecTex(){
+      const S=512;
+      const c=document.createElement('canvas');c.width=S;c.height=S;
+      const ctx=c.getContext('2d');
+      ctx.fillStyle='#aabbcc';ctx.fillRect(0,0,S,S); // ocean = mid-bright
+      // dim land patches
+      const lands=[
+        [0.155,0.22,0.12,0.14],[0.195,0.55,0.10,0.14],[0.188,0.67,0.09,0.11],
+        [0.468,0.25,0.08,0.11],[0.490,0.50,0.10,0.12],[0.570,0.24,0.13,0.13],
+        [0.640,0.18,0.14,0.12],[0.610,0.38,0.10,0.11],[0.720,0.44,0.06,0.06],
+        [0.730,0.63,0.10,0.10],
+      ];
+      ctx.fillStyle='#223344';
+      lands.forEach(([cfx,cfy,rfx,rfy])=>{
+        const cx=cfx*S,cy=cfy*S,rx=rfx*S,ry=rfy*S;
+        ctx.save();ctx.beginPath();ctx.ellipse(cx,cy,rx,ry,0,0,Math.PI*2);
+        ctx.fill();ctx.restore();
+      });
+      // polar ice = bright
+      ctx.fillStyle='rgba(220,235,255,0.9)';
+      ctx.beginPath();ctx.ellipse(S/2,S*.03,S*.28,S*.04,0,0,Math.PI*2);ctx.fill();
+      ctx.beginPath();ctx.ellipse(S/2,S*.96,S*.32,S*.05,0,0,Math.PI*2);ctx.fill();
+      return new THREE.CanvasTexture(c);
+    }
+
+    const earthTex=makeEarthTex();
+    const specTex=makeSpecTex();
 
     const globeMat=new THREE.ShaderMaterial({
       uniforms:{
-        globeMap:{value:globeTex},
-        sunDir:  {value:sun.position.clone().normalize()},
-        time:    {value:0},
-        camPos:  {value:camera.position.clone()},
+        earthMap: {value:earthTex},
+        specMap:  {value:specTex},
+        sunDir:   {value:sun.position.clone().normalize()},
+        time:     {value:0},
+        camPos:   {value:camera.position.clone()},
       },
       vertexShader:`
         varying vec2 vUv;varying vec3 vNormal;varying vec3 vWorldPos;
         void main(){
-          vUv=uv;vNormal=normalize(normalMatrix*normal);
+          vUv=uv;
+          vNormal=normalize(normalMatrix*normal);
           vec4 wp=modelMatrix*vec4(position,1.);vWorldPos=wp.xyz;
           gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);
         }`,
       fragmentShader:`
-        uniform sampler2D globeMap;
+        uniform sampler2D earthMap,specMap;
         uniform vec3 sunDir,camPos;
         uniform float time;
         varying vec2 vUv;varying vec3 vNormal;varying vec3 vWorldPos;
 
-        float hash(vec2 p){return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5453);}
-        float noise(vec2 p){
-          vec2 i=floor(p);vec2 f=fract(p);f=f*f*(3.-2.*f);
-          return mix(mix(hash(i),hash(i+vec2(1,0)),f.x),mix(hash(i+vec2(0,1)),hash(i+vec2(1,1)),f.x),f.y);
-        }
-        float fbm(vec2 p){
-          float v=0.;float a=.5;
-          for(int i=0;i<4;i++){v+=a*noise(p);p=p*2.1+vec2(1.7,9.2);a*=.5;}
-          return v;
-        }
-
         void main(){
-          vec3 base=texture2D(globeMap,vUv).rgb;
+          vec3 col = texture2D(earthMap,vUv).rgb;
+          float specularity = texture2D(specMap,vUv).r;
 
-          // painterly style: boost saturation, soften with fbm
-          float n=fbm(vUv*6.+vec2(time*.03,time*.02));
-          vec3 col=base;
-          // push ocean blues more violet/indigo
-          float isOcean=smoothstep(.05,.3,base.b-base.r);
-          col=mix(col, vec3(.12,.08,.55)+col*.4, isOcean*.45);
-          // push land more warm teal/sage
-          float isLand=smoothstep(.05,.25,(base.g+base.r*.5)-base.b*.8);
-          col=mix(col, vec3(.18,.72,.55)+col*.3, isLand*.35);
-
-          // painterly grain
-          col+=vec3(n*.06-.03);
-          col=mix(col,vec3(dot(col,vec3(.299,.587,.114))),-.15); // slight vividness boost
-
-          // soft lighting
+          // Diffuse lighting
           vec3 sDir=normalize(sunDir);
           float cosA=dot(vNormal,sDir);
-          float diff=smoothstep(-.25,.6,cosA);
-          // warm lit side, cool shadow
-          vec3 litTint =vec3(1.05,.95,1.10);
-          vec3 darkTint=vec3(.25,.20,.45);
-          col=col*mix(darkTint,litTint,diff);
+          float diff=max(0.,cosA);
 
-          // specular shimmer on ocean
+          // Hemisphere ambient: space-side deep blue, lit-side warm
+          vec3 ambient=mix(vec3(.02,.03,.08),vec3(.06,.06,.09),diff);
+
+          // Night-side: very dark with slight blue city-lights feel
+          float nightMix=smoothstep(.08,-.12,cosA);
+          vec3 nightCol=col*vec3(.04,.04,.07)+vec3(.00,.00,.02)*specularity;
+
+          // Day-side: colour with sunlight
+          vec3 dayCol=col*(ambient+vec3(1.00,.96,.90)*diff*0.9);
+
+          col=mix(dayCol,nightCol,nightMix);
+
+          // Specular highlight on ocean (Blinn-Phong)
           vec3 viewDir=normalize(camPos-vWorldPos);
           vec3 halfV=normalize(sDir+viewDir);
-          float spec=pow(max(0.,dot(vNormal,halfV)),80.)*isOcean*max(0.,cosA)*.4;
-          col+=vec3(.8,.75,1.)*spec;
+          float spec=pow(max(0.,dot(vNormal,halfV)),120.)*specularity*max(0.,cosA);
+          col+=vec3(0.85,0.90,1.0)*spec*0.55;
 
-          // pastel vignette edge
-          float edge=1.-clamp(dot(vNormal,vec3(0.,0.,1.)),0.,1.);
-          col=mix(col,vec3(.30,.18,.65),pow(edge,3.)*0.28);
+          // Subtle terminator softening
+          float terminator=smoothstep(-.05,.05,cosA);
+          col=mix(col*vec3(.7,.75,.9),col,terminator);
 
           gl_FragColor=vec4(clamp(col,0.,1.),1.);
         }`,
@@ -349,16 +423,16 @@
     const globe=new THREE.Mesh(new THREE.SphereGeometry(R,128,128),globeMat);
     scene.add(globe);
 
-    /* ---- WISPY CLOUD LAYER ---- */
+    /* ---- CLOUD LAYER ---- */
     function makeCloudTex(){
       const s=512,c=document.createElement('canvas');c.width=s;c.height=s;
       const ctx=c.getContext('2d');
       ctx.clearRect(0,0,s,s);
-      for(let i=0;i<80;i++){
-        const x=Math.random()*s,y=Math.random()*s,r=20+Math.random()*60;
+      for(let i=0;i<100;i++){
+        const x=Math.random()*s,y=Math.random()*s,r=15+Math.random()*55;
         const grd=ctx.createRadialGradient(x,y,0,x,y,r);
-        grd.addColorStop(0,'rgba(220,215,255,0.22)');
-        grd.addColorStop(0.5,'rgba(200,195,255,0.10)');
+        grd.addColorStop(0,'rgba(255,255,255,0.28)');
+        grd.addColorStop(0.4,'rgba(240,245,255,0.12)');
         grd.addColorStop(1,'rgba(0,0,0,0)');
         ctx.fillStyle=grd;ctx.fillRect(0,0,s,s);
       }
@@ -372,29 +446,26 @@
       fragmentShader:`uniform sampler2D cloudMap;uniform float time;uniform vec3 sunDir;
         varying vec2 vUv;varying vec3 vNormal;
         void main(){
-          vec2 uv2=vUv+vec2(time*.00025,time*.00008);
-          float alpha=texture2D(cloudMap,uv2).r;
-          float cosA=dot(vNormal,normalize(sunDir));
-          vec3 col=mix(vec3(.40,.35,.60),vec3(1.0,.95,1.0),smoothstep(-.1,.5,cosA));
-          float pulse=.94+.06*sin(time*.0006+vUv.x*30.);
-          gl_FragColor=vec4(col*pulse,alpha*.55);}`,
+          vec2 uv2=vUv+vec2(time*.00018,time*.00006);
+          float a=texture2D(cloudMap,uv2).r;
+          float cosA=max(0.,dot(vNormal,normalize(sunDir)));
+          vec3 col=mix(vec3(.55,.58,.65),vec3(1.,1.,1.),cosA);
+          gl_FragColor=vec4(col,a*.50);}`,
       transparent:true,depthWrite:false,blending:THREE.NormalBlending
     });
-    const clouds=new THREE.Mesh(new THREE.SphereGeometry(R*1.012,96,96),cloudMat);
+    const clouds=new THREE.Mesh(new THREE.SphereGeometry(R*1.010,96,96),cloudMat);
     scene.add(clouds);
 
-    /* ---- ATMOSPHERE — 3 layer lavender ---- */
-    scene.add(new THREE.Mesh(new THREE.SphereGeometry(R*1.12,64,64),new THREE.ShaderMaterial({
+    /* ---- ATMOSPHERE — thin realistic glow at limb only ---- */
+    // Outer haze (wide, very faint blue)
+    scene.add(new THREE.Mesh(new THREE.SphereGeometry(R*1.08,64,64),new THREE.ShaderMaterial({
       vertexShader:`varying vec3 vN;void main(){vN=normalize(normalMatrix*normal);gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}`,
-      fragmentShader:`varying vec3 vN;void main(){float e=1.-clamp(dot(vN,vec3(0.,0.,1.)),0.,1.);gl_FragColor=vec4(.60,.44,1.,pow(e,4.2)*.22);}`,
+      fragmentShader:`varying vec3 vN;void main(){float e=1.-clamp(dot(vN,vec3(0.,0.,1.)),0.,1.);gl_FragColor=vec4(.45,.65,1.,pow(e,5.5)*.18);}`,
       side:THREE.BackSide,blending:THREE.AdditiveBlending,transparent:true,depthWrite:false})));
-    scene.add(new THREE.Mesh(new THREE.SphereGeometry(R*1.05,64,64),new THREE.ShaderMaterial({
+    // Inner thin fringe
+    scene.add(new THREE.Mesh(new THREE.SphereGeometry(R*1.018,64,64),new THREE.ShaderMaterial({
       vertexShader:`varying vec3 vN;void main(){vN=normalize(normalMatrix*normal);gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}`,
-      fragmentShader:`varying vec3 vN;void main(){float e=1.-clamp(dot(vN,vec3(0.,0.,1.)),0.,1.);gl_FragColor=vec4(.30,.50,1.,pow(e,2.8)*.42);}`,
-      side:THREE.BackSide,blending:THREE.AdditiveBlending,transparent:true,depthWrite:false})));
-    scene.add(new THREE.Mesh(new THREE.SphereGeometry(R*1.022,64,64),new THREE.ShaderMaterial({
-      vertexShader:`varying vec3 vN;void main(){vN=normalize(normalMatrix*normal);gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}`,
-      fragmentShader:`varying vec3 vN;void main(){float e=1.-clamp(dot(vN,vec3(0.,0.,1.)),0.,1.);gl_FragColor=vec4(.78,.86,1.,pow(e,5.8)*.60);}`,
+      fragmentShader:`varying vec3 vN;void main(){float e=1.-clamp(dot(vN,vec3(0.,0.,1.)),0.,1.);gl_FragColor=vec4(.55,.75,1.,pow(e,7.)*0.45);}`,
       side:THREE.BackSide,blending:THREE.AdditiveBlending,transparent:true,depthWrite:false})));
 
     /* ---- lat/lon helper ---- */

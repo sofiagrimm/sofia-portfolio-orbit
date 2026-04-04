@@ -31,67 +31,80 @@
     .nav-links .divider{color:rgba(100,130,200,0.2);font-size:13px;user-select:none;}
 
     /* ---- PHOTOBOOTH STRIPS ---- */
+    /* Strips are fixed to the left/right edges, start below nav (80px), end above footer (80px) */
     .strip-wrap{
-      position:fixed;top:0;bottom:0;z-index:15;
+      position:fixed;
+      top:80px;
+      bottom:80px;
+      z-index:15;
       pointer-events:none;
-      width:88px;
+      width:96px;
       overflow:hidden;
     }
     .strip-wrap.left {left:0;}
     .strip-wrap.right{right:0;}
-    .strip{
-      position:absolute;top:0;
-      display:flex;flex-direction:column;
+
+    /* The scrolling inner track */
+    .strip-track{
+      position:absolute;
+      top:0;
+      left:0;
+      width:100%;
+      display:flex;
+      flex-direction:column;
+      align-items:center;
       gap:0;
-      /* two strips side by side inside each wrap */
+      /* will-change for GPU compositing */
+      will-change:transform;
     }
-    .strip-inner{
-      display:flex;flex-direction:column;
-      gap:5px;padding:5px 4px;
-      /* film strip background */
-      background:rgba(8,6,28,0.82);
-      border-right: 3px solid rgba(160,140,255,0.08);
-      backdrop-filter:blur(4px);
+
+    /* Film strip rail background */
+    .strip-rail{
+      position:absolute;
+      inset:0;
+      background:rgba(6,4,22,0.80);
+      border-right:1px solid rgba(140,120,255,0.10);
+      backdrop-filter:blur(6px);
+      -webkit-backdrop-filter:blur(6px);
     }
-    .strip-wrap.right .strip-inner{
+    .strip-wrap.right .strip-rail{
       border-right:none;
-      border-left: 3px solid rgba(160,140,255,0.08);
+      border-left:1px solid rgba(140,120,255,0.10);
     }
-    /* sprocket holes */
-    .strip-inner::before,.strip-inner::after{
-      content:'';
-      display:block;
-      width:10px;height:10px;
-      border-radius:2px;
-      background:rgba(0,0,0,0.7);
-      border:1px solid rgba(140,120,255,0.18);
-      margin:0 auto 5px;
-    }
-    .frame{
-      width:72px;height:56px;
-      border-radius:3px;
+
+    /* Each photo frame */
+    .pb-frame{
+      width:80px;
+      height:108px;
+      border-radius:4px;
       overflow:hidden;
+      flex-shrink:0;
+      border:1px solid rgba(160,140,255,0.14);
       position:relative;
-      flex-shrink:0;
-      border:1px solid rgba(160,140,255,0.12);
-    }
-    .frame canvas{
-      position:absolute;inset:0;width:100%!important;height:100%!important;
-      display:block;
-    }
-    /* film strip sprocket dots on sides */
-    .sprocket-col{
-      width:10px;
-      display:flex;flex-direction:column;
-      justify-content:space-around;
-      padding:12px 0;
-      flex-shrink:0;
-    }
-    .sprocket-dot{
-      width:8px;height:8px;border-radius:2px;
-      background:rgba(0,0,0,0.75);
-      border:1px solid rgba(140,120,255,0.20);
       margin:0 auto;
+    }
+    .pb-frame canvas{
+      position:absolute!important;
+      inset:0;
+      width:100%!important;
+      height:100%!important;
+    }
+
+    /* Sprocket strip row between frames */
+    .pb-sprocket{
+      width:100%;
+      height:22px;
+      display:flex;
+      align-items:center;
+      justify-content:space-around;
+      padding:0 8px;
+      flex-shrink:0;
+    }
+    .pb-hole{
+      width:9px;height:9px;
+      border-radius:2px;
+      background:rgba(0,0,0,0.85);
+      border:1px solid rgba(130,110,240,0.22);
     }
 
     .page{position:relative;z-index:10;max-width:720px;margin:0 auto;padding:130px 32px 80px;}
@@ -116,12 +129,15 @@
   <div class="nebula"></div>
 
   <!-- LEFT STRIP -->
-  <div class="strip-wrap left" id="stripLeft">
-    <div class="strip-inner" id="stripInnerLeft"></div>
+  <div class="strip-wrap left">
+    <div class="strip-rail"></div>
+    <div class="strip-track" id="trackLeft"></div>
   </div>
+
   <!-- RIGHT STRIP -->
-  <div class="strip-wrap right" id="stripRight">
-    <div class="strip-inner" id="stripInnerRight"></div>
+  <div class="strip-wrap right">
+    <div class="strip-rail"></div>
+    <div class="strip-track" id="trackRight"></div>
   </div>
 
   <nav>
@@ -172,105 +188,144 @@
   <div class="coords">41.3083&deg; N &nbsp; 72.9279&deg; W</div>
 
   <script>
-  // ---- PHOTOBOOTH STRIP GENERATOR ----
-  // Palette of dreamy frame colours (drawn procedurally)
+  // ---- PHOTOBOOTH STRIP LOGIC ----
+  const FRAME_W = 80;
+  const FRAME_H = 108;
+  const FRAME_COUNT = 8; // frames per loop (fewer, larger)
+
   const PALETTES = [
-    ['#c9b8ff','#8ecfff','#b8f0d8'],
-    ['#ffd6f0','#ffb8d4','#d4b8ff'],
-    ['#b8e8ff','#d8c8ff','#c8f0e8'],
-    ['#ffe8b8','#ffd0c8','#e8b8ff'],
-    ['#d0f0c8','#b8d8ff','#f0d8c8'],
-    ['#f0c8d8','#c8d0ff','#d8f0c8'],
+    ['#c4b0ff','#7ecfff','#aaf0d0','#e0d0ff'],
+    ['#ffd0ee','#ffaed0','#d0b4ff','#fce0ff'],
+    ['#aee8ff','#d4c4ff','#c4f0e4','#e0f4ff'],
+    ['#ffe4b0','#ffd0c4','#e4b0ff','#fff0d0'],
+    ['#ccf0c4','#b0d8ff','#f0d8c4','#d4fce4'],
+    ['#f0c4d8','#c4ccff','#d4f0c4','#ffe4f0'],
+    ['#b8e0ff','#d8b8ff','#b8ffd8','#ffd8b8'],
+    ['#ffd4e8','#b8d4ff','#d4ffb8','#e8b8ff'],
   ];
 
-  function drawFrame(canvas, palette, seed){
-    const w=canvas.width, h=canvas.height;
-    const ctx=canvas.getContext('2d');
-    // bg gradient
-    const g=ctx.createLinearGradient(0,0,w,h);
+  function drawFrame(canvas, palette, seed) {
+    const w = canvas.width, h = canvas.height;
+    const ctx = canvas.getContext('2d');
+    // gradient bg
+    const g = ctx.createLinearGradient(0, 0, w, h);
     g.addColorStop(0, palette[0]);
-    g.addColorStop(1, palette[1]);
-    ctx.fillStyle=g; ctx.fillRect(0,0,w,h);
-    // soft blobs
-    const rng=(n)=>Math.abs(Math.sin(seed*31.7+n*17.3));
-    for(let i=0;i<3;i++){
-      const bx=rng(i*3)*w, by=rng(i*3+1)*h, br=12+rng(i*3+2)*18;
-      const bg=ctx.createRadialGradient(bx,by,0,bx,by,br);
-      bg.addColorStop(0, palette[i%palette.length]+'cc');
+    g.addColorStop(0.6, palette[1]);
+    g.addColorStop(1, palette[2]);
+    ctx.fillStyle = g;
+    ctx.fillRect(0, 0, w, h);
+
+    // 2-3 soft blobs
+    const rng = n => Math.abs(Math.sin(seed * 23.9 + n * 14.7));
+    for (let i = 0; i < 3; i++) {
+      const bx = rng(i*4) * w;
+      const by = rng(i*4+1) * h;
+      const br = 14 + rng(i*4+2) * 28;
+      const bg = ctx.createRadialGradient(bx, by, 0, bx, by, br);
+      bg.addColorStop(0, palette[(i+2) % palette.length] + 'bb');
       bg.addColorStop(1, 'rgba(255,255,255,0)');
-      ctx.fillStyle=bg; ctx.fillRect(0,0,w,h);
+      ctx.fillStyle = bg;
+      ctx.fillRect(0, 0, w, h);
     }
-    // soft vignette
-    const vig=ctx.createRadialGradient(w/2,h/2,0,w/2,h/2,Math.max(w,h)*.7);
-    vig.addColorStop(0,'rgba(0,0,0,0)'); vig.addColorStop(1,'rgba(0,0,0,0.22)');
-    ctx.fillStyle=vig; ctx.fillRect(0,0,w,h);
-    // tiny abstract doodle
-    ctx.strokeStyle='rgba(255,255,255,0.35)'; ctx.lineWidth=1.2;
+
+    // subtle geometric mark
+    ctx.save();
+    ctx.globalAlpha = 0.22;
+    ctx.strokeStyle = '#ffffff';
+    ctx.lineWidth = 1.0;
+    const mx = rng(20)*w*0.5 + w*0.2;
+    const my = rng(21)*h*0.5 + h*0.2;
+    const mr = 8 + rng(22)*16;
+    const sides = 3 + Math.floor(rng(23)*4);
     ctx.beginPath();
-    const pts=4+Math.floor(rng(10)*4);
-    ctx.moveTo(rng(20)*w, rng(21)*h);
-    for(let i=0;i<pts;i++) ctx.lineTo(rng(22+i)*w, rng(23+i)*h);
+    for (let i = 0; i <= sides; i++) {
+      const angle = (i / sides) * Math.PI * 2 - Math.PI/2;
+      const x = mx + mr * Math.cos(angle);
+      const y = my + mr * Math.sin(angle);
+      i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+    }
     ctx.stroke();
-    // optional: tiny star dots
-    ctx.fillStyle='rgba(255,255,255,0.45)';
-    for(let i=0;i<6;i++){
-      const sx=rng(30+i)*w, sy=rng(31+i)*h, sr=0.8+rng(32+i)*1.4;
-      ctx.beginPath(); ctx.arc(sx,sy,sr,0,Math.PI*2); ctx.fill();
+    ctx.restore();
+
+    // tiny star dots
+    ctx.fillStyle = 'rgba(255,255,255,0.55)';
+    for (let i = 0; i < 8; i++) {
+      const sx = rng(30+i)*w, sy = rng(31+i)*h, sr = 0.6 + rng(32+i)*1.2;
+      ctx.beginPath(); ctx.arc(sx, sy, sr, 0, Math.PI*2); ctx.fill();
     }
+
+    // soft vignette
+    const vig = ctx.createRadialGradient(w/2, h/2, 0, w/2, h/2, Math.max(w,h)*0.75);
+    vig.addColorStop(0, 'rgba(0,0,0,0)');
+    vig.addColorStop(1, 'rgba(0,0,0,0.28)');
+    ctx.fillStyle = vig;
+    ctx.fillRect(0, 0, w, h);
   }
 
-  function buildStrip(containerId, frameCount, scrollDir, scrollSpeed){
-    const container=document.getElementById(containerId);
-    const FRAME_W=72, FRAME_H=56, GAP=5, SPROCKET_H=14;
-    // create enough frames to fill viewport + overflow for seamless loop
-    const totalNeeded=Math.ceil(window.innerHeight/(FRAME_H+GAP))+6;
-    const frames=[];
-    for(let i=0;i<totalNeeded*2;i++){
-      const outer=document.createElement('div');
-      outer.className='frame';
-      const c=document.createElement('canvas');
-      c.width=FRAME_W; c.height=FRAME_H;
-      const pal=PALETTES[i%PALETTES.length];
-      drawFrame(c, pal, i*7+containerId.length);
-      outer.appendChild(c);
-      container.appendChild(outer);
-      frames.push(outer);
-      // sprocket hole between frames
-      if(i<totalNeeded*2-1){
-        const sp=document.createElement('div');
-        sp.style.cssText='width:8px;height:8px;border-radius:2px;background:rgba(0,0,0,0.7);border:1px solid rgba(140,120,255,0.18);margin:2px auto;';
-        container.appendChild(sp);
+  function buildTrack(trackId, direction, speed) {
+    const track = document.getElementById(trackId);
+
+    // Build one full set of frames + spacers
+    function makeSet(seedOffset) {
+      const frag = document.createDocumentFragment();
+      for (let i = 0; i < FRAME_COUNT; i++) {
+        // sprocket row above each frame
+        const sp = document.createElement('div');
+        sp.className = 'pb-sprocket';
+        sp.innerHTML = '<div class="pb-hole"></div><div class="pb-hole"></div><div class="pb-hole"></div>';
+        frag.appendChild(sp);
+
+        const frame = document.createElement('div');
+        frame.className = 'pb-frame';
+        const c = document.createElement('canvas');
+        c.width = FRAME_W;
+        c.height = FRAME_H;
+        drawFrame(c, PALETTES[(i + seedOffset) % PALETTES.length], i * 11 + seedOffset * 7);
+        frame.appendChild(c);
+        frag.appendChild(frame);
       }
+      // final sprocket
+      const sp = document.createElement('div');
+      sp.className = 'pb-sprocket';
+      sp.innerHTML = '<div class="pb-hole"></div><div class="pb-hole"></div><div class="pb-hole"></div>';
+      frag.appendChild(sp);
+      return frag;
     }
 
-    const unitH=FRAME_H+GAP+10; // approx per frame
-    const totalH=unitH*totalNeeded;
-    let offset = scrollDir==='up' ? 0 : -totalH;
+    // Two copies for seamless loop
+    track.appendChild(makeSet(0));
+    track.appendChild(makeSet(4));
 
-    function tick(){
-      offset += scrollDir==='up' ? -scrollSpeed : scrollSpeed;
-      if(scrollDir==='up' && offset < -totalH) offset=0;
-      if(scrollDir==='down' && offset > 0) offset=-totalH;
-      container.style.transform=`translateY(${offset}px)`;
-      requestAnimationFrame(tick);
-    }
-    requestAnimationFrame(tick);
+    // Measure one set height after render
+    requestAnimationFrame(() => {
+      const totalH = track.scrollHeight / 2; // half = one loop
+      let offset = direction === 'up' ? 0 : -totalH;
+
+      function tick() {
+        offset += direction === 'up' ? -speed : speed;
+        if (direction === 'up'  && offset <= -totalH) offset = 0;
+        if (direction === 'down' && offset >= 0)      offset = -totalH;
+        track.style.transform = `translateY(${offset}px)`;
+        requestAnimationFrame(tick);
+      }
+      tick();
+    });
   }
 
-  buildStrip('stripInnerLeft',  20, 'up',   0.28);
-  buildStrip('stripInnerRight', 20, 'down', 0.22);
+  buildTrack('trackLeft',  'up',   0.18);
+  buildTrack('trackRight', 'down', 0.14);
   </script>
 
   <script type="module">
-    import('https://unpkg.com/three@0.161.0/build/three.module.js').then(THREE=>{
-      const renderer=new THREE.WebGLRenderer({antialias:true,alpha:false});
+    import('https://unpkg.com/three@0.161.0/build/three.module.js').then(THREE => {
+      const renderer = new THREE.WebGLRenderer({antialias:true,alpha:false});
       renderer.setPixelRatio(Math.min(window.devicePixelRatio,2));
       renderer.setSize(window.innerWidth,window.innerHeight);
       renderer.setClearColor(0x060d18,1);
       document.body.appendChild(renderer.domElement);
-      const scene=new THREE.Scene();
-      const camera=new THREE.PerspectiveCamera(36,window.innerWidth/window.innerHeight,0.1,500);
-      camera.position.set(0,0,46);camera.lookAt(0,0,0);
+      const scene = new THREE.Scene();
+      const camera = new THREE.PerspectiveCamera(36,window.innerWidth/window.innerHeight,0.1,500);
+      camera.position.set(0,0,46); camera.lookAt(0,0,0);
       window.addEventListener('resize',()=>{camera.aspect=window.innerWidth/window.innerHeight;camera.updateProjectionMatrix();renderer.setSize(window.innerWidth,window.innerHeight);});
       const N=7000,pos=new Float32Array(N*3),ph=new Float32Array(N),sp=new Float32Array(N),sz=new Float32Array(N);
       for(let i=0;i<N;i++){pos[i*3]=(Math.random()-.5)*220;pos[i*3+1]=(Math.random()-.5)*160;pos[i*3+2]=-Math.random()*260;ph[i]=Math.random()*Math.PI*2;sp[i]=.002+Math.random()*.005;sz[i]=.1+Math.random()*.2;}
