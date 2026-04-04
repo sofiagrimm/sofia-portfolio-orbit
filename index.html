@@ -127,9 +127,8 @@
 
     const R = 14.0;
     const Z = -18;
-    const SPEED = 0.0004; // radians per ms
+    const SPEED = 0.0004;
     const sphereGeo = new THREE.SphereGeometry(1.9, 64, 64);
-
     const groups = [];
 
     for (let i = 0; i < 5; i++) {
@@ -179,34 +178,34 @@
       group.add(new THREE.Mesh(sphereGeo, mat));
       group.add(sprite);
       group.add(planetRing);
-      // store initial angle offset so they stay evenly spaced
       group.userData.angleOffset = i * (2 * Math.PI / 5);
+
+      // set initial position immediately so planets show on first frame
+      const initAngle = group.userData.angleOffset;
+      group.position.set(Math.cos(initAngle) * R, Math.sin(initAngle) * R, Z);
+
       scene.add(group);
       groups.push(group);
     }
 
-    let lastTime = null;
+    let lastTime = performance.now();
     let orbitAngle = 0;
 
     function animate(time) {
       requestAnimationFrame(animate);
-      if (lastTime !== null) {
-        orbitAngle += SPEED * (time - lastTime);
-      }
-      lastTime = time;
+      const t = time ?? performance.now();
+      orbitAngle += SPEED * (t - lastTime);
+      lastTime = t;
 
       for (const group of groups) {
         const a = orbitAngle + group.userData.angleOffset;
-        group.position.set(
-          Math.cos(a) * R,
-          Math.sin(a) * R,
-          Z
-        );
+        group.position.set(Math.cos(a) * R, Math.sin(a) * R, Z);
       }
 
       renderer.render(scene, camera);
     }
-    animate();
+
+    requestAnimationFrame(animate);
   </script>
 </body>
 </html>
