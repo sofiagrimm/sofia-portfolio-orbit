@@ -7,17 +7,17 @@
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Inter:wght@300;400;500&display=swap');
     *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-    html,body{width:100%;min-height:100%;background:#060d18;font-family:'Inter',sans-serif;color:#e9f0ff;}
+    html,body{width:100%;height:100%;overflow:hidden;background:#060d18;font-family:'Inter',sans-serif;color:#e9f0ff;}
     canvas{display:block;position:fixed;inset:0;z-index:0}
     .nebula{
       position:fixed;inset:0;z-index:1;pointer-events:none;
       background:
-        radial-gradient(ellipse 50% 35% at 20% 60%, rgba(30,70,170,0.07) 0%, transparent 70%),
-        radial-gradient(ellipse 40% 30% at 80% 30%, rgba(20,80,190,0.07) 0%, transparent 70%),
-        radial-gradient(ellipse 50% 44% at 50% 50%, rgba(15,35,110,0.05) 0%, transparent 65%);
+        radial-gradient(ellipse 55% 38% at 15% 55%, rgba(40,70,180,0.06) 0%, transparent 70%),
+        radial-gradient(ellipse 45% 32% at 82% 28%, rgba(30,80,200,0.06) 0%, transparent 70%),
+        radial-gradient(ellipse 50% 44% at 50% 50%, rgba(20,40,120,0.05) 0%, transparent 65%);
     }
     nav{
-      position:fixed;top:0;left:0;right:0;z-index:20;
+      position:fixed;top:0;left:0;right:0;z-index:30;
       display:flex;align-items:center;justify-content:space-between;
       padding:0 48px;height:68px;
     }
@@ -34,89 +34,145 @@
     }
     .nav-links a:hover,.nav-links a.active{color:rgba(220,235,255,0.9);background:rgba(100,140,255,0.08);}
     .nav-links .divider{color:rgba(100,130,200,0.2);font-size:13px;user-select:none;}
-    .page{
-      position:relative;z-index:10;
-      max-width:760px;margin:0 auto;
-      padding:130px 32px 80px;
+
+    /* ── MAP WRAPPER ── */
+    .map-wrap{
+      position:fixed;inset:0;z-index:10;
+      display:flex;align-items:center;justify-content:center;
+      padding-top:68px;
     }
-    .page-eyebrow{
-      font-size:11px;letter-spacing:0.22em;text-transform:uppercase;
-      color:rgba(160,185,255,0.45);margin-bottom:20px;
+    .map-svg-wrap{
+      position:relative;
+      width:92vw;max-width:1100px;
     }
-    .page-title{
+    .map-svg-wrap svg{
+      width:100%;height:auto;display:block;
+      filter:drop-shadow(0 0 32px rgba(40,80,200,0.08));
+    }
+
+    /* ── MAP TITLE ── */
+    .map-title{
+      position:absolute;top:-42px;left:0;
       font-family:'Cormorant Garamond',serif;
-      font-size:54px;font-weight:300;line-height:1.08;
-      color:#eef3ff;margin-bottom:40px;
+      font-size:38px;font-weight:300;color:#eef3ff;
+      pointer-events:none;
     }
-    .page-title em{font-style:italic;color:rgba(190,210,255,0.85);}
-    .rule{width:48px;height:1px;background:linear-gradient(90deg,rgba(140,170,255,0.4),transparent);margin-bottom:48px;}
-    .research-list{display:flex;flex-direction:column;gap:28px;}
-    .research-item{
-      padding:28px 32px;border-radius:16px;
-      background:rgba(8,16,45,0.50);
-      border:1px solid rgba(100,130,220,0.10);
-      backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
-      transition:border-color .25s;
-    }
-    .research-item:hover{border-color:rgba(120,160,255,0.2);}
-    .ri-meta{
-      display:flex;justify-content:space-between;align-items:baseline;
-      margin-bottom:8px;
-    }
-    .ri-label{
+    .map-title em{font-style:italic;color:rgba(190,210,255,0.8);}
+    .map-hint{
+      position:absolute;top:-14px;left:2px;
       font-size:10px;letter-spacing:0.2em;text-transform:uppercase;
-      color:rgba(140,170,255,0.45);
+      color:rgba(140,170,255,0.38);pointer-events:none;
     }
-    .ri-date{
-      font-size:10px;letter-spacing:0.12em;
-      color:rgba(130,155,220,0.35);
+
+    /* ── PINS ── */
+    .pin-group{cursor:pointer;}
+    .pin-group .pin-ring{
+      fill:none;stroke-width:1;
+      transform-origin:center;
+      animation:pinPulse 2.6s ease-in-out infinite;
     }
-    .ri-title{
+    .pin-group .pin-dot{
+      transition:r .2s;
+    }
+    .pin-group:hover .pin-dot{r:6;}
+    @keyframes pinPulse{
+      0%,100%{r:10;opacity:.5;}
+      50%{r:18;opacity:0;}
+    }
+    /* per-color pulse rings – set via stroke attr on the element */
+
+    /* ── CONNECTOR LINES ── */
+    .conn-line{
+      stroke-width:0.6;
+      stroke-dasharray:3 4;
+      opacity:0.18;
+      animation:lineDash 3s linear infinite;
+    }
+    @keyframes lineDash{
+      from{stroke-dashoffset:0}to{stroke-dashoffset:-28}
+    }
+
+    /* ── PANEL ── */
+    .panel{
+      position:fixed;top:50%;right:3vw;
+      transform:translateY(-50%) translateX(120%);
+      z-index:40;
+      width:340px;
+      padding:28px 30px 26px;
+      border-radius:18px;
+      background:linear-gradient(135deg,rgba(8,16,48,0.80) 0%,rgba(6,12,38,0.88) 100%);
+      border:1px solid rgba(100,130,220,0.16);
+      box-shadow:0 8px 48px rgba(0,0,0,0.7),0 0 40px rgba(30,60,180,0.07),inset 0 1px 0 rgba(160,190,255,0.05);
+      backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);
+      transition:transform .35s cubic-bezier(.22,1,.36,1),opacity .3s;
+      opacity:0;pointer-events:none;
+    }
+    .panel.open{
+      transform:translateY(-50%) translateX(0);
+      opacity:1;pointer-events:auto;
+    }
+    .panel-close{
+      position:absolute;top:14px;right:16px;
+      background:none;border:none;cursor:pointer;
+      font-size:16px;color:rgba(160,185,255,0.4);
+      transition:color .2s;
+      font-family:'Inter',sans-serif;
+      line-height:1;
+    }
+    .panel-close:hover{color:rgba(220,235,255,0.8);}
+    .panel-eyebrow{
+      font-size:10px;letter-spacing:0.22em;text-transform:uppercase;
+      color:rgba(140,170,255,0.45);margin-bottom:8px;
+    }
+    .panel-title{
       font-family:'Cormorant Garamond',serif;
-      font-size:24px;font-weight:300;color:#ddeeff;
-      margin-bottom:10px;
+      font-size:22px;font-weight:300;line-height:1.2;
+      color:#ddeeff;margin-bottom:6px;
     }
-    .ri-org{
-      font-size:11px;letter-spacing:0.1em;text-transform:uppercase;
-      color:rgba(140,170,220,0.40);margin-bottom:12px;
+    .panel-org{
+      font-size:10px;letter-spacing:0.1em;text-transform:uppercase;
+      color:rgba(140,170,220,0.38);margin-bottom:14px;
     }
-    .ri-body{
-      font-size:13px;font-weight:300;line-height:1.75;
+    .panel-date{
+      font-size:10px;letter-spacing:0.12em;
+      color:rgba(130,155,220,0.32);margin-bottom:14px;
+      display:block;
+    }
+    .panel-rule{
+      width:36px;height:1px;
+      background:linear-gradient(90deg,rgba(140,170,255,0.35),transparent);
+      margin-bottom:14px;
+    }
+    .panel-body{
+      font-size:12.5px;font-weight:300;line-height:1.75;
       color:rgba(190,210,255,0.58);
     }
-    .ri-body ul{list-style:none;padding:0;display:flex;flex-direction:column;gap:6px;}
-    .ri-body ul li::before{content:'— ';color:rgba(140,170,255,0.3);}
-    .publication{
-      margin-top:40px;padding:24px 28px;border-radius:14px;
-      background:rgba(6,12,36,0.45);
-      border:1px solid rgba(80,110,190,0.09);
-    }
-    .pub-label{
-      font-size:10px;letter-spacing:0.2em;text-transform:uppercase;
-      color:rgba(140,170,255,0.4);margin-bottom:12px;
-    }
-    .pub-title{
-      font-size:13px;font-weight:300;line-height:1.7;
-      color:rgba(200,215,255,0.65);margin-bottom:10px;
-    }
-    .pub-venues{display:flex;flex-direction:column;gap:4px;}
-    .pub-venues a{
-      font-size:12px;font-weight:300;
+    .panel-body ul{list-style:none;padding:0;display:flex;flex-direction:column;gap:6px;}
+    .panel-body ul li::before{content:'— ';color:rgba(140,170,255,0.3);}
+    .panel-links{margin-top:16px;display:flex;flex-direction:column;gap:5px;}
+    .panel-links a{
+      font-size:11px;letter-spacing:0.1em;
       color:rgba(140,180,255,0.50);text-decoration:none;
       border-bottom:1px solid rgba(140,180,255,0.12);
-      align-self:flex-start;
-      transition:color .2s;
+      align-self:flex-start;transition:color .2s;
     }
-    .pub-venues a:hover{color:rgba(200,220,255,0.85);}
+    .panel-links a:hover{color:rgba(210,225,255,0.9);}
+
     .coords{
       position:fixed;bottom:32px;left:48px;z-index:20;
       font-size:10px;letter-spacing:0.18em;
+      color:rgba(110,130,190,0.28);font-weight:300;pointer-events:none;
+    }
+    .tagline{
+      position:fixed;bottom:32px;right:48px;z-index:20;
+      font-size:10px;letter-spacing:0.18em;text-transform:uppercase;
       color:rgba(110,130,190,0.28);font-weight:300;pointer-events:none;
     }
   </style>
 </head>
 <body>
   <div class="nebula"></div>
+
   <nav>
     <a class="nav-name" href="index.html">Sofia Grimm</a>
     <div class="nav-links">
@@ -126,79 +182,165 @@
       <a href="projects.html">Projects</a>
     </div>
   </nav>
-  <main class="page">
-    <div class="page-eyebrow">Research</div>
-    <h1 class="page-title">Work in the <em>lab.</em></h1>
-    <div class="rule"></div>
-    <div class="research-list">
 
-      <div class="research-item">
-        <div class="ri-meta">
-          <div class="ri-label">Neuroscience &amp; Neurodegeneration</div>
-          <div class="ri-date">Feb 2026 – Present</div>
-        </div>
-        <div class="ri-title">Locus Coeruleus Degeneration in Parkinson's Disease</div>
-        <div class="ri-org">Higley Lab · Yale School of Medicine</div>
-        <div class="ri-body"><ul>
-          <li>Characterizing locus coeruleus (LC) axon degeneration in PPT1-deficient mice via immunohistochemistry.</li>
-          <li>Investigating LC vulnerability and norepinephrine dysfunction as early markers in Parkinson's disease pathology.</li>
-        </ul></div>
-      </div>
+  <!-- PANEL -->
+  <div class="panel" id="panel">
+    <button class="panel-close" id="panelClose">&times;</button>
+    <div class="panel-eyebrow" id="pEyebrow"></div>
+    <div class="panel-title" id="pTitle"></div>
+    <div class="panel-org" id="pOrg"></div>
+    <span class="panel-date" id="pDate"></span>
+    <div class="panel-rule"></div>
+    <div class="panel-body" id="pBody"></div>
+    <div class="panel-links" id="pLinks"></div>
+  </div>
 
-      <div class="research-item">
-        <div class="ri-meta">
-          <div class="ri-label">Top-Down Proteomics &amp; Mass Spectrometry</div>
-          <div class="ri-date">Jun – Aug 2024</div>
-        </div>
-        <div class="ri-title">Novel SPME-CZE-MS System for Mass-Limited Proteomics</div>
-        <div class="ri-org">Sun Lab · Michigan State University (High School Honors Science Program)</div>
-        <div class="ri-body"><ul>
-          <li>Established a novel solid-phase microextraction (SPME)–capillary zone electrophoresis–tandem mass spectrometry (CZE-MS) system for top-down proteomics of mass-limited samples.</li>
-          <li>The SPME system increased injection capacity by ~30× compared to typical CZE-MS workflows.</li>
-        </ul></div>
-      </div>
+  <div class="map-wrap">
+    <div class="map-svg-wrap">
+      <div class="map-hint">Research</div>
+      <div class="map-title">Where the <em>work happened.</em></div>
 
-      <div class="research-item">
-        <div class="ri-meta">
-          <div class="ri-label">Drosophila Genetics &amp; Molecular Biology</div>
-          <div class="ri-date">Aug 2024 – Jun 2025</div>
-        </div>
-        <div class="ri-title">Enhancer-Trap Line Development &amp; P-Element Mapping</div>
-        <div class="ri-org">Stan-X Lab · Stanford University</div>
-        <div class="ri-body"><ul>
-          <li>Developed an enhancer-trapped line of Drosophila using the LexA-LexAop binary expression system.</li>
-          <li>Executed ligation and PCR protocols; dissected fly brains to detect GFP fluorescence.</li>
-          <li>Used inverse PCR and FlyBase BLAST to map P-element insertion to the CG11050 gene.</li>
-        </ul></div>
-      </div>
+      <!-- Natural Earth simplified world map path -->
+      <svg id="mapSvg" viewBox="0 0 1000 500" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <radialGradient id="globeGrad" cx="50%" cy="50%" r="50%">
+            <stop offset="0%" stop-color="#0d1e40" stop-opacity="1"/>
+            <stop offset="100%" stop-color="#060d18" stop-opacity="1"/>
+          </radialGradient>
+          <filter id="glow">
+            <feGaussianBlur stdDeviation="2.5" result="blur"/>
+            <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+          </filter>
+        </defs>
 
-      <div class="research-item">
-        <div class="ri-meta">
-          <div class="ri-label">Astrophysics &amp; Machine Learning</div>
-          <div class="ri-date">Jun – Aug 2023</div>
-        </div>
-        <div class="ri-title">CNN Classification of Double-Source Plane Gravitational Lenses</div>
-        <div class="ri-org">Fermi National Accelerator Laboratory · Quarknet Summer Research Program</div>
-        <div class="ri-body"><ul>
-          <li>Generated two simulated benchmark datasets of 40,000 images each of double-source plane lenses and Einstein rings.</li>
-          <li>Analyzed morphological differences and trained convolutional neural networks for automated lens classification.</li>
-        </ul></div>
-      </div>
+        <!-- Ocean background -->
+        <rect width="1000" height="500" fill="url(#globeGrad)" rx="6"/>
 
+        <!-- Latitude / longitude grid -->
+        <g stroke="rgba(80,110,180,0.07)" stroke-width="0.5" fill="none">
+          <!-- lat lines -->
+          <line x1="0" y1="83" x2="1000" y2="83"/>
+          <line x1="0" y1="166" x2="1000" y2="166"/>
+          <line x1="0" y1="250" x2="1000" y2="250"/>
+          <line x1="0" y1="333" x2="1000" y2="333"/>
+          <line x1="0" y1="416" x2="1000" y2="416"/>
+          <!-- lon lines -->
+          <line x1="111" y1="0" x2="111" y2="500"/>
+          <line x1="222" y1="0" x2="222" y2="500"/>
+          <line x1="333" y1="0" x2="333" y2="500"/>
+          <line x1="444" y1="0" x2="444" y2="500"/>
+          <line x1="556" y1="0" x2="556" y2="500"/>
+          <line x1="667" y1="0" x2="667" y2="500"/>
+          <line x1="778" y1="0" x2="778" y2="500"/>
+          <line x1="889" y1="0" x2="889" y2="500"/>
+        </g>
+
+        <!-- ===== CONTINENTS (simplified Natural Earth paths) ===== -->
+        <g fill="rgba(30,55,120,0.55)" stroke="rgba(80,120,220,0.18)" stroke-width="0.6">
+
+          <!-- North America -->
+          <path d="M95,68 L120,58 L155,52 L175,60 L192,55 L205,65 L215,80 L228,85 L232,100 L225,118 L235,125 L240,140 L230,155 L220,165 L210,178 L205,195 L195,210 L185,225 L175,238 L165,248 L155,258 L148,270 L140,280 L135,292 L128,300 L120,308 L115,320 L108,330 L100,340 L95,330 L90,318 L96,308 L100,295 L105,282 L108,268 L112,255 L115,240 L112,228 L105,218 L98,205 L93,192 L90,178 L88,163 L85,148 L82,133 L80,118 L78,103 L80,88 L88,75 Z"/>
+          <!-- Central America + Caribbean -->
+          <path d="M148,270 L155,276 L162,282 L165,290 L170,298 L175,305 L172,312 L165,315 L158,310 L152,300 L148,290 Z"/>
+          <path d="M176,265 L183,268 L186,275 L180,278 L174,272 Z"/>
+          <path d="M188,260 L195,258 L200,264 L196,270 L190,267 Z"/>
+          <!-- Greenland -->
+          <path d="M185,15 L210,10 L238,12 L255,22 L258,38 L250,52 L235,60 L218,65 L202,60 L190,50 L182,38 L182,26 Z"/>
+
+          <!-- South America -->
+          <path d="M170,298 L182,290 L196,285 L210,285 L222,288 L235,295 L245,305 L252,318 L255,332 L258,348 L258,364 L254,380 L248,394 L240,406 L230,416 L220,422 L208,425 L196,422 L186,415 L178,404 L172,390 L168,375 L165,360 L163,344 L162,328 L163,312 L168,300 Z"/>
+
+          <!-- Europe -->
+          <path d="M430,55 L445,48 L462,46 L478,50 L490,58 L498,68 L502,80 L496,92 L485,98 L472,100 L460,105 L450,112 L440,108 L432,98 L425,88 L424,75 Z"/>
+          <path d="M460,105 L472,100 L485,98 L496,92 L502,80 L510,85 L515,95 L510,108 L500,115 L490,120 L478,118 L468,115 L460,110 Z"/>
+          <path d="M430,55 L424,75 L418,88 L412,98 L415,110 L420,118 L428,122 L438,120 L450,112 L440,108 L432,98 L425,88 Z"/>
+          <!-- Iberian -->
+          <path d="M400,110 L415,105 L424,112 L428,122 L422,130 L412,135 L400,130 L394,120 Z"/>
+          <!-- British Isles -->
+          <path d="M410,70 L418,65 L424,72 L420,80 L412,82 L408,76 Z"/>
+          <!-- Scandinavia -->
+          <path d="M460,30 L472,22 L480,30 L478,45 L470,52 L462,48 L456,38 Z"/>
+          <path d="M480,30 L490,22 L498,28 L495,42 L484,48 L478,42 Z"/>
+
+          <!-- Africa -->
+          <path d="M432,148 L448,138 L465,132 L482,130 L498,132 L512,140 L520,152 L524,168 L522,185 L515,200 L508,215 L502,230 L496,245 L488,260 L478,272 L468,280 L455,285 L442,282 L430,274 L420,262 L414,248 L410,233 L408,217 L408,200 L410,184 L415,168 L422,155 Z"/>
+          <!-- Madagascar -->
+          <path d="M528,250 L534,242 L540,248 L542,260 L538,272 L530,278 L524,272 L522,260 Z"/>
+
+          <!-- Asia (main block) -->
+          <path d="M502,80 L520,72 L542,65 L565,58 L590,54 L615,52 L640,52 L665,54 L688,58 L708,65 L722,75 L730,88 L728,102 L720,114 L708,122 L695,128 L680,132 L665,135 L650,138 L635,140 L620,142 L605,145 L590,148 L575,152 L560,155 L548,160 L538,168 L530,178 L522,188 L515,200 L508,215 L512,200 L515,185 L515,170 L512,155 L508,142 L502,130 L498,118 L496,105 L498,92 L502,80 Z"/>
+          <!-- Indian subcontinent -->
+          <path d="M590,148 L605,145 L618,148 L625,158 L622,172 L615,185 L605,195 L595,200 L585,195 L578,182 L578,168 L582,156 Z"/>
+          <!-- Southeast Asia -->
+          <path d="M650,160 L665,155 L678,158 L685,168 L680,180 L668,185 L655,180 L648,170 Z"/>
+          <path d="M685,175 L698,172 L705,180 L700,192 L690,195 L683,188 Z"/>
+          <!-- Japan -->
+          <path d="M728,100 L736,94 L742,100 L738,110 L730,114 L724,108 Z"/>
+          <!-- Indonesia (simplified) -->
+          <path d="M665,220 L680,215 L692,220 L695,230 L685,236 L672,232 Z"/>
+          <path d="M700,218 L712,215 L720,222 L715,232 L703,230 Z"/>
+          <!-- Middle East -->
+          <path d="M520,130 L535,125 L550,125 L560,130 L562,142 L555,150 L542,155 L530,150 L520,142 Z"/>
+
+          <!-- Australia -->
+          <path d="M680,285 L700,278 L722,278 L740,282 L752,292 L758,305 L755,320 L745,332 L730,340 L712,342 L695,338 L680,328 L670,315 L668,300 L672,288 Z"/>
+          <!-- New Zealand -->
+          <path d="M768,338 L775,330 L780,338 L778,348 L770,350 Z"/>
+          <path d="M772,355 L778,348 L782,355 L778,365 L772,365 Z"/>
+
+          <!-- Antarctica (partial) -->
+          <path d="M60,465 L200,458 L340,455 L480,454 L620,455 L760,458 L900,462 L940,470 L900,480 L760,482 L620,483 L480,484 L340,483 L200,482 L60,478 Z"/>
+        </g>
+
+        <!-- ===== CONNECTION LINES from a central hub ===== -->
+        <!-- Hub near center-left of US -->
+        <g id="connLines">
+          <!-- New Haven to Yale dot -->
+          <line class="conn-line" x1="200" y1="155" x2="182" y2="148" stroke="rgba(160,210,255,0.6)"/>
+          <!-- New Haven to MSU -->
+          <line class="conn-line" x1="200" y1="155" x2="176" y2="152" stroke="rgba(160,210,255,0.6)"/>
+          <!-- New Haven to Stanford -->
+          <line class="conn-line" x1="200" y1="155" x2="100" y2="162" stroke="rgba(160,210,255,0.6)"/>
+          <!-- New Haven to Fermilab -->
+          <line class="conn-line" x1="200" y1="155" x2="172" y2="152" stroke="rgba(160,210,255,0.6)"/>
+        </g>
+
+        <!-- ===== PINS ===== -->
+        <!-- Yale / New Haven, CT  (~73W, 41N) → x≈183, y≈147 -->
+        <g class="pin-group" data-id="yale" transform="translate(183,147)">
+          <circle class="pin-ring" r="12" stroke="rgba(120,200,255,0.5)"/>
+          <circle class="pin-dot" r="5" fill="rgba(120,200,255,0.95)" filter="url(#glow)"/>
+          <text x="8" y="-8" font-family="Inter,sans-serif" font-size="8" letter-spacing="0.1em" fill="rgba(180,220,255,0.7)" text-transform="uppercase">YALE · NEW HAVEN</text>
+        </g>
+
+        <!-- MSU / East Lansing, MI  (~84W, 43N) → x≈178, y≈143 -->
+        <g class="pin-group" data-id="msu" transform="translate(170,143)">
+          <circle class="pin-ring" r="12" stroke="rgba(100,240,160,0.5)" style="animation-delay:.6s"/>
+          <circle class="pin-dot" r="5" fill="rgba(100,240,160,0.95)" filter="url(#glow)"/>
+          <text x="8" y="-8" font-family="Inter,sans-serif" font-size="8" letter-spacing="0.1em" fill="rgba(160,240,200,0.7)">MSU · EAST LANSING</text>
+        </g>
+
+        <!-- Stanford / Palo Alto, CA  (~122W, 37N) → x≈97, y≈152 -->
+        <g class="pin-group" data-id="stanford" transform="translate(97,155)">
+          <circle class="pin-ring" r="12" stroke="rgba(255,200,100,0.5)" style="animation-delay:1.1s"/>
+          <circle class="pin-dot" r="5" fill="rgba(255,200,100,0.95)" filter="url(#glow)"/>
+          <text x="8" y="-8" font-family="Inter,sans-serif" font-size="8" letter-spacing="0.1em" fill="rgba(255,220,160,0.7)">STANFORD · PALO ALTO</text>
+        </g>
+
+        <!-- Fermilab / Batavia, IL  (~88W, 42N) → x≈165, y≈145 -->
+        <g class="pin-group" data-id="fermilab" transform="translate(162,148)">
+          <circle class="pin-ring" r="12" stroke="rgba(200,140,255,0.5)" style="animation-delay:1.7s"/>
+          <circle class="pin-dot" r="5" fill="rgba(200,140,255,0.95)" filter="url(#glow)"/>
+          <text x="8" y="18" font-family="Inter,sans-serif" font-size="8" letter-spacing="0.1em" fill="rgba(220,180,255,0.7)">FERMILAB · BATAVIA</text>
+        </g>
+      </svg>
     </div>
+  </div>
 
-    <div class="publication">
-      <div class="pub-label">Publication &amp; Presentations</div>
-      <div class="pub-title">Grimm, S., Zhou, J., Nord, B., Ciprijanovic, A. (2023). <em>"Identifying Double-Source Plane Lenses for cosmological studies using simulated images."</em></div>
-      <div class="pub-venues">
-        <a href="https://agu.confex.com/agu/fm23/meetingapp.cgi/Paper/1438256" target="_blank">American Geophysical Union Annual Meeting →</a>
-        <a href="https://doi.org/10.2172/2006481" target="_blank">Fermilab/Quarknet Teachers' Workshop →</a>
-        <a href="#">DeepSkies Symposium →</a>
-      </div>
-    </div>
-
-  </main>
   <div class="coords">41.3083&deg; N &nbsp; 72.9279&deg; W</div>
+  <div class="tagline">science as an explorable universe</div>
+
+  <!-- stars background -->
   <script type="module">
     import('https://unpkg.com/three@0.161.0/build/three.module.js').then(THREE=>{
       const renderer=new THREE.WebGLRenderer({antialias:true,alpha:false});
@@ -210,16 +352,102 @@
       const camera=new THREE.PerspectiveCamera(36,window.innerWidth/window.innerHeight,0.1,500);
       camera.position.set(0,0,46);camera.lookAt(0,0,0);
       window.addEventListener('resize',()=>{camera.aspect=window.innerWidth/window.innerHeight;camera.updateProjectionMatrix();renderer.setSize(window.innerWidth,window.innerHeight);});
-      const N=7000,pos=new Float32Array(N*3),ph=new Float32Array(N),sp=new Float32Array(N),sz=new Float32Array(N);
-      for(let i=0;i<N;i++){pos[i*3]=(Math.random()-.5)*220;pos[i*3+1]=(Math.random()-.5)*160;pos[i*3+2]=-Math.random()*260;ph[i]=Math.random()*Math.PI*2;sp[i]=.002+Math.random()*.005;sz[i]=.1+Math.random()*.2;}
+      const N=6000,pos=new Float32Array(N*3),ph=new Float32Array(N),sp=new Float32Array(N),sz=new Float32Array(N);
+      for(let i=0;i<N;i++){pos[i*3]=(Math.random()-.5)*220;pos[i*3+1]=(Math.random()-.5)*160;pos[i*3+2]=-Math.random()*260;ph[i]=Math.random()*Math.PI*2;sp[i]=.002+Math.random()*.004;sz[i]=.08+Math.random()*.16;}
       const geo=new THREE.BufferGeometry();
       geo.setAttribute('position',new THREE.BufferAttribute(pos,3));
       geo.setAttribute('phase',new THREE.BufferAttribute(ph,1));
       geo.setAttribute('speed',new THREE.BufferAttribute(sp,1));
       geo.setAttribute('aSize',new THREE.BufferAttribute(sz,1));
-      const mat=new THREE.ShaderMaterial({uniforms:{time:{value:0}},vertexShader:`attribute float aSize;attribute float phase;attribute float speed;uniform float time;varying float vB;void main(){float r=abs(sin(time*speed+phase));vB=.7+.3*pow(r,.3);vec4 mv=modelViewMatrix*vec4(position,1.);gl_PointSize=aSize*(1.+2.*max(0.,r-.75)/.25)*(300./-mv.z);gl_Position=projectionMatrix*mv;}`,fragmentShader:`varying float vB;void main(){vec2 uv=gl_PointCoord-vec2(.5);if(length(uv)>.5)discard;float c=1.-smoothstep(0.,.45,length(uv));gl_FragColor=vec4(vec3(.75,.88,1.)*vB,c*vB);}`,transparent:true,depthWrite:false});
+      const mat=new THREE.ShaderMaterial({uniforms:{time:{value:0}},vertexShader:`attribute float aSize;attribute float phase;attribute float speed;uniform float time;varying float vB;void main(){float r=abs(sin(time*speed+phase));vB=.6+.4*pow(r,.4);vec4 mv=modelViewMatrix*vec4(position,1.);gl_PointSize=aSize*(1.+1.5*max(0.,r-.8)/.2)*(300./-mv.z);gl_Position=projectionMatrix*mv;}`,fragmentShader:`varying float vB;void main(){vec2 uv=gl_PointCoord-vec2(.5);if(length(uv)>.5)discard;float c=1.-smoothstep(0.,.45,length(uv));gl_FragColor=vec4(vec3(.75,.88,1.)*vB,c*vB*.6);}`,transparent:true,depthWrite:false});
       scene.add(new THREE.Points(geo,mat));
       (function loop(t){requestAnimationFrame(loop);mat.uniforms.time.value=t*.001;renderer.render(scene,camera);})(0);
+    });
+  </script>
+
+  <script>
+    const data = {
+      yale: {
+        eyebrow: 'Neuroscience · Neurodegeneration',
+        title: 'Locus Coeruleus Degeneration in Parkinson's Disease',
+        org: 'Higley Lab · Yale School of Medicine',
+        date: 'Feb 2026 – Present',
+        bullets: [
+          'Characterizing locus coeruleus (LC) axon degeneration in PPT1-deficient mice via immunohistochemistry.',
+          'Investigating LC vulnerability and norepinephrine dysfunction as early markers in Parkinson's disease pathology.'
+        ],
+        links: []
+      },
+      msu: {
+        eyebrow: 'Top-Down Proteomics · Mass Spectrometry',
+        title: 'Novel SPME-CZE-MS System for Mass-Limited Proteomics',
+        org: 'Sun Lab · Michigan State University',
+        date: 'Jun – Aug 2024',
+        bullets: [
+          'Established a novel SPME–CZE–tandem MS system for top-down proteomics of mass-limited samples.',
+          'Increased injection capacity by ~30× compared to typical CZE-MS workflows.'
+        ],
+        links: []
+      },
+      stanford: {
+        eyebrow: 'Drosophila Genetics · Molecular Biology',
+        title: 'Enhancer-Trap Line Development & P-Element Mapping',
+        org: 'Stan-X Lab · Stanford University',
+        date: 'Aug 2024 – Jun 2025',
+        bullets: [
+          'Developed an enhancer-trapped Drosophila line using the LexA-LexAop binary expression system.',
+          'Executed ligation and PCR protocols; dissected fly brains to detect GFP fluorescence.',
+          'Used inverse PCR and FlyBase BLAST to map P-element insertion to the CG11050 gene.'
+        ],
+        links: []
+      },
+      fermilab: {
+        eyebrow: 'Astrophysics · Machine Learning',
+        title: 'CNN Classification of Double-Source Plane Gravitational Lenses',
+        org: 'Fermi National Accelerator Laboratory · Quarknet',
+        date: 'Jun – Aug 2023',
+        bullets: [
+          'Generated two 40,000-image benchmark datasets of double-source plane lenses and Einstein rings.',
+          'Trained CNNs (PyTorch) for automated morphological classification.'
+        ],
+        links: [
+          {label:'AGU Annual Meeting →', href:'https://agu.confex.com/agu/fm23/meetingapp.cgi/Paper/1438256'},
+          {label:'Fermilab/Quarknet Workshop →', href:'https://doi.org/10.2172/2006481'}
+        ]
+      }
+    };
+
+    const panel = document.getElementById('panel');
+    const panelClose = document.getElementById('panelClose');
+
+    document.querySelectorAll('.pin-group').forEach(pin => {
+      pin.addEventListener('click', e => {
+        const d = data[pin.dataset.id];
+        if(!d) return;
+        document.getElementById('pEyebrow').textContent = d.eyebrow;
+        document.getElementById('pTitle').textContent = d.title;
+        document.getElementById('pOrg').textContent = d.org;
+        document.getElementById('pDate').textContent = d.date;
+        const ul = document.createElement('ul');
+        d.bullets.forEach(b => { const li = document.createElement('li'); li.textContent = b; ul.appendChild(li); });
+        const body = document.getElementById('pBody');
+        body.innerHTML = '';
+        body.appendChild(ul);
+        const linksEl = document.getElementById('pLinks');
+        linksEl.innerHTML = '';
+        d.links.forEach(l => {
+          const a = document.createElement('a');
+          a.href = l.href; a.target = '_blank'; a.textContent = l.label;
+          linksEl.appendChild(a);
+        });
+        panel.classList.add('open');
+        e.stopPropagation();
+      });
+    });
+
+    panelClose.addEventListener('click', () => panel.classList.remove('open'));
+    document.addEventListener('click', e => {
+      if(!panel.contains(e.target)) panel.classList.remove('open');
     });
   </script>
 </body>
