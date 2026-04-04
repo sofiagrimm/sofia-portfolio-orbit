@@ -23,29 +23,43 @@
     .page-subtitle{font-size:13px;font-weight:300;color:rgba(160,190,255,.40);letter-spacing:.06em;margin-bottom:36px;}
     .rule{width:48px;height:1px;background:linear-gradient(90deg,rgba(140,170,255,.4),transparent);margin-bottom:44px;}
 
-    /* ═══════════════════════════════════════
-       CARD FLIP SYSTEM
-    ═══════════════════════════════════════ */
-    .memory-grid{
-      display:grid;
-      grid-template-columns:repeat(4,1fr);
-      gap:18px;
+    /* ═══ GRID ═══ */
+    .memory-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:18px;}
+
+    /* ═══ CARD SCENE — entrance + idle float ═══ */
+    @keyframes cardEntrance {
+      0%   { opacity:0; transform:translateY(28px) scale(0.93); }
+      100% { opacity:1; transform:translateY(0)    scale(1); }
     }
+    @keyframes idleFloat {
+      0%,100% { transform:translateY(0px); }
+      50%      { transform:translateY(-5px); }
+    }
+
     .card-scene{
       aspect-ratio:3/4;
       perspective:900px;
       cursor:pointer;
+      opacity:0; /* filled by entrance anim */
+      animation: cardEntrance .6s cubic-bezier(.22,1,.36,1) forwards;
+      /* idle float layered on top in JS after entrance */
     }
+    .card-scene.floating {
+      animation: idleFloat 4.5s ease-in-out infinite;
+    }
+
+    /* ═══ FLIPPER ═══ */
     .card-flipper{
       position:relative;
       width:100%;height:100%;
       transform-style:preserve-3d;
-      transition:transform .55s cubic-bezier(.22,1,.36,1);
+      transition:transform .6s cubic-bezier(.22,1,.36,1);
       border-radius:14px;
+      will-change:transform;
     }
-    .card-scene.flipped .card-flipper{
-      transform:rotateY(180deg);
-    }
+    .card-scene.flipped .card-flipper{ transform:rotateY(180deg); }
+
+    /* shared face */
     .card-face{
       position:absolute;inset:0;
       border-radius:14px;
@@ -54,86 +68,123 @@
       overflow:hidden;
     }
 
-    /* ── BACK FACE ── */
+    /* ═══ BACK FACE ═══ */
     .card-back{
       background:#0a1230;
       border:1px solid rgba(130,155,255,.18);
       display:flex;align-items:center;justify-content:center;
-      transition:box-shadow .22s;
+      transition:box-shadow .22s, border-color .22s;
     }
     .card-scene:not(.flipped):hover .card-back{
-      box-shadow:0 10px 36px rgba(100,130,255,.22);
-      border-color:rgba(160,185,255,.32);
+      box-shadow:0 14px 44px rgba(100,130,255,.30), 0 0 0 1px rgba(160,185,255,.20);
+      border-color:rgba(160,185,255,.38);
     }
-    .card-back svg{
-      width:100%;height:100%;
-      position:absolute;inset:0;
+    .card-back svg{width:100%;height:100%;position:absolute;inset:0;}
+
+    /* ── shimmer sweep ── */
+    @keyframes shimmerSweep {
+      0%   { transform:translateX(-120%) rotate(22deg); opacity:0; }
+      10%  { opacity:1; }
+      90%  { opacity:1; }
+      100% { transform:translateX(220%) rotate(22deg); opacity:0; }
+    }
+    .card-back .cb-shimmer{
+      position:absolute;top:0;left:0;
+      width:28%;height:100%;
+      background:linear-gradient(90deg,transparent 0%,rgba(200,215,255,0.11) 50%,transparent 100%);
+      animation:shimmerSweep 4.2s ease-in-out infinite;
+      pointer-events:none;z-index:2;
     }
 
-    /* ── Card back animations ── */
-    @keyframes shimmerSweep {
-      0%   { transform: translateX(-100%) rotate(25deg); opacity:0; }
-      15%  { opacity: 1; }
-      85%  { opacity: 1; }
-      100% { transform: translateX(200%) rotate(25deg); opacity:0; }
+    /* ── aurora wash ── */
+    @keyframes auroraWash {
+      0%   { background-position:0% 50%;   opacity:0.07; }
+      50%  { background-position:100% 50%; opacity:0.13; }
+      100% { background-position:0% 50%;   opacity:0.07; }
     }
+    .card-back .cb-aurora{
+      position:absolute;inset:0;border-radius:14px;
+      background:linear-gradient(120deg,rgba(100,130,255,0),rgba(160,100,255,0.2),rgba(80,180,255,0.15),rgba(100,130,255,0));
+      background-size:300% 300%;
+      animation:auroraWash 6s ease-in-out infinite;
+      pointer-events:none;z-index:1;
+    }
+
+    /* ── burst ring on flip ── */
+    @keyframes burstRing {
+      0%   { transform:scale(0.5); opacity:0.7; }
+      100% { transform:scale(2.2); opacity:0;   }
+    }
+    .card-back .cb-burst{
+      position:absolute;
+      width:60%;padding-top:60%;
+      top:50%;left:50%;
+      margin-top:-30%;margin-left:-30%;
+      border-radius:50%;
+      border:1.5px solid rgba(180,200,255,0.6);
+      pointer-events:none;z-index:3;
+      opacity:0;
+    }
+    .card-scene.bursting .cb-burst{
+      animation:burstRing .55s cubic-bezier(.22,1,.36,1) forwards;
+    }
+
+    /* ── SVG keyframes (referenced inline) ── */
     @keyframes suitPulse {
-      0%,100% { opacity:0.55; transform: scale(1); }
-      50%      { opacity:0.78; transform: scale(1.06); }
+      0%,100% { opacity:0.55; transform:scale(1);    }
+      50%      { opacity:0.82; transform:scale(1.08); }
     }
     @keyframes cornerTwinkle {
       0%,100% { opacity:0.55; }
-      40%      { opacity:0.90; }
-      60%      { opacity:0.35; }
+      35%      { opacity:0.92; }
+      65%      { opacity:0.30; }
     }
     @keyframes borderGlow {
-      0%,100% { stroke-opacity:0.22; }
-      50%      { stroke-opacity:0.55; }
+      0%,100% { stroke-opacity:0.20; }
+      50%      { stroke-opacity:0.58; }
     }
     @keyframes particleDrift {
-      0%   { transform: translateY(0)   translateX(0)   scale(1);   opacity:0.7; }
-      33%  { transform: translateY(-6px) translateX(4px) scale(1.3); opacity:1;   }
-      66%  { transform: translateY(4px) translateX(-3px) scale(0.8); opacity:0.5; }
-      100% { transform: translateY(0)   translateX(0)   scale(1);   opacity:0.7; }
+      0%   { transform:translateY(0)    translateX(0)    scale(1);   opacity:0.65; }
+      33%  { transform:translateY(-7px) translateX(4px)  scale(1.4); opacity:1;    }
+      66%  { transform:translateY(5px)  translateX(-4px) scale(0.7); opacity:0.45; }
+      100% { transform:translateY(0)    translateX(0)    scale(1);   opacity:0.65; }
     }
     @keyframes frameRotate {
-      0%   { transform:rotate(0deg);   }
-      100% { transform:rotate(360deg); }
+      to { transform:rotate(360deg); }
+    }
+    @keyframes orbitRing {
+      from { transform:rotate(0deg);   }
+      to   { transform:rotate(360deg); }
+    }
+    @keyframes orbitRingRev {
+      from { transform:rotate(0deg);   }
+      to   { transform:rotate(-360deg); }
     }
 
-    /* Apply to SVG children via .card-back class helpers */
-    .card-back .cb-shimmer{
-      position:absolute;
-      top:0;left:0;
-      width:30%;height:100%;
-      background:linear-gradient(90deg,transparent 0%,rgba(200,215,255,0.09) 50%,transparent 100%);
-      animation: shimmerSweep 4s ease-in-out infinite;
-      pointer-events:none;
-      z-index:2;
-    }
-    .card-back .cb-suit-anim{ animation: suitPulse 3s ease-in-out infinite; transform-origin:50% 50%; }
-    .card-back .cb-corner-anim{ animation: cornerTwinkle 2.5s ease-in-out infinite; }
-    .card-back .cb-border-anim{ animation: borderGlow 3.5s ease-in-out infinite; }
-    .card-back .cb-particle{ animation: particleDrift 3s ease-in-out infinite; transform-origin:50% 50%; }
-    /* stagger particles per card — set via inline style animation-delay */
-
-    /* ── FRONT FACE ── */
+    /* ═══ FRONT FACE ═══ */
     .card-front{
       background:rgba(6,14,44,.92);
       border:1px solid rgba(120,150,240,.18);
-      backdrop-filter:blur(20px);
-      -webkit-backdrop-filter:blur(20px);
+      backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
       transform:rotateY(180deg);
       padding:20px 18px 16px;
       display:flex;flex-direction:column;gap:8px;
       box-shadow:0 16px 60px rgba(0,0,0,.7),inset 0 1px 0 rgba(200,210,255,.05);
     }
+    /* hint to flip back */
+    .fr-flip-hint{
+      font-size:8px;letter-spacing:.14em;text-transform:uppercase;
+      color:rgba(140,165,255,.28);text-align:right;margin-top:auto;
+      transition:opacity .2s;
+    }
+    .card-scene:hover .fr-flip-hint{ opacity:0.6; }
+
     .fr-tag{font-size:9px;letter-spacing:.18em;text-transform:uppercase;color:rgba(140,175,255,.5);}
     .fr-date{font-size:9px;letter-spacing:.1em;color:rgba(120,150,210,.32);margin-top:1px;}
     .fr-rule{width:28px;height:1px;background:linear-gradient(90deg,rgba(150,170,255,.3),transparent);margin:2px 0;}
     .fr-title{font-family:'Cormorant Garamond',serif;font-size:clamp(13px,1.5vw,18px);font-weight:300;line-height:1.2;color:#ddeeff;}
-    .fr-body{font-size:10px;font-weight:300;line-height:1.65;color:rgba(190,210,255,.52);flex:1;overflow:hidden;display:-webkit-box;-webkit-line-clamp:7;-webkit-box-orient:vertical;}
-    .fr-link{font-size:9px;letter-spacing:.14em;text-transform:uppercase;color:rgba(150,185,255,.55);text-decoration:none;border-bottom:1px solid rgba(140,180,255,.15);align-self:flex-start;margin-top:auto;transition:color .2s;}
+    .fr-body{font-size:10px;font-weight:300;line-height:1.65;color:rgba(190,210,255,.52);flex:1;overflow:hidden;display:-webkit-box;-webkit-line-clamp:6;-webkit-box-orient:vertical;}
+    .fr-link{font-size:9px;letter-spacing:.14em;text-transform:uppercase;color:rgba(150,185,255,.55);text-decoration:none;border-bottom:1px solid rgba(140,180,255,.15);align-self:flex-start;transition:color .2s;}
     .fr-link:hover{color:rgba(210,225,255,.9);}
     .coords{position:fixed;bottom:32px;left:48px;z-index:20;font-size:10px;letter-spacing:.18em;color:rgba(110,130,190,.28);font-weight:300;pointer-events:none;}
   </style>
@@ -152,7 +203,7 @@
   <main class="page">
     <div class="page-eyebrow">Projects</div>
     <h1 class="page-title">Things I've <em>built.</em></h1>
-    <p class="page-subtitle">Click any card to reveal.</p>
+    <p class="page-subtitle">Click any card to reveal — click again to flip back.</p>
     <div class="rule"></div>
     <div class="memory-grid" id="memoryGrid"></div>
   </main>
@@ -170,154 +221,176 @@
       { tag:"Finance · Investing", date:"2022 – 2025", title:"Latin School Investment Fund", body:"Board member managing a $100,000 student-run stock portfolio as one of eleven voting members. Gave weekly portfolio stock reports and pitched new investments to the Board.", link:"#", linkLabel:"Details →" }
     ];
 
-    const SUITS = ['♠','♥','♦','♣'];
-    const SUIT_COLORS = [
-      'rgba(180,195,255,0.75)',
-      'rgba(255,140,160,0.75)',
-      'rgba(255,160,120,0.75)',
-      'rgba(160,220,180,0.75)',
-    ];
-    const RANKS = ['I','II','III','IV','V','VI','VII','VIII'];
+    const SUITS      = ['♠','♥','♦','♣'];
+    const SUIT_COLORS= ['rgba(180,195,255,0.80)','rgba(255,140,160,0.80)','rgba(255,170,110,0.80)','rgba(140,225,175,0.80)'];
+    const RANKS      = ['I','II','III','IV','V','VI','VII','VIII'];
 
-    const flippedSet = new Set();
-
-    function makeCardBackSVG(index) {
-      const suit = SUITS[index % 4];
-      const sc   = SUIT_COLORS[index % 4];
-      const rank = RANKS[index];
-      const delay = (index * 0.42).toFixed(2);
-      const pDelay = (d) => (index * 0.31 + d).toFixed(2);
-
+    function makeCardBackSVG(idx) {
+      const suit = SUITS[idx%4], sc = SUIT_COLORS[idx%4], rank = RANKS[idx];
+      const d  = (idx*0.42).toFixed(2);
+      const pd = (x)=>(idx*0.31+x).toFixed(2);
       return `<svg viewBox="0 0 180 240" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice">
         <defs>
-          <pattern id="grid${index}" width="18" height="18" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+          <pattern id="g${idx}" width="18" height="18" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
             <path d="M18 0L0 0 0 18" fill="none" stroke="rgba(140,165,255,0.07)" stroke-width="0.6"/>
           </pattern>
-          <radialGradient id="vg${index}" cx="50%" cy="50%" r="72%">
-            <stop offset="0%" stop-color="rgba(30,50,120,0)"/>
+          <radialGradient id="vg${idx}" cx="50%" cy="50%" r="72%">
+            <stop offset="0%"   stop-color="rgba(30,50,120,0)"/>
             <stop offset="100%" stop-color="rgba(4,8,30,0.55)"/>
           </radialGradient>
-          <radialGradient id="cg${index}" cx="50%" cy="50%" r="55%">
-            <stop offset="0%" stop-color="rgba(100,130,255,0.06)"/>
+          <radialGradient id="cg${idx}" cx="50%" cy="50%" r="55%">
+            <stop offset="0%"   stop-color="rgba(100,130,255,0.07)"/>
             <stop offset="100%" stop-color="rgba(20,40,110,0)"/>
           </radialGradient>
-          <filter id="glow${index}">
-            <feGaussianBlur stdDeviation="2.5" result="blur"/>
+          <filter id="glow${idx}" x="-30%" y="-30%" width="160%" height="160%">
+            <feGaussianBlur stdDeviation="3" result="blur"/>
             <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
           </filter>
         </defs>
 
-        <!-- Base -->
+        <!-- Base layers -->
         <rect width="180" height="240" fill="#0a1230"/>
-        <rect width="180" height="240" fill="url(#grid${index})"/>
-        <rect width="180" height="240" fill="url(#cg${index})"/>
+        <rect width="180" height="240" fill="url(#g${idx})"/>
+        <rect width="180" height="240" fill="url(#cg${idx})"/>
 
         <!-- Animated outer border -->
-        <rect x="7" y="7" width="166" height="226" rx="10" ry="10" fill="none"
-              stroke="${sc}" stroke-width="1" stroke-opacity="0.22"
-              style="animation:borderGlow 3.5s ease-in-out ${delay}s infinite"/>
-        <rect x="11" y="11" width="158" height="218" rx="8" ry="8"
-              fill="none" stroke="rgba(140,165,255,0.10)" stroke-width="0.6"/>
+        <rect x="7" y="7" width="166" height="226" rx="10" fill="none"
+              stroke="${sc}" stroke-width="1.1" stroke-opacity="0.22"
+              style="animation:borderGlow 3.5s ease-in-out ${d}s infinite"/>
+        <rect x="11" y="11" width="158" height="218" rx="8"
+              fill="none" stroke="rgba(140,165,255,0.09)" stroke-width="0.5"/>
 
-        <!-- Spinning diamond ornament (top-center) -->
-        <g transform="translate(90,30)" style="animation:frameRotate 12s linear ${delay}s infinite;transform-box:fill-box;transform-origin:50% 50%;">
+        <!-- Spinning top diamond -->
+        <g transform="translate(90,30)"
+           style="animation:frameRotate 10s linear ${d}s infinite;transform-box:fill-box;transform-origin:50% 50%;">
           <rect x="-5" y="-5" width="10" height="10" rx="1"
-                fill="none" stroke="${sc}" stroke-width="0.8" stroke-opacity="0.5"
-                transform="rotate(45)"/>
+                fill="none" stroke="${sc}" stroke-width="0.9" stroke-opacity="0.55" transform="rotate(45)"/>
         </g>
-        <!-- Spinning diamond ornament (bottom-center) -->
-        <g transform="translate(90,210)" style="animation:frameRotate 12s linear ${delay}s infinite reverse;transform-box:fill-box;transform-origin:50% 50%;">
+        <!-- Spinning bottom diamond (reverse) -->
+        <g transform="translate(90,210)"
+           style="animation:frameRotate 10s linear ${d}s infinite reverse;transform-box:fill-box;transform-origin:50% 50%;">
           <rect x="-5" y="-5" width="10" height="10" rx="1"
-                fill="none" stroke="${sc}" stroke-width="0.8" stroke-opacity="0.5"
-                transform="rotate(45)"/>
+                fill="none" stroke="${sc}" stroke-width="0.9" stroke-opacity="0.55" transform="rotate(45)"/>
         </g>
 
-        <!-- Corner labels with twinkle -->
-        <g style="animation:cornerTwinkle 2.5s ease-in-out ${delay}s infinite">
+        <!-- Corner labels -->
+        <g style="animation:cornerTwinkle 2.5s ease-in-out ${d}s infinite">
           <text x="15" y="28" font-family="Georgia,serif" font-size="13" text-anchor="middle" fill="${sc}">${suit}</text>
-          <text x="15" y="42" font-family="Georgia,serif" font-size="9"  text-anchor="middle" fill="rgba(180,200,255,0.45)">${rank}</text>
+          <text x="15" y="41" font-family="Georgia,serif" font-size="9"  text-anchor="middle" fill="rgba(180,200,255,0.45)">${rank}</text>
           <text x="165" y="28" font-family="Georgia,serif" font-size="13" text-anchor="middle" fill="${sc}">${suit}</text>
-          <text x="165" y="42" font-family="Georgia,serif" font-size="9"  text-anchor="middle" fill="rgba(180,200,255,0.45)">${rank}</text>
+          <text x="165" y="41" font-family="Georgia,serif" font-size="9"  text-anchor="middle" fill="rgba(180,200,255,0.45)">${rank}</text>
           <g transform="rotate(180,90,120)">
-            <text x="-75" y="-92" font-family="Georgia,serif" font-size="13" text-anchor="middle" fill="${sc}">${suit}</text>
-            <text x="-75" y="-78" font-family="Georgia,serif" font-size="9"  text-anchor="middle" fill="rgba(180,200,255,0.45)">${rank}</text>
+            <text x="-75" y="-93" font-family="Georgia,serif" font-size="13" text-anchor="middle" fill="${sc}">${suit}</text>
+            <text x="-75" y="-80" font-family="Georgia,serif" font-size="9"  text-anchor="middle" fill="rgba(180,200,255,0.45)">${rank}</text>
           </g>
           <g transform="rotate(180,90,120)">
-            <text x="75" y="-92" font-family="Georgia,serif" font-size="13" text-anchor="middle" fill="${sc}">${suit}</text>
-            <text x="75" y="-78" font-family="Georgia,serif" font-size="9"  text-anchor="middle" fill="rgba(180,200,255,0.45)">${rank}</text>
+            <text x="75" y="-93" font-family="Georgia,serif" font-size="13" text-anchor="middle" fill="${sc}">${suit}</text>
+            <text x="75" y="-80" font-family="Georgia,serif" font-size="9"  text-anchor="middle" fill="rgba(180,200,255,0.45)">${rank}</text>
           </g>
         </g>
 
         <!-- Inner frame -->
-        <rect x="32" y="52" width="116" height="136" rx="5" ry="5"
-              fill="rgba(20,35,100,0.25)" stroke="rgba(140,165,255,0.14)" stroke-width="0.8"/>
+        <rect x="32" y="52" width="116" height="136" rx="5"
+              fill="rgba(20,35,100,0.22)" stroke="rgba(140,165,255,0.13)" stroke-width="0.8"/>
 
-        <!-- Inner cross lines -->
-        <line x1="32" y1="120" x2="148" y2="120" stroke="rgba(140,165,255,0.06)" stroke-width="0.7"/>
-        <line x1="90" y1="52"  x2="90"  y2="188" stroke="rgba(140,165,255,0.06)" stroke-width="0.7"/>
+        <!-- Cross lines -->
+        <line x1="32"  y1="120" x2="148" y2="120" stroke="rgba(140,165,255,0.05)" stroke-width="0.7"/>
+        <line x1="90"  y1="52"  x2="90"  y2="188" stroke="rgba(140,165,255,0.05)" stroke-width="0.7"/>
+
+        <!-- Orbit rings around central suit -->
+        <g transform="translate(90,120)"
+           style="animation:orbitRing 8s linear ${d}s infinite;transform-box:fill-box;transform-origin:50% 50%;">
+          <ellipse cx="0" cy="0" rx="28" ry="10"
+                   fill="none" stroke="${sc}" stroke-width="0.5" stroke-opacity="0.22"
+                   stroke-dasharray="3 4"/>
+        </g>
+        <g transform="translate(90,120)"
+           style="animation:orbitRingRev 12s linear ${d}s infinite;transform-box:fill-box;transform-origin:50% 50%;">
+          <ellipse cx="0" cy="0" rx="22" ry="8"
+                   fill="none" stroke="${sc}" stroke-width="0.4" stroke-opacity="0.16"
+                   stroke-dasharray="2 5"/>
+        </g>
 
         <!-- Corner pips inside frame -->
-        <g fill="${sc}" opacity="0.40" font-family="Georgia,serif" font-size="11" text-anchor="middle">
-          <text x="50" y="76">${suit}</text>
+        <g fill="${sc}" opacity="0.38" font-family="Georgia,serif" font-size="11" text-anchor="middle">
+          <text x="50"  y="76">${suit}</text>
           <text x="130" y="76">${suit}</text>
-          <text x="50" y="183">${suit}</text>
+          <text x="50"  y="183">${suit}</text>
           <text x="130" y="183">${suit}</text>
         </g>
 
-        <!-- Central suit — pulsing + glow -->
-        <text x="90" y="136" font-family="Georgia,serif" font-size="52" text-anchor="middle" dominant-baseline="middle"
-              fill="${sc}" filter="url(#glow${index})"
-              style="animation:suitPulse 3s ease-in-out ${delay}s infinite;transform-box:fill-box;transform-origin:50% 50%;">${suit}</text>
+        <!-- Central suit — pulse + glow -->
+        <text x="90" y="120" font-family="Georgia,serif" font-size="54" text-anchor="middle" dominant-baseline="middle"
+              fill="${sc}" filter="url(#glow${idx})"
+              style="animation:suitPulse 3s ease-in-out ${d}s infinite;transform-box:fill-box;transform-origin:50% 50%;">${suit}</text>
 
         <!-- Monogram overlay -->
-        <text x="90" y="136" font-family="Georgia,serif" font-style="italic" font-size="18" text-anchor="middle" dominant-baseline="middle"
-              fill="rgba(210,220,255,0.18)">SG</text>
+        <text x="90" y="120" font-family="Georgia,serif" font-style="italic" font-size="17" text-anchor="middle" dominant-baseline="middle"
+              fill="rgba(210,220,255,0.16)">SG</text>
 
         <!-- Decorative rules -->
-        <line x1="40" y1="60"  x2="140" y2="60"  stroke="rgba(160,175,255,0.12)" stroke-width="0.6"/>
-        <line x1="40" y1="180" x2="140" y2="180" stroke="rgba(160,175,255,0.12)" stroke-width="0.6"/>
+        <line x1="40" y1="60"  x2="140" y2="60"  stroke="rgba(160,175,255,0.11)" stroke-width="0.6"/>
+        <line x1="40" y1="180" x2="140" y2="180" stroke="rgba(160,175,255,0.11)" stroke-width="0.6"/>
 
-        <!-- Dot ornaments mid-frame -->
-        <circle cx="34" cy="120" r="2" fill="${sc}" opacity="0.28"
-                style="animation:cornerTwinkle 2s ease-in-out ${pDelay(0.3)}s infinite"/>
-        <circle cx="146" cy="120" r="2" fill="${sc}" opacity="0.28"
-                style="animation:cornerTwinkle 2s ease-in-out ${pDelay(0.7)}s infinite"/>
+        <!-- Side dot ornaments -->
+        <circle cx="34"  cy="120" r="2" fill="${sc}" opacity="0.26"
+                style="animation:cornerTwinkle 2s ease-in-out ${pd(0.3)}s infinite"/>
+        <circle cx="146" cy="120" r="2" fill="${sc}" opacity="0.26"
+                style="animation:cornerTwinkle 2s ease-in-out ${pd(0.7)}s infinite"/>
 
         <!-- Floating micro-particles -->
-        <circle cx="60"  cy="90"  r="1.2" fill="${sc}" opacity="0.5" style="animation:particleDrift 3.1s ease-in-out ${pDelay(0.0)}s infinite"/>
-        <circle cx="120" cy="100" r="1.0" fill="${sc}" opacity="0.4" style="animation:particleDrift 3.7s ease-in-out ${pDelay(0.5)}s infinite"/>
-        <circle cx="75"  cy="155" r="1.3" fill="${sc}" opacity="0.45" style="animation:particleDrift 2.8s ease-in-out ${pDelay(1.1)}s infinite"/>
-        <circle cx="115" cy="145" r="1.0" fill="${sc}" opacity="0.35" style="animation:particleDrift 4.2s ease-in-out ${pDelay(0.8)}s infinite"/>
-        <circle cx="90"  cy="75"  r="0.9" fill="rgba(220,230,255,0.6)" style="animation:particleDrift 3.4s ease-in-out ${pDelay(1.4)}s infinite"/>
+        <circle cx="62"  cy="88"  r="1.2" fill="${sc}" opacity="0.50" style="animation:particleDrift 3.1s ease-in-out ${pd(0.0)}s infinite"/>
+        <circle cx="118" cy="98"  r="1.0" fill="${sc}" opacity="0.40" style="animation:particleDrift 3.7s ease-in-out ${pd(0.5)}s infinite"/>
+        <circle cx="75"  cy="157" r="1.3" fill="${sc}" opacity="0.45" style="animation:particleDrift 2.8s ease-in-out ${pd(1.1)}s infinite"/>
+        <circle cx="113" cy="147" r="1.0" fill="${sc}" opacity="0.35" style="animation:particleDrift 4.2s ease-in-out ${pd(0.8)}s infinite"/>
+        <circle cx="90"  cy="74"  r="0.9" fill="rgba(220,230,255,0.6)" style="animation:particleDrift 3.4s ease-in-out ${pd(1.4)}s infinite"/>
+        <circle cx="55"  cy="140" r="0.8" fill="${sc}" opacity="0.30" style="animation:particleDrift 5.0s ease-in-out ${pd(2.0)}s infinite"/>
+        <circle cx="128" cy="155" r="0.9" fill="${sc}" opacity="0.32" style="animation:particleDrift 4.6s ease-in-out ${pd(1.7)}s infinite"/>
 
         <!-- Vignette -->
-        <rect width="180" height="240" fill="url(#vg${index})" rx="12"/>
+        <rect width="180" height="240" fill="url(#vg${idx})" rx="12"/>
 
         <!-- Card number -->
         <text x="166" y="233" font-family="'Inter',sans-serif" font-size="7" text-anchor="end"
-              fill="rgba(140,165,255,0.20)" letter-spacing="1">${String(index+1).padStart(2,'0')}</text>
+              fill="rgba(140,165,255,0.18)" letter-spacing="1">${String(idx+1).padStart(2,'0')}</text>
       </svg>`;
     }
 
     const grid = document.getElementById('memoryGrid');
+
     PROJECTS.forEach((p, i) => {
-      const scene = document.createElement('div');
+      const scene   = document.createElement('div');
       scene.className = 'card-scene';
+      scene.style.animationDelay = (i * 0.07) + 's';
+
       const flipper = document.createElement('div');
       flipper.className = 'card-flipper';
 
+      /* ── back face ── */
       const back = document.createElement('div');
       back.className = 'card-face card-back';
       back.innerHTML = makeCardBackSVG(i);
-      // Shimmer overlay
+
+      const aurora = document.createElement('div');
+      aurora.className = 'cb-aurora';
+      aurora.style.animationDelay = (i * 0.55) + 's';
+      back.appendChild(aurora);
+
       const shimmer = document.createElement('div');
       shimmer.className = 'cb-shimmer';
-      shimmer.style.animationDelay = (i * 0.6) + 's';
+      shimmer.style.animationDelay = (i * 0.60) + 's';
       back.appendChild(shimmer);
 
+      const burst = document.createElement('div');
+      burst.className = 'cb-burst';
+      back.appendChild(burst);
+
+      /* ── front face ── */
       const front = document.createElement('div');
       front.className = 'card-face card-front';
-      const linkAttr = (p.link && p.link !== '#') ? `href="${p.link}" target="_blank" rel="noopener"` : `href="${p.link}"`;
+      const linkAttr = (p.link && p.link !== '#')
+        ? `href="${p.link}" target="_blank" rel="noopener"`
+        : `href="${p.link}"`;
       front.innerHTML = `
         <span class="fr-tag">${p.tag}</span>
         <span class="fr-date">${p.date}</span>
@@ -325,6 +398,7 @@
         <div class="fr-title">${p.title}</div>
         <div class="fr-body">${p.body}</div>
         <a class="fr-link" ${linkAttr}>${p.linkLabel}</a>
+        <span class="fr-flip-hint">click to flip back ↩</span>
       `;
 
       flipper.appendChild(back);
@@ -332,12 +406,50 @@
       scene.appendChild(flipper);
       grid.appendChild(scene);
 
-      if (flippedSet.has(i)) scene.classList.add('flipped');
+      /* ── entrance → idle float ── */
+      scene.addEventListener('animationend', (e) => {
+        if (e.animationName === 'cardEntrance') {
+          scene.style.opacity = '1';
+          scene.style.animation = 'none'; // clear entrance
+          // small frame delay then start idle float with unique phase
+          requestAnimationFrame(() => {
+            scene.style.animationDelay = (i * 0.38) + 's';
+            scene.classList.add('floating');
+          });
+        }
+      }, { once: true });
 
-      scene.addEventListener('click', () => {
-        if (!scene.classList.contains('flipped')) {
+      /* ── 3D hover tilt ── */
+      scene.addEventListener('mousemove', (e) => {
+        if (scene.classList.contains('flipped')) return;
+        const r  = scene.getBoundingClientRect();
+        const mx = (e.clientX - r.left) / r.width  - 0.5; // -0.5..0.5
+        const my = (e.clientY - r.top)  / r.height - 0.5;
+        flipper.style.transform = `rotateY(${mx * 18}deg) rotateX(${-my * 14}deg)`;
+      });
+      scene.addEventListener('mouseleave', () => {
+        if (scene.classList.contains('flipped')) return;
+        flipper.style.transform = '';
+      });
+
+      /* ── flip toggle ── */
+      scene.addEventListener('click', (e) => {
+        // Don't flip back if clicking the project link
+        if (e.target.classList.contains('fr-link')) return;
+
+        const isFlipped = scene.classList.contains('flipped');
+
+        if (!isFlipped) {
+          // Flip to front: burst ring effect
+          flipper.style.transform = '';
           scene.classList.add('flipped');
-          flippedSet.add(i);
+          scene.classList.add('bursting');
+          burst.addEventListener('animationend', () => {
+            scene.classList.remove('bursting');
+          }, { once: true });
+        } else {
+          // Flip back to back
+          scene.classList.remove('flipped');
         }
       });
     });
