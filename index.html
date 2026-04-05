@@ -134,7 +134,7 @@
         scene.add(new THREE.LineSegments(new THREE.BufferGeometry().setFromPoints(lp),new THREE.LineBasicMaterial({color:0x3a5888,transparent:true,opacity:0.22})));
       });
       var R=16.5,Z=-18,SPEED=0.0004;
-      // Orbit ring drawn in 3D — always matches planet orbit radius exactly
+      // Orbit ring — radius matches planet orbit path
       scene.add(new THREE.Mesh(new THREE.RingGeometry(R-0.2,R+0.2,180),new THREE.MeshBasicMaterial({color:0x2a3a5a,side:THREE.DoubleSide,transparent:true,opacity:0.15})));
       function makeRingTex(gb){var c=document.createElement('canvas');c.width=256;c.height=1;var ctx=c.getContext('2d');var g=ctx.createLinearGradient(0,0,256,0);g.addColorStop(0,gb.replace('1)','0.0)'));g.addColorStop(0.08,gb.replace('1)','0.8)'));g.addColorStop(0.4,gb.replace('1)','0.55)'));g.addColorStop(0.65,gb.replace('1)','0.25)'));g.addColorStop(1,gb.replace('1)','0.0)'));ctx.fillStyle=g;ctx.fillRect(0,0,256,1);return new THREE.CanvasTexture(c);}
       var configs=[
@@ -144,7 +144,12 @@
         {color:0x44eeaa,emissive:0x00281a,glow:'rgba(60,240,170,',ringColor:'rgba(60,240,170,1)',ringTilt:{x:0.44,z:0.10},spinAxis:new THREE.Vector3(-0.2,1,0.15).normalize(),spinSpeed:0.009},
         {color:0xffcc44,emissive:0x281a00,glow:'rgba(255,200,50,',ringColor:'rgba(255,200,60,1)',ringTilt:{x:0.38,z:-0.22},spinAxis:new THREE.Vector3(0.15,0.95,0.25).normalize(),spinSpeed:0.007}
       ];
-      var sphereGeo=new THREE.SphereGeometry(1.9,128,64);
+      // Planet sphere radius = 1.9
+      // Ring passes through planet midpoint: inner = 1.9 - 0.6 = 1.3, outer = 1.9 + 0.6 = 2.5
+      var PLANET_R = 1.9;
+      var RING_INNER = PLANET_R - 0.6;
+      var RING_OUTER = PLANET_R + 0.6;
+      var sphereGeo=new THREE.SphereGeometry(PLANET_R,128,64);
       var groups=[],meshes=[];
       var quat=new THREE.Quaternion();
       function buildPlanet(i){
@@ -159,9 +164,9 @@
         var ig=new THREE.Group();var sphere=new THREE.Mesh(sphereGeo,mat);ig.add(sphere);ig.add(sprite);
         var group=new THREE.Group();group.add(ig);
         if(cfg.ringColor){
-          var rg=new THREE.RingGeometry(2.8,3.5,128);
+          var rg=new THREE.RingGeometry(RING_INNER,RING_OUTER,128);
           var rpos=rg.attributes.position,ruv=rg.attributes.uv,rv3=new THREE.Vector3();
-          for(var j=0;j<rpos.count;j++){rv3.fromBufferAttribute(rpos,j);ruv.setXY(j,(rv3.length()-2.8)/(3.5-2.8),0.5);}
+          for(var j=0;j<rpos.count;j++){rv3.fromBufferAttribute(rpos,j);ruv.setXY(j,(rv3.length()-RING_INNER)/(RING_OUTER-RING_INNER),0.5);}
           var pr=new THREE.Mesh(rg,new THREE.MeshBasicMaterial({map:makeRingTex(cfg.ringColor),side:THREE.DoubleSide,transparent:true,opacity:0.7,depthWrite:false}));
           pr.rotation.x=cfg.ringTilt.x;pr.rotation.z=cfg.ringTilt.z;group.add(pr);
         }

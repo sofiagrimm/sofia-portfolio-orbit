@@ -52,7 +52,9 @@
       width:280px;height:360px;border-radius:6px;overflow:hidden;flex-shrink:0;
       border:1px solid rgba(160,140,255,0.18);position:relative;margin:0 auto;
     }
-    .pb-frame canvas{position:absolute!important;inset:0;width:100%!important;height:100%!important;}
+    .pb-frame img{
+      position:absolute;inset:0;width:100%;height:100%;object-fit:cover;
+    }
     .pb-sprocket{
       width:100%;height:28px;display:flex;align-items:center;
       justify-content:space-around;padding:0 14px;flex-shrink:0;
@@ -203,7 +205,7 @@
     .gc--gold   {--card-glow-color:rgba(255,200,60,0.10);--card-border:rgba(255,215,90,0.36);--card-outer-glow:rgba(240,180,40,0.08);--card-stripe:linear-gradient(90deg,rgba(255,200,60,0.8),rgba(255,225,110,0.5),rgba(255,200,60,0.1));--card-accent:rgba(255,220,100,0.90);--card-icon-bg:rgba(180,130,10,0.22);--card-icon-border:rgba(240,190,50,0.30);}
     .gc--rose   {--card-glow-color:rgba(255,100,160,0.10);--card-border:rgba(255,130,175,0.36);--card-outer-glow:rgba(240,80,140,0.07);--card-stripe:linear-gradient(90deg,rgba(255,100,160,0.8),rgba(255,150,195,0.5),rgba(255,100,160,0.1));--card-accent:rgba(255,155,190,0.88);--card-icon-bg:rgba(180,40,90,0.22);--card-icon-border:rgba(240,100,150,0.30);}
 
-    /* HONORS & AWARDS — unified neutral style */
+    /* HONORS & AWARDS */
     .awards{
       display:flex;flex-direction:column;gap:10px;
       margin-top:4px;
@@ -530,40 +532,64 @@
 
   <!-- Film strip script -->
   <script>
-  const FRAME_W = 280, FRAME_H = 360, FRAME_COUNT = 3;
-  const PALETTES = [
-    ['#c4b0ff','#7ecfff','#aaf0d0','#e0d0ff'],
-    ['#ffd0ee','#ffaed0','#d0b4ff','#fce0ff'],
-    ['#aee8ff','#d4c4ff','#c4f0e4','#e0f4ff'],
-    ['#ffe4b0','#ffd0c4','#e4b0ff','#fff0d0'],
-    ['#ccf0c4','#b0d8ff','#f0d8c4','#d4fce4'],
-    ['#f0c4d8','#c4ccff','#d4f0c4','#ffe4f0'],
+  // Images uploaded to repo root
+  const PHOTOS = [
+    '633A206B-E09F-4B4C-AF48-604EFAA9065E.HEIC',
+    'C738E431-3996-47B9-B722-135265FF7B7F.HEIC',
+    'IMG_3326.heic',
+    'IMG_3334.heic'
   ];
-  function drawFrame(canvas, palette, seed) {
-    const w = canvas.width, h = canvas.height;
-    const ctx = canvas.getContext('2d');
-    const g = ctx.createLinearGradient(0,0,w,h);
-    g.addColorStop(0,palette[0]);g.addColorStop(0.6,palette[1]);g.addColorStop(1,palette[2]);
-    ctx.fillStyle=g;ctx.fillRect(0,0,w,h);
-    const rng=n=>Math.abs(Math.sin(seed*23.9+n*14.7));
-    for(let i=0;i<4;i++){const bx=rng(i*4)*w,by=rng(i*4+1)*h,br=32+rng(i*4+2)*72;const bg=ctx.createRadialGradient(bx,by,0,bx,by,br);bg.addColorStop(0,palette[(i+2)%palette.length]+'bb');bg.addColorStop(1,'rgba(255,255,255,0)');ctx.fillStyle=bg;ctx.fillRect(0,0,w,h);}
-    ctx.save();ctx.globalAlpha=0.20;ctx.strokeStyle='#ffffff';ctx.lineWidth=1.2;
-    const mx=rng(20)*w*.5+w*.2,my=rng(21)*h*.5+h*.2,mr=16+rng(22)*34,sides=3+Math.floor(rng(23)*4);
-    ctx.beginPath();for(let i=0;i<=sides;i++){const a=(i/sides)*Math.PI*2-Math.PI/2;ctx.lineTo(mx+mr*Math.cos(a),my+mr*Math.sin(a));}ctx.stroke();ctx.restore();
-    ctx.fillStyle='rgba(255,255,255,0.55)';
-    for(let i=0;i<14;i++){const sx=rng(30+i)*w,sy=rng(31+i)*h,sr=0.8+rng(32+i)*1.8;ctx.beginPath();ctx.arc(sx,sy,sr,0,Math.PI*2);ctx.fill();}
-    const vig=ctx.createRadialGradient(w/2,h/2,0,w/2,h/2,Math.max(w,h)*.75);
-    vig.addColorStop(0,'rgba(0,0,0,0)');vig.addColorStop(1,'rgba(0,0,0,0.32)');
-    ctx.fillStyle=vig;ctx.fillRect(0,0,w,h);
+
+  // Left strip: photos 0,1 repeated; Right strip: photos 2,3 repeated
+  const LEFT_PHOTOS  = [PHOTOS[0], PHOTOS[1], PHOTOS[0], PHOTOS[1], PHOTOS[0], PHOTOS[1]];
+  const RIGHT_PHOTOS = [PHOTOS[2], PHOTOS[3], PHOTOS[2], PHOTOS[3], PHOTOS[2], PHOTOS[3]];
+
+  function buildTrack(trackId, direction, speed, photos) {
+    const track = document.getElementById(trackId);
+
+    function makeSet(photoList) {
+      const frag = document.createDocumentFragment();
+      for (let i = 0; i < photoList.length; i++) {
+        const sp = document.createElement('div');
+        sp.className = 'pb-sprocket';
+        sp.innerHTML = '<div class="pb-hole"></div><div class="pb-hole"></div><div class="pb-hole"></div>';
+        frag.appendChild(sp);
+        const frame = document.createElement('div');
+        frame.className = 'pb-frame';
+        const img = document.createElement('img');
+        img.src = photoList[i];
+        img.alt = '';
+        img.loading = 'lazy';
+        frame.appendChild(img);
+        frag.appendChild(frame);
+      }
+      const sp = document.createElement('div');
+      sp.className = 'pb-sprocket';
+      sp.innerHTML = '<div class="pb-hole"></div><div class="pb-hole"></div><div class="pb-hole"></div>';
+      frag.appendChild(sp);
+      return frag;
+    }
+
+    // Two sets for seamless looping
+    track.appendChild(makeSet(photos));
+    track.appendChild(makeSet(photos));
+
+    requestAnimationFrame(() => {
+      const totalH = track.scrollHeight / 2;
+      let offset = direction === 'up' ? 0 : -totalH;
+      function tick() {
+        offset += direction === 'up' ? -speed : speed;
+        if (direction === 'up' && offset <= -totalH) offset = 0;
+        if (direction === 'down' && offset >= 0) offset = -totalH;
+        track.style.transform = `translateY(${offset}px)`;
+        requestAnimationFrame(tick);
+      }
+      tick();
+    });
   }
-  function buildTrack(trackId,direction,speed){
-    const track=document.getElementById(trackId);
-    function makeSet(seedOffset){const frag=document.createDocumentFragment();for(let i=0;i<FRAME_COUNT;i++){const sp=document.createElement('div');sp.className='pb-sprocket';sp.innerHTML='<div class="pb-hole"></div><div class="pb-hole"></div><div class="pb-hole"></div>';frag.appendChild(sp);const frame=document.createElement('div');frame.className='pb-frame';const c=document.createElement('canvas');c.width=FRAME_W;c.height=FRAME_H;drawFrame(c,PALETTES[(i+seedOffset)%PALETTES.length],i*11+seedOffset*7);frame.appendChild(c);frag.appendChild(frame);}const sp=document.createElement('div');sp.className='pb-sprocket';sp.innerHTML='<div class="pb-hole"></div><div class="pb-hole"></div><div class="pb-hole"></div>';frag.appendChild(sp);return frag;}
-    track.appendChild(makeSet(0));track.appendChild(makeSet(3));
-    requestAnimationFrame(()=>{const totalH=track.scrollHeight/2;let offset=direction==='up'?0:-totalH;function tick(){offset+=direction==='up'?-speed:speed;if(direction==='up'&&offset<=-totalH)offset=0;if(direction==='down'&&offset>=0)offset=-totalH;track.style.transform=`translateY(${offset}px)`;requestAnimationFrame(tick);}tick();});
-  }
-  buildTrack('trackLeft','up',0.15);
-  buildTrack('trackRight','down',0.12);
+
+  buildTrack('trackLeft',  'up',   0.15, LEFT_PHOTOS);
+  buildTrack('trackRight', 'down', 0.12, RIGHT_PHOTOS);
   </script>
 
   <!-- Stars background -->
