@@ -271,8 +271,22 @@
     const SUIT_COLORS = ['rgba(180,195,255,0.80)','rgba(255,140,160,0.80)','rgba(255,170,110,0.80)','rgba(140,225,175,0.80)'];
     const RANKS       = ['I','II','III','IV','V','VI','VII','VIII'];
 
+    // Each row gets a different shuffle of the 4 suits so no column repeats across rows.
+    // Row 0 (cards 0-3): ♠ ♥ ♦ ♣  →  indices [0,1,2,3]
+    // Row 1 (cards 4-7): ♣ ♦ ♠ ♥  →  indices [3,2,0,1]
+    const ROW_SUITS = [
+      [0,1,2,3],
+      [3,2,0,1]
+    ];
+
+    function getSuitIdx(cardIdx) {
+      const row = Math.floor(cardIdx / 4);
+      const col = cardIdx % 4;
+      return ROW_SUITS[row % ROW_SUITS.length][col];
+    }
+
     function makeCardBackSVG(idx) {
-      const suit=SUITS[idx%4],sc=SUIT_COLORS[idx%4],rank=RANKS[idx];
+      const si=getSuitIdx(idx),suit=SUITS[si],sc=SUIT_COLORS[si],rank=RANKS[idx];
       const d=(idx*0.42).toFixed(2),pd=x=>(idx*0.31+x).toFixed(2);
       return `<svg viewBox="0 0 180 240" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice">
         <defs>
