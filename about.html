@@ -74,7 +74,7 @@
     /* ── Section label ── */
     .section-label{
       font-size:10px;letter-spacing:0.22em;text-transform:uppercase;
-      color:rgba(140,170,255,0.45);margin-top:52px;margin-bottom:22px;
+      color:rgba(140,170,255,0.45);margin-top:56px;margin-bottom:26px;
       display:flex;align-items:center;gap:12px;
     }
     .section-label::after{
@@ -82,19 +82,19 @@
       background:linear-gradient(90deg,rgba(100,130,200,0.18),transparent);
     }
 
-    /* ═══════════════════════════════════════════
-       AT A GLANCE — redesigned cards
-    ═══════════════════════════════════════════ */
+    /* ═════════════════════════════════════════════
+       AT A GLANCE
+    ═════════════════════════════════════════════ */
     .glance-grid{
       display:grid;
       grid-template-columns:1fr 1fr;
-      gap:14px;
+      gap:18px;
     }
 
     .glance-card{
       position:relative;overflow:hidden;
       border-radius:16px;
-      padding:24px 22px 20px;
+      padding:28px 26px 24px;
       background:rgba(8,14,46,0.62);
       border:1px solid rgba(100,130,220,0.13);
       backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
@@ -102,15 +102,12 @@
       cursor:default;
     }
 
-    /* top accent stripe */
     .glance-card::after{
       content:'';
       position:absolute;top:0;left:0;right:0;height:2px;
       background:var(--card-stripe);
       border-radius:16px 16px 0 0;
     }
-
-    /* ambient glow layer */
     .glance-card::before{
       content:'';
       position:absolute;inset:0;
@@ -125,10 +122,9 @@
       box-shadow:0 12px 48px rgba(0,0,0,0.5), 0 0 0 1px var(--card-border), 0 0 40px var(--card-outer-glow);
     }
 
-    /* ── Card header row ── */
     .gc-header{
       display:flex;align-items:center;justify-content:space-between;
-      margin-bottom:14px;
+      margin-bottom:18px;
     }
     .gc-label{
       font-size:9px;font-weight:500;letter-spacing:0.22em;text-transform:uppercase;
@@ -143,20 +139,18 @@
     }
     .gc-icon-wrap svg{width:16px;height:16px;stroke:var(--card-accent);fill:none;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round;}
 
-    /* ── Big stat number ── */
     .gc-stat{
       font-family:'Cormorant Garamond',serif;
       font-size:38px;font-weight:300;line-height:1;
       color:var(--card-accent);
-      margin-bottom:4px;
+      margin-bottom:5px;
       letter-spacing:-0.01em;
     }
     .gc-stat-label{
       font-size:10px;font-weight:400;letter-spacing:0.14em;text-transform:uppercase;
-      color:rgba(180,200,255,0.42);margin-bottom:12px;
+      color:rgba(180,200,255,0.42);margin-bottom:16px;
     }
 
-    /* ── Body text ── */
     .gc-value{
       font-size:13px;font-weight:300;line-height:1.7;
       color:rgba(210,226,255,0.80);
@@ -170,8 +164,7 @@
       font-size:11px;opacity:0.65;
     }
 
-    /* ── Pill tags ── */
-    .gc-pills{display:flex;flex-wrap:wrap;gap:7px;margin-top:8px;}
+    .gc-pills{display:flex;flex-wrap:wrap;gap:7px;margin-top:10px;}
     .gc-pill{
       font-size:10px;letter-spacing:0.10em;text-transform:uppercase;
       color:var(--card-accent);
@@ -185,10 +178,9 @@
       background:rgba(255,255,255,0.06);
     }
 
-    /* ── Language rows ── */
     .gc-lang-row{
       display:flex;align-items:center;justify-content:space-between;
-      padding:5px 0;
+      padding:6px 0;
       border-bottom:1px solid rgba(255,255,255,0.04);
     }
     .gc-lang-row:last-child{border-bottom:none;}
@@ -206,10 +198,9 @@
     }
     .gc-lang-dot.filled{opacity:0.85;}
 
-    /* ── Cert rows ── */
     .gc-cert-row{
       display:flex;align-items:flex-start;gap:10px;
-      padding:6px 0;
+      padding:7px 0;
       border-bottom:1px solid rgba(255,255,255,0.04);
     }
     .gc-cert-row:last-child{border-bottom:none;}
@@ -220,17 +211,16 @@
     .gc-cert-text{font-size:12.5px;font-weight:300;color:rgba(220,234,255,0.80);line-height:1.5;}
     .gc-cert-text strong{font-weight:500;color:rgba(235,244,255,0.96);}
 
-    /* ── Activity rows ── */
     .gc-act-row{
       display:flex;flex-direction:column;
       padding:7px 0;
       border-bottom:1px solid rgba(255,255,255,0.04);
     }
     .gc-act-row:last-child{border-bottom:none;}
-    .gc-act-name{font-size:13px;font-weight:500;color:rgba(232,242,255,0.94);}
-    .gc-act-role{font-size:11px;color:var(--card-accent);opacity:0.75;margin-top:1px;letter-spacing:0.06em;}
+    .gc-act-name{font-size:12.5px;font-weight:500;color:rgba(232,242,255,0.94);}
+    .gc-act-role{font-size:10.5px;color:var(--card-accent);opacity:0.75;margin-top:2px;letter-spacing:0.04em;}
 
-    /* ── Color themes ── */
+    /* Color themes */
     .gc--blue   {--card-glow-color:rgba(80,140,255,0.12);--card-border:rgba(100,160,255,0.40);--card-outer-glow:rgba(80,140,255,0.08);--card-stripe:linear-gradient(90deg,rgba(80,140,255,0.8),rgba(120,180,255,0.5),rgba(80,140,255,0.1));--card-accent:rgba(140,190,255,0.88);--card-icon-bg:rgba(60,100,220,0.20);--card-icon-border:rgba(100,150,255,0.30);}
     .gc--purple {--card-glow-color:rgba(180,100,255,0.12);--card-border:rgba(190,120,255,0.40);--card-outer-glow:rgba(160,80,255,0.08);--card-stripe:linear-gradient(90deg,rgba(180,100,255,0.8),rgba(210,150,255,0.5),rgba(180,100,255,0.1));--card-accent:rgba(210,165,255,0.88);--card-icon-bg:rgba(140,60,220,0.20);--card-icon-border:rgba(180,110,255,0.30);}
     .gc--cyan   {--card-glow-color:rgba(40,210,255,0.10);--card-border:rgba(60,220,255,0.36);--card-outer-glow:rgba(40,200,255,0.07);--card-stripe:linear-gradient(90deg,rgba(40,210,255,0.8),rgba(80,230,255,0.5),rgba(40,210,255,0.1));--card-accent:rgba(100,225,255,0.88);--card-icon-bg:rgba(20,160,200,0.20);--card-icon-border:rgba(40,200,255,0.30);}
@@ -238,26 +228,27 @@
     .gc--gold   {--card-glow-color:rgba(255,200,60,0.10);--card-border:rgba(255,215,90,0.36);--card-outer-glow:rgba(240,180,40,0.08);--card-stripe:linear-gradient(90deg,rgba(255,200,60,0.8),rgba(255,225,110,0.5),rgba(255,200,60,0.1));--card-accent:rgba(255,220,100,0.90);--card-icon-bg:rgba(180,130,10,0.22);--card-icon-border:rgba(240,190,50,0.30);}
     .gc--rose   {--card-glow-color:rgba(255,100,160,0.10);--card-border:rgba(255,130,175,0.36);--card-outer-glow:rgba(240,80,140,0.07);--card-stripe:linear-gradient(90deg,rgba(255,100,160,0.8),rgba(255,150,195,0.5),rgba(255,100,160,0.1));--card-accent:rgba(255,155,190,0.88);--card-icon-bg:rgba(180,40,90,0.22);--card-icon-border:rgba(240,100,150,0.30);}
 
-    /* ═══════════════════════════════════════════
-       HONORS & AWARDS — redesigned
-    ═══════════════════════════════════════════ */
+    /* ═════════════════════════════════════════════
+       HONORS & AWARDS
+    ═════════════════════════════════════════════ */
     .awards{
       display:flex;flex-direction:column;gap:10px;
       margin-top:4px;
     }
     .award{
       position:relative;overflow:hidden;
-      display:flex;align-items:center;gap:16px;
-      padding:16px 20px;
+      display:flex;align-items:center;gap:0;
+      padding:17px 20px 17px 24px;
       border-radius:14px;
       background:rgba(8,14,46,0.55);
       border:1px solid rgba(100,130,220,0.12);
       backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
       transition:border-color .28s, transform .28s, box-shadow .28s, background .28s;
     }
+    /* left accent stripe */
     .award::before{
       content:'';
-      position:absolute;left:0;top:0;bottom:0;width:2px;
+      position:absolute;left:0;top:0;bottom:0;width:3px;
       background:var(--award-stripe, linear-gradient(180deg, rgba(140,170,255,0.6), rgba(100,130,220,0.2)));
       border-radius:14px 0 0 14px;
     }
@@ -268,34 +259,16 @@
       box-shadow:0 8px 36px rgba(0,0,0,0.38), -4px 0 28px var(--award-glow, rgba(120,150,255,0.06));
     }
 
-    /* rank badge */
-    .award-rank{
-      flex-shrink:0;
-      width:36px;height:36px;
-      border-radius:10px;
-      background:var(--award-badge-bg, rgba(60,80,180,0.20));
-      border:1px solid var(--award-badge-border, rgba(100,130,220,0.25));
-      display:flex;align-items:center;justify-content:center;
-      font-family:'Cormorant Garamond',serif;
-      font-size:16px;font-weight:300;
-      color:var(--award-badge-color, rgba(160,190,255,0.85));
-      transition:box-shadow .28s;
-    }
-    .award:hover .award-rank{
-      box-shadow:0 0 14px var(--award-glow, rgba(120,150,255,0.20));
-    }
-
     /* content */
     .award-content{flex:1;min-width:0;}
     .award-name{
       font-size:13.5px;font-weight:400;
       color:rgba(220,234,255,0.90);
       line-height:1.4;
-      white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
     }
     .award-org{
       font-size:10px;letter-spacing:0.10em;
-      color:rgba(150,175,255,0.42);margin-top:2px;
+      color:rgba(150,175,255,0.42);margin-top:3px;
     }
 
     /* year badge */
@@ -306,7 +279,7 @@
       background:var(--award-badge-bg, rgba(60,80,180,0.20));
       border:1px solid var(--award-badge-border, rgba(100,130,220,0.20));
       padding:4px 10px;border-radius:20px;
-      white-space:nowrap;
+      white-space:nowrap;margin-left:14px;
     }
 
     /* tier color themes */
@@ -404,7 +377,7 @@
         </div>
         <div class="gc-stat">4</div>
         <div class="gc-stat-label">Languages spoken</div>
-        <div style="margin-top:2px;">
+        <div style="margin-top:4px;">
           <div class="gc-lang-row">
             <span class="gc-lang-name">English</span>
             <div style="display:flex;align-items:center;gap:6px;">
@@ -466,7 +439,7 @@
         </div>
         <div class="gc-stat">3</div>
         <div class="gc-stat-label">Professional certifications</div>
-        <div style="margin-top:4px;">
+        <div style="margin-top:6px;">
           <div class="gc-cert-row"><div class="gc-cert-dot"></div><div class="gc-cert-text"><strong>IBM</strong> Data Science Professional</div></div>
           <div class="gc-cert-row"><div class="gc-cert-dot"></div><div class="gc-cert-text"><strong>QubitxQubit</strong> Quantum Winter School</div></div>
           <div class="gc-cert-row"><div class="gc-cert-dot"></div><div class="gc-cert-text"><strong>Microsoft</strong> Intensive Quantum</div></div>
@@ -481,9 +454,17 @@
             <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>
           </div>
         </div>
-        <div class="gc-stat">2</div>
+        <div class="gc-stat">5</div>
         <div class="gc-stat-label">Leadership roles</div>
-        <div style="margin-top:4px;">
+        <div style="margin-top:6px;">
+          <div class="gc-act-row">
+            <span class="gc-act-name">Splash at Yale</span>
+            <span class="gc-act-role">Instructor &amp; Client Lead</span>
+          </div>
+          <div class="gc-act-row">
+            <span class="gc-act-name">Yale Healthcare Consulting Collective</span>
+            <span class="gc-act-role">Client Lead</span>
+          </div>
           <div class="gc-act-row">
             <span class="gc-act-name">Yale College Council</span>
             <span class="gc-act-role">Director of Social Events</span>
@@ -491,6 +472,10 @@
           <div class="gc-act-row">
             <span class="gc-act-name">Yale Undergraduate Law Journal</span>
             <span class="gc-act-role">Online Editor</span>
+          </div>
+          <div class="gc-act-row">
+            <span class="gc-act-name">Global Strategy Consulting</span>
+            <span class="gc-act-role">Associate Consultant</span>
           </div>
         </div>
       </div>
@@ -504,7 +489,6 @@
     <div class="awards">
 
       <div class="award award--gold">
-        <div class="award-rank">I</div>
         <div class="award-content">
           <div class="award-name">Best Solo Hack, YHack</div>
           <div class="award-org">Yale University Annual Hackathon</div>
@@ -513,7 +497,6 @@
       </div>
 
       <div class="award award--gold">
-        <div class="award-rank">I</div>
         <div class="award-content">
           <div class="award-name">Gold &mdash; Hispanic Heritage Youth Award</div>
           <div class="award-org">National recognition</div>
@@ -522,7 +505,6 @@
       </div>
 
       <div class="award award--silver">
-        <div class="award-rank">II</div>
         <div class="award-content">
           <div class="award-name">National Merit Finalist</div>
           <div class="award-org">National Merit Scholarship Corporation</div>
@@ -531,7 +513,6 @@
       </div>
 
       <div class="award award--silver">
-        <div class="award-rank">II</div>
         <div class="award-content">
           <div class="award-name">National Honorable Mention &mdash; NCWIT Aspirations in Computing</div>
           <div class="award-org">National Center for Women &amp; IT</div>
@@ -540,7 +521,6 @@
       </div>
 
       <div class="award award--gold">
-        <div class="award-rank">I</div>
         <div class="award-content">
           <div class="award-name">Gold &mdash; Presidential Service Award</div>
           <div class="award-org">The White House</div>
@@ -549,7 +529,6 @@
       </div>
 
       <div class="award award--teal">
-        <div class="award-rank">F</div>
         <div class="award-content">
           <div class="award-name">RISE Global Finalist</div>
           <div class="award-org">Schmidt Futures &amp; Rhodes Trust</div>
@@ -558,7 +537,6 @@
       </div>
 
       <div class="award award--rose">
-        <div class="award-rank">&#9733;</div>
         <div class="award-content">
           <div class="award-name">Fan Favorite &mdash; Chicago Cubs STEAM Fair</div>
           <div class="award-org">Wrigley Field, Chicago</div>
@@ -567,7 +545,6 @@
       </div>
 
       <div class="award award--teal">
-        <div class="award-rank">S</div>
         <div class="award-content">
           <div class="award-name">CCIR STEM Scholarship &amp; Spotlight Scholar</div>
           <div class="award-org">Cambridge Centre for International Research</div>
