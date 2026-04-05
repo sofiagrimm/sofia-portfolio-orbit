@@ -167,51 +167,21 @@
     }
     .popup-body strong{font-weight:500;color:rgba(220,232,255,0.88);}
 
-    /* ── MOBILE ── */
     @media (max-width: 768px) {
       html, body { overflow: auto; height: auto; }
-
-      nav {
-        padding: 0 20px;
-        height: 58px;
-      }
+      nav { padding: 0 20px; height: 58px; }
       .nav-name { font-size: 22px; }
-      .nav-links a {
-        font-size: 10px;
-        padding: 5px 8px;
-        letter-spacing: 0.10em;
-      }
+      .nav-links a { font-size: 10px; padding: 5px 8px; letter-spacing: 0.10em; }
       .nav-links .divider { display: none; }
-
       .card-ring { display: none; }
-
-      .ui {
-        position: relative;
-        min-height: 100svh;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        padding: 80px 20px 80px;
-      }
-
-      .center-card {
-        position: relative;
-        left: auto; top: auto;
-        transform: none;
-        width: 100%;
-        max-width: 340px;
-        padding: 32px 24px 28px;
-        border-radius: 20px;
-      }
-
+      .ui { position: relative; min-height: 100svh; display: flex; align-items: center; justify-content: center; padding: 80px 20px 80px; }
+      .center-card { position: relative; left: auto; top: auto; transform: none; width: 100%; max-width: 340px; padding: 32px 24px 28px; border-radius: 20px; }
       .card-eyebrow { font-size: 11px; margin-bottom: 14px; }
       .card-title { font-size: 36px; }
       .card-rule { margin: 16px auto; }
       .card-sub { font-size: 11px; }
-
       .coords { left: 20px; bottom: 20px; }
       .tagline { right: 20px; bottom: 20px; font-size: 9px; }
-
       #popupBox { padding: 28px 22px 24px; }
       .popup-title { font-size: 26px; }
       .popup-body { font-size: 12px; }
@@ -287,6 +257,288 @@
         accentHex: '#ffcc44'
       }
     ];
+
+    // Build a high-resolution Earth texture on canvas using detailed continent polygons
+    // Coordinates are [lon, lat] in degrees; mapped to equirectangular UV
+    function buildEarthTexture() {
+      const W = 2048, H = 1024;
+      const c = document.createElement('canvas');
+      c.width = W; c.height = H;
+      const ctx = c.getContext('2d');
+
+      // Deep ocean
+      const oceanGrad = ctx.createLinearGradient(0,0,0,H);
+      oceanGrad.addColorStop(0,   '#0a1a3a');
+      oceanGrad.addColorStop(0.5, '#0d2244');
+      oceanGrad.addColorStop(1,   '#091830');
+      ctx.fillStyle = oceanGrad;
+      ctx.fillRect(0, 0, W, H);
+
+      // Convert lon/lat -> canvas x,y
+      function p(lon, lat) {
+        return [(lon + 180) / 360 * W, (90 - lat) / 180 * H];
+      }
+
+      function drawLand(polys, fill, stroke) {
+        ctx.fillStyle = fill || '#2d5a3d';
+        ctx.strokeStyle = stroke || '#3a7050';
+        ctx.lineWidth = 0.8;
+        for (const poly of polys) {
+          ctx.beginPath();
+          const first = p(poly[0][0], poly[0][1]);
+          ctx.moveTo(first[0], first[1]);
+          for (let i = 1; i < poly.length; i++) {
+            const pt = p(poly[i][0], poly[i][1]);
+            ctx.lineTo(pt[0], pt[1]);
+          }
+          ctx.closePath();
+          ctx.fill();
+          ctx.stroke();
+        }
+      }
+
+      const landFill   = '#263d2b';
+      const landStroke = '#325040';
+      const highlightFill   = '#2e4a33';
+
+      // ── NORTH AMERICA ──────────────────────────────────────────────────────
+      drawLand([[
+        [-168,72],[-140,72],[-130,69],[-120,68],[-100,70],[-85,70],[-78,72],[-70,73],
+        [-60,76],[-64,78],[-68,80],[-80,82],[-90,82],[-100,80],[-114,78],[-130,76],
+        [-140,75],[-155,73],[-163,70],[-168,72]
+      ]], landFill, landStroke); // Arctic Canada
+
+      drawLand([[
+        [-168,70],[-156,68],[-145,62],[-138,58],[-130,54],[-124,48],[-124,42],
+        [-120,37],[-117,32],[-110,30],[-105,22],[-98,20],[-92,18],[-88,16],
+        [-85,22],[-88,26],[-90,28],[-94,30],[-96,26],[-100,28],[-104,30],
+        [-106,32],[-112,28],[-116,30],[-118,34],[-122,38],[-122,46],[-126,50],
+        [-130,55],[-138,58],[-145,62],[-152,60],[-156,58],[-160,56],[-165,60],
+        [-166,64],[-168,68],[-168,70]
+      ]], landFill, landStroke); // Alaska + Pacific coast
+
+      drawLand([[
+        [-124,48],[-116,44],[-112,38],[-110,35],[-104,30],[-98,26],[-94,30],
+        [-90,30],[-88,30],[-86,30],[-84,32],[-80,32],[-76,34],[-74,38],
+        [-72,42],[-70,44],[-66,46],[-64,44],[-60,46],[-56,48],[-54,50],
+        [-58,52],[-62,54],[-66,56],[-70,56],[-76,54],[-80,52],[-84,50],
+        [-88,48],[-92,48],[-96,48],[-100,48],[-104,48],[-108,48],[-112,48],
+        [-116,48],[-124,48]
+      ]], landFill, landStroke); // Main US/Canada body
+
+      drawLand([[
+        [-117,32],[-110,30],[-105,25],[-100,22],[-96,20],[-92,18],[-90,20],
+        [-92,24],[-96,28],[-100,30],[-104,32],[-110,30],[-117,32]
+      ]], landFill, landStroke); // Mexico
+
+      drawLand([[
+        [-90,20],[-86,16],[-84,12],[-80,8],[-77,8],[-75,10],[-78,14],
+        [-82,18],[-86,20],[-90,20]
+      ]], landFill, landStroke); // Central America
+
+      drawLand([[
+        [-60,12],[-62,10],[-66,10],[-68,12],[-70,14],[-72,12],[-74,12],
+        [-76,8],[-78,4],[-76,0],[-72,-2],[-68,-4],[-64,-4],[-60,0],
+        [-56,2],[-52,4],[-50,2],[-48,0],[-50,-4],[-52,-8],[-52,-14],
+        [-54,-18],[-58,-22],[-60,-26],[-62,-30],[-62,-34],[-58,-38],
+        [-56,-40],[-60,-42],[-64,-42],[-66,-40],[-68,-36],[-66,-32],
+        [-68,-28],[-66,-24],[-64,-22],[-60,-18],[-58,-14],[-56,-10],
+        [-52,-6],[-48,-2],[-44,0],[-40,-2],[-38,-6],[-36,-10],[-36,-14],
+        [-38,-18],[-40,-22],[-42,-24],[-44,-22],[-46,-18],[-48,-16],
+        [-50,-12],[-52,-8],[-54,-4],[-56,0],[-56,4],[-54,6],[-52,6],
+        [-50,4],[-48,4],[-44,4],[-40,6],[-38,8],[-36,8],[-34,6],
+        [-36,4],[-38,2],[-40,0],[-38,-2],[-36,-4],[-34,-6],[-34,-10],
+        [-36,-14],[-38,-18],[-40,-22],[-44,-24],[-48,-28],[-50,-30],
+        [-52,-32],[-52,-36],[-56,-40],[-60,-44],[-64,-44],[-68,-40],
+        [-68,-36],[-66,-28],[-68,-24],[-70,-20],[-70,-16],[-68,-12],
+        [-66,-8],[-62,-4],[-58,0],[-54,4],[-52,8],[-50,10],[-52,10],
+        [-54,10],[-56,8],[-58,6],[-60,8],[-60,10],[-60,12]
+      ]], landFill, landStroke); // South America
+
+      // ── GREENLAND ──────────────────────────────────────────────────────────
+      drawLand([[
+        [-44,82],[-30,80],[-20,78],[-18,76],[-20,74],[-24,72],[-28,70],
+        [-32,68],[-36,66],[-40,64],[-44,62],[-46,64],[-48,66],[-50,68],
+        [-52,70],[-54,72],[-54,76],[-50,78],[-46,80],[-44,82]
+      ]], landFill, landStroke);
+
+      // ── EUROPE ─────────────────────────────────────────────────────────────
+      drawLand([[
+        [-10,36],[0,36],[4,38],[8,40],[12,38],[16,38],[18,40],[20,42],
+        [24,42],[26,40],[28,42],[30,44],[28,46],[26,48],[24,50],[22,52],
+        [20,54],[18,56],[16,58],[14,60],[12,62],[10,64],[8,66],[6,68],
+        [4,70],[2,72],[0,74],[-2,72],[-4,70],[-6,68],[-8,66],[-10,64],
+        [-12,62],[-14,60],[-16,58],[-14,56],[-12,54],[-10,52],[-8,50],
+        [-8,48],[-6,46],[-4,44],[-2,42],[-4,38],[-8,38],[-10,36]
+      ]], landFill, landStroke);
+
+      // Scandinavian peninsula
+      drawLand([[
+        [4,56],[8,58],[10,60],[12,62],[14,64],[16,66],[18,68],[20,70],
+        [22,72],[24,70],[26,68],[28,66],[28,64],[26,62],[24,60],[22,58],
+        [20,56],[18,58],[16,56],[14,56],[12,56],[10,56],[8,56],[6,56],[4,56]
+      ]], landFill, landStroke);
+
+      // Iberian peninsula detail
+      drawLand([[[-10,36],[-8,36],[-6,36],[-4,36],[-2,36],[0,36],[2,38],
+        [2,40],[0,42],[-2,44],[-4,44],[-6,44],[-8,44],[-10,44],[-10,40],[-10,36]
+      ]], landFill, landStroke);
+
+      // Italy boot
+      drawLand([[[12,44],[14,44],[16,42],[18,40],[16,38],[14,38],[12,40],[12,44]]], landFill, landStroke);
+
+      // UK
+      drawLand([[[-4,50],[-2,50],[0,52],[0,54],[-2,56],[-4,58],[-6,58],[-6,56],
+        [-4,54],[-2,52],[-4,50]
+      ]], landFill, landStroke);
+      drawLand([[[-8,54],[-6,52],[-4,52],[-6,54],[-8,56],[-8,54]]], landFill, landStroke); // Ireland
+
+      // ── AFRICA ─────────────────────────────────────────────────────────────
+      drawLand([[
+        [-18,16],[-14,14],[-10,10],[-8,6],[-4,4],[0,4],[4,4],[8,4],
+        [8,6],[10,8],[12,10],[14,12],[16,14],[18,14],[20,12],[22,10],
+        [24,10],[26,8],[28,6],[30,4],[32,2],[34,0],[36,-2],[38,-4],
+        [40,-8],[42,-12],[44,-14],[42,-18],[40,-20],[38,-22],[36,-24],
+        [34,-28],[32,-30],[30,-32],[28,-34],[26,-34],[24,-32],[22,-30],
+        [20,-28],[18,-26],[16,-24],[14,-22],[12,-20],[10,-18],[8,-16],
+        [6,-14],[4,-12],[2,-10],[0,-8],[-2,-6],[-4,-6],[-6,-4],[-8,-4],
+        [-12,-4],[-14,-2],[-16,0],[-18,2],[-18,6],[-16,10],[-14,14],
+        [-16,16],[-18,16]
+      ]], landFill, landStroke);
+
+      // Morocco/NW Africa coast detail
+      drawLand([[[-6,36],[-4,36],[-2,36],[0,34],[2,32],[4,30],[4,28],[2,26],
+        [0,24],[-2,22],[-4,20],[-6,18],[-8,16],[-10,16],[-12,16],[-14,16],
+        [-16,16],[-18,16],[-18,20],[-16,22],[-14,24],[-12,24],[-10,22],
+        [-8,22],[-6,26],[-4,28],[-2,30],[-2,32],[-4,34],[-6,36]
+      ]], landFill, landStroke);
+
+      // Madagascar
+      drawLand([[[44,-12],[46,-14],[50,-16],[50,-20],[48,-24],[46,-26],[44,-24],
+        [44,-20],[44,-16],[44,-12]
+      ]], landFill, landStroke);
+
+      // ── ASIA ───────────────────────────────────────────────────────────────
+      drawLand([[
+        [26,42],[30,42],[34,42],[38,40],[40,38],[42,36],[44,36],[46,38],
+        [48,40],[50,42],[52,44],[56,44],[60,44],[64,40],[68,38],[70,36],
+        [72,34],[74,34],[76,32],[78,30],[80,28],[82,28],[84,26],[86,26],
+        [88,24],[90,22],[92,22],[94,20],[96,18],[98,18],[100,20],[102,18],
+        [104,16],[104,12],[100,8],[100,4],[104,2],[106,2],[108,4],[110,4],
+        [112,6],[114,8],[116,8],[118,8],[120,10],[122,12],[124,14],[126,16],
+        [128,18],[130,20],[132,22],[134,24],[136,26],[138,28],[140,30],
+        [140,32],[138,34],[136,36],[134,38],[132,40],[130,42],[128,44],
+        [128,48],[126,50],[124,52],[122,54],[120,56],[118,58],[116,60],
+        [114,62],[112,64],[110,66],[108,68],[106,70],[104,72],[100,72],
+        [96,70],[92,68],[88,68],[84,68],[80,68],[76,66],[72,64],[68,64],
+        [64,64],[60,62],[56,60],[52,58],[48,56],[44,54],[40,52],[36,50],
+        [32,48],[28,46],[26,44],[26,42]
+      ]], landFill, landStroke);
+
+      // Arabian peninsula
+      drawLand([[[36,30],[40,28],[44,24],[48,20],[52,16],[56,14],[60,14],[62,16],
+        [60,18],[56,22],[52,24],[48,28],[44,30],[40,32],[36,32],[36,30]
+      ]], landFill, landStroke);
+
+      // Indian subcontinent extra detail
+      drawLand([[[66,22],[68,24],[70,22],[72,20],[72,18],[70,16],[68,14],[66,12],
+        [64,10],[64,8],[66,8],[68,10],[70,12],[72,14],[74,16],[76,16],
+        [78,14],[80,12],[80,10],[78,8],[76,8],[74,8],[72,8],[70,8],
+        [68,8],[66,10],[64,12],[62,16],[60,20],[62,22],[64,22],[66,22]
+      ]], landFill, landStroke);
+
+      // Southeast Asia peninsulas
+      drawLand([[[100,20],[102,18],[104,16],[106,14],[106,10],[104,8],[102,6],
+        [100,6],[100,8],[100,10],[100,14],[100,16],[100,20]
+      ]], landFill, landStroke);
+
+      // Japan
+      drawLand([[[130,32],[132,34],[134,36],[136,38],[138,38],[140,36],[140,34],
+        [138,32],[136,32],[134,32],[132,32],[130,32]
+      ]], landFill, landStroke);
+      drawLand([[[130,44],[132,44],[134,44],[136,42],[136,40],[134,40],[132,42],[130,44]]], landFill, landStroke);
+      drawLand([[[140,42],[142,44],[144,44],[144,42],[142,42],[140,42]]], landFill, landStroke);
+
+      // Korean peninsula
+      drawLand([[[126,34],[128,36],[130,38],[128,40],[126,40],[124,38],[124,36],[126,34]]], landFill, landStroke);
+
+      // ── RUSSIA / SIBERIA ──────────────────────────────────────────────────
+      drawLand([[
+        [28,72],[40,70],[52,70],[60,68],[72,68],[80,70],[90,72],[100,72],
+        [110,72],[120,72],[130,70],[140,68],[150,64],[160,60],[164,58],
+        [166,56],[168,56],[168,60],[166,62],[164,64],[162,66],[160,68],
+        [156,70],[150,72],[140,74],[130,74],[120,74],[110,74],[100,74],
+        [90,74],[80,72],[70,72],[60,72],[50,72],[40,72],[30,72],[28,72]
+      ]], landFill, landStroke);
+
+      // Kamchatka
+      drawLand([[[160,56],[162,54],[162,52],[160,50],[158,52],[158,54],[160,56]]], landFill, landStroke);
+
+      // ── AUSTRALIA ─────────────────────────────────────────────────────────
+      drawLand([[
+        [114,-22],[116,-20],[118,-18],[120,-18],[122,-18],[124,-18],[126,-16],
+        [128,-14],[130,-12],[132,-12],[134,-12],[136,-12],[138,-14],[140,-14],
+        [142,-14],[144,-16],[146,-18],[148,-20],[150,-22],[152,-24],[152,-28],
+        [152,-32],[150,-36],[148,-38],[146,-38],[144,-36],[142,-34],[140,-34],
+        [138,-34],[136,-34],[134,-34],[132,-32],[130,-32],[128,-34],[126,-34],
+        [124,-34],[122,-34],[120,-32],[118,-30],[116,-28],[114,-26],[114,-22]
+      ]], landFill, landStroke);
+
+      // New Zealand
+      drawLand([[[168,-44],[170,-44],[172,-42],[174,-40],[172,-38],[170,-38],[168,-40],[168,-44]]], landFill, landStroke);
+      drawLand([[[174,-36],[176,-36],[176,-38],[174,-40],[172,-40],[172,-38],[174,-36]]], landFill, landStroke);
+
+      // ── ANTARCTICA ────────────────────────────────────────────────────────
+      drawLand([[
+        [-180,-72],[-160,-70],[-140,-68],[-120,-68],[-100,-70],[-80,-72],
+        [-60,-70],[-40,-70],[-20,-72],[0,-72],[20,-72],[40,-70],[60,-68],
+        [80,-68],[100,-70],[120,-70],[140,-68],[160,-68],[180,-70],
+        [180,-90],[-180,-90],[-180,-72]
+      ]], '#3a4a5a', '#4a5a6a');
+
+      // ── ICECAPS (Greenland ice highlight) ─────────────────────────────────
+      // Add subtle ocean detail — shallow seas
+      ctx.fillStyle = 'rgba(20,50,90,0.15)';
+      ctx.beginPath();
+      // Bering sea region
+      const bs = [[-180,52],[-170,54],[-160,56],[-170,60],[-180,60]];
+      ctx.moveTo(...p(bs[0][0],bs[0][1]));
+      bs.slice(1).forEach(pt => ctx.lineTo(...p(pt[0],pt[1])));
+      ctx.closePath();
+      ctx.fill();
+
+      // Add graticule lines (lat/lon grid) subtly
+      ctx.strokeStyle = 'rgba(80,140,180,0.06)';
+      ctx.lineWidth = 0.5;
+      for (let lon = -180; lon <= 180; lon += 30) {
+        ctx.beginPath();
+        const [x] = p(lon, 0);
+        ctx.moveTo(x, 0);
+        ctx.lineTo(x, H);
+        ctx.stroke();
+      }
+      for (let lat = -90; lat <= 90; lat += 30) {
+        ctx.beginPath();
+        const [, y] = p(0, lat);
+        ctx.moveTo(0, y);
+        ctx.lineTo(W, y);
+        ctx.stroke();
+      }
+
+      // Atmospheric haze overlay at poles
+      const topGrad = ctx.createLinearGradient(0,0,0,H*0.12);
+      topGrad.addColorStop(0,'rgba(140,200,255,0.06)');
+      topGrad.addColorStop(1,'rgba(140,200,255,0)');
+      ctx.fillStyle = topGrad;
+      ctx.fillRect(0,0,W,H*0.12);
+      const botGrad = ctx.createLinearGradient(0,H*0.88,0,H);
+      botGrad.addColorStop(0,'rgba(200,230,255,0.04)');
+      botGrad.addColorStop(1,'rgba(200,230,255,0.12)');
+      ctx.fillStyle = botGrad;
+      ctx.fillRect(0,H*0.88,W,H*0.12);
+
+      return c;
+    }
   </script>
 
   <script>
@@ -390,44 +642,86 @@
         return new THREE.CanvasTexture(c);
       }
 
+      // Build Earth texture
+      var earthCanvas = buildEarthTexture();
+      var earthTex = new THREE.CanvasTexture(earthCanvas);
+      earthTex.needsUpdate = true;
+
+      // Atmosphere glow sprite for Earth
+      var atmCanvas = document.createElement('canvas');
+      atmCanvas.width = atmCanvas.height = 256;
+      var atmCtx = atmCanvas.getContext('2d');
+      var atmGrad = atmCtx.createRadialGradient(128,128,50,128,128,128);
+      atmGrad.addColorStop(0, 'rgba(60,140,255,0)');
+      atmGrad.addColorStop(0.6, 'rgba(60,140,255,0.08)');
+      atmGrad.addColorStop(0.82, 'rgba(80,160,255,0.22)');
+      atmGrad.addColorStop(1, 'rgba(100,180,255,0)');
+      atmCtx.fillStyle = atmGrad;
+      atmCtx.fillRect(0,0,256,256);
+
       var configs=[
         {color:0x44ccff,emissive:0x0a2a44,glow:'rgba(60,200,255,',ringColor:'rgba(60,200,255,1)',ringTilt:{x:0.42,z:0.18},spinAxis:new THREE.Vector3(0.2,1,0.1).normalize(),spinSpeed:0.008},
         {color:0x5588ff,emissive:0x080e38,glow:'rgba(80,120,255,',ringColor:'rgba(80,120,255,1)',ringTilt:{x:0.50,z:-0.14},spinAxis:new THREE.Vector3(-0.1,1,0.3).normalize(),spinSpeed:0.012},
         {color:0xcc88ff,emissive:0x1a0830,glow:'rgba(200,120,255,',ringColor:'rgba(200,120,255,1)',ringTilt:{x:0.32,z:0.28},spinAxis:new THREE.Vector3(0.3,0.9,-0.2).normalize(),spinSpeed:0.006},
-        {color:0x44eeaa,emissive:0x042818,glow:'rgba(40,220,140,',ringColor:'rgba(40,220,140,1)',ringTilt:{x:0.46,z:0.08},spinAxis:new THREE.Vector3(-0.2,1,0.15).normalize(),spinSpeed:0.010},
+        // Planet index 3 = Earth globe
+        {isEarth:true,emissive:0x000816,glow:'rgba(60,140,255,',ringColor:null,spinAxis:new THREE.Vector3(0.07,1,0).normalize(),spinSpeed:0.004},
         {color:0xffcc44,emissive:0x281a00,glow:'rgba(255,200,50,',ringColor:'rgba(255,200,60,1)',ringTilt:{x:0.38,z:-0.22},spinAxis:new THREE.Vector3(0.15,0.95,0.25).normalize(),spinSpeed:0.007}
       ];
 
       var R=16.5,Z=-18,SPEED=0.0004;
-      var sphereGeo=new THREE.SphereGeometry(1.9,64,64);
+      var sphereGeo=new THREE.SphereGeometry(1.9,128,64);
       var groups=[],meshes=[];
       var quat=new THREE.Quaternion();
 
       for(var i=0;i<5;i++){
         var cfg=configs[i];
-        var mat=new THREE.MeshStandardMaterial({color:cfg.color,emissive:cfg.emissive,emissiveIntensity:0.35,metalness:0.18,roughness:0.3});
+        var mat;
+        if(cfg.isEarth){
+          mat = new THREE.MeshStandardMaterial({
+            map: earthTex,
+            emissive: new THREE.Color(cfg.emissive),
+            emissiveIntensity: 0.08,
+            metalness: 0.0,
+            roughness: 0.7
+          });
+        } else {
+          mat=new THREE.MeshStandardMaterial({color:cfg.color,emissive:cfg.emissive,emissiveIntensity:0.35,metalness:0.18,roughness:0.3});
+        }
+
         var gc=document.createElement('canvas');gc.width=gc.height=128;
-        var ctx=gc.getContext('2d');
-        var grad=ctx.createRadialGradient(64,64,0,64,64,64);
-        grad.addColorStop(0,cfg.glow+'0.7)');grad.addColorStop(0.4,cfg.glow+'0.22)');grad.addColorStop(1,cfg.glow+'0)');
-        ctx.fillStyle=grad;ctx.fillRect(0,0,128,128);
+        var ctx2=gc.getContext('2d');
+        if(cfg.isEarth){
+          // Use atmospheric glow
+          ctx2.drawImage(atmCanvas,0,0,128,128);
+        } else {
+          var grad=ctx2.createRadialGradient(64,64,0,64,64,64);
+          grad.addColorStop(0,cfg.glow+'0.7)');grad.addColorStop(0.4,cfg.glow+'0.22)');grad.addColorStop(1,cfg.glow+'0)');
+          ctx2.fillStyle=grad;ctx2.fillRect(0,0,128,128);
+        }
         var sprite=new THREE.Sprite(new THREE.SpriteMaterial({map:new THREE.CanvasTexture(gc),transparent:true,depthWrite:false}));
-        sprite.scale.set(4.8,4.8,1);
-        var ringGeo=new THREE.RingGeometry(2.8,3.5,128);
-        var rpos=ringGeo.attributes.position,ruv=ringGeo.attributes.uv,rv3=new THREE.Vector3();
-        for(var j=0;j<rpos.count;j++){rv3.fromBufferAttribute(rpos,j);ruv.setXY(j,(rv3.length()-2.8)/(3.5-2.8),0.5);}
-        var planetRing=new THREE.Mesh(ringGeo,new THREE.MeshBasicMaterial({map:makeRingTexture(cfg.ringColor),side:THREE.DoubleSide,transparent:true,opacity:0.7,depthWrite:false}));
-        planetRing.rotation.x=cfg.ringTilt.x;planetRing.rotation.z=cfg.ringTilt.z;
-        var sphere=new THREE.Mesh(sphereGeo,mat);
+        sprite.scale.set(cfg.isEarth ? 5.2 : 4.8, cfg.isEarth ? 5.2 : 4.8, 1);
+
         var innerGroup=new THREE.Group();
+        var sphere=new THREE.Mesh(sphereGeo,mat);
         innerGroup.add(sphere); innerGroup.add(sprite);
         var group=new THREE.Group();
-        group.add(innerGroup); group.add(planetRing);
+        group.add(innerGroup);
+
+        if(!cfg.isEarth && cfg.ringColor){
+          var ringGeo=new THREE.RingGeometry(2.8,3.5,128);
+          var rpos=ringGeo.attributes.position,ruv=ringGeo.attributes.uv,rv3=new THREE.Vector3();
+          for(var j=0;j<rpos.count;j++){rv3.fromBufferAttribute(rpos,j);ruv.setXY(j,(rv3.length()-2.8)/(3.5-2.8),0.5);}
+          var planetRing=new THREE.Mesh(ringGeo,new THREE.MeshBasicMaterial({map:makeRingTexture(cfg.ringColor),side:THREE.DoubleSide,transparent:true,opacity:0.7,depthWrite:false}));
+          planetRing.rotation.x=cfg.ringTilt.x;planetRing.rotation.z=cfg.ringTilt.z;
+          group.add(planetRing);
+        }
+
         group.userData.angleOffset=i*(2*Math.PI/5);
         group.userData.spinAxis=cfg.spinAxis;
         group.userData.spinSpeed=cfg.spinSpeed;
         group.userData.innerGroup=innerGroup;
         group.userData.planetIndex=i;
+        group.userData.isEarth=!!cfg.isEarth;
         group.position.set(Math.cos(group.userData.angleOffset)*R,Math.sin(group.userData.angleOffset)*R,Z);
         scene.add(group);
         groups.push(group);
