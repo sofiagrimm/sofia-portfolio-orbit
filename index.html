@@ -133,9 +133,16 @@
         var lp=[];con.edges.forEach(function(e){lp.push(pts[e[0]],pts[e[1]]);});
         scene.add(new THREE.LineSegments(new THREE.BufferGeometry().setFromPoints(lp),new THREE.LineBasicMaterial({color:0x3a5888,transparent:true,opacity:0.22})));
       });
-      var R=16.5,Z=-18,SPEED=0.0004;
-      // Orbit ring — radius matches planet orbit path
-      scene.add(new THREE.Mesh(new THREE.RingGeometry(R-0.2,R+0.2,180),new THREE.MeshBasicMaterial({color:0x2a3a5a,side:THREE.DoubleSide,transparent:true,opacity:0.15})));
+
+      // Orbit radius reduced to 11 so the static ring sits tightly around/through the planets
+      var R=11,Z=-18,SPEED=0.0004;
+
+      // Static orbit path — thin band at exactly R, opacity bumped to 0.25 so it reads clearly
+      scene.add(new THREE.Mesh(
+        new THREE.RingGeometry(R-0.12,R+0.12,180),
+        new THREE.MeshBasicMaterial({color:0x4a6a9a,side:THREE.DoubleSide,transparent:true,opacity:0.25})
+      ));
+
       function makeRingTex(gb){var c=document.createElement('canvas');c.width=256;c.height=1;var ctx=c.getContext('2d');var g=ctx.createLinearGradient(0,0,256,0);g.addColorStop(0,gb.replace('1)','0.0)'));g.addColorStop(0.08,gb.replace('1)','0.8)'));g.addColorStop(0.4,gb.replace('1)','0.55)'));g.addColorStop(0.65,gb.replace('1)','0.25)'));g.addColorStop(1,gb.replace('1)','0.0)'));ctx.fillStyle=g;ctx.fillRect(0,0,256,1);return new THREE.CanvasTexture(c);}
       var configs=[
         {color:0x44ccff,emissive:0x0a2a44,glow:'rgba(60,200,255,',ringColor:'rgba(60,200,255,1)',ringTilt:{x:0.42,z:0.18},spinAxis:new THREE.Vector3(0.2,1,0.1).normalize(),spinSpeed:0.008},
@@ -144,11 +151,8 @@
         {color:0x44eeaa,emissive:0x00281a,glow:'rgba(60,240,170,',ringColor:'rgba(60,240,170,1)',ringTilt:{x:0.44,z:0.10},spinAxis:new THREE.Vector3(-0.2,1,0.15).normalize(),spinSpeed:0.009},
         {color:0xffcc44,emissive:0x281a00,glow:'rgba(255,200,50,',ringColor:'rgba(255,200,60,1)',ringTilt:{x:0.38,z:-0.22},spinAxis:new THREE.Vector3(0.15,0.95,0.25).normalize(),spinSpeed:0.007}
       ];
-      // Planet sphere radius = 1.9
-      // Ring passes through planet midpoint: inner = 1.9 - 0.6 = 1.3, outer = 1.9 + 0.6 = 2.5
-      var PLANET_R = 1.9;
-      var RING_INNER = PLANET_R - 0.6;
-      var RING_OUTER = PLANET_R + 0.6;
+      // Planet radius 1.9; per-planet Saturn ring straddles equator: inner=1.3, outer=2.5
+      var PLANET_R=1.9,RING_INNER=1.3,RING_OUTER=2.5;
       var sphereGeo=new THREE.SphereGeometry(PLANET_R,128,64);
       var groups=[],meshes=[];
       var quat=new THREE.Quaternion();
