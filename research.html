@@ -7,7 +7,10 @@
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Inter:wght@300;400;500&display=swap');
     *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-    html,body{width:100%;height:100%;overflow:hidden;background:#060d18;font-family:'Inter',sans-serif;color:#e9f0ff;}
+    html,body{width:100%;height:100%;background:#060d18;font-family:'Inter',sans-serif;color:#e9f0ff;}
+
+    /* On desktop we lock overflow to the shell; on mobile body scrolls */
+    body { overflow: hidden; }
 
     .nebula{
       position:fixed;inset:0;z-index:1;pointer-events:none;
@@ -16,13 +19,15 @@
         radial-gradient(ellipse 45% 32% at 82% 28%, rgba(30,80,200,0.07) 0%, transparent 70%),
         radial-gradient(ellipse 50% 44% at 50% 50%, rgba(20,40,120,0.05) 0%, transparent 65%);
     }
+
+    /* ── NAV ─────────────────────────────────────────── */
     nav{
       position:fixed;top:0;left:0;right:0;z-index:20;
       display:flex;align-items:center;justify-content:space-between;
       padding:0 48px;height:68px;
     }
     .nav-name{font-family:'Cormorant Garamond',serif;font-size:28px;font-weight:300;font-style:italic;
-      letter-spacing:0.06em;color:rgba(220,232,255,0.9);text-decoration:none;}
+      letter-spacing:0.06em;color:rgba(220,232,255,0.9);text-decoration:none;white-space:nowrap;}
     .nav-links{display:flex;align-items:center;gap:4px;}
     .nav-links a{font-size:13px;font-weight:400;letter-spacing:0.13em;text-transform:uppercase;
       color:rgba(160,190,255,0.5);text-decoration:none;padding:7px 16px;border-radius:4px;
@@ -30,16 +35,19 @@
     .nav-links a:hover,.nav-links a.active{color:rgba(220,235,255,0.9);background:rgba(100,140,255,0.08);}
     .nav-links .divider{color:rgba(100,130,200,0.2);font-size:13px;user-select:none;}
 
+    /* ── PAGE SHELL ──────────────────────────────────── */
+    /* Fluid left panel: shrinks from 340px down to 240px as viewport narrows */
     .page-shell{
       position:fixed;inset:0;z-index:10;
       display:grid;
-      grid-template-columns:340px 1fr;
+      grid-template-columns: clamp(240px, 28vw, 340px) 1fr;
       padding-top:68px;
     }
 
+    /* ── LEFT PANEL ──────────────────────────────────── */
     .left-panel{
       overflow-y:auto;overflow-x:hidden;
-      padding:48px 36px 60px 48px;
+      padding:48px 28px 60px 40px;
       display:flex;flex-direction:column;
       border-right:1px solid rgba(100,130,220,0.10);
       background:rgba(6,13,24,0.55);
@@ -63,9 +71,10 @@
     .section-label::after{content:'';flex:1;height:1px;background:linear-gradient(90deg,rgba(100,130,200,0.18),transparent);}
     .section-label:first-of-type{margin-top:0;}
 
+    /* ── ENTRY CARDS ─────────────────────────────────── */
     .entry{
       position:relative;overflow:hidden;
-      padding:20px 20px 18px 22px;
+      padding:18px 18px 16px 20px;
       border-radius:14px;
       background:rgba(8,14,46,0.55);
       border:1px solid rgba(100,130,220,0.13);
@@ -86,19 +95,22 @@
       border-color:var(--border);
       box-shadow:0 8px 36px rgba(0,0,0,0.38), -4px 0 28px var(--glow);
     }
-    .entry-header{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:8px;}
-    .entry-label{font-size:9px;font-weight:500;letter-spacing:0.22em;text-transform:uppercase;color:var(--accent);}
-    .entry-loc{font-size:9px;letter-spacing:0.12em;text-transform:uppercase;color:rgba(150,175,255,0.38);white-space:nowrap;}
-    .entry-title{font-size:13.5px;font-weight:400;color:rgba(220,234,255,0.92);line-height:1.45;margin-bottom:6px;}
-    .entry-body{font-size:12px;font-weight:300;line-height:1.7;color:rgba(190,210,255,0.55);}
+    .entry-header{display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:7px;}
+    .entry-label{font-size:9px;font-weight:500;letter-spacing:0.20em;text-transform:uppercase;color:var(--accent);}
+    .entry-loc{font-size:9px;letter-spacing:0.10em;text-transform:uppercase;color:rgba(150,175,255,0.38);white-space:nowrap;flex-shrink:0;}
+    .entry-title{font-size:13px;font-weight:400;color:rgba(220,234,255,0.92);line-height:1.45;margin-bottom:5px;}
+    .entry-body{font-size:11.5px;font-weight:300;line-height:1.65;color:rgba(190,210,255,0.55);}
 
-    .e--cyan{--stripe:linear-gradient(180deg,rgba(40,210,255,0.8),rgba(40,210,255,0.1));--border:rgba(60,220,255,0.36);--glow:rgba(40,200,255,0.07);--accent:rgba(100,225,255,0.88);}
-    .e--blue{--stripe:linear-gradient(180deg,rgba(80,140,255,0.8),rgba(80,140,255,0.1));--border:rgba(100,160,255,0.40);--glow:rgba(80,140,255,0.08);--accent:rgba(140,190,255,0.88);}
+    /* ── COLOR THEMES ────────────────────────────────── */
+    .e--cyan  {--stripe:linear-gradient(180deg,rgba(40,210,255,0.8),rgba(40,210,255,0.1));--border:rgba(60,220,255,0.36);--glow:rgba(40,200,255,0.07);--accent:rgba(100,225,255,0.88);}
+    .e--blue  {--stripe:linear-gradient(180deg,rgba(80,140,255,0.8),rgba(80,140,255,0.1));--border:rgba(100,160,255,0.40);--glow:rgba(80,140,255,0.08);--accent:rgba(140,190,255,0.88);}
     .e--purple{--stripe:linear-gradient(180deg,rgba(180,100,255,0.8),rgba(180,100,255,0.1));--border:rgba(190,120,255,0.40);--glow:rgba(160,80,255,0.08);--accent:rgba(210,165,255,0.88);}
-    .e--green{--stripe:linear-gradient(180deg,rgba(40,220,140,0.8),rgba(40,220,140,0.1));--border:rgba(60,230,150,0.36);--glow:rgba(40,200,120,0.07);--accent:rgba(80,235,165,0.88);}
-    .e--gold{--stripe:linear-gradient(180deg,rgba(255,200,60,0.8),rgba(255,200,60,0.1));--border:rgba(255,215,90,0.36);--glow:rgba(240,180,40,0.08);--accent:rgba(255,220,100,0.90);}
-    .e--rose{--stripe:linear-gradient(180deg,rgba(255,100,160,0.8),rgba(255,100,160,0.1));--border:rgba(255,130,175,0.36);--glow:rgba(240,80,140,0.07);--accent:rgba(255,155,190,0.88);}
+    .e--green {--stripe:linear-gradient(180deg,rgba(40,220,140,0.8),rgba(40,220,140,0.1));--border:rgba(60,230,150,0.36);--glow:rgba(40,200,120,0.07);--accent:rgba(80,235,165,0.88);}
+    .e--gold  {--stripe:linear-gradient(180deg,rgba(255,200,60,0.8),rgba(255,200,60,0.1));--border:rgba(255,215,90,0.36);--glow:rgba(240,180,40,0.08);--accent:rgba(255,220,100,0.90);}
+    .e--rose  {--stripe:linear-gradient(180deg,rgba(255,100,160,0.8),rgba(255,100,160,0.1));--border:rgba(255,130,175,0.36);--glow:rgba(240,80,140,0.07);--accent:rgba(255,155,190,0.88);}
+    .e--orange{--stripe:linear-gradient(180deg,rgba(255,150,50,0.8),rgba(255,150,50,0.1));--border:rgba(255,170,70,0.36);--glow:rgba(240,130,30,0.07);--accent:rgba(255,185,100,0.90);}
 
+    /* ── RIGHT PANEL / GLOBE ─────────────────────────── */
     .right-panel{
       position:relative;
       display:flex;align-items:center;justify-content:center;
@@ -106,12 +118,10 @@
     }
     #globeCanvas{display:block;width:100%;height:100%;cursor:grab;}
     #globeCanvas:active{cursor:grabbing;}
-
     .globe-label{
-      position:absolute;top:32px;left:50%;transform:translateX(-50%);
+      position:absolute;top:28px;left:50%;transform:translateX(-50%);
       font-size:10px;letter-spacing:0.22em;text-transform:uppercase;
-      color:rgba(140,170,255,0.35);pointer-events:none;
-      white-space:nowrap;
+      color:rgba(140,170,255,0.35);pointer-events:none;white-space:nowrap;
     }
 
     #pinTooltip{
@@ -129,8 +139,73 @@
     #pinTooltip .tt-name{font-family:'Cormorant Garamond',serif;font-size:18px;font-weight:300;line-height:1.2;color:#eef3ff;}
     #pinTooltip .tt-sub{font-size:11px;font-weight:300;color:rgba(190,210,255,0.55);margin-top:2px;}
 
-    .coords{position:fixed;bottom:32px;left:48px;z-index:20;font-size:10px;letter-spacing:0.18em;color:rgba(110,130,190,0.28);font-weight:300;pointer-events:none;}
-    .tagline{position:fixed;bottom:32px;right:48px;z-index:20;font-size:10px;letter-spacing:0.18em;text-transform:uppercase;color:rgba(110,130,190,0.28);font-weight:300;pointer-events:none;}
+    .coords{position:fixed;bottom:28px;left:40px;z-index:20;font-size:10px;letter-spacing:0.18em;color:rgba(110,130,190,0.28);font-weight:300;pointer-events:none;}
+    .tagline{position:fixed;bottom:28px;right:40px;z-index:20;font-size:10px;letter-spacing:0.18em;text-transform:uppercase;color:rgba(110,130,190,0.28);font-weight:300;pointer-events:none;}
+
+    /* ── BREAKPOINT: 1100px ──────────────────────────── */
+    /* Panel already shrinks via clamp; just tighten type & padding */
+    @media (max-width: 1100px) {
+      nav { padding: 0 32px; }
+      .left-panel { padding: 40px 22px 50px 32px; }
+      .page-title { font-size: 40px; }
+      .entry { padding: 15px 15px 13px 18px; }
+      .entry-title { font-size: 12.5px; }
+      .entry-body { font-size: 11px; }
+      .coords, .tagline { display: none; }
+    }
+
+    /* ── BREAKPOINT: 900px ───────────────────────────── */
+    @media (max-width: 900px) {
+      nav { padding: 0 24px; height: 58px; }
+      .nav-name { font-size: 22px; }
+      .nav-links a { font-size: 11px; padding: 6px 10px; letter-spacing: 0.08em; }
+      .nav-links .divider { display: none; }
+      .page-shell { padding-top: 58px; }
+      .left-panel { padding: 32px 16px 40px 24px; }
+      .page-title { font-size: 34px; margin-bottom: 20px; }
+      .rule { margin-bottom: 24px; }
+      .section-label { margin-top: 28px; margin-bottom: 12px; }
+      .entry { padding: 13px 13px 11px 16px; margin-bottom: 8px; border-radius: 11px; }
+      .entry-title { font-size: 12px; }
+      .entry-body { font-size: 10.5px; line-height: 1.6; }
+      .globe-label { font-size: 9px; top: 16px; }
+    }
+
+    /* ── BREAKPOINT: 700px — vertical stack ──────────── */
+    @media (max-width: 700px) {
+      body { overflow: auto; }
+      .page-shell {
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        height: auto;
+        min-height: calc(100vh - 58px);
+      }
+      .left-panel {
+        overflow: visible;
+        height: auto;
+        border-right: none;
+        border-bottom: 1px solid rgba(100,130,220,0.10);
+        padding: 28px 20px 32px;
+      }
+      .right-panel {
+        height: 52vw;
+        min-height: 260px;
+        max-height: 420px;
+        flex-shrink: 0;
+      }
+      .globe-label { display: none; }
+      #pinTooltip { font-size: 10px; padding: 6px 11px; }
+    }
+
+    /* ── BREAKPOINT: 420px ───────────────────────────── */
+    @media (max-width: 420px) {
+      nav { padding: 0 16px; }
+      .nav-links a { font-size: 10px; padding: 5px 7px; }
+      .left-panel { padding: 22px 16px 28px; }
+      .page-title { font-size: 30px; }
+      .entry-loc { display: none; }
+    }
   </style>
 </head>
 <body>
@@ -159,7 +234,7 @@
           <span class="entry-loc">New Haven, CT</span>
         </div>
         <div class="entry-title">Higley Lab — Locus Coeruleus</div>
-        <div class="entry-body">Characterizing <strong style="color:rgba(220,234,255,0.8)">locus coeruleus axon degeneration</strong> in PPT1-deficient mice to investigate norepinephrine dysfunction in Parkinson's disease. Confocal microscopy, IHC, perfusion protocols.</div>
+        <div class="entry-body">Characterizing <strong style="color:rgba(220,234,255,0.8)">locus coeruleus axon degeneration</strong> in PPT1-deficient mice to investigate norepinephrine dysfunction in Parkinson’s disease. Confocal microscopy, IHC, perfusion protocols.</div>
       </div>
 
       <div class="entry e--green" data-pin="pcdd" onclick="focusPin('pcdd',this)">
@@ -200,6 +275,15 @@
         <div class="entry-body">Genetics research at Stanford spanning computational and experimental approaches. Investigating genomic mechanisms and applying bioinformatic tools to biological datasets.</div>
       </div>
 
+      <div class="entry e--orange" data-pin="sevilla" onclick="focusPin('sevilla',this)">
+        <div class="entry-header">
+          <span class="entry-label">Medical Shadowing &middot; Clínica Santa Isabel</span>
+          <span class="entry-loc">Sevilla, Spain</span>
+        </div>
+        <div class="entry-title">Clínica Santa Isabel — Medical Shadowing</div>
+        <div class="entry-body">Clinical observation and medical shadowing at <strong style="color:rgba(220,234,255,0.8)">Clínica Santa Isabel</strong> in Sevilla, Spain. Exposure to clinical workflows, patient care, and hospital operations in a Spanish-language environment.</div>
+      </div>
+
       <div class="entry e--purple" data-pin="cambridge" onclick="focusPin('cambridge',this)">
         <div class="entry-header">
           <span class="entry-label">STEM Research &middot; CCIR</span>
@@ -238,12 +322,13 @@
     import * as THREE from 'three';
 
     const PINS = {
-      higley:   { lat:41.3028, lng:-72.9399, label:'Neuroscience · Yale SOM', name:'Higley Lab', sub:'New Haven, CT', color:0x44ccff, glowColor:'rgba(68,204,255,' },
-      pcdd:     { lat:41.3115, lng:-72.9247, label:'MedTech · Yale Engineering', name:'PCDD Project', sub:'New Haven, CT', color:0x44eeaa, glowColor:'rgba(68,238,170,' },
-      fermilab: { lat:41.8420, lng:-88.2568, label:'Astrophysics · Fermilab', name:'Gravitational Lens CNN', sub:'Batavia, IL', color:0xffcc44, glowColor:'rgba(255,204,68,' },
-      msu:      { lat:42.7018, lng:-84.4822, label:'Proteomics · Michigan State', name:'Mass Spectrometry Lab', sub:'East Lansing, MI', color:0xff6699, glowColor:'rgba(255,102,153,' },
-      stanford: { lat:37.4275, lng:-122.1697, label:'Genetics · Stanford', name:'Genetics Research', sub:'Palo Alto, CA', color:0x5588ff, glowColor:'rgba(85,136,255,' },
-      cambridge:{ lat:52.2053, lng:0.1218, label:'STEM Research · CCIR', name:'Cambridge Centre', sub:'Cambridge, UK', color:0xcc88ff, glowColor:'rgba(204,136,255,' },
+      higley:   { lat:41.3028, lng:-72.9399, label:'Neuroscience · Yale SOM',           name:'Higley Lab',              sub:'New Haven, CT',    color:0x44ccff, glowColor:'rgba(68,204,255,'  },
+      pcdd:     { lat:41.3115, lng:-72.9247, label:'MedTech · Yale Engineering',         name:'PCDD Project',            sub:'New Haven, CT',    color:0x44eeaa, glowColor:'rgba(68,238,170,' },
+      fermilab: { lat:41.8420, lng:-88.2568, label:'Astrophysics · Fermilab',           name:'Gravitational Lens CNN',  sub:'Batavia, IL',      color:0xffcc44, glowColor:'rgba(255,204,68,' },
+      msu:      { lat:42.7018, lng:-84.4822, label:'Proteomics · Michigan State',        name:'Mass Spectrometry Lab',   sub:'East Lansing, MI', color:0xff6699, glowColor:'rgba(255,102,153,'},
+      stanford: { lat:37.4275, lng:-122.1697,label:'Genetics · Stanford',               name:'Genetics Research',       sub:'Palo Alto, CA',    color:0x5588ff, glowColor:'rgba(85,136,255,' },
+      sevilla:  { lat:37.3891, lng:-5.9845,  label:'Medical Shadowing · Clínica Santa Isabel', name:'Clínica Santa Isabel', sub:'Sevilla, Spain',   color:0xff9944, glowColor:'rgba(255,153,68,' },
+      cambridge:{ lat:52.2053, lng:0.1218,   label:'STEM Research · CCIR',              name:'Cambridge Centre',        sub:'Cambridge, UK',    color:0xcc88ff, glowColor:'rgba(204,136,255,' },
     };
 
     const canvas = document.getElementById('globeCanvas');
@@ -281,16 +366,10 @@
       const c = document.createElement('canvas');
       c.width = W; c.height = H;
       const ctx = c.getContext('2d');
-
       const ocean = ctx.createLinearGradient(0, 0, 0, H);
-      ocean.addColorStop(0, '#0a1a3d');
-      ocean.addColorStop(0.5, '#0d2248');
-      ocean.addColorStop(1, '#081630');
-      ctx.fillStyle = ocean;
-      ctx.fillRect(0, 0, W, H);
-
+      ocean.addColorStop(0, '#0a1a3d'); ocean.addColorStop(0.5, '#0d2248'); ocean.addColorStop(1, '#081630');
+      ctx.fillStyle = ocean; ctx.fillRect(0, 0, W, H);
       function px(lon, lat) { return [(lon + 180) / 360 * W, (90 - lat) / 180 * H]; }
-
       function drawRings(rings) {
         ctx.beginPath();
         for (const ring of rings) {
@@ -301,17 +380,10 @@
         }
         ctx.fill(); ctx.stroke();
       }
-
       try {
         const res = await fetch('https://raw.githubusercontent.com/holtzy/D3-graph-gallery/master/DATA/world.geojson');
         const gj = await res.json();
         ctx.fillStyle = '#1a3a2a'; ctx.strokeStyle = '#2e4832'; ctx.lineWidth = 0.5;
-        for (const f of gj.features) {
-          const g = f.geometry;
-          if (g.type === 'Polygon') drawRings(g.coordinates);
-          else if (g.type === 'MultiPolygon') for (const poly of g.coordinates) drawRings(poly);
-        }
-        ctx.fillStyle = 'rgba(55,85,50,0.18)'; ctx.strokeStyle = 'transparent'; ctx.lineWidth = 0;
         for (const f of gj.features) {
           const g = f.geometry;
           if (g.type === 'Polygon') drawRings(g.coordinates);
@@ -335,252 +407,124 @@
           ctx.closePath(); ctx.fill(); ctx.stroke();
         }
       }
-
-      ctx.globalAlpha = 0.04;
-      ctx.strokeStyle = '#8899cc'; ctx.lineWidth = 1;
-      for (let lat = -90; lat <= 90; lat += 30) {
-        const y = (90 - lat) / 180 * H;
-        ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(W, y); ctx.stroke();
-      }
-      for (let lng = -180; lng <= 180; lng += 30) {
-        const x = (lng + 180) / 360 * W;
-        ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, H); ctx.stroke();
-      }
+      ctx.globalAlpha = 0.04; ctx.strokeStyle = '#8899cc'; ctx.lineWidth = 1;
+      for (let lat = -90; lat <= 90; lat += 30) { const y = (90-lat)/180*H; ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(W,y); ctx.stroke(); }
+      for (let lng = -180; lng <= 180; lng += 30) { const x = (lng+180)/360*W; ctx.beginPath(); ctx.moveTo(x,0); ctx.lineTo(x,H); ctx.stroke(); }
       ctx.globalAlpha = 1;
-
       return c;
     }
 
     const earthGeo = new THREE.SphereGeometry(GLOBE_R, 128, 64);
-    const earthMat = new THREE.MeshPhongMaterial({
-      color: 0x0d2248,
-      shininess: 12,
-      specular: new THREE.Color(0x112244),
-    });
+    const earthMat = new THREE.MeshPhongMaterial({ color:0x0d2248, shininess:12, specular:new THREE.Color(0x112244) });
     const earthMesh = new THREE.Mesh(earthGeo, earthMat);
     scene.add(earthMesh);
-
-    buildEarthTexture().then(function(earthCanvas) {
-      const tex = new THREE.CanvasTexture(earthCanvas);
-      tex.needsUpdate = true;
-      earthMat.map = tex;
-      earthMat.color.set(0xffffff);
-      earthMat.needsUpdate = true;
+    buildEarthTexture().then(ec => {
+      const tex = new THREE.CanvasTexture(ec); tex.needsUpdate = true;
+      earthMat.map = tex; earthMat.color.set(0xffffff); earthMat.needsUpdate = true;
     });
 
     const atmGeo = new THREE.SphereGeometry(GLOBE_R * 1.025, 64, 32);
     const atmMat = new THREE.ShaderMaterial({
-      side: THREE.FrontSide,
-      transparent: true,
-      depthWrite: false,
-      uniforms: { glowColor: { value: new THREE.Color(0x1a3a7a) } },
-      vertexShader: `
-        varying vec3 vNormal;
-        varying vec3 vViewDir;
-        void main() {
-          vNormal = normalize(normalMatrix * normal);
-          vec4 mvPos = modelViewMatrix * vec4(position, 1.0);
-          vViewDir = normalize(-mvPos.xyz);
-          gl_Position = projectionMatrix * mvPos;
-        }
-      `,
-      fragmentShader: `
-        uniform vec3 glowColor;
-        varying vec3 vNormal;
-        varying vec3 vViewDir;
-        void main() {
-          float rim = 1.0 - clamp(dot(vNormal, vViewDir), 0.0, 1.0);
-          float alpha = pow(rim, 3.5) * 0.55;
-          gl_FragColor = vec4(glowColor, alpha);
-        }
-      `
+      side:THREE.FrontSide, transparent:true, depthWrite:false,
+      uniforms:{ glowColor:{ value:new THREE.Color(0x1a3a7a) } },
+      vertexShader:`varying vec3 vNormal;varying vec3 vViewDir;void main(){vNormal=normalize(normalMatrix*normal);vec4 mv=modelViewMatrix*vec4(position,1.);vViewDir=normalize(-mv.xyz);gl_Position=projectionMatrix*mv;}`,
+      fragmentShader:`uniform vec3 glowColor;varying vec3 vNormal;varying vec3 vViewDir;void main(){float rim=1.-clamp(dot(vNormal,vViewDir),0.,1.);float a=pow(rim,3.5)*.55;gl_FragColor=vec4(glowColor,a);}`
     });
     scene.add(new THREE.Mesh(atmGeo, atmMat));
 
-    const N = 8000;
-    const sPos = new Float32Array(N * 3);
-    for (let i = 0; i < N; i++) {
-      const theta = Math.random() * Math.PI * 2;
-      const phi = Math.acos(2 * Math.random() - 1);
-      const r = 200 + Math.random() * 100;
-      sPos[i*3] = r * Math.sin(phi) * Math.cos(theta);
-      sPos[i*3+1] = r * Math.sin(phi) * Math.sin(theta);
-      sPos[i*3+2] = r * Math.cos(phi);
-    }
-    const sGeo = new THREE.BufferGeometry();
-    sGeo.setAttribute('position', new THREE.BufferAttribute(sPos, 3));
-    scene.add(new THREE.Points(sGeo, new THREE.PointsMaterial({
-      color: 0xd0e4ff, size: 0.3, transparent: true, opacity: 0.7, sizeAttenuation: true
-    })));
+    const N = 8000, sPos = new Float32Array(N*3);
+    for (let i=0;i<N;i++){const th=Math.random()*Math.PI*2,ph=Math.acos(2*Math.random()-1),r=200+Math.random()*100;sPos[i*3]=r*Math.sin(ph)*Math.cos(th);sPos[i*3+1]=r*Math.sin(ph)*Math.sin(th);sPos[i*3+2]=r*Math.cos(ph);}
+    const sGeo=new THREE.BufferGeometry();sGeo.setAttribute('position',new THREE.BufferAttribute(sPos,3));
+    scene.add(new THREE.Points(sGeo,new THREE.PointsMaterial({color:0xd0e4ff,size:0.3,transparent:true,opacity:0.7,sizeAttenuation:true})));
 
-    function latLngToVec3(lat, lng, r) {
-      const phi = (90 - lat) * Math.PI / 180;
-      const theta = (lng + 180) * Math.PI / 180;
-      return new THREE.Vector3(
-        -r * Math.sin(phi) * Math.cos(theta),
-        r * Math.cos(phi),
-        r * Math.sin(phi) * Math.sin(theta)
-      );
+    function latLngToVec3(lat,lng,r){
+      const phi=(90-lat)*Math.PI/180,theta=(lng+180)*Math.PI/180;
+      return new THREE.Vector3(-r*Math.sin(phi)*Math.cos(theta),r*Math.cos(phi),r*Math.sin(phi)*Math.sin(theta));
     }
 
-    const pinObjects = [];
-    const pinGroup = new THREE.Group();
-
-    Object.entries(PINS).forEach(([id, pin]) => {
-      const pos = latLngToVec3(pin.lat, pin.lng, GLOBE_R + 0.01);
-      const normal = pos.clone().normalize();
-
-      const stemHeight = 0.055;
-      const stemGeo = new THREE.CylinderGeometry(0.003, 0.003, stemHeight, 6);
-      const stemMat = new THREE.MeshBasicMaterial({ color: pin.color, transparent: true, opacity: 0.7 });
-      const stem = new THREE.Mesh(stemGeo, stemMat);
-
-      const headGeo = new THREE.SphereGeometry(0.022, 16, 16);
-      const headMat = new THREE.MeshStandardMaterial({
-        color: pin.color, emissive: pin.color, emissiveIntensity: 0.6,
-        metalness: 0.1, roughness: 0.3
-      });
-      const head = new THREE.Mesh(headGeo, headMat);
-
-      const gc = document.createElement('canvas'); gc.width = gc.height = 64;
-      const gctx = gc.getContext('2d');
-      const gr = gctx.createRadialGradient(32, 32, 0, 32, 32, 32);
-      gr.addColorStop(0, pin.glowColor + '0.8)');
-      gr.addColorStop(0.4, pin.glowColor + '0.3)');
-      gr.addColorStop(1, pin.glowColor + '0)');
-      gctx.fillStyle = gr; gctx.fillRect(0, 0, 64, 64);
-      const glow = new THREE.Sprite(new THREE.SpriteMaterial({
-        map: new THREE.CanvasTexture(gc), transparent: true, depthWrite: false, blending: THREE.AdditiveBlending
-      }));
-      glow.scale.set(0.18, 0.18, 1);
-
-      const pinGrp = new THREE.Group();
-      stem.position.set(0, stemHeight / 2, 0);
-      head.position.set(0, stemHeight + 0.022, 0);
-      glow.position.set(0, stemHeight + 0.022, 0);
-      pinGrp.add(stem, head, glow);
-
-      pinGrp.position.copy(pos);
-      const up = new THREE.Vector3(0, 1, 0);
-      const q = new THREE.Quaternion().setFromUnitVectors(up, normal);
-      pinGrp.setRotationFromQuaternion(q);
-
-      pinGroup.add(pinGrp);
-      pinObjects.push({ id, head, pinGrp, pin });
+    const pinObjects=[], pinGroup=new THREE.Group();
+    Object.entries(PINS).forEach(([id,pin])=>{
+      const pos=latLngToVec3(pin.lat,pin.lng,GLOBE_R+0.01);
+      const stemH=0.055;
+      const stem=new THREE.Mesh(new THREE.CylinderGeometry(0.003,0.003,stemH,6),new THREE.MeshBasicMaterial({color:pin.color,transparent:true,opacity:0.7}));
+      const head=new THREE.Mesh(new THREE.SphereGeometry(0.022,16,16),new THREE.MeshStandardMaterial({color:pin.color,emissive:pin.color,emissiveIntensity:0.6,metalness:0.1,roughness:0.3}));
+      const gc=document.createElement('canvas');gc.width=gc.height=64;
+      const gctx=gc.getContext('2d'),gr=gctx.createRadialGradient(32,32,0,32,32,32);
+      gr.addColorStop(0,pin.glowColor+'0.8)');gr.addColorStop(0.4,pin.glowColor+'0.3)');gr.addColorStop(1,pin.glowColor+'0)');
+      gctx.fillStyle=gr;gctx.fillRect(0,0,64,64);
+      const glow=new THREE.Sprite(new THREE.SpriteMaterial({map:new THREE.CanvasTexture(gc),transparent:true,depthWrite:false,blending:THREE.AdditiveBlending}));
+      glow.scale.set(0.18,0.18,1);
+      const pg=new THREE.Group();
+      stem.position.set(0,stemH/2,0);head.position.set(0,stemH+0.022,0);glow.position.set(0,stemH+0.022,0);
+      pg.add(stem,head,glow);pg.position.copy(pos);
+      pg.setRotationFromQuaternion(new THREE.Quaternion().setFromUnitVectors(new THREE.Vector3(0,1,0),pos.clone().normalize()));
+      pinGroup.add(pg);
+      pinObjects.push({id,head,pinGrp:pg,pin});
     });
     scene.add(pinGroup);
 
-    let isDragging = false, prevMouse = { x: 0, y: 0 };
-    let rotX = 0.3, rotY = -0.5;
-    let velX = 0, velY = 0;
-    const ROT_SPEED = 0.008;
+    let isDragging=false,prevMouse={x:0,y:0},rotX=0.3,rotY=-0.5,velX=0,velY=0;
+    const ROT=0.008;
+    canvas.addEventListener('mousedown',e=>{isDragging=true;prevMouse={x:e.clientX,y:e.clientY};velX=velY=0;});
+    window.addEventListener('mousemove',e=>{if(!isDragging)return;velX=(e.clientY-prevMouse.y)*ROT;velY=(e.clientX-prevMouse.x)*ROT;rotX+=velX;rotY+=velY;prevMouse={x:e.clientX,y:e.clientY};});
+    window.addEventListener('mouseup',()=>{isDragging=false;});
+    let prevTouch=null;
+    canvas.addEventListener('touchstart',e=>{prevTouch=e.touches[0];velX=velY=0;},{passive:true});
+    canvas.addEventListener('touchmove',e=>{if(!prevTouch)return;const t=e.touches[0];rotX+=(t.clientY-prevTouch.clientY)*ROT;rotY+=(t.clientX-prevTouch.clientX)*ROT;prevTouch=t;},{passive:true});
+    canvas.addEventListener('touchend',()=>{prevTouch=null;});
 
-    canvas.addEventListener('mousedown', e => {
-      isDragging = true;
-      prevMouse = { x: e.clientX, y: e.clientY };
-      velX = velY = 0;
-    });
-    window.addEventListener('mousemove', e => {
-      if (!isDragging) return;
-      const dx = e.clientX - prevMouse.x;
-      const dy = e.clientY - prevMouse.y;
-      velX = dy * ROT_SPEED;
-      velY = dx * ROT_SPEED;
-      rotX += velX; rotY += velY;
-      prevMouse = { x: e.clientX, y: e.clientY };
-    });
-    window.addEventListener('mouseup', () => { isDragging = false; });
-
-    let prevTouch = null;
-    canvas.addEventListener('touchstart', e => { prevTouch = e.touches[0]; velX = velY = 0; }, { passive: true });
-    canvas.addEventListener('touchmove', e => {
-      if (!prevTouch) return;
-      const t = e.touches[0];
-      rotX += (t.clientY - prevTouch.clientY) * ROT_SPEED;
-      rotY += (t.clientX - prevTouch.clientX) * ROT_SPEED;
-      prevTouch = t;
-    }, { passive: true });
-    canvas.addEventListener('touchend', () => { prevTouch = null; });
-
-    const raycaster = new THREE.Raycaster();
-    const mouse = new THREE.Vector2();
-    const tooltip = document.getElementById('pinTooltip');
-    let hoveredPin = null;
-
-    canvas.addEventListener('mousemove', e => {
-      const rect = canvas.getBoundingClientRect();
-      mouse.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
-      mouse.y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
-      raycaster.setFromCamera(mouse, camera);
-      const heads = pinObjects.map(p => p.head);
-      const hits = raycaster.intersectObjects(heads);
-      if (hits.length > 0) {
-        const found = pinObjects.find(p => p.head === hits[0].object);
-        hoveredPin = found;
-        canvas.style.cursor = 'pointer';
-        document.getElementById('ttLabel').textContent = found.pin.label;
-        document.getElementById('ttName').textContent = found.pin.name;
-        document.getElementById('ttSub').textContent = found.pin.sub;
-        tooltip.style.left = (e.clientX + 16) + 'px';
-        tooltip.style.top = (e.clientY - 10) + 'px';
-        tooltip.style.opacity = '1';
-        document.querySelectorAll('.entry').forEach(el => {
-          el.classList.toggle('active', el.dataset.pin === found.id);
-        });
+    const raycaster=new THREE.Raycaster(),mouse=new THREE.Vector2();
+    const tooltip=document.getElementById('pinTooltip');
+    let hoveredPin=null;
+    canvas.addEventListener('mousemove',e=>{
+      const rect=canvas.getBoundingClientRect();
+      mouse.x=((e.clientX-rect.left)/rect.width)*2-1;
+      mouse.y=-((e.clientY-rect.top)/rect.height)*2+1;
+      raycaster.setFromCamera(mouse,camera);
+      const hits=raycaster.intersectObjects(pinObjects.map(p=>p.head));
+      if(hits.length>0){
+        const found=pinObjects.find(p=>p.head===hits[0].object);
+        hoveredPin=found;canvas.style.cursor='pointer';
+        document.getElementById('ttLabel').textContent=found.pin.label;
+        document.getElementById('ttName').textContent=found.pin.name;
+        document.getElementById('ttSub').textContent=found.pin.sub;
+        tooltip.style.left=(e.clientX+16)+'px';tooltip.style.top=(e.clientY-10)+'px';tooltip.style.opacity='1';
+        document.querySelectorAll('.entry').forEach(el=>el.classList.toggle('active',el.dataset.pin===found.id));
       } else {
-        hoveredPin = null;
-        canvas.style.cursor = isDragging ? 'grabbing' : 'grab';
-        tooltip.style.opacity = '0';
+        hoveredPin=null;canvas.style.cursor=isDragging?'grabbing':'grab';tooltip.style.opacity='0';
       }
     });
 
-    let targetRotX = rotX, targetRotY = rotY;
-    let animating = false;
-
-    window.focusPin = function(id, el) {
-      document.querySelectorAll('.entry').forEach(e => e.classList.remove('active'));
+    let targetRotX=rotX,targetRotY=rotY,animating=false;
+    window.focusPin=function(id,el){
+      document.querySelectorAll('.entry').forEach(e=>e.classList.remove('active'));
       el.classList.add('active');
-      const pin = PINS[id];
-      if (!pin) return;
-      targetRotX = -(pin.lat * Math.PI / 180) * 0.7;
-      targetRotY = -(pin.lng + 90) * Math.PI / 180;
-      animating = true;
+      const pin=PINS[id];if(!pin)return;
+      targetRotX=-(pin.lat*Math.PI/180)*0.7;
+      targetRotY=-(pin.lng+90)*Math.PI/180;
+      animating=true;
     };
 
-    let lastInteract = performance.now();
-    ['mousedown','touchstart'].forEach(ev => canvas.addEventListener(ev, () => { lastInteract = performance.now(); }));
-
-    let lastT = performance.now();
-    function animate(t) {
+    let lastInteract=performance.now();
+    ['mousedown','touchstart'].forEach(ev=>canvas.addEventListener(ev,()=>{lastInteract=performance.now();}));
+    let lastT=performance.now();
+    function animate(t){
       requestAnimationFrame(animate);
-      const dt = (t - lastT) / 16; lastT = t;
-
-      if (!isDragging) {
-        if (animating) {
-          rotX += (targetRotX - rotX) * 0.06;
-          rotY += (targetRotY - rotY) * 0.06;
-          if (Math.abs(targetRotX - rotX) < 0.001 && Math.abs(targetRotY - rotY) < 0.001) animating = false;
-        } else {
-          rotX += velX * 0.92 * dt; velX *= 0.92;
-          rotY += velY * 0.92 * dt; velY *= 0.92;
-          if (performance.now() - lastInteract > 3000) rotY += 0.0004 * dt;
-        }
+      const dt=(t-lastT)/16;lastT=t;
+      if(!isDragging){
+        if(animating){rotX+=(targetRotX-rotX)*0.06;rotY+=(targetRotY-rotY)*0.06;if(Math.abs(targetRotX-rotX)<0.001&&Math.abs(targetRotY-rotY)<0.001)animating=false;}
+        else{rotX+=velX*0.92*dt;velX*=0.92;rotY+=velY*0.92*dt;velY*=0.92;if(performance.now()-lastInteract>3000)rotY+=0.0004*dt;}
       }
-      rotX = Math.max(-Math.PI / 2.2, Math.min(Math.PI / 2.2, rotX));
-
-      earthMesh.rotation.x = rotX;
-      earthMesh.rotation.y = rotY;
-      pinGroup.rotation.x = rotX;
-      pinGroup.rotation.y = rotY;
-
-      const pulse = 0.85 + 0.15 * Math.sin(t * 0.003);
-      pinObjects.forEach(p => {
-        const isHovered = hoveredPin && hoveredPin.id === p.id;
-        p.head.material.emissiveIntensity = isHovered ? 1.2 : 0.6 * pulse;
-        p.head.scale.setScalar(isHovered ? 1.5 : 1.0);
+      rotX=Math.max(-Math.PI/2.2,Math.min(Math.PI/2.2,rotX));
+      earthMesh.rotation.x=rotX;earthMesh.rotation.y=rotY;
+      pinGroup.rotation.x=rotX;pinGroup.rotation.y=rotY;
+      const pulse=0.85+0.15*Math.sin(t*0.003);
+      pinObjects.forEach(p=>{
+        const h=hoveredPin&&hoveredPin.id===p.id;
+        p.head.material.emissiveIntensity=h?1.2:0.6*pulse;
+        p.head.scale.setScalar(h?1.5:1.0);
       });
-
-      renderer.render(scene, camera);
+      renderer.render(scene,camera);
     }
     requestAnimationFrame(animate);
   </script>
