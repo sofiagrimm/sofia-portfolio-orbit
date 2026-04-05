@@ -532,15 +532,13 @@
 
   <!-- Film strip script -->
   <script>
-  // Images uploaded to repo root
   const PHOTOS = [
-    '633A206B-E09F-4B4C-AF48-604EFAA9065E.HEIC',
-    'C738E431-3996-47B9-B722-135265FF7B7F.HEIC',
-    'IMG_3326.heic',
-    'IMG_3334.heic'
+    '633A206B-E09F-4B4C-AF48-604EFAA9065E.jpg',
+    'C738E431-3996-47B9-B722-135265FF7B7F_(1).jpg',
+    'IMG_3326.jpg',
+    'IMG_3334_(1).jpg'
   ];
 
-  // Left strip: photos 0,1 repeated; Right strip: photos 2,3 repeated
   const LEFT_PHOTOS  = [PHOTOS[0], PHOTOS[1], PHOTOS[0], PHOTOS[1], PHOTOS[0], PHOTOS[1]];
   const RIGHT_PHOTOS = [PHOTOS[2], PHOTOS[3], PHOTOS[2], PHOTOS[3], PHOTOS[2], PHOTOS[3]];
 
@@ -570,7 +568,6 @@
       return frag;
     }
 
-    // Two sets for seamless looping
     track.appendChild(makeSet(photos));
     track.appendChild(makeSet(photos));
 
