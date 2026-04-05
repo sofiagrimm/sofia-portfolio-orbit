@@ -337,18 +337,6 @@
       }
       ctx.globalAlpha = 1;
 
-      const arctic = ctx.createRadialGradient(W/2, 0, 0, W/2, 0, H*0.18);
-      arctic.addColorStop(0, 'rgba(200,220,240,0.9)');
-      arctic.addColorStop(0.6, 'rgba(180,200,225,0.5)');
-      arctic.addColorStop(1, 'rgba(160,190,210,0)');
-      ctx.fillStyle = arctic; ctx.fillRect(0, 0, W, H * 0.18);
-
-      const ant = ctx.createRadialGradient(W/2, H, 0, W/2, H, H*0.16);
-      ant.addColorStop(0, 'rgba(210,225,238,0.92)');
-      ant.addColorStop(0.5, 'rgba(190,210,228,0.5)');
-      ant.addColorStop(1, 'rgba(170,200,220,0)');
-      ctx.fillStyle = ant; ctx.fillRect(0, H * 0.84, W, H * 0.16);
-
       return c;
     }
 
@@ -361,7 +349,6 @@
     const earthMesh = new THREE.Mesh(earthGeo, earthMat);
     scene.add(earthMesh);
 
-    // Upgrade texture async once GeoJSON loads
     buildEarthTexture().then(function(earthCanvas) {
       const tex = new THREE.CanvasTexture(earthCanvas);
       tex.needsUpdate = true;
