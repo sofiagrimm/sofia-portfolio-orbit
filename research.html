@@ -1,1 +1,618 @@
-{open('/tmp/research_new.html').read()}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Research — Sofia Grimm</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Inter:wght@300;400;500&display=swap');
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    html,body{width:100%;height:100%;overflow:hidden;background:#060d18;font-family:'Inter',sans-serif;color:#e9f0ff;}
+
+    .nebula{
+      position:fixed;inset:0;z-index:1;pointer-events:none;
+      background:
+        radial-gradient(ellipse 55% 38% at 15% 55%, rgba(40,70,180,0.07) 0%, transparent 70%),
+        radial-gradient(ellipse 45% 32% at 82% 28%, rgba(30,80,200,0.07) 0%, transparent 70%),
+        radial-gradient(ellipse 50% 44% at 50% 50%, rgba(20,40,120,0.05) 0%, transparent 65%);
+    }
+    nav{
+      position:fixed;top:0;left:0;right:0;z-index:20;
+      display:flex;align-items:center;justify-content:space-between;
+      padding:0 48px;height:68px;
+    }
+    .nav-name{font-family:'Cormorant Garamond',serif;font-size:28px;font-weight:300;font-style:italic;
+      letter-spacing:0.06em;color:rgba(220,232,255,0.9);text-decoration:none;}
+    .nav-links{display:flex;align-items:center;gap:4px;}
+    .nav-links a{font-size:13px;font-weight:400;letter-spacing:0.13em;text-transform:uppercase;
+      color:rgba(160,190,255,0.5);text-decoration:none;padding:7px 16px;border-radius:4px;
+      transition:color .25s,background .25s;}
+    .nav-links a:hover,.nav-links a.active{color:rgba(220,235,255,0.9);background:rgba(100,140,255,0.08);}
+    .nav-links .divider{color:rgba(100,130,200,0.2);font-size:13px;user-select:none;}
+
+    /* Layout */
+    .page-shell{
+      position:fixed;inset:0;z-index:10;
+      display:grid;
+      grid-template-columns:340px 1fr;
+      padding-top:68px;
+    }
+
+    /* LEFT PANEL */
+    .left-panel{
+      overflow-y:auto;overflow-x:hidden;
+      padding:48px 36px 60px 48px;
+      display:flex;flex-direction:column;
+      border-right:1px solid rgba(100,130,220,0.10);
+      background:rgba(6,13,24,0.55);
+      backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
+      scrollbar-width:thin;scrollbar-color:rgba(80,110,200,0.2) transparent;
+    }
+    .left-panel::-webkit-scrollbar{width:4px;}
+    .left-panel::-webkit-scrollbar-track{background:transparent;}
+    .left-panel::-webkit-scrollbar-thumb{background:rgba(80,110,200,0.2);border-radius:2px;}
+
+    .page-eyebrow{font-size:11px;letter-spacing:0.22em;text-transform:uppercase;color:rgba(160,185,255,0.45);margin-bottom:18px;}
+    .page-title{font-family:'Cormorant Garamond',serif;font-size:46px;font-weight:300;line-height:1.08;color:#eef3ff;margin-bottom:28px;}
+    .page-title em{font-style:italic;color:rgba(190,210,255,0.85);}
+    .rule{width:48px;height:1px;background:linear-gradient(90deg,rgba(140,170,255,0.4),transparent);margin-bottom:32px;}
+
+    .section-label{
+      font-size:10px;letter-spacing:0.22em;text-transform:uppercase;
+      color:rgba(140,170,255,0.45);margin-bottom:16px;margin-top:40px;
+      display:flex;align-items:center;gap:10px;
+    }
+    .section-label::after{content:'';flex:1;height:1px;background:linear-gradient(90deg,rgba(100,130,200,0.18),transparent);}
+    .section-label:first-of-type{margin-top:0;}
+
+    /* Research entry cards */
+    .entry{
+      position:relative;overflow:hidden;
+      padding:20px 20px 18px 22px;
+      border-radius:14px;
+      background:rgba(8,14,46,0.55);
+      border:1px solid rgba(100,130,220,0.13);
+      backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
+      transition:border-color .28s, transform .28s, box-shadow .28s, background .28s;
+      cursor:pointer;
+      margin-bottom:10px;
+    }
+    .entry::before{
+      content:'';
+      position:absolute;left:0;top:0;bottom:0;width:3px;
+      background:var(--stripe);
+      border-radius:14px 0 0 14px;
+    }
+    .entry.active,.entry:hover{
+      transform:translateX(4px);
+      background:rgba(12,20,58,0.72);
+      border-color:var(--border);
+      box-shadow:0 8px 36px rgba(0,0,0,0.38), -4px 0 28px var(--glow);
+    }
+    .entry-header{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:8px;}
+    .entry-label{font-size:9px;font-weight:500;letter-spacing:0.22em;text-transform:uppercase;color:var(--accent);}
+    .entry-loc{font-size:9px;letter-spacing:0.12em;text-transform:uppercase;color:rgba(150,175,255,0.38);white-space:nowrap;}
+    .entry-title{font-size:13.5px;font-weight:400;color:rgba(220,234,255,0.92);line-height:1.45;margin-bottom:6px;}
+    .entry-body{font-size:12px;font-weight:300;line-height:1.7;color:rgba(190,210,255,0.55);}
+
+    /* Color themes */
+    .e--cyan{--stripe:linear-gradient(180deg,rgba(40,210,255,0.8),rgba(40,210,255,0.1));--border:rgba(60,220,255,0.36);--glow:rgba(40,200,255,0.07);--accent:rgba(100,225,255,0.88);}
+    .e--blue{--stripe:linear-gradient(180deg,rgba(80,140,255,0.8),rgba(80,140,255,0.1));--border:rgba(100,160,255,0.40);--glow:rgba(80,140,255,0.08);--accent:rgba(140,190,255,0.88);}
+    .e--purple{--stripe:linear-gradient(180deg,rgba(180,100,255,0.8),rgba(180,100,255,0.1));--border:rgba(190,120,255,0.40);--glow:rgba(160,80,255,0.08);--accent:rgba(210,165,255,0.88);}
+    .e--green{--stripe:linear-gradient(180deg,rgba(40,220,140,0.8),rgba(40,220,140,0.1));--border:rgba(60,230,150,0.36);--glow:rgba(40,200,120,0.07);--accent:rgba(80,235,165,0.88);}
+    .e--gold{--stripe:linear-gradient(180deg,rgba(255,200,60,0.8),rgba(255,200,60,0.1));--border:rgba(255,215,90,0.36);--glow:rgba(240,180,40,0.08);--accent:rgba(255,220,100,0.90);}
+
+    /* RIGHT PANEL — Globe */
+    .right-panel{
+      position:relative;
+      display:flex;align-items:center;justify-content:center;
+      overflow:hidden;
+    }
+    #globeCanvas{display:block;width:100%;height:100%;cursor:grab;}
+    #globeCanvas:active{cursor:grabbing;}
+
+    /* Globe UI overlays */
+    .globe-label{
+      position:absolute;top:32px;left:50%;transform:translateX(-50%);
+      font-size:10px;letter-spacing:0.22em;text-transform:uppercase;
+      color:rgba(140,170,255,0.35);pointer-events:none;
+      white-space:nowrap;
+    }
+
+    /* Pin tooltip */
+    #pinTooltip{
+      position:absolute;z-index:30;pointer-events:none;
+      font-size:11px;letter-spacing:.10em;
+      color:rgba(220,235,255,0.88);
+      background:rgba(6,12,40,0.88);backdrop-filter:blur(12px);
+      border:1px solid rgba(120,150,255,0.22);
+      padding:8px 14px;border-radius:12px;
+      opacity:0;transition:opacity .15s;
+      white-space:nowrap;
+      box-shadow:0 8px 32px rgba(0,0,0,0.5);
+    }
+    #pinTooltip .tt-label{font-size:9px;letter-spacing:0.18em;text-transform:uppercase;color:rgba(150,180,255,0.45);margin-bottom:3px;}
+    #pinTooltip .tt-name{font-family:'Cormorant Garamond',serif;font-size:18px;font-weight:300;line-height:1.2;color:#eef3ff;}
+    #pinTooltip .tt-sub{font-size:11px;font-weight:300;color:rgba(190,210,255,0.55);margin-top:2px;}
+
+    .coords{position:fixed;bottom:32px;left:48px;z-index:20;font-size:10px;letter-spacing:0.18em;color:rgba(110,130,190,0.28);font-weight:300;pointer-events:none;}
+    .tagline{position:fixed;bottom:32px;right:48px;z-index:20;font-size:10px;letter-spacing:0.18em;text-transform:uppercase;color:rgba(110,130,190,0.28);font-weight:300;pointer-events:none;}
+  </style>
+</head>
+<body>
+  <div class="nebula"></div>
+  <nav>
+    <a class="nav-name" href="index.html">Sofia Grimm</a>
+    <div class="nav-links">
+      <a href="index.html">Home</a><span class="divider">|</span>
+      <a href="about.html">About</a><span class="divider">|</span>
+      <a href="research.html" class="active">Research</a><span class="divider">|</span>
+      <a href="projects.html">Projects</a>
+    </div>
+  </nav>
+
+  <div class="page-shell">
+    <!-- LEFT: research entries -->
+    <div class="left-panel">
+      <div class="page-eyebrow">Research</div>
+      <h1 class="page-title">Where I've<br><em>explored.</em></h1>
+      <div class="rule"></div>
+
+      <div class="section-label">Active</div>
+
+      <div class="entry e--cyan active" data-pin="higley" onclick="focusPin('higley',this)">
+        <div class="entry-header">
+          <span class="entry-label">Neuroscience &middot; Yale SOM</span>
+          <span class="entry-loc">New Haven, CT</span>
+        </div>
+        <div class="entry-title">Higley Lab — Locus Coeruleus</div>
+        <div class="entry-body">Characterizing <strong style="color:rgba(220,234,255,0.8)">locus coeruleus axon degeneration</strong> in PPT1-deficient mice to investigate norepinephrine dysfunction in Parkinson's disease. Confocal microscopy, IHC, perfusion protocols.</div>
+      </div>
+
+      <div class="entry e--green" data-pin="pcdd" onclick="focusPin('pcdd',this)">
+        <div class="entry-header">
+          <span class="entry-label">MedTech &middot; Yale Engineering</span>
+          <span class="entry-loc">New Haven, CT</span>
+        </div>
+        <div class="entry-title">PCDD — Medication Dispenser &amp; Deactivator</div>
+        <div class="entry-body">Business strategy for a <strong style="color:rgba(220,234,255,0.8)">patent-pending medication dispenser</strong> device under Dr. Wiznia. Ingress mechanisms, activated charcoal deactivation, go-to-market planning.</div>
+      </div>
+
+      <div class="section-label">Prior Research</div>
+
+      <div class="entry e--gold" data-pin="fermilab" onclick="focusPin('fermilab',this)">
+        <div class="entry-header">
+          <span class="entry-label">Astrophysics &middot; Fermilab</span>
+          <span class="entry-loc">Batavia, IL</span>
+        </div>
+        <div class="entry-title">Gravitational Lens CNN</div>
+        <div class="entry-body">Generated 40,000-image benchmark datasets of <strong style="color:rgba(220,234,255,0.8)">double-source plane gravitational lenses</strong> &amp; Einstein rings. Trained PyTorch CNNs for automated morphological classification. <strong style="color:rgba(255,220,100,0.9)">Published at AGU Annual Meeting 2023.</strong></div>
+      </div>
+
+      <div class="entry e--blue" data-pin="stanford" onclick="focusPin('stanford',this)">
+        <div class="entry-header">
+          <span class="entry-label">Proteomics &middot; Stanford</span>
+          <span class="entry-loc">Palo Alto, CA</span>
+        </div>
+        <div class="entry-title">Mass Spectrometry &amp; Proteomics</div>
+        <div class="entry-body">Computational and wet-lab proteomics including <strong style="color:rgba(220,234,255,0.8)">capillary zone electrophoresis</strong>, liquid chromatography, and antibody engineering. Mass spectrometry workflows and cell culture.</div>
+      </div>
+
+      <div class="entry e--purple" data-pin="cambridge" onclick="focusPin('cambridge',this)">
+        <div class="entry-header">
+          <span class="entry-label">STEM Research &middot; CCIR</span>
+          <span class="entry-loc">Cambridge, UK</span>
+        </div>
+        <div class="entry-title">Cambridge Centre for International Research</div>
+        <div class="entry-body">CCIR STEM Scholarship &amp; Spotlight Scholar. Intensive research program spanning emerging computational methods. <strong style="color:rgba(210,165,255,0.9)">2023.</strong></div>
+      </div>
+
+    </div><!-- /left-panel -->
+
+    <!-- RIGHT: Globe -->
+    <div class="right-panel">
+      <div class="globe-label">drag to rotate &nbsp;&middot;&nbsp; hover pins to explore</div>
+      <canvas id="globeCanvas"></canvas>
+      <div id="pinTooltip">
+        <div class="tt-label" id="ttLabel"></div>
+        <div class="tt-name" id="ttName"></div>
+        <div class="tt-sub" id="ttSub"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="coords">41.3083&deg; N &nbsp; 72.9279&deg; W</div>
+  <div class="tagline">science across the world</div>
+
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "https://cdn.jsdelivr.net/npm/three@0.161.0/build/three.module.js",
+      "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.161.0/examples/jsm/"
+    }
+  }
+  </script>
+
+  <script type="module">
+    import * as THREE from 'three';
+
+    // Pin data
+    const PINS = {
+      higley:   { lat:41.3028, lng:-72.9399, label:'Neuroscience · Yale SOM', name:'Higley Lab', sub:'New Haven, CT', color:0x44ccff, glowColor:'rgba(68,204,255,' },
+      pcdd:     { lat:41.3115, lng:-72.9247, label:'MedTech · Yale Engineering', name:'PCDD Project', sub:'New Haven, CT', color:0x44eeaa, glowColor:'rgba(68,238,170,' },
+      fermilab: { lat:41.8420, lng:-88.2568, label:'Astrophysics · Fermilab', name:'Gravitational Lens CNN', sub:'Batavia, IL', color:0xffcc44, glowColor:'rgba(255,204,68,' },
+      stanford: { lat:37.4275, lng:-122.1697, label:'Proteomics · Stanford', name:'Mass Spectrometry Lab', sub:'Palo Alto, CA', color:0x5588ff, glowColor:'rgba(85,136,255,' },
+      cambridge:{ lat:52.2053, lng:0.1218, label:'STEM Research · CCIR', name:'Cambridge Centre', sub:'Cambridge, UK', color:0xcc88ff, glowColor:'rgba(204,136,255,' },
+    };
+
+    const canvas = document.getElementById('globeCanvas');
+    const container = canvas.parentElement;
+
+    const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: false });
+    renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+    renderer.setClearColor(0x060d18, 1);
+
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(40, 1, 0.1, 1000);
+    camera.position.set(0, 0, 3.2);
+
+    // Resize
+    function resize() {
+      const w = container.clientWidth, h = container.clientHeight;
+      renderer.setSize(w, h);
+      camera.aspect = w / h;
+      camera.updateProjectionMatrix();
+    }
+    resize();
+    new ResizeObserver(resize).observe(container);
+
+    // Lights
+    scene.add(new THREE.AmbientLight(0x1a2a4a, 2.2));
+    const sun = new THREE.DirectionalLight(0xffffff, 2.0);
+    sun.position.set(5, 3, 5);
+    scene.add(sun);
+    const rim = new THREE.DirectionalLight(0x8899ff, 0.8);
+    rim.position.set(-4, 2, -3);
+    scene.add(rim);
+
+    const GLOBE_R = 1.0;
+
+    function buildEarthTexture() {
+      const W = 2048, H = 1024;
+      const c = document.createElement('canvas');
+      c.width = W; c.height = H;
+      const ctx = c.getContext('2d');
+
+      const ocean = ctx.createLinearGradient(0, 0, 0, H);
+      ocean.addColorStop(0, '#0a1a3d');
+      ocean.addColorStop(0.5, '#0d2248');
+      ocean.addColorStop(1, '#081630');
+      ctx.fillStyle = ocean;
+      ctx.fillRect(0, 0, W, H);
+
+      function toXY(lat, lng) {
+        return [(lng + 180) / 360 * W, (90 - lat) / 180 * H];
+      }
+
+      function continent(coords, fillColor) {
+        ctx.beginPath();
+        coords.forEach(([lat, lng], i) => {
+          const [x, y] = toXY(lat, lng);
+          i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+        });
+        ctx.closePath();
+        ctx.fillStyle = fillColor;
+        ctx.fill();
+      }
+
+      const LAND = '#1a3a2a';
+      const LAND2 = '#162e22';
+      const LAND_HI = '#1f4030';
+
+      // North America
+      continent([[71,-168],[66,-166],[62,-166],[58,-162],[56,-160],[52,-174],[50,-130],[48,-125],[45,-124],[42,-124],[38,-123],[34,-120],[28,-114],[24,-110],[20,-105],[17,-94],[16,-90],[18,-94],[22,-106],[22,-100],[24,-98],[28,-97],[30,-98],[32,-97],[35,-97],[37,-97],[40,-80],[44,-67],[47,-55],[49,-55],[54,-58],[58,-62],[62,-65],[65,-68],[70,-75],[73,-72],[76,-63],[75,-57],[68,-54],[60,-46],[60,-48],[63,-52],[65,-55],[70,-56],[72,-56],[74,-60],[76,-64],[80,-66],[82,-54],[83,-30],[83,0],[83,30],[80,20],[76,20],[72,24],[68,28],[66,28],[64,25],[62,25],[60,28],[58,26],[56,22],[54,18],[52,16],[54,14],[56,10],[58,8],[60,5],[62,5],[64,12],[66,14],[68,16],[70,20],[72,24],[74,26],[76,28],[76,34],[72,30],[68,28]], LAND2);
+
+      // North America main body
+      continent([[71,-168],[64,-167],[60,-167],[56,-160],[50,-128],[48,-124],[42,-124],[38,-123],[34,-120],[28,-114],[22,-100],[16,-92],[14,-88],[10,-84],[8,-77],[10,-75],[14,-73],[18,-70],[22,-90],[25,-90],[22,-88],[22,-80],[26,-78],[26,-82],[28,-82],[30,-84],[32,-82],[33,-81],[35,-78],[33,-75],[32,-78],[30,-80],[28,-80],[25,-80],[24,-78],[23,-74],[24,-72],[40,-74],[42,-72],[45,-66],[47,-55],[49,-54],[54,-58],[58,-62],[62,-65],[65,-68],[70,-75],[72,-76],[74,-78],[76,-80],[78,-80],[80,-85],[82,-90],[83,-95],[83,-130],[83,-160],[80,-167],[76,-166],[72,-168]], LAND);
+
+      // Greenland
+      continent([[83,-30],[83,-70],[76,-72],[68,-54],[60,-44],[60,-48],[63,-52],[65,-55],[70,-56],[72,-56],[74,-60],[76,-64],[80,-66],[82,-42],[83,-30]], LAND2);
+
+      // South America
+      continent([[12,-72],[10,-62],[8,-60],[5,-52],[0,-50],[-5,-36],[-10,-37],[-12,-40],[-15,-40],[-18,-40],[-20,-41],[-22,-43],[-24,-46],[-26,-48],[-28,-50],[-30,-52],[-33,-53],[-35,-57],[-38,-58],[-40,-62],[-42,-65],[-44,-66],[-46,-66],[-48,-68],[-50,-69],[-52,-70],[-54,-69],[-55,-68],[-53,-70],[-50,-70],[-48,-66],[-46,-64],[-44,-64],[-40,-62],[-38,-58],[-35,-57],[-33,-53],[-30,-50],[-28,-50],[-26,-48],[-24,-44],[-20,-42],[-18,-40],[-14,-38],[-10,-37],[-5,-35],[0,-50],[4,-60],[8,-60],[10,-62],[12,-72],[10,-76],[8,-79],[4,-77],[0,-80],[-4,-80],[-2,-79],[0,-78],[2,-77],[5,-77],[8,-78],[10,-76]], LAND);
+
+      // Europe
+      continent([[71,26],[70,22],[68,18],[64,14],[62,6],[58,5],[55,8],[52,4],[51,2],[49,0],[46,-2],[44,0],[43,3],[42,3],[40,0],[38,0],[36,-6],[36,-10],[38,-10],[40,-8],[40,-6],[42,-9],[44,-8],[46,-2],[48,0],[50,2],[52,4],[55,8],[57,10],[60,5],[62,6],[64,14],[66,16],[68,18],[70,22],[72,26],[74,24],[76,22],[76,28],[74,30],[72,30],[70,30],[68,28],[66,28],[64,26],[62,26],[60,30],[58,28],[56,24],[54,20],[52,18],[50,18],[48,22],[46,22],[44,22],[42,20],[40,20],[38,18],[36,16],[36,14],[38,14],[40,18],[42,16],[44,14],[46,14],[48,16],[50,16],[52,14],[54,12],[56,10],[58,8],[60,6],[62,6],[64,12],[66,14],[68,16],[70,20],[72,24],[74,26],[76,28],[76,34],[74,34],[72,32],[70,32],[68,30]], LAND_HI);
+
+      // Africa
+      continent([[36,10],[32,10],[28,6],[22,14],[18,16],[14,14],[10,14],[6,10],[2,8],[-2,8],[-4,10],[-6,12],[-8,12],[-10,14],[-12,14],[-14,12],[-16,12],[-18,12],[-20,14],[-22,14],[-24,14],[-26,16],[-28,18],[-30,18],[-32,18],[-34,18],[-34,24],[-32,28],[-30,30],[-28,32],[-26,34],[-24,36],[-20,36],[-16,36],[-12,40],[-10,40],[-6,40],[-2,42],[0,42],[2,42],[4,40],[6,38],[8,38],[10,40],[12,42],[14,42],[16,40],[18,38],[20,38],[22,38],[24,36],[26,34],[28,34],[30,36],[32,36],[34,36],[36,34],[38,36],[38,42],[36,44],[34,44],[32,42],[28,40],[26,34],[24,34],[22,38],[18,38],[14,42],[10,44],[6,42],[2,42],[0,42],[-4,42],[-8,40],[-12,40],[-16,36],[-20,36],[-24,36],[-26,34],[-28,32],[-30,28],[-34,26],[-34,18],[-30,16],[-26,14],[-22,14],[-18,12],[-14,10],[-10,14],[-6,12],[-4,10],[-2,8],[2,8],[6,10],[10,14],[14,14],[18,16],[22,14],[26,12],[30,10],[34,10],[36,10]], LAND_HI);
+
+      // Asia main
+      continent([[72,180],[74,174],[76,168],[78,162],[80,156],[80,140],[76,136],[72,132],[68,128],[64,124],[60,120],[56,120],[52,116],[48,114],[44,110],[40,110],[36,108],[32,108],[28,104],[24,100],[20,100],[16,100],[12,100],[8,98],[4,100],[8,98],[12,100],[16,102],[20,100],[24,100],[28,104],[32,108],[36,110],[40,112],[44,110],[48,114],[52,116],[56,118],[60,120],[64,126],[68,130],[72,134],[76,138],[80,142],[80,156],[78,165],[76,170],[74,176],[72,180]], LAND2);
+
+      // Middle East / Arabia
+      continent([[36,36],[32,36],[28,34],[24,36],[20,38],[18,40],[16,44],[14,44],[12,44],[12,48],[14,50],[16,54],[18,56],[20,58],[22,60],[24,60],[26,58],[28,60],[30,62],[32,58],[34,54],[36,52],[38,48],[38,44],[36,36]], LAND_HI);
+
+      // India
+      continent([[28,68],[24,68],[20,70],[16,73],[12,77],[8,78],[8,80],[10,80],[12,80],[14,80],[16,82],[18,84],[20,86],[22,88],[24,90],[28,90],[28,72],[28,68]], LAND_HI);
+
+      // SE Asia
+      continent([[20,100],[16,100],[12,100],[8,102],[4,104],[0,104],[4,108],[8,108],[10,105],[12,108],[14,108],[16,108],[18,106],[20,106],[22,104],[24,102],[28,104]], LAND2);
+
+      // Russia/Siberia
+      continent([[72,180],[72,160],[74,150],[76,140],[76,130],[72,128],[68,128],[64,132],[60,132],[56,130],[52,128],[48,124],[44,118],[40,116],[36,120],[38,130],[40,136],[44,136],[48,138],[52,140],[56,140],[60,140],[64,140],[68,140],[72,145],[74,150],[76,158],[78,164],[80,170],[80,178],[76,180],[72,180]], LAND2);
+
+      // Australia
+      continent([[-14,128],[-16,122],[-20,114],[-24,114],[-28,114],[-32,116],[-34,118],[-34,122],[-32,126],[-28,130],[-24,132],[-20,134],[-16,136],[-14,136],[-12,134],[-10,136],[-12,142],[-14,144],[-16,146],[-18,148],[-20,150],[-22,150],[-24,152],[-26,154],[-28,154],[-30,152],[-32,152],[-34,150],[-36,150],[-38,148],[-40,148],[-38,142],[-36,140],[-34,138],[-32,136],[-30,132],[-28,130],[-24,130],[-20,130],[-16,130],[-14,128]], LAND_HI);
+
+      // UK
+      continent([[58,0],[56,-2],[54,-2],[52,-4],[52,-2],[54,0],[56,0],[58,0]], LAND2);
+      continent([[54,-8],[52,-10],[52,-8],[54,-8]], LAND2);
+
+      // Japan
+      continent([[44,142],[42,140],[40,140],[36,136],[34,132],[34,136],[36,138],[38,140],[40,142],[42,142],[44,142]], LAND2);
+
+      // Grid lines
+      ctx.globalAlpha = 0.04;
+      ctx.strokeStyle = '#8899cc';
+      ctx.lineWidth = 1;
+      for (let lat = -90; lat <= 90; lat += 30) {
+        const y = (90 - lat) / 180 * H;
+        ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(W, y); ctx.stroke();
+      }
+      for (let lng = -180; lng <= 180; lng += 30) {
+        const x = (lng + 180) / 360 * W;
+        ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, H); ctx.stroke();
+      }
+      ctx.globalAlpha = 1;
+
+      // Arctic/Antarctic ice
+      const arctic = ctx.createRadialGradient(W/2, 0, 0, W/2, 0, H*0.18);
+      arctic.addColorStop(0, 'rgba(200,220,240,0.9)');
+      arctic.addColorStop(0.6, 'rgba(180,200,225,0.5)');
+      arctic.addColorStop(1, 'rgba(160,190,210,0)');
+      ctx.fillStyle = arctic; ctx.fillRect(0, 0, W, H * 0.18);
+
+      const ant = ctx.createRadialGradient(W/2, H, 0, W/2, H, H*0.16);
+      ant.addColorStop(0, 'rgba(210,225,238,0.92)');
+      ant.addColorStop(0.5, 'rgba(190,210,228,0.5)');
+      ant.addColorStop(1, 'rgba(170,200,220,0)');
+      ctx.fillStyle = ant; ctx.fillRect(0, H * 0.84, W, H * 0.16);
+
+      return new THREE.CanvasTexture(c);
+    }
+
+    const earthTex = buildEarthTexture();
+    const earthGeo = new THREE.SphereGeometry(GLOBE_R, 128, 64);
+    const earthMat = new THREE.MeshPhongMaterial({
+      map: earthTex,
+      shininess: 12,
+      specular: new THREE.Color(0x112244),
+    });
+    const earthMesh = new THREE.Mesh(earthGeo, earthMat);
+    scene.add(earthMesh);
+
+    // Atmosphere
+    const atmGeo = new THREE.SphereGeometry(GLOBE_R * 1.025, 64, 32);
+    const atmMat = new THREE.ShaderMaterial({
+      side: THREE.FrontSide,
+      transparent: true,
+      depthWrite: false,
+      uniforms: { glowColor: { value: new THREE.Color(0x1a3a7a) } },
+      vertexShader: `
+        varying vec3 vNormal;
+        varying vec3 vViewDir;
+        void main() {
+          vNormal = normalize(normalMatrix * normal);
+          vec4 mvPos = modelViewMatrix * vec4(position, 1.0);
+          vViewDir = normalize(-mvPos.xyz);
+          gl_Position = projectionMatrix * mvPos;
+        }
+      `,
+      fragmentShader: `
+        uniform vec3 glowColor;
+        varying vec3 vNormal;
+        varying vec3 vViewDir;
+        void main() {
+          float rim = 1.0 - clamp(dot(vNormal, vViewDir), 0.0, 1.0);
+          float alpha = pow(rim, 3.5) * 0.55;
+          gl_FragColor = vec4(glowColor, alpha);
+        }
+      `
+    });
+    scene.add(new THREE.Mesh(atmGeo, atmMat));
+
+    // Stars
+    const N = 8000;
+    const sPos = new Float32Array(N * 3);
+    for (let i = 0; i < N; i++) {
+      const theta = Math.random() * Math.PI * 2;
+      const phi = Math.acos(2 * Math.random() - 1);
+      const r = 200 + Math.random() * 100;
+      sPos[i*3] = r * Math.sin(phi) * Math.cos(theta);
+      sPos[i*3+1] = r * Math.sin(phi) * Math.sin(theta);
+      sPos[i*3+2] = r * Math.cos(phi);
+    }
+    const sGeo = new THREE.BufferGeometry();
+    sGeo.setAttribute('position', new THREE.BufferAttribute(sPos, 3));
+    scene.add(new THREE.Points(sGeo, new THREE.PointsMaterial({
+      color: 0xd0e4ff, size: 0.3, transparent: true, opacity: 0.7, sizeAttenuation: true
+    })));
+
+    function latLngToVec3(lat, lng, r) {
+      const phi = (90 - lat) * Math.PI / 180;
+      const theta = (lng + 180) * Math.PI / 180;
+      return new THREE.Vector3(
+        -r * Math.sin(phi) * Math.cos(theta),
+        r * Math.cos(phi),
+        r * Math.sin(phi) * Math.sin(theta)
+      );
+    }
+
+    // Pins
+    const pinObjects = [];
+    const pinGroup = new THREE.Group();
+
+    Object.entries(PINS).forEach(([id, pin]) => {
+      const pos = latLngToVec3(pin.lat, pin.lng, GLOBE_R + 0.01);
+      const normal = pos.clone().normalize();
+
+      const stemHeight = 0.055;
+      const stemGeo = new THREE.CylinderGeometry(0.003, 0.003, stemHeight, 6);
+      const stemMat = new THREE.MeshBasicMaterial({ color: pin.color, transparent: true, opacity: 0.7 });
+      const stem = new THREE.Mesh(stemGeo, stemMat);
+
+      const headGeo = new THREE.SphereGeometry(0.022, 16, 16);
+      const headMat = new THREE.MeshStandardMaterial({
+        color: pin.color, emissive: pin.color, emissiveIntensity: 0.6,
+        metalness: 0.1, roughness: 0.3
+      });
+      const head = new THREE.Mesh(headGeo, headMat);
+
+      const gc = document.createElement('canvas'); gc.width = gc.height = 64;
+      const gctx = gc.getContext('2d');
+      const gr = gctx.createRadialGradient(32, 32, 0, 32, 32, 32);
+      gr.addColorStop(0, pin.glowColor + '0.8)');
+      gr.addColorStop(0.4, pin.glowColor + '0.3)');
+      gr.addColorStop(1, pin.glowColor + '0)');
+      gctx.fillStyle = gr; gctx.fillRect(0, 0, 64, 64);
+      const glow = new THREE.Sprite(new THREE.SpriteMaterial({
+        map: new THREE.CanvasTexture(gc), transparent: true, depthWrite: false, blending: THREE.AdditiveBlending
+      }));
+      glow.scale.set(0.18, 0.18, 1);
+
+      const pinGrp = new THREE.Group();
+      stem.position.set(0, stemHeight / 2, 0);
+      head.position.set(0, stemHeight + 0.022, 0);
+      glow.position.set(0, stemHeight + 0.022, 0);
+      pinGrp.add(stem, head, glow);
+
+      pinGrp.position.copy(pos);
+      const up = new THREE.Vector3(0, 1, 0);
+      const q = new THREE.Quaternion().setFromUnitVectors(up, normal);
+      pinGrp.setRotationFromQuaternion(q);
+
+      pinGroup.add(pinGrp);
+      pinObjects.push({ id, head, pinGrp, pin });
+    });
+    scene.add(pinGroup);
+
+    // Drag
+    let isDragging = false, prevMouse = { x: 0, y: 0 };
+    let rotX = 0.3, rotY = -0.5;
+    let velX = 0, velY = 0;
+    const ROT_SPEED = 0.008;
+
+    canvas.addEventListener('mousedown', e => {
+      isDragging = true;
+      prevMouse = { x: e.clientX, y: e.clientY };
+      velX = velY = 0;
+    });
+    window.addEventListener('mousemove', e => {
+      if (!isDragging) return;
+      const dx = e.clientX - prevMouse.x;
+      const dy = e.clientY - prevMouse.y;
+      velX = dy * ROT_SPEED;
+      velY = dx * ROT_SPEED;
+      rotX += velX; rotY += velY;
+      prevMouse = { x: e.clientX, y: e.clientY };
+    });
+    window.addEventListener('mouseup', () => { isDragging = false; });
+
+    let prevTouch = null;
+    canvas.addEventListener('touchstart', e => { prevTouch = e.touches[0]; velX = velY = 0; }, { passive: true });
+    canvas.addEventListener('touchmove', e => {
+      if (!prevTouch) return;
+      const t = e.touches[0];
+      rotX += (t.clientY - prevTouch.clientY) * ROT_SPEED;
+      rotY += (t.clientX - prevTouch.clientX) * ROT_SPEED;
+      prevTouch = t;
+    }, { passive: true });
+    canvas.addEventListener('touchend', () => { prevTouch = null; });
+
+    // Hover
+    const raycaster = new THREE.Raycaster();
+    const mouse = new THREE.Vector2();
+    const tooltip = document.getElementById('pinTooltip');
+    let hoveredPin = null;
+
+    canvas.addEventListener('mousemove', e => {
+      const rect = canvas.getBoundingClientRect();
+      mouse.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
+      mouse.y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
+      raycaster.setFromCamera(mouse, camera);
+      const heads = pinObjects.map(p => p.head);
+      const hits = raycaster.intersectObjects(heads);
+      if (hits.length > 0) {
+        const found = pinObjects.find(p => p.head === hits[0].object);
+        hoveredPin = found;
+        canvas.style.cursor = 'pointer';
+        document.getElementById('ttLabel').textContent = found.pin.label;
+        document.getElementById('ttName').textContent = found.pin.name;
+        document.getElementById('ttSub').textContent = found.pin.sub;
+        tooltip.style.left = (e.clientX + 16) + 'px';
+        tooltip.style.top = (e.clientY - 10) + 'px';
+        tooltip.style.opacity = '1';
+        document.querySelectorAll('.entry').forEach(el => {
+          el.classList.toggle('active', el.dataset.pin === found.id);
+        });
+      } else {
+        hoveredPin = null;
+        canvas.style.cursor = isDragging ? 'grabbing' : 'grab';
+        tooltip.style.opacity = '0';
+      }
+    });
+
+    // Focus pin from sidebar
+    let targetRotX = rotX, targetRotY = rotY;
+    let animating = false;
+
+    window.focusPin = function(id, el) {
+      document.querySelectorAll('.entry').forEach(e => e.classList.remove('active'));
+      el.classList.add('active');
+      const pin = PINS[id];
+      if (!pin) return;
+      targetRotX = -(pin.lat * Math.PI / 180) * 0.7;
+      targetRotY = -(pin.lng + 90) * Math.PI / 180;
+      animating = true;
+    };
+
+    let lastInteract = performance.now();
+    ['mousedown','touchstart'].forEach(ev => canvas.addEventListener(ev, () => { lastInteract = performance.now(); }));
+
+    let lastT = performance.now();
+    function animate(t) {
+      requestAnimationFrame(animate);
+      const dt = (t - lastT) / 16; lastT = t;
+
+      if (!isDragging) {
+        if (animating) {
+          rotX += (targetRotX - rotX) * 0.06;
+          rotY += (targetRotY - rotY) * 0.06;
+          if (Math.abs(targetRotX - rotX) < 0.001 && Math.abs(targetRotY - rotY) < 0.001) animating = false;
+        } else {
+          rotX += velX * 0.92 * dt; velX *= 0.92;
+          rotY += velY * 0.92 * dt; velY *= 0.92;
+          if (performance.now() - lastInteract > 3000) rotY += 0.0004 * dt;
+        }
+      }
+      rotX = Math.max(-Math.PI / 2.2, Math.min(Math.PI / 2.2, rotX));
+
+      earthMesh.rotation.x = rotX;
+      earthMesh.rotation.y = rotY;
+      pinGroup.rotation.x = rotX;
+      pinGroup.rotation.y = rotY;
+
+      const pulse = 0.85 + 0.15 * Math.sin(t * 0.003);
+      pinObjects.forEach(p => {
+        const isHovered = hoveredPin && hoveredPin.id === p.id;
+        p.head.material.emissiveIntensity = isHovered ? 1.2 : 0.6 * pulse;
+        p.head.scale.setScalar(isHovered ? 1.5 : 1.0);
+      });
+
+      renderer.render(scene, camera);
+    }
+    requestAnimationFrame(animate);
+  </script>
+</body>
+</html>
