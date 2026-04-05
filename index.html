@@ -80,48 +80,93 @@
     </div>
   </div>
 
-  <script src="land.js"></script>
   <script>
     const PLANET_INFO=[
-      {label:'Research \u00b7 Neuroscience',title:'Higley Lab \u2014 Locus Coeruleus',body:'Characterizing <strong>locus coeruleus axon degeneration</strong> in PPT1-deficient mice to investigate <strong>norepinephrine dysfunction</strong> in Parkinson\u2019s disease at Yale School of Medicine. Work spans confocal microscopy, IHC, and perfusion protocols.',accentHex:'#44ccff'},
-      {label:'Research \u00b7 Astrophysics',title:'Gravitational Lens CNN \u2014 Fermilab',body:'Generated 40,000-image benchmark datasets of <strong>double-source plane gravitational lenses</strong> and Einstein rings at Fermi National Accelerator Laboratory. Trained PyTorch CNNs for automated morphological classification. <strong>Published at AGU Annual Meeting 2023.</strong>',accentHex:'#5588ff'},
-      {label:'Consulting \u00b7 Strategy',title:'Yale Healthcare Consulting Collective',body:'Client Lead on healthcare strategy engagements. Current project: configuring a <strong>decision support tool for the American Red Cross</strong> to benchmark vehicle counts against live inventory and quantify regional fleet surplus.',accentHex:'#cc88ff'},
-      {label:'Startup \u00b7 MedTech',title:'PCDD \u2014 Yale Engineering',body:'Developing business strategy for a <strong>patent-pending medication dispenser &amp; deactivator</strong> device under Dr. Wiznia at Yale School of Engineering. Work spans ingress mechanisms, activated charcoal deactivation protocols, and go-to-market planning.',accentHex:'#44eeaa'},
-      {label:'Research \u00b7 Proteomics',title:'Mass Spectrometry &amp; Proteomics',body:'Research spanning <strong>computational and wet-lab proteomics</strong>, including capillary zone electrophoresis, liquid chromatography, and antibody engineering. Prior work at Stanford on mass spectrometry workflows and cell culture.',accentHex:'#ffcc44'}
+      {label:'Research · Neuroscience',title:'Higley Lab — Locus Coeruleus',body:'Characterizing <strong>locus coeruleus axon degeneration</strong> in PPT1-deficient mice to investigate <strong>norepinephrine dysfunction</strong> in Parkinson\u2019s disease at Yale School of Medicine. Work spans confocal microscopy, IHC, and perfusion protocols.',accentHex:'#44ccff'},
+      {label:'Research · Astrophysics',title:'Gravitational Lens CNN — Fermilab',body:'Generated 40,000-image benchmark datasets of <strong>double-source plane gravitational lenses</strong> and Einstein rings at Fermi National Accelerator Laboratory. Trained PyTorch CNNs for automated morphological classification. <strong>Published at AGU Annual Meeting 2023.</strong>',accentHex:'#5588ff'},
+      {label:'Consulting · Strategy',title:'Yale Healthcare Consulting Collective',body:'Client Lead on healthcare strategy engagements. Current project: configuring a <strong>decision support tool for the American Red Cross</strong> to benchmark vehicle counts against live inventory and quantify regional fleet surplus.',accentHex:'#cc88ff'},
+      {label:'Startup · MedTech',title:'PCDD — Yale Engineering',body:'Developing business strategy for a <strong>patent-pending medication dispenser &amp; deactivator</strong> device under Dr. Wiznia at Yale School of Engineering. Work spans ingress mechanisms, activated charcoal deactivation protocols, and go-to-market planning.',accentHex:'#44eeaa'},
+      {label:'Research · Proteomics',title:'Mass Spectrometry &amp; Proteomics',body:'Research spanning <strong>computational and wet-lab proteomics</strong>, including capillary zone electrophoresis, liquid chromatography, and antibody engineering. Prior work at Stanford on mass spectrometry workflows and cell culture.',accentHex:'#ffcc44'}
     ];
 
-    function buildEarthTexture(){
-      const W=2048,H=1024;
+    // Build Earth texture — fetches real Natural Earth GeoJSON for accurate coastlines
+    async function buildEarthTexture() {
+      const W=2048, H=1024;
       const c=document.createElement('canvas');
-      c.width=W;c.height=H;
+      c.width=W; c.height=H;
       const ctx=c.getContext('2d');
+
+      // Ocean
       const og=ctx.createLinearGradient(0,0,0,H);
-      og.addColorStop(0,'#081828');og.addColorStop(0.5,'#0c2038');og.addColorStop(1,'#071422');
-      ctx.fillStyle=og;ctx.fillRect(0,0,W,H);
-      function px(lon,lat){return[(lon+180)/360*W,(90-lat)/180*H];}
-      ctx.fillStyle='#243829';ctx.strokeStyle='#2e4832';ctx.lineWidth=0.5;
-      for(const poly of LAND_POLYS){
-        if(poly.length<3)continue;
+      og.addColorStop(0,'#081828'); og.addColorStop(0.5,'#0c2038'); og.addColorStop(1,'#071422');
+      ctx.fillStyle=og; ctx.fillRect(0,0,W,H);
+
+      function px(lon,lat){ return [(lon+180)/360*W, (90-lat)/180*H]; }
+
+      function drawRings(rings){
         ctx.beginPath();
-        const[x0,y0]=px(poly[0][0],poly[0][1]);ctx.moveTo(x0,y0);
-        for(let i=1;i<poly.length;i++){const[x,y]=px(poly[i][0],poly[i][1]);ctx.lineTo(x,y);}
-        ctx.closePath();ctx.fill();ctx.stroke();
+        for(const ring of rings){
+          if(ring.length<3) continue;
+          const [x0,y0]=px(ring[0][0],ring[0][1]); ctx.moveTo(x0,y0);
+          for(let i=1;i<ring.length;i++){const [x,y]=px(ring[i][0],ring[i][1]);ctx.lineTo(x,y);}
+          ctx.closePath();
+        }
+        ctx.fill(); ctx.stroke();
       }
-      ctx.fillStyle='rgba(55,85,50,0.2)';ctx.lineWidth=0;
-      for(const poly of LAND_POLYS){
-        if(poly.length<3)continue;
-        ctx.beginPath();
-        const[x0,y0]=px(poly[0][0],poly[0][1]);ctx.moveTo(x0,y0);
-        for(let i=1;i<poly.length;i++){const[x,y]=px(poly[i][0],poly[i][1]);ctx.lineTo(x,y);}
-        ctx.closePath();ctx.fill();
+
+      try {
+        const res = await fetch('https://raw.githubusercontent.com/holtzy/D3-graph-gallery/master/DATA/world.geojson');
+        const gj = await res.json();
+        ctx.fillStyle='#243829'; ctx.strokeStyle='#2e4832'; ctx.lineWidth=0.5;
+        for(const f of gj.features){
+          const g=f.geometry;
+          if(g.type==='Polygon') drawRings(g.coordinates);
+          else if(g.type==='MultiPolygon') for(const poly of g.coordinates) drawRings(poly);
+        }
+        // Second pass: subtle highlight
+        ctx.fillStyle='rgba(55,85,50,0.18)'; ctx.strokeStyle='transparent'; ctx.lineWidth=0;
+        for(const f of gj.features){
+          const g=f.geometry;
+          if(g.type==='Polygon') drawRings(g.coordinates);
+          else if(g.type==='MultiPolygon') for(const poly of g.coordinates) drawRings(poly);
+        }
+      } catch(e) {
+        // Fallback: simple painted continents if fetch fails
+        ctx.fillStyle='#243829'; ctx.strokeStyle='#2e4832'; ctx.lineWidth=0.8;
+        const fallback=[
+          [[-170,72],[-50,72],[-50,15],[-80,8],[-80,25],[-115,25],[-120,35],[-125,50],[-140,60],[-170,65],[-170,72]],
+          [[-80,12],[-75,12],[-77,8],[-82,8],[-82,10],[-80,12]],
+          [[-35,-5],[-35,-55],[-70,-55],[-80,-35],[-80,-5],[-60,5],[-50,5],[-35,-5]],
+          [[-10,72],[30,72],[30,35],[35,30],[40,15],[15,0],[-18,15],[-10,35],[-10,72]],
+          [[25,72],[65,72],[70,60],[45,40],[30,42],[25,50],[25,72]],
+          [[25,42],[40,40],[65,38],[80,28],[70,20],[60,20],[40,12],[30,12],[25,30],[25,42]],
+          [[60,60],[130,60],[140,45],[140,25],[120,20],[100,5],[95,5],[100,20],[105,15],[110,20],[80,10],[70,15],[60,25],[55,40],[60,60]],
+          [[130,50],[145,50],[145,35],[130,35],[130,50]],
+          [[130,45],[145,45],[145,42],[130,42],[130,45]],
+          [[114,-20],[155,-20],[152,-38],[130,-38],[115,-35],[114,-20]],
+          [[-180,-70],[180,-70],[180,-90],[-180,-90],[-180,-70]]
+        ];
+        for(const poly of fallback){
+          ctx.beginPath();
+          const[x0,y0]=px(poly[0][0],poly[0][1]);ctx.moveTo(x0,y0);
+          for(let i=1;i<poly.length;i++){const[x,y]=px(poly[i][0],poly[i][1]);ctx.lineTo(x,y);}
+          ctx.closePath();ctx.fill();ctx.stroke();
+        }
       }
-      ctx.strokeStyle='rgba(80,150,180,0.045)';ctx.lineWidth=0.4;
+
+      // Graticule
+      ctx.strokeStyle='rgba(80,150,180,0.045)'; ctx.lineWidth=0.4;
       for(let lon=-180;lon<=180;lon+=30){ctx.beginPath();const[x]=px(lon,90);ctx.moveTo(x,0);ctx.lineTo(x,H);ctx.stroke();}
       for(let lat=-90;lat<=90;lat+=30){ctx.beginPath();const[,y]=px(0,lat);ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke();}
-      const tg=ctx.createLinearGradient(0,0,0,H*0.07);tg.addColorStop(0,'rgba(200,230,255,0.22)');tg.addColorStop(1,'rgba(200,230,255,0)');
+
+      // Polar ice glow
+      const tg=ctx.createLinearGradient(0,0,0,H*0.07);
+      tg.addColorStop(0,'rgba(200,230,255,0.22)');tg.addColorStop(1,'rgba(200,230,255,0)');
       ctx.fillStyle=tg;ctx.fillRect(0,0,W,H*0.07);
-      const bg=ctx.createLinearGradient(0,H*0.93,0,H);bg.addColorStop(0,'rgba(200,230,255,0)');bg.addColorStop(1,'rgba(200,230,255,0.18)');
+      const bg=ctx.createLinearGradient(0,H*0.93,0,H);
+      bg.addColorStop(0,'rgba(200,230,255,0)');bg.addColorStop(1,'rgba(200,230,255,0.18)');
       ctx.fillStyle=bg;ctx.fillRect(0,H*0.93,W,H*0.07);
+
       return c;
     }
   </script>
@@ -176,12 +221,7 @@
       scene.add(new THREE.Mesh(new THREE.RingGeometry(15.8,16.4,180),new THREE.MeshBasicMaterial({color:0x2a3a5a,side:THREE.DoubleSide,transparent:true,opacity:0.15})));
       scene.add(new THREE.Mesh(new THREE.RingGeometry(20.0,20.2,180),new THREE.MeshBasicMaterial({color:0x1e2e48,side:THREE.DoubleSide,transparent:true,opacity:0.08})));
       function makeRingTex(gb){var c=document.createElement('canvas');c.width=256;c.height=1;var ctx=c.getContext('2d');var g=ctx.createLinearGradient(0,0,256,0);g.addColorStop(0,gb.replace('1)','0.0)'));g.addColorStop(0.08,gb.replace('1)','0.8)'));g.addColorStop(0.4,gb.replace('1)','0.55)'));g.addColorStop(0.65,gb.replace('1)','0.25)'));g.addColorStop(1,gb.replace('1)','0.0)'));ctx.fillStyle=g;ctx.fillRect(0,0,256,1);return new THREE.CanvasTexture(c);}
-      var earthCanvas=buildEarthTexture();
-      var earthTex=new THREE.CanvasTexture(earthCanvas);earthTex.needsUpdate=true;
-      var atmC=document.createElement('canvas');atmC.width=atmC.height=256;
-      var atmCtx=atmC.getContext('2d');var ag=atmCtx.createRadialGradient(128,128,50,128,128,128);
-      ag.addColorStop(0,'rgba(60,140,255,0)');ag.addColorStop(0.6,'rgba(60,140,255,0.08)');ag.addColorStop(0.82,'rgba(80,160,255,0.22)');ag.addColorStop(1,'rgba(100,180,255,0)');
-      atmCtx.fillStyle=ag;atmCtx.fillRect(0,0,256,256);
+
       var configs=[
         {color:0x44ccff,emissive:0x0a2a44,glow:'rgba(60,200,255,',ringColor:'rgba(60,200,255,1)',ringTilt:{x:0.42,z:0.18},spinAxis:new THREE.Vector3(0.2,1,0.1).normalize(),spinSpeed:0.008},
         {color:0x5588ff,emissive:0x080e38,glow:'rgba(80,120,255,',ringColor:'rgba(80,120,255,1)',ringTilt:{x:0.50,z:-0.14},spinAxis:new THREE.Vector3(-0.1,1,0.3).normalize(),spinSpeed:0.012},
@@ -193,11 +233,23 @@
       var sphereGeo=new THREE.SphereGeometry(1.9,128,64);
       var groups=[],meshes=[];
       var quat=new THREE.Quaternion();
-      for(var i=0;i<5;i++){
+
+      // Atmosphere canvas for Earth glow sprite
+      var atmC=document.createElement('canvas');atmC.width=atmC.height=256;
+      var atmCtx=atmC.getContext('2d');
+      var ag=atmCtx.createRadialGradient(128,128,50,128,128,128);
+      ag.addColorStop(0,'rgba(60,140,255,0)');ag.addColorStop(0.6,'rgba(60,140,255,0.08)');ag.addColorStop(0.82,'rgba(80,160,255,0.22)');ag.addColorStop(1,'rgba(100,180,255,0)');
+      atmCtx.fillStyle=ag;atmCtx.fillRect(0,0,256,256);
+
+      // Build Earth planet with async texture; others build synchronously
+      function buildPlanet(i, earthTex) {
         var cfg=configs[i];
         var mat;
-        if(cfg.isEarth){mat=new THREE.MeshStandardMaterial({map:earthTex,emissive:new THREE.Color(cfg.emissive),emissiveIntensity:0.08,metalness:0.0,roughness:0.7});}
-        else{mat=new THREE.MeshStandardMaterial({color:cfg.color,emissive:cfg.emissive,emissiveIntensity:0.35,metalness:0.18,roughness:0.3});}
+        if(cfg.isEarth){
+          mat=new THREE.MeshStandardMaterial({map:earthTex||new THREE.Texture(),emissive:new THREE.Color(cfg.emissive),emissiveIntensity:0.08,metalness:0.0,roughness:0.7});
+        } else {
+          mat=new THREE.MeshStandardMaterial({color:cfg.color,emissive:cfg.emissive,emissiveIntensity:0.35,metalness:0.18,roughness:0.3});
+        }
         var gc=document.createElement('canvas');gc.width=gc.height=128;
         var gctx=gc.getContext('2d');
         if(cfg.isEarth){gctx.drawImage(atmC,0,0,128,128);}
@@ -218,7 +270,21 @@
         group.userData.innerGroup=ig;group.userData.planetIndex=i;group.userData.isEarth=!!cfg.isEarth;
         group.position.set(Math.cos(group.userData.angleOffset)*R,Math.sin(group.userData.angleOffset)*R,Z);
         scene.add(group);groups.push(group);meshes.push(sphere);
+        return {group,sphere,mat};
       }
+
+      // Build all 5 planets immediately (Earth starts with blank texture)
+      for(var i=0;i<5;i++) buildPlanet(i, null);
+
+      // Async: upgrade Earth texture once GeoJSON loads
+      buildEarthTexture().then(function(earthCanvas){
+        var earthTex=new THREE.CanvasTexture(earthCanvas);
+        earthTex.needsUpdate=true;
+        // Find the Earth mesh (index 3) and update its map
+        meshes[3].material.map=earthTex;
+        meshes[3].material.needsUpdate=true;
+      });
+
       var raycaster=new THREE.Raycaster();
       var hint=document.getElementById('planetHint');
       var overlay=document.getElementById('popupOverlay');
