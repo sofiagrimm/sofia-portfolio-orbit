@@ -26,7 +26,8 @@
     .card-rule{width:52px;height:1px;background:linear-gradient(90deg,transparent,rgba(140,170,255,0.35),transparent);margin:22px auto;}
     .card-sub{font-size:12px;font-weight:300;letter-spacing:0.18em;text-transform:uppercase;color:rgba(150,170,220,0.40);}
     .coords{position:fixed;bottom:32px;left:48px;z-index:20;font-size:10px;letter-spacing:0.18em;color:rgba(110,130,190,0.28);font-weight:300;pointer-events:none;}
-    .tagline{position:fixed;bottom:32px;right:48px;z-index:20;font-size:10px;letter-spacing:0.18em;text-transform:uppercase;color:rgba(110,130,190,0.28);font-weight:300;pointer-events:none;}
+    .hints{position:fixed;bottom:32px;right:48px;z-index:20;text-align:right;pointer-events:none;}
+    .hints span{display:block;font-size:10px;letter-spacing:0.18em;text-transform:uppercase;color:rgba(110,130,190,0.28);font-weight:300;line-height:1.8;}
     #planetHint{position:fixed;z-index:30;pointer-events:none;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:rgba(200,220,255,0.75);background:rgba(8,14,40,0.72);backdrop-filter:blur(8px);border:1px solid rgba(120,150,255,0.18);padding:6px 12px;border-radius:20px;opacity:0;transition:opacity .18s;white-space:nowrap;}
     #popupOverlay{position:fixed;inset:0;z-index:40;background:rgba(4,8,28,0);display:flex;align-items:center;justify-content:center;pointer-events:none;transition:background .35s;}
     #popupOverlay.visible{background:rgba(4,8,28,0.55);pointer-events:auto;}
@@ -40,7 +41,7 @@
     .popup-rule{width:36px;height:1px;background:linear-gradient(90deg,rgba(140,170,255,0.4),transparent);margin-bottom:16px;}
     .popup-body{font-size:13px;font-weight:300;line-height:1.8;color:rgba(200,218,255,0.62);}
     .popup-body strong{font-weight:500;color:rgba(220,232,255,0.88);}
-    @media(max-width:768px){html,body{overflow:auto;height:auto}nav{padding:0 20px;height:58px}.nav-name{font-size:22px}.nav-links a{font-size:10px;padding:5px 8px;letter-spacing:0.10em}.nav-links .divider{display:none}.ui{position:relative;min-height:100svh;display:flex;align-items:center;justify-content:center;padding:80px 20px}.center-card{position:relative;left:auto;top:auto;transform:none;width:100%;max-width:340px;padding:32px 24px 28px;border-radius:20px}.card-eyebrow{font-size:11px;margin-bottom:14px}.card-title{font-size:36px}.card-rule{margin:16px auto}.card-sub{font-size:11px}.coords{left:20px;bottom:20px}.tagline{right:20px;bottom:20px;font-size:9px}#popupBox{padding:28px 22px 24px}.popup-title{font-size:26px}.popup-body{font-size:12px}}
+    @media(max-width:768px){html,body{overflow:auto;height:auto}nav{padding:0 20px;height:58px}.nav-name{font-size:22px}.nav-links a{font-size:10px;padding:5px 8px;letter-spacing:0.10em}.nav-links .divider{display:none}.ui{position:relative;min-height:100svh;display:flex;align-items:center;justify-content:center;padding:80px 20px}.center-card{position:relative;left:auto;top:auto;transform:none;width:100%;max-width:340px;padding:32px 24px 28px;border-radius:20px}.card-eyebrow{font-size:11px;margin-bottom:14px}.card-title{font-size:36px}.card-rule{margin:16px auto}.card-sub{font-size:11px}.coords{left:20px;bottom:20px}.hints{right:20px;bottom:20px}.hints span{font-size:9px}#popupBox{padding:28px 22px 24px}.popup-title{font-size:26px}.popup-body{font-size:12px}}
   </style>
 </head>
 <body>
@@ -63,7 +64,10 @@
     </div>
   </div>
   <div class="coords">41.3083&deg; N &nbsp; 72.9279&deg; W</div>
-  <div class="tagline">science as an explorable universe</div>
+  <div class="hints">
+    <span>drag to rotate</span>
+    <span>hover pins to explore</span>
+  </div>
   <div id="planetHint"></div>
   <div id="popupOverlay">
     <div id="popupBox">
@@ -133,16 +137,11 @@
         var lp=[];con.edges.forEach(function(e){lp.push(pts[e[0]],pts[e[1]]);});
         scene.add(new THREE.LineSegments(new THREE.BufferGeometry().setFromPoints(lp),new THREE.LineBasicMaterial({color:0x3a5888,transparent:true,opacity:0.22})));
       });
-
-      // Orbit radius reduced to 11 so the static ring sits tightly around/through the planets
       var R=11,Z=-18,SPEED=0.0004;
-
-      // Static orbit path — thin band at exactly R, opacity bumped to 0.25 so it reads clearly
       scene.add(new THREE.Mesh(
         new THREE.RingGeometry(R-0.12,R+0.12,180),
         new THREE.MeshBasicMaterial({color:0x4a6a9a,side:THREE.DoubleSide,transparent:true,opacity:0.25})
       ));
-
       function makeRingTex(gb){var c=document.createElement('canvas');c.width=256;c.height=1;var ctx=c.getContext('2d');var g=ctx.createLinearGradient(0,0,256,0);g.addColorStop(0,gb.replace('1)','0.0)'));g.addColorStop(0.08,gb.replace('1)','0.8)'));g.addColorStop(0.4,gb.replace('1)','0.55)'));g.addColorStop(0.65,gb.replace('1)','0.25)'));g.addColorStop(1,gb.replace('1)','0.0)'));ctx.fillStyle=g;ctx.fillRect(0,0,256,1);return new THREE.CanvasTexture(c);}
       var configs=[
         {color:0x44ccff,emissive:0x0a2a44,glow:'rgba(60,200,255,',ringColor:'rgba(60,200,255,1)',ringTilt:{x:0.42,z:0.18},spinAxis:new THREE.Vector3(0.2,1,0.1).normalize(),spinSpeed:0.008},
@@ -151,7 +150,6 @@
         {color:0x44eeaa,emissive:0x00281a,glow:'rgba(60,240,170,',ringColor:'rgba(60,240,170,1)',ringTilt:{x:0.44,z:0.10},spinAxis:new THREE.Vector3(-0.2,1,0.15).normalize(),spinSpeed:0.009},
         {color:0xffcc44,emissive:0x281a00,glow:'rgba(255,200,50,',ringColor:'rgba(255,200,60,1)',ringTilt:{x:0.38,z:-0.22},spinAxis:new THREE.Vector3(0.15,0.95,0.25).normalize(),spinSpeed:0.007}
       ];
-      // Planet radius 1.9; per-planet Saturn ring straddles equator: inner=1.3, outer=2.5
       var PLANET_R=1.9,RING_INNER=1.3,RING_OUTER=2.5;
       var sphereGeo=new THREE.SphereGeometry(PLANET_R,128,64);
       var groups=[],meshes=[];
