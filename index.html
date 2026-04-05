@@ -137,12 +137,30 @@
         var lp=[];con.edges.forEach(function(e){lp.push(pts[e[0]],pts[e[1]]);});
         scene.add(new THREE.LineSegments(new THREE.BufferGeometry().setFromPoints(lp),new THREE.LineBasicMaterial({color:0x3a5888,transparent:true,opacity:0.22})));
       });
-      var R=11,Z=-18,SPEED=0.0004;
+
+      // Orbit radius expanded to 14
+      var R=14,Z=-18,SPEED=0.0004;
+
+      // Static orbit path
       scene.add(new THREE.Mesh(
         new THREE.RingGeometry(R-0.12,R+0.12,180),
         new THREE.MeshBasicMaterial({color:0x4a6a9a,side:THREE.DoubleSide,transparent:true,opacity:0.25})
       ));
-      function makeRingTex(gb){var c=document.createElement('canvas');c.width=256;c.height=1;var ctx=c.getContext('2d');var g=ctx.createLinearGradient(0,0,256,0);g.addColorStop(0,gb.replace('1)','0.0)'));g.addColorStop(0.08,gb.replace('1)','0.8)'));g.addColorStop(0.4,gb.replace('1)','0.55)'));g.addColorStop(0.65,gb.replace('1)','0.25)'));g.addColorStop(1,gb.replace('1)','0.0)'));ctx.fillStyle=g;ctx.fillRect(0,0,256,1);return new THREE.CanvasTexture(c);}
+
+      // Simple solid-color ring texture for per-planet saturn rings
+      function makeRingTex(color){
+        var c=document.createElement('canvas');c.width=128;c.height=1;
+        var ctx=c.getContext('2d');
+        var g=ctx.createLinearGradient(0,0,128,0);
+        g.addColorStop(0,color.replace('1)','0.0)'));
+        g.addColorStop(0.15,color.replace('1)','0.9)'));
+        g.addColorStop(0.5,color.replace('1)','0.6)'));
+        g.addColorStop(0.85,color.replace('1)','0.9)'));
+        g.addColorStop(1,color.replace('1)','0.0)'));
+        ctx.fillStyle=g;ctx.fillRect(0,0,128,1);
+        return new THREE.CanvasTexture(c);
+      }
+
       var configs=[
         {color:0x44ccff,emissive:0x0a2a44,glow:'rgba(60,200,255,',ringColor:'rgba(60,200,255,1)',ringTilt:{x:0.42,z:0.18},spinAxis:new THREE.Vector3(0.2,1,0.1).normalize(),spinSpeed:0.008},
         {color:0x5588ff,emissive:0x080e38,glow:'rgba(80,120,255,',ringColor:'rgba(80,120,255,1)',ringTilt:{x:0.50,z:-0.14},spinAxis:new THREE.Vector3(-0.1,1,0.3).normalize(),spinSpeed:0.012},
@@ -150,35 +168,49 @@
         {color:0x44eeaa,emissive:0x00281a,glow:'rgba(60,240,170,',ringColor:'rgba(60,240,170,1)',ringTilt:{x:0.44,z:0.10},spinAxis:new THREE.Vector3(-0.2,1,0.15).normalize(),spinSpeed:0.009},
         {color:0xffcc44,emissive:0x281a00,glow:'rgba(255,200,50,',ringColor:'rgba(255,200,60,1)',ringTilt:{x:0.38,z:-0.22},spinAxis:new THREE.Vector3(0.15,0.95,0.25).normalize(),spinSpeed:0.007}
       ];
-      var PLANET_R=1.9,RING_INNER=1.3,RING_OUTER=2.5;
+
+      // Planet radius 1.9; wider saturn ring: inner=1.1, outer=2.9
+      var PLANET_R=1.9,RING_INNER=1.1,RING_OUTER=2.9;
       var sphereGeo=new THREE.SphereGeometry(PLANET_R,128,64);
       var groups=[],meshes=[];
       var quat=new THREE.Quaternion();
+
       function buildPlanet(i){
         var cfg=configs[i];
         var mat=new THREE.MeshStandardMaterial({color:cfg.color,emissive:cfg.emissive,emissiveIntensity:0.35,metalness:0.18,roughness:0.3});
         var gc=document.createElement('canvas');gc.width=gc.height=128;
         var gctx=gc.getContext('2d');
-        var gg=gctx.createRadialGradient(64,64,0,64,64,64);gg.addColorStop(0,cfg.glow+'0.7)');gg.addColorStop(0.4,cfg.glow+'0.22)');gg.addColorStop(1,cfg.glow+'0)');
+        var gg=gctx.createRadialGradient(64,64,0,64,64,64);
+        gg.addColorStop(0,cfg.glow+'0.7)');gg.addColorStop(0.4,cfg.glow+'0.22)');gg.addColorStop(1,cfg.glow+'0)');
         gctx.fillStyle=gg;gctx.fillRect(0,0,128,128);
         var sprite=new THREE.Sprite(new THREE.SpriteMaterial({map:new THREE.CanvasTexture(gc),transparent:true,depthWrite:false}));
         sprite.scale.set(4.8,4.8,1);
-        var ig=new THREE.Group();var sphere=new THREE.Mesh(sphereGeo,mat);ig.add(sphere);ig.add(sprite);
+        var ig=new THREE.Group();
+        var sphere=new THREE.Mesh(sphereGeo,mat);
+        ig.add(sphere);ig.add(sprite);
         var group=new THREE.Group();group.add(ig);
-        if(cfg.ringColor){
-          var rg=new THREE.RingGeometry(RING_INNER,RING_OUTER,128);
-          var rpos=rg.attributes.position,ruv=rg.attributes.uv,rv3=new THREE.Vector3();
-          for(var j=0;j<rpos.count;j++){rv3.fromBufferAttribute(rpos,j);ruv.setXY(j,(rv3.length()-RING_INNER)/(RING_OUTER-RING_INNER),0.5);}
-          var pr=new THREE.Mesh(rg,new THREE.MeshBasicMaterial({map:makeRingTex(cfg.ringColor),side:THREE.DoubleSide,transparent:true,opacity:0.7,depthWrite:false}));
-          pr.rotation.x=cfg.ringTilt.x;pr.rotation.z=cfg.ringTilt.z;group.add(pr);
-        }
+        // Saturn ring — simple MeshBasicMaterial with colored texture, no UV remap needed
+        var rg=new THREE.RingGeometry(RING_INNER,RING_OUTER,128);
+        var ringMat=new THREE.MeshBasicMaterial({
+          map:makeRingTex(cfg.ringColor),
+          side:THREE.DoubleSide,
+          transparent:true,
+          opacity:0.82,
+          depthWrite:false
+        });
+        var pr=new THREE.Mesh(rg,ringMat);
+        pr.rotation.x=cfg.ringTilt.x;
+        pr.rotation.z=cfg.ringTilt.z;
+        group.add(pr);
         group.userData.angleOffset=i*(2*Math.PI/5);
-        group.userData.spinAxis=cfg.spinAxis;group.userData.spinSpeed=cfg.spinSpeed;
+        group.userData.spinAxis=cfg.spinAxis;
+        group.userData.spinSpeed=cfg.spinSpeed;
         group.userData.innerGroup=ig;
         group.position.set(Math.cos(group.userData.angleOffset)*R,Math.sin(group.userData.angleOffset)*R,Z);
         scene.add(group);groups.push(group);meshes.push(sphere);
       }
       for(var i=0;i<5;i++) buildPlanet(i);
+
       var raycaster=new THREE.Raycaster();
       var hint=document.getElementById('planetHint');
       var overlay=document.getElementById('popupOverlay');
