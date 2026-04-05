@@ -210,6 +210,15 @@
     }
     .gc-cert-text{font-size:12.5px;font-weight:300;color:rgba(220,234,255,0.80);line-height:1.5;}
     .gc-cert-text strong{font-weight:500;color:rgba(235,244,255,0.96);}
+    .gc-cert-link{
+      color:inherit;text-decoration:none;
+      border-bottom:1px solid rgba(255,220,100,0.20);
+      transition:border-color .2s, color .2s;
+    }
+    .gc-cert-link:hover{
+      color:rgba(255,235,160,0.96);
+      border-color:rgba(255,220,100,0.55);
+    }
 
     .gc-act-row{
       display:flex;flex-direction:column;
@@ -245,7 +254,6 @@
       backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
       transition:border-color .28s, transform .28s, box-shadow .28s, background .28s;
     }
-    /* left accent stripe */
     .award::before{
       content:'';
       position:absolute;left:0;top:0;bottom:0;width:3px;
@@ -258,20 +266,9 @@
       border-color:var(--award-border, rgba(140,170,255,0.28));
       box-shadow:0 8px 36px rgba(0,0,0,0.38), -4px 0 28px var(--award-glow, rgba(120,150,255,0.06));
     }
-
-    /* content */
     .award-content{flex:1;min-width:0;}
-    .award-name{
-      font-size:13.5px;font-weight:400;
-      color:rgba(220,234,255,0.90);
-      line-height:1.4;
-    }
-    .award-org{
-      font-size:10px;letter-spacing:0.10em;
-      color:rgba(150,175,255,0.42);margin-top:3px;
-    }
-
-    /* year badge */
+    .award-name{font-size:13.5px;font-weight:400;color:rgba(220,234,255,0.90);line-height:1.4;}
+    .award-org{font-size:10px;letter-spacing:0.10em;color:rgba(150,175,255,0.42);margin-top:3px;}
     .award-year{
       flex-shrink:0;
       font-size:10px;letter-spacing:0.14em;font-weight:500;
@@ -281,8 +278,6 @@
       padding:4px 10px;border-radius:20px;
       white-space:nowrap;margin-left:14px;
     }
-
-    /* tier color themes */
     .award--gold   {--award-stripe:linear-gradient(180deg,rgba(255,215,80,0.9),rgba(255,180,40,0.3));--award-border:rgba(255,215,80,0.35);--award-glow:rgba(255,200,60,0.10);--award-badge-bg:rgba(140,100,0,0.25);--award-badge-border:rgba(255,200,60,0.35);--award-badge-color:rgba(255,220,100,0.95);}
     .award--silver {--award-stripe:linear-gradient(180deg,rgba(180,200,255,0.8),rgba(140,165,220,0.25));--award-border:rgba(180,210,255,0.30);--award-glow:rgba(160,190,255,0.08);--award-badge-bg:rgba(80,100,180,0.22);--award-badge-border:rgba(160,190,255,0.28);--award-badge-color:rgba(190,215,255,0.92);}
     .award--teal   {--award-stripe:linear-gradient(180deg,rgba(60,220,200,0.8),rgba(40,180,160,0.25));--award-border:rgba(60,220,200,0.28);--award-glow:rgba(40,200,180,0.08);--award-badge-bg:rgba(20,120,110,0.22);--award-badge-border:rgba(40,200,180,0.28);--award-badge-color:rgba(80,230,210,0.92);}
@@ -328,7 +323,7 @@
     <div class="bio">
       <p>Born and raised in <strong>Hong Kong</strong> for the first fourteen years of my life before moving to <strong>Chicago</strong> for high school, I'm a student at <strong>Yale University</strong> pursuing a B.S. in <strong>Chemistry</strong> and <strong>Ethics, Politics &amp; Economics</strong>. I'm drawn to the places where <strong>science meets systems</strong>: whether that be a protein's folding behavior, a disease mechanism, or a policy question about emerging technology.</p>
       <p>My research spans <strong>computational</strong> and <strong>wet labs</strong>, focusing on a broad range of subjects including <strong>neurodegenerative diseases</strong>, <strong>genetics</strong>, <strong>astrophysics</strong>, <strong>proteomics</strong>, <strong>machine learning</strong>, and <strong>mathematical optimization</strong>. Currently I'm at the <strong>Higley Lab</strong> at Yale School of Medicine, where I'm characterizing <strong>locus coeruleus axon degeneration</strong> in PPT1-deficient mice to investigate <strong>norepinephrine dysfunction</strong> in <strong>Parkinson's disease</strong>. I also work on the <strong>PCDD startup</strong> at Yale Engineering, developing business strategy for a patent-pending medication dispenser device.</p>
-      <p>Outside the lab I consult, build, and write. I'm a <strong>Client Lead</strong> at <strong>Yale Healthcare Consulting Collective</strong>, an <strong>Associate Consultant</strong> at <strong>Global Strategy Consulting</strong>, and an <strong>Online Editor</strong> at the <strong>Yale Undergraduate Law Journal</strong>. I speak <strong>English</strong>, <strong>Chinese</strong>, <strong>Spanish</strong>, and <strong>Latin</strong>.</p>
+      <p>Outside the lab I consult, build, and write. I'm a <strong>Client Lead</strong> at <strong>Yale Healthcare Consulting Collective</strong> and an <strong>Online Editor</strong> at the <strong>Yale Undergraduate Law Journal</strong>. I speak <strong>English</strong>, <strong>Chinese</strong>, <strong>Spanish</strong>, and <strong>Latin</strong>.</p>
     </div>
 
     <div class="section-label">At a glance</div>
@@ -437,12 +432,21 @@
             <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89L17 22l-5-3-5 3 1.523-9.11"/></svg>
           </div>
         </div>
-        <div class="gc-stat">3</div>
+        <div class="gc-stat">2</div>
         <div class="gc-stat-label">Professional certifications</div>
         <div style="margin-top:6px;">
-          <div class="gc-cert-row"><div class="gc-cert-dot"></div><div class="gc-cert-text"><strong>IBM</strong> Data Science Professional</div></div>
-          <div class="gc-cert-row"><div class="gc-cert-dot"></div><div class="gc-cert-text"><strong>QubitxQubit</strong> Quantum Winter School</div></div>
-          <div class="gc-cert-row"><div class="gc-cert-dot"></div><div class="gc-cert-text"><strong>Microsoft</strong> Intensive Quantum</div></div>
+          <div class="gc-cert-row">
+            <div class="gc-cert-dot"></div>
+            <div class="gc-cert-text">
+              <a class="gc-cert-link" href="https://www.coursera.org/account/accomplishments/professional-cert/certificate/RTJTDVWW8MMV" target="_blank" rel="noopener noreferrer"><strong>IBM</strong> Data Science Professional</a>
+            </div>
+          </div>
+          <div class="gc-cert-row">
+            <div class="gc-cert-dot"></div>
+            <div class="gc-cert-text">
+              <a class="gc-cert-link" href="https://verified.sertifier.com/en/verify/99120184795450/?ref=email" target="_blank" rel="noopener noreferrer"><strong>Microsoft &amp; QubitxQubit</strong> Intensive Quantum Winter School</a>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -454,13 +458,9 @@
             <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>
           </div>
         </div>
-        <div class="gc-stat">5</div>
+        <div class="gc-stat">3</div>
         <div class="gc-stat-label">Leadership roles</div>
         <div style="margin-top:6px;">
-          <div class="gc-act-row">
-            <span class="gc-act-name">Splash at Yale</span>
-            <span class="gc-act-role">Instructor &amp; Client Lead</span>
-          </div>
           <div class="gc-act-row">
             <span class="gc-act-name">Yale Healthcare Consulting Collective</span>
             <span class="gc-act-role">Client Lead</span>
@@ -472,10 +472,6 @@
           <div class="gc-act-row">
             <span class="gc-act-name">Yale Undergraduate Law Journal</span>
             <span class="gc-act-role">Online Editor</span>
-          </div>
-          <div class="gc-act-row">
-            <span class="gc-act-name">Global Strategy Consulting</span>
-            <span class="gc-act-role">Associate Consultant</span>
           </div>
         </div>
       </div>
