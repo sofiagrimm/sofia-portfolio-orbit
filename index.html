@@ -97,8 +97,6 @@
       font-size:10px;letter-spacing:0.18em;text-transform:uppercase;
       color:rgba(110,130,190,0.28);font-weight:300;pointer-events:none;
     }
-
-    /* Planet cursor hint */
     #planetHint{
       position:fixed;z-index:30;pointer-events:none;
       font-size:11px;letter-spacing:.12em;text-transform:uppercase;
@@ -109,8 +107,6 @@
       opacity:0;transition:opacity .18s;
       white-space:nowrap;
     }
-
-    /* Planet popup overlay */
     #popupOverlay{
       position:fixed;inset:0;z-index:40;
       background:rgba(4,8,28,0);
@@ -170,6 +166,56 @@
       font-size:13px;font-weight:300;line-height:1.8;color:rgba(200,218,255,0.62);
     }
     .popup-body strong{font-weight:500;color:rgba(220,232,255,0.88);}
+
+    /* ── MOBILE ── */
+    @media (max-width: 768px) {
+      html, body { overflow: auto; height: auto; }
+
+      nav {
+        padding: 0 20px;
+        height: 58px;
+      }
+      .nav-name { font-size: 22px; }
+      .nav-links a {
+        font-size: 10px;
+        padding: 5px 8px;
+        letter-spacing: 0.10em;
+      }
+      .nav-links .divider { display: none; }
+
+      .card-ring { display: none; }
+
+      .ui {
+        position: relative;
+        min-height: 100svh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 80px 20px 80px;
+      }
+
+      .center-card {
+        position: relative;
+        left: auto; top: auto;
+        transform: none;
+        width: 100%;
+        max-width: 340px;
+        padding: 32px 24px 28px;
+        border-radius: 20px;
+      }
+
+      .card-eyebrow { font-size: 11px; margin-bottom: 14px; }
+      .card-title { font-size: 36px; }
+      .card-rule { margin: 16px auto; }
+      .card-sub { font-size: 11px; }
+
+      .coords { left: 20px; bottom: 20px; }
+      .tagline { right: 20px; bottom: 20px; font-size: 9px; }
+
+      #popupBox { padding: 28px 22px 24px; }
+      .popup-title { font-size: 26px; }
+      .popup-body { font-size: 12px; }
+    }
   </style>
 </head>
 <body>
@@ -213,7 +259,7 @@
       {
         label: 'Research · Neuroscience',
         title: 'Higley Lab — Locus Coeruleus',
-        body: 'Characterizing <strong>locus coeruleus axon degeneration</strong> in PPT1-deficient mice to investigate <strong>norepinephrine dysfunction</strong> in Parkinson's disease at Yale School of Medicine. Work spans confocal microscopy, IHC, and perfusion protocols.',
+        body: 'Characterizing <strong>locus coeruleus axon degeneration</strong> in PPT1-deficient mice to investigate <strong>norepinephrine dysfunction</strong> in Parkinson\u2019s disease at Yale School of Medicine. Work spans confocal microscopy, IHC, and perfusion protocols.',
         accentHex: '#44ccff'
       },
       {
@@ -266,7 +312,6 @@
       var key=new THREE.DirectionalLight(0xffffff,1.1); key.position.set(18,24,18); scene.add(key);
       var rim=new THREE.DirectionalLight(0xaac4ff,1.2); rim.position.set(-24,4,-20); scene.add(rim);
 
-      // Stars
       var STAR_COUNT=9000;
       var starPositions=new Float32Array(STAR_COUNT*3);
       var starPhase=new Float32Array(STAR_COUNT);
@@ -293,7 +338,6 @@
       });
       scene.add(new THREE.Points(starGeo,starMat));
 
-      // Constellations
       var CZ=-90;
       var constellations=[
         {name:'Orion',offset:[-68,12],stars:[[0,8],[3.5,8],[-1,5.5],[4.5,5.5],[0.8,4.2],[1.8,3.8],[2.8,3.4],[0.2,1.5],[3.5,1.5]],edges:[[0,2],[1,3],[2,4],[3,6],[4,5],[5,6],[7,4],[8,6],[2,3]]},
@@ -328,7 +372,6 @@
         scene.add(new THREE.LineSegments(new THREE.BufferGeometry().setFromPoints(lp),new THREE.LineBasicMaterial({color:0x3a5888,transparent:true,opacity:0.22})));
       });
 
-      // Orbit rings
       var orbitRing=new THREE.Mesh(new THREE.RingGeometry(15.8,16.4,180),new THREE.MeshBasicMaterial({color:0x2a3a5a,side:THREE.DoubleSide,transparent:true,opacity:0.15}));
       orbitRing.position.set(0,0,-18); scene.add(orbitRing);
       var outerRing=new THREE.Mesh(new THREE.RingGeometry(20.0,20.2,180),new THREE.MeshBasicMaterial({color:0x1e2e48,side:THREE.DoubleSide,transparent:true,opacity:0.08}));
@@ -347,7 +390,6 @@
         return new THREE.CanvasTexture(c);
       }
 
-      // Planet configs
       var configs=[
         {color:0x44ccff,emissive:0x0a2a44,glow:'rgba(60,200,255,',ringColor:'rgba(60,200,255,1)',ringTilt:{x:0.42,z:0.18},spinAxis:new THREE.Vector3(0.2,1,0.1).normalize(),spinSpeed:0.008},
         {color:0x5588ff,emissive:0x080e38,glow:'rgba(80,120,255,',ringColor:'rgba(80,120,255,1)',ringTilt:{x:0.50,z:-0.14},spinAxis:new THREE.Vector3(-0.1,1,0.3).normalize(),spinSpeed:0.012},
@@ -392,7 +434,6 @@
         meshes.push(sphere);
       }
 
-      // Raycaster
       var raycaster=new THREE.Raycaster();
       var hint=document.getElementById('planetHint');
       var overlay=document.getElementById('popupOverlay');
@@ -446,7 +487,6 @@
       overlay.addEventListener('click',function(e){if(e.target===overlay)closePopup();});
       document.addEventListener('keydown',function(e){if(e.key==='Escape')closePopup();});
 
-      // Animate
       var lastTime=performance.now(),orbitAngle=0;
       function animate(time){
         requestAnimationFrame(animate);

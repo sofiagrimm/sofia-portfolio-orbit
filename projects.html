@@ -131,22 +131,22 @@
     @keyframes orbitRing    { from{transform:rotate(0deg);}   to{transform:rotate(360deg);}  }
     @keyframes orbitRingRev { from{transform:rotate(0deg);}   to{transform:rotate(-360deg);} }
 
-    /* ═══ FRONT FACE ═══ */
+    /* ═══ FRONT FACE — enlarged typography ═══ */
     .card-front{
       background:rgba(6,14,44,.92);
       border:1px solid rgba(120,150,240,.18);
       backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
       transform:rotateY(180deg);
-      padding:20px 18px 16px;
-      display:flex;flex-direction:column;gap:8px;
+      padding:22px 20px 18px;
+      display:flex;flex-direction:column;gap:10px;
       box-shadow:0 16px 60px rgba(0,0,0,.7),inset 0 1px 0 rgba(200,210,255,.05);
     }
-    .fr-tag{font-size:9px;letter-spacing:.18em;text-transform:uppercase;color:rgba(140,175,255,.5);}
-    .fr-date{font-size:9px;letter-spacing:.1em;color:rgba(120,150,210,.32);margin-top:1px;}
-    .fr-rule{width:28px;height:1px;background:linear-gradient(90deg,rgba(150,170,255,.3),transparent);margin:2px 0;}
-    .fr-title{font-family:'Cormorant Garamond',serif;font-size:clamp(13px,1.5vw,18px);font-weight:300;line-height:1.2;color:#ddeeff;}
-    .fr-body{font-size:10px;font-weight:300;line-height:1.65;color:rgba(190,210,255,.52);flex:1;overflow:hidden;display:-webkit-box;-webkit-line-clamp:6;-webkit-box-orient:vertical;}
-    .fr-link{font-size:9px;letter-spacing:.14em;text-transform:uppercase;color:rgba(150,185,255,.55);text-decoration:none;border-bottom:1px solid rgba(140,180,255,.15);align-self:flex-start;transition:color .2s;}
+    .fr-tag{font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:rgba(140,175,255,.6);font-weight:500;}
+    .fr-date{font-size:11px;letter-spacing:.10em;color:rgba(140,165,220,.45);margin-top:-4px;}
+    .fr-rule{width:32px;height:1px;background:linear-gradient(90deg,rgba(150,170,255,.35),transparent);margin:0;}
+    .fr-title{font-family:'Cormorant Garamond',serif;font-size:clamp(16px,1.8vw,22px);font-weight:300;line-height:1.25;color:#ddeeff;}
+    .fr-body{font-size:12.5px;font-weight:300;line-height:1.72;color:rgba(195,215,255,.60);flex:1;overflow:hidden;display:-webkit-box;-webkit-line-clamp:6;-webkit-box-orient:vertical;}
+    .fr-link{font-size:10.5px;letter-spacing:.13em;text-transform:uppercase;color:rgba(160,195,255,.60);text-decoration:none;border-bottom:1px solid rgba(140,180,255,.18);align-self:flex-start;transition:color .2s;}
     .fr-link:hover{color:rgba(210,225,255,.9);}
 
     /* ═══ POPUP OVERLAY ═══ */
@@ -163,8 +163,6 @@
       backdrop-filter:blur(4px);
       -webkit-backdrop-filter:blur(4px);
     }
-
-    /* ═══ POPUP CARD WRAPPER ═══ */
     #cardPopupInner{
       position:relative;
       width:min(320px,78vw);
@@ -192,7 +190,6 @@
         transform .36s cubic-bezier(.55,0,.45,1),
         filter    .36s cubic-bezier(.55,0,.45,1);
     }
-
     #cardPopupClose{
       position:absolute;
       top:-16px;right:-16px;
@@ -214,7 +211,6 @@
       transform:scale(1.15) rotate(90deg);
       box-shadow:0 6px 28px rgba(80,120,255,.4);
     }
-
     #cardPopupFlipper{
       width:100%;height:100%;
       transform-style:preserve-3d;
@@ -247,7 +243,6 @@
   </main>
   <div class="coords">41.3083&deg; N &nbsp; 72.9279&deg; W</div>
 
-  <!-- Card popup overlay -->
   <div id="cardPopupOverlay">
     <div id="cardPopupInner">
       <button id="cardPopupClose" aria-label="Close card">&#x2715;</button>
@@ -267,14 +262,10 @@
       { tag:"Finance · Investing", date:"2022 – 2025", title:"Latin School Investment Fund", body:"Board member managing a $100,000 student-run stock portfolio as one of eleven voting members. Gave weekly portfolio stock reports and pitched new investments to the Board.", link:"#", linkLabel:"Details →" }
     ];
 
-    const SUITS       = ['♠','♥','♦','♣'];
+    const SUITS       = ['\u2660','\u2665','\u2666','\u2663'];
     const SUIT_COLORS = ['rgba(180,195,255,0.80)','rgba(255,140,160,0.80)','rgba(255,170,110,0.80)','rgba(140,225,175,0.80)'];
     const RANKS       = ['I','II','III','IV','V','VI','VII','VIII'];
-
-    const ROW_SUITS = [
-      [0,1,2,3],
-      [3,2,0,1]
-    ];
+    const ROW_SUITS   = [[0,1,2,3],[3,2,0,1]];
 
     function getSuitIdx(cardIdx) {
       const row = Math.floor(cardIdx / 4);
@@ -478,7 +469,6 @@
     });
   </script>
 
-  <!-- Stars background only (planets live on the home page) -->
   <script type="module">
     import('https://unpkg.com/three@0.161.0/build/three.module.js').then(THREE=>{
       const renderer=new THREE.WebGLRenderer({antialias:true,alpha:false});
