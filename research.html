@@ -18,6 +18,25 @@
     html,body{width:100%;height:100%;overflow:hidden;background:#04080f;font-family:'Inter',sans-serif;color:#e9f0ff;}
     #c{display:block;position:fixed;top:0;left:0;width:100%;height:100%;z-index:1;cursor:grab;}
     #c:active{cursor:grabbing;}
+
+    /* Loading overlay */
+    #loader{
+      position:fixed;inset:0;z-index:200;
+      background:#04080f;
+      display:flex;flex-direction:column;align-items:center;justify-content:center;
+      gap:18px;
+      transition:opacity .6s ease;
+    }
+    #loader.hidden{opacity:0;pointer-events:none;}
+    .loader-ring{
+      width:48px;height:48px;border-radius:50%;
+      border:2px solid rgba(100,120,200,0.12);
+      border-top:2px solid rgba(140,160,255,0.55);
+      animation:spin 1.1s linear infinite;
+    }
+    @keyframes spin{to{transform:rotate(360deg)}}
+    .loader-label{font-size:11px;letter-spacing:.22em;text-transform:uppercase;color:rgba(140,150,200,0.38);}
+
     nav{position:fixed;top:0;left:0;right:0;z-index:30;
       display:flex;align-items:center;justify-content:space-between;
       padding:0 48px;height:68px;pointer-events:auto;}
@@ -30,7 +49,6 @@
     .nav-links a:hover,.nav-links a.active{color:rgba(220,235,255,.9);background:rgba(100,140,255,.08);}
     .nav-links .divider{color:rgba(100,130,200,.2);font-size:13px;user-select:none;}
 
-    /* ---- RESEARCH DESCRIPTION BOX (right side) ---- */
     .research-desc{
       position:fixed;right:3vw;bottom:72px;
       z-index:40;width:300px;
@@ -47,11 +65,8 @@
       line-height:1.72;color:rgba(210,202,255,.72);
       letter-spacing:.015em;
     }
-    .research-desc p em{
-      font-style:normal;color:rgba(230,225,255,.88);
-    }
+    .research-desc p em{font-style:normal;color:rgba(230,225,255,.88);}
 
-    /* ---- PANEL ---- */
     .panel{position:fixed;top:50%;right:3vw;
       transform:translateY(-50%) translateX(calc(100% + 40px));
       z-index:50;width:340px;padding:28px 30px 26px;border-radius:18px;
@@ -79,7 +94,6 @@
       border-bottom:1px solid rgba(160,150,255,.12);align-self:flex-start;transition:color .2s;}
     .plinks a:hover{color:rgba(220,215,255,.9);}
 
-    /* ---- HUD (left) ---- */
     .hud{
       position:fixed;left:48px;top:50%;transform:translateY(-50%);
       z-index:20;text-align:left;pointer-events:none;
@@ -100,6 +114,11 @@
   </style>
 </head>
 <body>
+  <div id="loader">
+    <div class="loader-ring"></div>
+    <div class="loader-label">Loading Earth</div>
+  </div>
+
   <canvas id="c"></canvas>
   <nav>
     <a class="nav-name" href="index.html">Sofia Grimm</a>
@@ -111,7 +130,6 @@
     </div>
   </nav>
 
-  <!-- Research description text box -->
   <div class="research-desc">
     <div class="research-desc-rule"></div>
     <p>On my first day in a research lab, I quickly learned two things: <em>nothing works the first time,</em> and the most interesting problems are those in which there is uncertainty.</p>
@@ -140,31 +158,31 @@
 
     const SITES=[
       {id:'yale',lat:41.31,lon:-72.93,color:new THREE.Color(0x88d8ff),
-       eyebrow:'Neuroscience · Neurodegeneration',
+       eyebrow:'Neuroscience \u00b7 Neurodegeneration',
        title:'Locus Coeruleus Degeneration in Parkinson\u2019s Disease',
-       org:'Higley Lab · Yale School of Medicine',date:'Feb 2026 – Present',
+       org:'Higley Lab \u00b7 Yale School of Medicine',date:'Feb 2026 \u2013 Present',
        bullets:['Characterizing LC axon degeneration in PPT1-deficient mice via IHC.',
                 'Investigating norepinephrine dysfunction as an early Parkinson\u2019s marker.'],links:[]},
       {id:'msu',lat:42.72,lon:-84.48,color:new THREE.Color(0x78f0b0),
-       eyebrow:'Top-Down Proteomics · Mass Spectrometry',
+       eyebrow:'Top-Down Proteomics \u00b7 Mass Spectrometry',
        title:'Novel SPME-CZE-MS System for Mass-Limited Proteomics',
-       org:'Sun Lab · Michigan State University',date:'Jun – Aug 2024',
-       bullets:['Built a novel SPME–CZE–MS/MS system for top-down proteomics.',
-                'Increased injection capacity ~30× vs. standard CZE-MS.'],links:[]},
+       org:'Sun Lab \u00b7 Michigan State University',date:'Jun \u2013 Aug 2024',
+       bullets:['Built a novel SPME\u2013CZE\u2013MS/MS system for top-down proteomics.',
+                'Increased injection capacity ~30\u00d7 vs. standard CZE-MS.'],links:[]},
       {id:'stanford',lat:37.43,lon:-122.17,color:new THREE.Color(0xffd880),
-       eyebrow:'Drosophila Genetics · Molecular Biology',
+       eyebrow:'Drosophila Genetics \u00b7 Molecular Biology',
        title:'Enhancer-Trap Line Development & P-Element Mapping',
-       org:'Stan-X Lab · Stanford University',date:'Aug 2024 – Jun 2025',
+       org:'Stan-X Lab \u00b7 Stanford University',date:'Aug 2024 \u2013 Jun 2025',
        bullets:['Developed enhancer-trapped Drosophila line via LexA-LexAop system.',
                 'Mapped P-element insertion to CG11050 via inverse PCR & FlyBase BLAST.'],links:[]},
       {id:'fermilab',lat:41.84,lon:-88.27,color:new THREE.Color(0xd8a0ff),
-       eyebrow:'Astrophysics · Machine Learning',
+       eyebrow:'Astrophysics \u00b7 Machine Learning',
        title:'CNN Classification of Gravitational Lens Morphologies',
-       org:'Fermi National Accelerator Lab · Quarknet',date:'Jun – Aug 2023',
+       org:'Fermi National Accelerator Lab \u00b7 Quarknet',date:'Jun \u2013 Aug 2023',
        bullets:['Generated two 40,000-image datasets of double-source plane lenses.',
                 'Trained CNNs (PyTorch) for automated morphological classification.'],
-       links:[{label:'AGU Annual Meeting →',href:'https://agu.confex.com/agu/fm23/meetingapp.cgi/Paper/1438256'},
-              {label:'Fermilab/Quarknet Workshop →',href:'https://doi.org/10.2172/2006481'}]}
+       links:[{label:'AGU Annual Meeting \u2192',href:'https://agu.confex.com/agu/fm23/meetingapp.cgi/Paper/1438256'},
+              {label:'Fermilab/Quarknet Workshop \u2192',href:'https://doi.org/10.2172/2006481'}]}
     ];
 
     const W=()=>window.innerWidth, H=()=>window.innerHeight;
@@ -174,7 +192,7 @@
     renderer.setSize(W(),H());
     renderer.setClearColor(0x04080f,1);
     renderer.toneMapping=THREE.ACESFilmicToneMapping;
-    renderer.toneMappingExposure=1.05;
+    renderer.toneMappingExposure=1.1;
 
     const scene=new THREE.Scene();
     const camera=new THREE.PerspectiveCamera(38,W()/H(),0.1,500);
@@ -215,271 +233,137 @@
     }
 
     /* ---- LIGHTING ---- */
-    scene.add(new THREE.AmbientLight(0x0d1a33,1.2));
-    const sun=new THREE.DirectionalLight(0xfff6e8,3.8);
+    scene.add(new THREE.AmbientLight(0x060e22,1.0));
+    const sun=new THREE.DirectionalLight(0xfff8f0,4.2);
     sun.position.set(6,2.5,4); scene.add(sun);
-    const fill=new THREE.DirectionalLight(0x1a3a88,0.35);
+    const fill=new THREE.DirectionalLight(0x1a3a88,0.25);
     fill.position.set(-5,0,-3); scene.add(fill);
 
-    /* =============================================
-       REALISTIC EARTH — photorealistic texture pass
-       ============================================= */
     const R=1.0;
 
-    function makeEarthTex(){
-      const S=2048;
-      const cv=document.createElement('canvas');cv.width=S;cv.height=S;
-      const ctx=cv.getContext('2d');
+    /* =====================================================
+       TEXTURE LOADING — Three.js bundled NASA-derived maps
+       ===================================================== */
+    const texLoader=new THREE.TextureLoader();
+    texLoader.crossOrigin='anonymous';
 
-      /* ── Ocean base: realistic dark navy → mid blue ── */
-      const og=ctx.createLinearGradient(0,0,0,S);
-      og.addColorStop(0,   '#081630');
-      og.addColorStop(0.12,'#0a1e42');
-      og.addColorStop(0.30,'#0c2450');
-      og.addColorStop(0.50,'#0d2860');
-      og.addColorStop(0.70,'#0c2450');
-      og.addColorStop(0.88,'#0a1e42');
-      og.addColorStop(1,   '#081630');
-      ctx.fillStyle=og; ctx.fillRect(0,0,S,S);
+    const EARTH_URL  = 'https://unpkg.com/three@0.161.0/examples/textures/planets/earth_atmos_2048.jpg';
+    const SPEC_URL   = 'https://unpkg.com/three@0.161.0/examples/textures/planets/earth_specular_2048.jpg';
+    const NORMAL_URL = 'https://unpkg.com/three@0.161.0/examples/textures/planets/earth_normal_2048.jpg';
+    const NIGHT_URL  = 'https://unpkg.com/three@0.161.0/examples/textures/planets/earth_lights_2048.png';
 
-      const L=[
-        // ── North America ──
-        [0.155,0.195,0.080,0.055,'#2a5e26',true],
-        [0.152,0.250,0.075,0.070,'#2e6628',true],
-        [0.148,0.310,0.065,0.065,'#337030',true],
-        [0.155,0.368,0.060,0.058,'#306830',true],
-        [0.162,0.418,0.052,0.050,'#347534',true],
-        [0.132,0.230,0.028,0.055,'#4a6030',true],
-        [0.128,0.290,0.024,0.060,'#4a5c28'],
-        [0.188,0.270,0.022,0.060,'#2a6028'],
-        [0.172,0.430,0.030,0.035,'#3a7432'],
-        [0.178,0.456,0.022,0.022,'#3a6e30'],
-        [0.186,0.382,0.012,0.025,'#2e6828'],
-        [0.152,0.108,0.032,0.052,'#c8d8e6'],
-        [0.148,0.092,0.024,0.030,'#dce8f0'],
-        [0.200,0.430,0.008,0.006,'#348030'],
-        [0.192,0.436,0.006,0.005,'#308030'],
-        // ── South America ──
-        [0.196,0.470,0.046,0.048,'#267028'],
-        [0.190,0.518,0.050,0.055,'#206820'],
-        [0.200,0.572,0.052,0.062,'#1e6020'],
-        [0.196,0.630,0.044,0.055,'#1a5818'],
-        [0.200,0.680,0.038,0.040,'#1c5c1a'],
-        [0.194,0.706,0.032,0.028,'#1e6018'],
-        [0.172,0.530,0.012,0.090,'#6a5030'],
-        [0.170,0.620,0.010,0.060,'#604828'],
-        // ── Europe ──
-        [0.462,0.200,0.032,0.042,'#4a7030'],
-        [0.480,0.222,0.034,0.044,'#507838'],
-        [0.468,0.252,0.028,0.038,'#4e7432'],
-        [0.450,0.228,0.022,0.035,'#486830'],
-        [0.448,0.268,0.020,0.028,'#8a7438'],
-        [0.482,0.272,0.010,0.030,'#608040'],
-        [0.462,0.188,0.012,0.018,'#487040'],
-        [0.480,0.155,0.020,0.042,'#406835'],
-        [0.490,0.132,0.014,0.030,'#3c6030'],
-        [0.430,0.152,0.016,0.014,'#b0c4d0'],
-        // ── Africa ──
-        [0.488,0.322,0.044,0.042,'#907840'],
-        [0.490,0.368,0.050,0.052,'#886e38'],
-        [0.490,0.420,0.052,0.058,'#806432'],
-        [0.488,0.472,0.050,0.055,'#785c2e'],
-        [0.490,0.528,0.046,0.052,'#6e5428'],
-        [0.488,0.582,0.040,0.045,'#645025'],
-        [0.488,0.626,0.032,0.036,'#5a4820'],
-        [0.490,0.658,0.026,0.026,'#50401c'],
-        [0.488,0.352,0.048,0.028,'#c8a860'],
-        [0.488,0.378,0.044,0.025,'#c0a058'],
-        [0.492,0.468,0.030,0.030,'#206018'],
-        [0.540,0.546,0.012,0.024,'#6a5c30'],
-        // ── Middle East / Arabia ──
-        [0.545,0.300,0.036,0.040,'#b09840'],
-        [0.558,0.330,0.030,0.038,'#a89038'],
-        [0.550,0.358,0.028,0.030,'#a08830'],
-        // ── Asia ──
-        [0.535,0.248,0.030,0.022,'#8a7a38'],
-        [0.555,0.145,0.080,0.060,'#5a7030'],
-        [0.620,0.120,0.090,0.058,'#527028'],
-        [0.680,0.110,0.085,0.055,'#4e6828'],
-        [0.740,0.118,0.075,0.058,'#4a6428'],
-        [0.575,0.220,0.055,0.048,'#8a8038'],
-        [0.625,0.218,0.055,0.048,'#809038'],
-        [0.665,0.215,0.050,0.046,'#788838'],
-        [0.598,0.330,0.038,0.040,'#7a8040'],
-        [0.602,0.368,0.034,0.040,'#6e7838'],
-        [0.608,0.408,0.028,0.038,'#608030'],
-        [0.608,0.440,0.022,0.030,'#587828'],
-        [0.612,0.470,0.006,0.008,'#508028'],
-        [0.660,0.222,0.068,0.058,'#5a7030'],
-        [0.688,0.240,0.058,0.050,'#527030'],
-        [0.708,0.268,0.048,0.045,'#4a6828'],
-        [0.715,0.295,0.040,0.040,'#486028'],
-        [0.730,0.262,0.012,0.018,'#4e7030'],
-        [0.742,0.246,0.010,0.028,'#507838'],
-        [0.748,0.228,0.008,0.020,'#4e7035'],
-        [0.730,0.320,0.006,0.010,'#488038'],
-        [0.690,0.368,0.028,0.038,'#407c30'],
-        [0.700,0.400,0.022,0.030,'#387828'],
-        [0.706,0.428,0.018,0.025,'#307420'],
-        [0.704,0.450,0.010,0.020,'#2a7020'],
-        [0.720,0.452,0.020,0.022,'#207818'],
-        [0.700,0.458,0.022,0.015,'#257820'],
-        [0.718,0.470,0.018,0.008,'#228020'],
-        [0.740,0.400,0.010,0.030,'#287830'],
-        [0.758,0.490,0.025,0.018,'#307830'],
-        // ── Australia ──
-        [0.728,0.592,0.050,0.045,'#a07040'],
-        [0.738,0.630,0.048,0.048,'#986838'],
-        [0.728,0.660,0.042,0.038,'#906030'],
-        [0.718,0.620,0.028,0.038,'#7a5828'],
-        [0.710,0.592,0.018,0.020,'#507830'],
-        [0.748,0.660,0.018,0.025,'#608030'],
-        [0.780,0.668,0.010,0.022,'#4a7840'],
-        [0.784,0.692,0.008,0.016,'#487040'],
-        // ── Polar ──
-        [0.500,0.940,0.340,0.062,'#d8e8f4'],
-        [0.500,0.968,0.360,0.036,'#e4eef8'],
-        [0.500,0.984,0.340,0.020,'#eef4fc'],
-        [0.500,0.024,0.280,0.045,'#c4d8ea'],
-        [0.500,0.010,0.250,0.025,'#d0e0f0'],
-      ];
-
-      L.forEach(([cfx,cfy,rfx,rfy,baseCol,highlight])=>{
-        const cx=cfx*S,cy=cfy*S,rx=rfx*S,ry=rfy*S;
-        ctx.save();
-        ctx.beginPath();
-        ctx.ellipse(cx,cy,rx,ry,0,0,Math.PI*2);
-        const grd=ctx.createRadialGradient(cx-rx*.2,cy-ry*.2,0,cx,cy,Math.max(rx,ry)*1.05);
-        grd.addColorStop(0,  baseCol+'ff');
-        grd.addColorStop(0.55,baseCol+'dd');
-        grd.addColorStop(0.85,baseCol+'66');
-        grd.addColorStop(1,  baseCol+'00');
-        ctx.fillStyle=grd;
-        ctx.fill();
-        ctx.restore();
-      });
-
-      L.slice(0,-5).forEach(([cfx,cfy,rfx,rfy])=>{
-        const cx=cfx*S,cy=cfy*S,rx=(rfx+.008)*S,ry=(rfy+.008)*S;
-        ctx.save();
-        ctx.beginPath();
-        ctx.ellipse(cx,cy,rx,ry,0,0,Math.PI*2);
-        const g=ctx.createRadialGradient(cx,cy,Math.min(rfx,rfy)*.6*S,cx,cy,Math.max(rx,ry)*1.1);
-        g.addColorStop(0,'rgba(0,0,0,0)');
-        g.addColorStop(1,'rgba(15,70,160,0.09)');
-        ctx.fillStyle=g;
-        ctx.fill();
-        ctx.restore();
-      });
-
-      const id=ctx.getImageData(0,0,S,S);
-      for(let i=0;i<id.data.length;i+=4){
-        const n=(Math.random()-.5)*10;
-        id.data[i]  =Math.min(255,Math.max(0,id.data[i]  +n));
-        id.data[i+1]=Math.min(255,Math.max(0,id.data[i+1]+n));
-        id.data[i+2]=Math.min(255,Math.max(0,id.data[i+2]+n));
+    let texturesLoaded=0;
+    const loaderEl=document.getElementById('loader');
+    function onTexLoad(){
+      texturesLoaded++;
+      if(texturesLoaded>=4){
+        loaderEl.classList.add('hidden');
+        setTimeout(()=>loaderEl.style.display='none',700);
       }
-      ctx.putImageData(id,0,0);
-
-      const lbg=ctx.createLinearGradient(0,0,0,S);
-      lbg.addColorStop(0,  'rgba(160,195,235,0.13)');
-      lbg.addColorStop(0.14,'rgba(0,0,0,0)');
-      lbg.addColorStop(0.86,'rgba(0,0,0,0)');
-      lbg.addColorStop(1,  'rgba(160,195,235,0.13)');
-      ctx.fillStyle=lbg; ctx.fillRect(0,0,S,S);
-
-      return new THREE.CanvasTexture(cv);
     }
 
-    function makeSpecTex(){
-      const S=1024;
-      const cv=document.createElement('canvas');cv.width=S;cv.height=S;
-      const ctx=cv.getContext('2d');
-      ctx.fillStyle='#8899aa'; ctx.fillRect(0,0,S,S);
-      const matte=[
-        [0.155,0.280,0.13,0.18],[0.190,0.560,0.11,0.18],[0.194,0.650,0.09,0.14],
-        [0.465,0.230,0.07,0.10],[0.490,0.480,0.11,0.16],[0.550,0.320,0.07,0.08],
-        [0.570,0.190,0.13,0.10],[0.630,0.200,0.14,0.11],[0.685,0.250,0.12,0.10],
-        [0.600,0.370,0.09,0.10],[0.720,0.440,0.05,0.06],[0.730,0.625,0.10,0.11],
-      ];
-      ctx.fillStyle='#1a2430';
-      matte.forEach(([cfx,cfy,rfx,rfy])=>{
-        const cx=cfx*S,cy=cfy*S,rx=rfx*S,ry=rfy*S;
-        ctx.save();ctx.beginPath();ctx.ellipse(cx,cy,rx,ry,0,0,Math.PI*2);
-        ctx.fill();ctx.restore();
-      });
-      ctx.fillStyle='rgba(230,242,255,0.95)';
-      ctx.beginPath();ctx.ellipse(S/2,S*.025,S*.30,S*.046,0,0,Math.PI*2);ctx.fill();
-      ctx.beginPath();ctx.ellipse(S/2,S*.960,S*.36,S*.055,0,0,Math.PI*2);ctx.fill();
-      return new THREE.CanvasTexture(cv);
-    }
+    const earthTex  = texLoader.load(EARTH_URL,  onTexLoad, undefined, onTexLoad);
+    const specTex   = texLoader.load(SPEC_URL,   onTexLoad, undefined, onTexLoad);
+    const normalTex = texLoader.load(NORMAL_URL, onTexLoad, undefined, onTexLoad);
+    const nightTex  = texLoader.load(NIGHT_URL,  onTexLoad, undefined, onTexLoad);
 
-    const earthTex=makeEarthTex();
-    const specTex=makeSpecTex();
+    earthTex.colorSpace  = THREE.SRGBColorSpace;
+    nightTex.colorSpace  = THREE.SRGBColorSpace;
+    earthTex.anisotropy  = renderer.capabilities.getMaxAnisotropy();
+    specTex.anisotropy   = renderer.capabilities.getMaxAnisotropy();
+    normalTex.anisotropy = renderer.capabilities.getMaxAnisotropy();
 
+    /* ---- GLOBE SHADER — day/night blend + specular + normal map ---- */
     const globeMat=new THREE.ShaderMaterial({
       uniforms:{
-        earthMap:{value:earthTex},
-        specMap: {value:specTex},
-        sunDir:  {value:sun.position.clone().normalize()},
-        time:    {value:0},
-        camPos:  {value:camera.position.clone()},
+        earthMap:  {value:earthTex},
+        specMap:   {value:specTex},
+        nightMap:  {value:nightTex},
+        normalMap2:{value:normalTex},
+        sunDir:    {value:sun.position.clone().normalize()},
+        time:      {value:0},
+        camPos:    {value:camera.position.clone()},
       },
       vertexShader:`
-        varying vec2 vUv;varying vec3 vNormal;varying vec3 vWorldPos;
+        varying vec2 vUv;
+        varying vec3 vNormal;
+        varying vec3 vWorldPos;
+        varying mat3 vTBN;
         void main(){
           vUv=uv;
-          vNormal=normalize(normalMatrix*normal);
-          vec4 wp=modelMatrix*vec4(position,1.);vWorldPos=wp.xyz;
+          vec3 N=normalize(normalMatrix*normal);
+          vec3 T=normalize(normalMatrix*tangent.xyz)*tangent.w;
+          vec3 B=cross(N,T);
+          vTBN=mat3(T,B,N);
+          vNormal=N;
+          vec4 wp=modelMatrix*vec4(position,1.);
+          vWorldPos=wp.xyz;
           gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);
         }`,
       fragmentShader:`
-        uniform sampler2D earthMap,specMap;
+        uniform sampler2D earthMap,specMap,nightMap,normalMap2;
         uniform vec3 sunDir,camPos;
         uniform float time;
-        varying vec2 vUv;varying vec3 vNormal;varying vec3 vWorldPos;
+        varying vec2 vUv;
+        varying vec3 vNormal;
+        varying vec3 vWorldPos;
+        varying mat3 vTBN;
 
         void main(){
-          vec3 baseCol=texture2D(earthMap,vUv).rgb;
-          float spec=texture2D(specMap,vUv).r;
+          vec3 dayCol   = texture2D(earthMap,vUv).rgb;
+          float specVal = texture2D(specMap,vUv).r;
+          vec3 nightCol = texture2D(nightMap,vUv).rgb;
+
+          vec3 nSample  = texture2D(normalMap2,vUv).xyz*2.0-1.0;
+          nSample.xy   *= 0.55;
+          vec3 N        = normalize(vTBN*nSample);
 
           vec3 sDir=normalize(sunDir);
-          float NdL=dot(vNormal,sDir);
+          float NdL=dot(N,sDir);
           float diff=max(0.,NdL);
 
-          vec3 amb=mix(vec3(.012,.018,.040),vec3(.035,.040,.055),diff);
-          vec3 dayCol=baseCol*(amb+vec3(.98,.93,.86)*diff*1.05);
-
-          float nightT=smoothstep(.10,-.10,NdL);
-          vec3 nightCol=baseCol*vec3(.03,.035,.06)+vec3(.000,.001,.004)*spec;
-          vec3 col=mix(dayCol,nightCol,nightT);
+          vec3 amb   = vec3(.010,.016,.038);
+          vec3 light = vec3(.98,.92,.83)*diff*1.12;
+          vec3 litDay= dayCol*(amb+light);
 
           vec3 viewDir=normalize(camPos-vWorldPos);
-          vec3 halfV=normalize(sDir+viewDir);
-          float sh=pow(max(0.,dot(vNormal,halfV)),180.)*spec*max(0.,NdL);
-          col+=vec3(.80,.88,1.0)*sh*0.65;
+          vec3 halfV  =normalize(sDir+viewDir);
+          float sh=pow(max(0.,dot(N,halfV)),220.)*specVal*max(0.,NdL);
+          float fresnel=pow(1.-max(0.,dot(N,viewDir)),3.);
+          vec3 specCol=mix(vec3(.80,.88,1.0),vec3(.60,.80,1.0),fresnel);
+          litDay += specCol*sh*0.85;
 
-          float term=smoothstep(-.04,.06,NdL);
-          col=mix(col*vec3(.60,.70,.90),col,term);
+          float terminator = smoothstep(-.08,.10,NdL);
+          vec3 termCol     = mix(vec3(.08,.12,.25),litDay,terminator);
+
+          float nightBlend  = smoothstep(.08,-.10,NdL);
+          vec3 cities       = pow(nightCol,vec3(0.7))*2.4;
+          vec3 nightFinal   = vec3(.005,.007,.018)+cities*nightBlend;
+
+          vec3 col=mix(termCol, nightFinal, smoothstep(.12,-.05,NdL));
+
+          float poleBlend=smoothstep(.85,.98,abs(vUv.y-.5)*2.);
+          col=mix(col,col*1.25+vec3(.06,.08,.10),poleBlend*terminator);
 
           gl_FragColor=vec4(clamp(col,0.,1.),1.);
         }`,
     });
 
-    const globe=new THREE.Mesh(new THREE.SphereGeometry(R,128,128),globeMat);
+    const globe=new THREE.Mesh(
+      new THREE.SphereGeometry(R,256,256),
+      globeMat
+    );
     scene.add(globe);
 
     /* ---- CLOUD LAYER ---- */
     function makeCloudTex(){
-      const s=1024,cv=document.createElement('canvas');cv.width=s;cv.height=s;
+      const s=2048,cv=document.createElement('canvas');cv.width=s;cv.height=s;
       const ctx=cv.getContext('2d');
       ctx.clearRect(0,0,s,s);
       const bands=[
-        {y:.18,spread:.10,alpha:.22},
-        {y:.30,spread:.08,alpha:.16},
-        {y:.50,spread:.06,alpha:.12},
-        {y:.70,spread:.09,alpha:.18},
-        {y:.82,spread:.07,alpha:.14},
+        {y:.08,spread:.06,alpha:.10},{y:.20,spread:.10,alpha:.13},
+        {y:.35,spread:.08,alpha:.09},{y:.50,spread:.05,alpha:.07},
+        {y:.65,spread:.09,alpha:.11},{y:.80,spread:.09,alpha:.14},{y:.92,spread:.06,alpha:.10},
       ];
       bands.forEach(({y,spread,alpha})=>{
         const bg=ctx.createLinearGradient(0,(y-spread)*s,0,(y+spread)*s);
@@ -488,43 +372,76 @@
         bg.addColorStop(1,'rgba(255,255,255,0)');
         ctx.fillStyle=bg;ctx.fillRect(0,0,s,s);
       });
-      for(let i=0;i<140;i++){
-        const x=Math.random()*s,y=Math.random()*s,r=20+Math.random()*60;
+      for(let i=0;i<60;i++){
+        const x=Math.random()*s,y=Math.random()*s;
+        const rx=60+Math.random()*180,ry=30+Math.random()*90;
+        const angle=Math.random()*Math.PI;
+        const a=0.18+Math.random()*0.28;
+        const grd=ctx.createRadialGradient(x,y,0,x,y,Math.max(rx,ry));
+        grd.addColorStop(0,`rgba(255,255,255,${a})`);
+        grd.addColorStop(.35,`rgba(252,254,255,${a*.45})`);
+        grd.addColorStop(.7,`rgba(248,252,255,${a*.12})`);
+        grd.addColorStop(1,'rgba(0,0,0,0)');
+        ctx.save();
+        ctx.translate(x,y);ctx.rotate(angle);ctx.scale(1,ry/rx);
+        ctx.translate(-x,-y);
+        ctx.fillStyle=grd;ctx.fillRect(0,0,s,s);
+        ctx.restore();
+      }
+      for(let i=0;i<200;i++){
+        const x=Math.random()*s,y=Math.random()*s,r=12+Math.random()*45;
+        const a=0.10+Math.random()*0.22;
         const grd=ctx.createRadialGradient(x,y,0,x,y,r);
-        grd.addColorStop(0,'rgba(255,255,255,0.26)');
-        grd.addColorStop(.4,'rgba(248,252,255,0.11)');
+        grd.addColorStop(0,`rgba(255,255,255,${a})`);
+        grd.addColorStop(.5,`rgba(250,253,255,${a*.4})`);
         grd.addColorStop(1,'rgba(0,0,0,0)');
         ctx.fillStyle=grd;ctx.fillRect(0,0,s,s);
       }
+      const id=ctx.getImageData(0,0,s,s);
+      for(let i=3;i<id.data.length;i+=4){
+        id.data[i]=Math.min(255,Math.max(0,id.data[i]+(Math.random()-.5)*18));
+      }
+      ctx.putImageData(id,0,0);
       return new THREE.CanvasTexture(cv);
     }
+
     const cloudMat=new THREE.ShaderMaterial({
-      uniforms:{cloudMap:{value:makeCloudTex()},time:{value:0},sunDir:{value:sun.position.clone().normalize()}},
+      uniforms:{
+        cloudMap:{value:makeCloudTex()},
+        time:{value:0},
+        sunDir:{value:sun.position.clone().normalize()}
+      },
       vertexShader:`varying vec2 vUv;varying vec3 vNormal;
         void main(){vUv=uv;vNormal=normalize(normalMatrix*normal);
           gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}`,
       fragmentShader:`uniform sampler2D cloudMap;uniform float time;uniform vec3 sunDir;
         varying vec2 vUv;varying vec3 vNormal;
         void main(){
-          vec2 uv2=vUv+vec2(time*.00016,time*.000048);
-          float a=texture2D(cloudMap,uv2).r;
+          vec2 drift=vUv+vec2(time*.000120,time*.000032);
+          float a=texture2D(cloudMap,drift).r;
           float cosA=max(0.,dot(vNormal,normalize(sunDir)));
-          vec3 col=mix(vec3(.52,.55,.62),vec3(1.,1.,1.),cosA);
-          gl_FragColor=vec4(col,a*.48);}`,
+          vec3 sunlit=vec3(1.,1.,1.)*(.85+.15*cosA);
+          vec3 shadow=vec3(.30,.34,.44);
+          vec3 col=mix(shadow,sunlit,smoothstep(0.,.3,cosA));
+          gl_FragColor=vec4(col,a*.52);}`,
       transparent:true,depthWrite:false,blending:THREE.NormalBlending
     });
-    const clouds=new THREE.Mesh(new THREE.SphereGeometry(R*1.008,96,96),cloudMat);
+    const clouds=new THREE.Mesh(new THREE.SphereGeometry(R*1.006,128,128),cloudMat);
     scene.add(clouds);
 
     /* ---- ATMOSPHERE ---- */
-    scene.add(new THREE.Mesh(new THREE.SphereGeometry(R*1.072,64,64),new THREE.ShaderMaterial({
+    scene.add(new THREE.Mesh(new THREE.SphereGeometry(R*1.085,64,64),new THREE.ShaderMaterial({
       vertexShader:`varying vec3 vN;void main(){vN=normalize(normalMatrix*normal);gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}`,
-      fragmentShader:`varying vec3 vN;void main(){float e=1.-clamp(dot(vN,vec3(0.,0.,1.)),0.,1.);gl_FragColor=vec4(.35,.58,.95,pow(e,6.0)*.14);}`,
+      fragmentShader:`varying vec3 vN;void main(){float rim=1.-clamp(dot(vN,vec3(0.,0.,1.)),0.,1.);gl_FragColor=vec4(.28,.52,.92,pow(rim,5.0)*.18);}`,
       side:THREE.BackSide,blending:THREE.AdditiveBlending,transparent:true,depthWrite:false})));
-    scene.add(new THREE.Mesh(new THREE.SphereGeometry(R*1.016,64,64),new THREE.ShaderMaterial({
+    scene.add(new THREE.Mesh(new THREE.SphereGeometry(R*1.018,64,64),new THREE.ShaderMaterial({
       vertexShader:`varying vec3 vN;void main(){vN=normalize(normalMatrix*normal);gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}`,
-      fragmentShader:`varying vec3 vN;void main(){float e=1.-clamp(dot(vN,vec3(0.,0.,1.)),0.,1.);gl_FragColor=vec4(.45,.68,.98,pow(e,8.)*0.38);}`,
+      fragmentShader:`varying vec3 vN;void main(){float rim=1.-clamp(dot(vN,vec3(0.,0.,1.)),0.,1.);gl_FragColor=vec4(.42,.64,.98,pow(rim,9.)*.42);}`,
       side:THREE.BackSide,blending:THREE.AdditiveBlending,transparent:true,depthWrite:false})));
+    scene.add(new THREE.Mesh(new THREE.SphereGeometry(R*1.009,64,64),new THREE.ShaderMaterial({
+      vertexShader:`varying vec3 vN;void main(){vN=normalize(normalMatrix*normal);gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}`,
+      fragmentShader:`varying vec3 vN;void main(){float e=1.-clamp(dot(vN,vec3(0.,0.,1.)),0.,1.);gl_FragColor=vec4(.55,.72,1.,pow(e,14.)*.28);}`,
+      transparent:true,depthWrite:false,blending:THREE.AdditiveBlending})));
 
     /* ---- HELPERS ---- */
     function ll2v(lat,lon,r){
@@ -579,7 +496,7 @@
       s.bullets.forEach(b=>{const li=document.createElement('li');li.textContent=b;ul.appendChild(li);});
       const bd=document.getElementById('pBod');bd.innerHTML='';bd.appendChild(ul);
       const lk=document.getElementById('pLnk');lk.innerHTML='';
-      s.links.forEach(l=>{const a=document.createElement('a');a.href=l.href;a.target='_blank';a.textContent=l.label;lk.appendChild(a);});
+      s.links.forEach(l=>{const a=document.createElement('a');a.href=l.href;a.target='_blank';a.rel='noopener noreferrer';a.textContent=l.label;lk.appendChild(a);});
       panel.classList.add('open');
     }
 
@@ -591,6 +508,7 @@
       vx=dy*.005;vy=dx*.005;
       globe.rotation.y+=vy;pinGroup.rotation.y+=vy;
       globe.rotation.x+=vx;pinGroup.rotation.x+=vx;
+      clouds.rotation.y+=vy;clouds.rotation.x+=vx;
       syncGlowSprites();}
     function endDrag(){dragging=false;}
     canvas.addEventListener('mousedown',e=>startDrag(e.clientX,e.clientY));
@@ -617,8 +535,16 @@
       if(hits.length){const pm=pinMeshes.find(p=>p.dot===hits[0].object);if(pm)openPanel(pm.site);}
       else if(!panel.contains(e.target))panel.classList.remove('open');
     });
+    canvas.addEventListener('touchend',e=>{
+      if(moved)return;
+      const t=e.changedTouches[0];
+      mv2.x=(t.clientX/W())*2-1;mv2.y=-(t.clientY/H())*2+1;
+      rc.setFromCamera(mv2,camera);
+      const hits=rc.intersectObjects(pinMeshes.map(p=>p.dot),false);
+      if(hits.length){const pm=pinMeshes.find(p=>p.dot===hits[0].object);if(pm)openPanel(pm.site);}
+    });
 
-    const SPIN=0.00028;
+    const SPIN=0.00022;
     function animate(t){
       requestAnimationFrame(animate);
       const ts=t*.001;
@@ -626,15 +552,18 @@
       globeMat.uniforms.time.value=ts;
       cloudMat.uniforms.time.value=ts;
       globeMat.uniforms.camPos.value.copy(camera.position);
-      if(autoSpin){globe.rotation.y+=SPIN;pinGroup.rotation.y+=SPIN;syncGlowSprites();}
-      else if(!dragging){
+      if(autoSpin){
+        globe.rotation.y+=SPIN;pinGroup.rotation.y+=SPIN;
+        clouds.rotation.y+=SPIN*.72;
+        syncGlowSprites();
+      } else if(!dragging){
         vx*=.92;vy*=.92;
         globe.rotation.y+=vy;pinGroup.rotation.y+=vy;
         globe.rotation.x+=vx;pinGroup.rotation.x+=vx;
+        clouds.rotation.y+=vy;clouds.rotation.x+=vx;
         syncGlowSprites();
         if(Math.abs(vx)<.00008&&Math.abs(vy)<.00008)autoSpin=true;
       }
-      clouds.rotation.y+=SPIN*.70;
       pinMeshes.forEach(({glowSprite,phase})=>{
         const pulse=0.72+0.38*Math.abs(Math.sin(ts*.5+phase));
         glowSprite.material.opacity=pulse*.88;
