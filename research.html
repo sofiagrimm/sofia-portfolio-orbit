@@ -90,124 +90,336 @@
 
     const SITES = [
       { id:'yale',     lat:41.31,  lon:-72.93,  color:new THREE.Color(0x88d8ff),
-        eyebrow:'Neuroscience \u00b7 Neurodegeneration',
+        eyebrow:'Neuroscience · Neurodegeneration',
         title:'Locus Coeruleus Degeneration in Parkinson\u2019s Disease',
-        org:'Higley Lab \u00b7 Yale School of Medicine', date:'Feb 2026 \u2013 Present',
+        org:'Higley Lab · Yale School of Medicine', date:'Feb 2026 \u2013 Present',
         bullets:['Characterizing LC axon degeneration in PPT1-deficient mice via IHC.',
                  'Investigating norepinephrine dysfunction as an early Parkinson\u2019s marker.'], links:[] },
       { id:'msu',      lat:42.72,  lon:-84.48,  color:new THREE.Color(0x78f0b0),
-        eyebrow:'Top-Down Proteomics \u00b7 Mass Spectrometry',
+        eyebrow:'Top-Down Proteomics · Mass Spectrometry',
         title:'Novel SPME-CZE-MS System for Mass-Limited Proteomics',
-        org:'Sun Lab \u00b7 Michigan State University', date:'Jun \u2013 Aug 2024',
+        org:'Sun Lab · Michigan State University', date:'Jun \u2013 Aug 2024',
         bullets:['Built a novel SPME\u2013CZE\u2013MS/MS system for top-down proteomics.',
                  'Increased injection capacity ~30\u00d7 vs. standard CZE-MS.'], links:[] },
       { id:'stanford', lat:37.43,  lon:-122.17, color:new THREE.Color(0xffd880),
-        eyebrow:'Drosophila Genetics \u00b7 Molecular Biology',
+        eyebrow:'Drosophila Genetics · Molecular Biology',
         title:'Enhancer-Trap Line Development & P-Element Mapping',
-        org:'Stan-X Lab \u00b7 Stanford University', date:'Aug 2024 \u2013 Jun 2025',
+        org:'Stan-X Lab · Stanford University', date:'Aug 2024 \u2013 Jun 2025',
         bullets:['Developed enhancer-trapped Drosophila line via LexA-LexAop system.',
                  'Mapped P-element insertion to CG11050 via inverse PCR & FlyBase BLAST.'], links:[] },
       { id:'fermilab', lat:41.84,  lon:-88.27,  color:new THREE.Color(0xd8a0ff),
-        eyebrow:'Astrophysics \u00b7 Machine Learning',
+        eyebrow:'Astrophysics · Machine Learning',
         title:'CNN Classification of Gravitational Lens Morphologies',
-        org:'Fermi National Accelerator Lab \u00b7 Quarknet', date:'Jun \u2013 Aug 2023',
+        org:'Fermi National Accelerator Lab · Quarknet', date:'Jun \u2013 Aug 2023',
         bullets:['Generated two 40,000-image datasets of double-source plane lenses.',
                  'Trained CNNs (PyTorch) for automated morphological classification.'],
         links:[{ label:'AGU Annual Meeting \u2192', href:'https://agu.confex.com/agu/fm23/meetingapp.cgi/Paper/1438256' },
                { label:'Fermilab/Quarknet Workshop \u2192', href:'https://doi.org/10.2172/2006481' }] }
     ];
 
-    // BUILD GLOBE TEXTURE ENTIRELY ON CANVAS (no external images)
-    // Equirectangular: lon [-180,180] -> x [0,TW], lat [90,-90] -> y [0,TH]
+    // ─── GLOBE TEXTURE ────────────────────────────────────────────────────────
     const TW=4096, TH=2048;
     const tc=document.createElement('canvas');
     tc.width=TW; tc.height=TH;
     const tx=tc.getContext('2d');
 
-    function ll2xy(lon,lat){ return [(lon+180)/360*TW,(90-lat)/180*TH]; }
+    // lon/lat → pixel
+    function px(lon,lat){ return [(lon+180)/360*TW, (90-lat)/180*TH]; }
 
-    // Ocean
-    tx.fillStyle='#0d1b3e';
-    tx.fillRect(0,0,TW,TH);
-
-    // Grid
-    tx.strokeStyle='rgba(100,140,255,0.07)'; tx.lineWidth=1;
-    for(let lat=-90;lat<=90;lat+=30){const y=(90-lat)/180*TH;tx.beginPath();tx.moveTo(0,y);tx.lineTo(TW,y);tx.stroke();}
-    for(let lon=-180;lon<=180;lon+=30){const x=(lon+180)/360*TW;tx.beginPath();tx.moveTo(x,0);tx.lineTo(x,TH);tx.stroke();}
-
-    function poly(pts,fill,stroke){
+    // draw a polygon from [lon,lat] pairs
+    function shape(pts, fill, strokeCol, sw=2){
       tx.beginPath();
-      pts.forEach(([lon,lat],i)=>{
-        const [x,y]=ll2xy(lon,lat);
-        i===0?tx.moveTo(x,y):tx.lineTo(x,y);
-      });
+      pts.forEach(([lon,lat],i)=>{ const [x,y]=px(lon,lat); i?tx.lineTo(x,y):tx.moveTo(x,y); });
       tx.closePath();
-      if(fill){tx.fillStyle=fill;tx.fill();}
-      if(stroke){tx.strokeStyle=stroke;tx.lineWidth=2;tx.stroke();}
+      if(fill){ tx.fillStyle=fill; tx.fill('evenodd'); }
+      if(strokeCol){ tx.strokeStyle=strokeCol; tx.lineWidth=sw; tx.stroke(); }
     }
 
-    const LAND='#2d5a3d', COAST='#1e3d2a';
+    // Ocean base
+    const oceanGrad = tx.createLinearGradient(0,0,0,TH);
+    oceanGrad.addColorStop(0,'#0a1a40');
+    oceanGrad.addColorStop(0.5,'#0d1f4a');
+    oceanGrad.addColorStop(1,'#091535');
+    tx.fillStyle=oceanGrad; tx.fillRect(0,0,TW,TH);
 
-    // NORTH AMERICA
-    poly([[-168,72],[-140,70],[-120,68],[-110,72],[-85,73],[-75,72],[-65,68],[-55,62],[-55,47],[-60,45],[-66,45],[-70,42],[-75,38],[-80,32],[-81,25],[-84,20],[-90,18],[-92,16],[-88,15],[-84,10],[-77,8],[-77,9],[-80,10],[-83,11],[-85,11],[-85,10],[-88,16],[-93,20],[-97,19],[-104,19],[-106,24],[-109,23],[-112,29],[-117,32],[-117,34],[-121,37],[-124,40],[-124,49],[-126,50],[-130,55],[-136,58],[-140,60],[-145,60],[-152,58],[-158,58],[-162,55],[-165,60],[-168,60],[-168,72]],LAND,COAST);
-    // Greenland
-    poly([[-45,83],[-30,82],[-18,76],[-18,70],[-22,66],[-30,63],[-42,65],[-50,67],[-57,68],[-62,67],[-65,66],[-68,65],[-72,63],[-73,60],[-68,57],[-55,58],[-50,62],[-44,63],[-43,65],[-40,68],[-38,72],[-40,76],[-44,78],[-44,83],[-45,83]],LAND,COAST);
-    // SOUTH AMERICA
-    poly([[-80,10],[-77,8],[-73,11],[-63,10],[-60,7],[-52,4],[-50,1],[-50,-4],[-36,-5],[-34,-7],[-35,-12],[-39,-15],[-40,-20],[-43,-23],[-45,-24],[-48,-27],[-50,-29],[-52,-33],[-53,-34],[-58,-38],[-62,-41],[-65,-43],[-66,-46],[-67,-51],[-68,-54],[-69,-56],[-63,-55],[-56,-53],[-52,-51],[-50,-48],[-48,-46],[-50,-41],[-53,-38],[-58,-37],[-64,-35],[-68,-31],[-70,-27],[-70,-22],[-70,-18],[-75,-15],[-78,-11],[-80,-3],[-80,0],[-80,10]],LAND,COAST);
-    // EUROPE
-    poly([[-10,36],[-8,38],[-9,40],[-8,44],[-2,44],[3,44],[5,44],[6,47],[10,47],[12,47],[14,46],[16,48],[17,48],[19,49],[22,48],[26,48],[30,46],[32,46],[30,49],[32,52],[28,55],[25,58],[22,58],[19,60],[20,63],[18,65],[15,66],[14,68],[18,70],[20,71],[26,70],[28,71],[30,70],[30,65],[28,60],[25,57],[22,57],[18,56],[14,55],[10,55],[8,55],[6,53],[4,52],[2,51],[-2,51],[-5,48],[-4,44],[-8,40],[-10,36]],LAND,COAST);
-    poly([[5,58],[8,58],[12,56],[18,56],[22,57],[25,57],[28,60],[30,65],[28,68],[26,70],[22,70],[18,70],[15,69],[14,68],[14,65],[14,62],[12,60],[8,58],[5,58]],LAND,COAST);
-    poly([[-6,58],[-2,57],[2,51],[-2,51],[-5,50],[-6,52],[-8,53],[-10,54],[-8,56],[-6,58]],LAND,COAST);
-    poly([[-10,54],[-6,52],[-6,55],[-8,55],[-10,54]],LAND,COAST);
-    // AFRICA
-    poly([[-18,15],[-16,20],[-16,24],[-12,28],[-5,36],[5,37],[10,37],[12,38],[15,38],[20,37],[25,37],[32,32],[35,29],[37,22],[43,12],[44,11],[50,12],[50,16],[44,22],[42,26],[38,28],[36,32],[37,36],[37,38],[36,40],[40,42],[42,44],[41,48],[38,52],[38,56],[36,58],[34,52],[28,48],[20,44],[15,42],[10,40],[2,40],[0,38],[-5,36],[5,37],[10,37],[12,32],[10,24],[8,18],[8,12],[4,6],[2,4],[-2,4],[-4,5],[-6,6],[-8,5],[-10,7],[-12,7],[-16,13],[-18,15]],LAND,COAST);
-    poly([[44,-12],[50,-14],[50,-22],[46,-25],[44,-20],[44,-12]],LAND,COAST);
-    // RUSSIA / NORTH ASIA
-    poly([[28,71],[32,72],[38,74],[50,76],[60,76],[70,73],[80,73],[90,72],[100,72],[110,70],[120,68],[130,66],[140,62],[142,54],[138,48],[132,44],[130,42],[128,44],[124,53],[120,58],[110,58],[100,54],[90,52],[80,50],[70,48],[60,44],[54,42],[52,44],[48,46],[44,44],[40,42],[36,44],[34,48],[32,52],[28,55],[22,58],[25,58],[28,60],[30,65],[28,68],[28,71]],LAND,COAST);
-    poly([[142,54],[148,54],[162,58],[163,60],[162,62],[158,62],[156,60],[152,58],[148,54],[142,54]],LAND,COAST);
-    poly([[130,32],[132,34],[136,34],[138,36],[140,38],[142,40],[141,42],[140,44],[136,44],[132,40],[130,34],[130,32]],LAND,COAST);
-    // MIDDLE EAST
-    poly([[26,38],[32,32],[35,29],[37,22],[40,20],[43,12],[50,16],[56,22],[60,24],[58,24],[56,26],[54,30],[52,34],[50,30],[48,28],[44,30],[42,36],[36,38],[32,36],[28,38],[26,38]],LAND,COAST);
-    // SOUTH + SE ASIA
-    poly([[60,44],[70,48],[80,50],[90,52],[100,54],[110,58],[118,54],[122,52],[126,46],[128,44],[130,42],[128,40],[122,38],[120,34],[118,32],[116,28],[114,22],[110,18],[108,14],[104,10],[100,4],[100,2],[104,1],[110,2],[114,4],[116,8],[110,14],[104,18],[100,22],[96,24],[94,26],[90,22],[86,20],[80,14],[76,10],[72,10],[68,12],[64,22],[60,24],[58,24],[56,26],[54,30],[60,36],[64,36],[68,36],[72,34],[76,30],[80,26],[84,26],[88,26],[90,26],[94,28],[96,28],[90,30],[86,28],[80,30],[76,34],[72,36],[68,34],[64,34],[60,36],[60,44]],LAND,COAST);
-    poly([[80,10],[82,8],[82,6],[80,7],[80,10]],LAND,COAST);
-    poly([[96,4],[100,2],[104,1],[106,2],[106,4],[104,6],[100,6],[96,4]],LAND,COAST);
-    poly([[106,2],[110,2],[112,4],[114,4],[112,6],[108,8],[106,6],[106,2]],LAND,COAST);
-    poly([[108,0],[114,0],[116,-2],[116,-8],[108,-8],[106,-6],[106,-2],[108,0]],LAND,COAST);
-    poly([[116,18],[120,18],[122,14],[120,10],[118,10],[116,14],[116,18]],LAND,COAST);
-    // AUSTRALIA
-    poly([[114,-22],[116,-20],[122,-18],[128,-14],[132,-12],[136,-12],[138,-12],[140,-14],[142,-12],[148,-18],[152,-22],[154,-26],[152,-30],[152,-34],[148,-38],[144,-38],[140,-36],[136,-36],[132,-34],[128,-34],[122,-34],[116,-34],[114,-32],[112,-26],[112,-22],[114,-22]],LAND,COAST);
-    poly([[172,-34],[174,-36],[174,-40],[172,-44],[170,-44],[168,-42],[170,-38],[172,-34]],LAND,COAST);
-    poly([[172,-40],[174,-44],[172,-46],[170,-44],[172,-40]],LAND,COAST);
-    // ANTARCTICA
-    poly([[-180,-70],[-180,-90],[180,-90],[180,-70],[160,-66],[140,-68],[120,-66],[100,-66],[80,-68],[60,-70],[40,-70],[20,-70],[0,-70],[-20,-68],[-40,-68],[-60,-64],[-80,-62],[-100,-66],[-120,-66],[-140,-68],[-160,-68],[-180,-70]],'#c8d8e8','#aabbcc');
+    // Subtle lat/lon grid
+    tx.strokeStyle='rgba(80,120,220,0.06)'; tx.lineWidth=1;
+    for(let lat=-90;lat<=90;lat+=15){
+      const y=(90-lat)/180*TH;
+      tx.beginPath(); tx.moveTo(0,y); tx.lineTo(TW,y); tx.stroke();
+    }
+    for(let lon=-180;lon<=180;lon+=15){
+      const x=(lon+180)/360*TW;
+      tx.beginPath(); tx.moveTo(x,0); tx.lineTo(x,TH); tx.stroke();
+    }
 
-    // Subtle highlight pass
-    tx.globalAlpha=0.18;
-    poly([[-168,72],[-140,70],[-120,68],[-110,72],[-85,73],[-75,72],[-65,68],[-55,62],[-65,56],[-80,50],[-100,48],[-120,48],[-140,56],[-155,58],[-168,60],[-168,72]],'#7ab890');
-    tx.globalAlpha=1.0;
+    const L='#2e5e3e', C='#1c3d28', L2='#3a7048'; // land, coast, highlight
 
-    const earthTex=new THREE.CanvasTexture(tc);
-    earthTex.colorSpace=THREE.SRGBColorSpace;
-    earthTex.anisotropy=8;
+    // ── NORTH AMERICA ─────────────────────────────────────────────────
+    shape([
+      [-168,72],[-163,71],[-156,71],[-140,70],[-136,68],[-130,56],[-126,50],
+      [-124,49],[-124,47],[-124,40],[-122,37],[-117,34],[-117,32],[-114,31],
+      [-111,29],[-109,24],[-106,24],[-104,20],[-97,20],[-91,19],[-90,18],
+      [-88,16],[-85,12],[-83,10],[-80,9],[-78,8],[-77,8],[-77,9],[-79,10],
+      [-82,11],[-85,11],[-86,10],[-88,16],[-92,16],[-94,18],[-97,19],
+      [-104,19],[-106,22],[-108,23],[-110,24],[-114,28],[-117,30],[-117,32],
+      [-114,31],[-111,26],[-108,23],
+      // back up east coast
+      [-81,25],[-80,32],[-76,35],[-74,38],[-72,41],[-70,42],[-66,45],
+      [-60,46],[-60,47],[-64,48],[-66,48],[-70,47],[-73,45],[-75,44],
+      [-77,44],[-83,46],[-87,46],[-90,47],[-95,49],[-100,49],[-110,49],
+      [-120,49],[-124,49],[-126,50],[-130,55],[-136,58],[-140,59],[-145,60],
+      [-150,60],[-155,58],[-158,58],[-162,55],[-164,55],[-165,60],[-166,62],
+      [-164,63],[-163,66],[-164,68],[-166,68],[-168,66],[-168,72]
+    ], L, C);
 
-    // THREE.JS SETUP
+    // Great Lakes slight detail — Lake Superior region just visible
+    shape([[-92,48],[-84,46],[-76,44],[-78,44],[-84,46],[-92,48]], '#0d1f4a', null);
+
+    // Florida peninsula detail
+    shape([[-82,28],[-80,25],[-81,24],[-83,24],[-84,26],[-82,28]], L, C);
+
+    // Baja California
+    shape([[-117,32],[-114,31],[-111,26],[-110,23],[-109,23],[-110,25],[-113,29],[-117,32]], L, C);
+
+    // Cuba
+    shape([[-84,23],[-82,23],[-80,22],[-75,20],[-74,20],[-77,20],[-80,22],[-84,23]], L, C);
+
+    // Hispaniola
+    shape([[-74,20],[-72,19],[-69,19],[-70,19],[-72,20],[-74,20]], L, C);
+
+    // GREENLAND
+    shape([
+      [-45,83],[-35,83],[-22,83],[-18,80],[-16,76],[-18,72],[-22,68],
+      [-26,65],[-30,63],[-36,64],[-42,65],[-46,65],[-50,67],[-55,68],
+      [-58,67],[-62,66],[-64,65],[-66,63],[-68,62],[-73,60],[-74,58],
+      [-68,57],[-58,60],[-52,62],[-46,63],[-44,65],[-40,68],[-38,72],
+      [-40,76],[-43,78],[-44,80],[-45,83]
+    ], L, C);
+
+    // Iceland
+    shape([[-24,66],[-22,63],[-14,63],[-13,64],[-14,66],[-18,66],[-22,66],[-24,66]], L, C);
+
+    // ── SOUTH AMERICA ─────────────────────────────────────────────────
+    shape([
+      [-80,10],[-78,8],[-76,8],[-73,11],[-70,13],[-68,12],[-65,11],
+      [-63,10],[-60,8],[-56,6],[-52,4],[-50,2],[-50,0],[-50,-4],
+      [-45,-1],[-40,-2],[-37,-4],[-35,-6],[-35,-8],[-38,-12],[-38,-15],
+      [-39,-17],[-40,-19],[-41,-21],[-43,-23],[-44,-24],[-47,-24],
+      [-48,-26],[-49,-28],[-50,-30],[-52,-33],[-53,-34],[-58,-38],
+      [-62,-41],[-64,-42],[-65,-44],[-65,-46],[-66,-48],[-67,-50],
+      [-68,-52],[-68,-54],[-68,-56],[-65,-55],[-62,-54],[-58,-52],
+      [-56,-51],[-54,-49],[-52,-47],[-50,-45],[-50,-40],[-52,-38],
+      [-54,-36],[-56,-34],[-60,-33],[-64,-34],[-66,-32],[-68,-30],
+      [-70,-28],[-70,-24],[-70,-20],[-70,-18],[-72,-15],[-75,-14],
+      [-77,-12],[-80,-8],[-80,-3],[-80,0],[-80,4],[-80,8],[-80,10]
+    ], L, C);
+
+    // ── EUROPE ────────────────────────────────────────────────────────
+    // Main body
+    shape([
+      [-9,38],[-8,38],[-8,44],[-2,44],[0,44],[3,44],[5,44],
+      [6,47],[8,47],[10,47],[12,47],[14,46],[16,47],[17,48],
+      [19,48],[20,49],[22,48],[24,48],[26,48],[28,47],[30,46],
+      [32,46],[30,48],[32,52],[28,55],[24,58],[22,58],[20,60],
+      [20,63],[18,65],[16,66],[15,68],[18,70],[20,71],[24,70],
+      [26,71],[28,71],[30,70],[30,65],[28,60],[26,58],[24,57],
+      [22,57],[18,56],[14,55],[10,55],[8,55],[6,54],[4,53],
+      [2,51],[-2,51],[-4,50],[-5,48],[-4,44],[-8,44],[-9,38]
+    ], L, C);
+
+    // Scandinavia detail
+    shape([
+      [5,58],[7,58],[10,55],[14,55],[18,56],[20,58],[22,57],
+      [24,57],[26,58],[28,60],[30,65],[28,68],[26,70],[24,70],
+      [22,70],[20,70],[18,70],[16,69],[14,68],[15,66],[16,65],
+      [14,62],[12,61],[8,58],[5,58]
+    ], L, C);
+
+    // Great Britain
+    shape([[-5,50],[-3,50],[0,51],[2,52],[1,54],[-1,55],[-3,56],
+           [-4,58],[-6,58],[-5,56],[-4,54],[-3,52],[-5,50]], L, C);
+    // Ireland
+    shape([[-10,52],[-6,52],[-6,55],[-8,55],[-10,54],[-10,52]], L, C);
+
+    // Iberian peninsula more detail
+    shape([[-9,38],[-8,36],[-6,36],[-2,36],[0,38],[2,40],[4,42],
+           [3,44],[-2,44],[-8,44],[-9,38]], L, C);
+
+    // Italy
+    shape([[6,44],[8,44],[10,44],[12,44],[14,42],[16,40],[18,40],
+           [16,38],[15,38],[14,40],[12,38],[10,38],[8,40],[6,44]], L, C);
+    // Sicily
+    shape([[12,38],[14,37],[16,37],[15,38],[13,38],[12,38]], L, C);
+
+    // ── AFRICA ────────────────────────────────────────────────────────
+    shape([
+      [-17,15],[-16,20],[-16,24],[-13,28],[-8,32],[-5,36],
+      [0,37],[5,37],[10,37],[12,38],[15,38],[20,37],[24,37],
+      [28,34],[32,32],[34,30],[36,28],[38,24],[40,20],[42,15],
+      [44,12],[44,11],[46,12],[50,12],[52,14],[50,16],[46,20],
+      [44,22],[42,26],[38,28],[36,32],[36,34],[36,36],[38,38],
+      [40,40],[42,42],[42,44],[40,46],[38,52],[38,56],[36,58],
+      [34,54],[28,48],[22,46],[18,44],[14,42],[10,40],[6,38],
+      [2,38],[0,36],[-4,36],[-5,36],[-8,32],[-13,28],[-10,24],
+      [-8,18],[−8,12],[4,6],[2,4],[0,2],[-2,2],[-4,4],[-6,6],
+      [-8,5],[-10,6],[-12,7],[-14,10],[-16,12],[-17,15]
+    ], L, C);
+
+    // Madagascar
+    shape([[44,-12],[46,-12],[50,-14],[50,-18],[48,-24],[46,-26],
+           [44,-24],[44,-20],[44,-16],[44,-12]], L, C);
+
+    // ── RUSSIA / NORTH ASIA ───────────────────────────────────────────
+    shape([
+      [28,71],[32,72],[38,74],[44,74],[50,76],[60,76],[70,73],
+      [80,73],[88,72],[96,72],[104,72],[112,70],[118,68],[126,66],
+      [132,64],[138,60],[140,56],[140,54],[138,48],[134,46],
+      [132,44],[130,42],[130,40],[132,38],[134,36],[136,34],
+      [136,32],[134,32],[130,34],[126,36],[124,40],[122,40],
+      [120,42],[118,44],[116,48],[112,50],[108,52],[104,52],
+      [100,52],[96,52],[92,52],[88,50],[84,52],[80,52],[76,50],
+      [72,48],[68,48],[64,44],[60,44],[56,42],[54,42],[52,44],
+      [48,46],[44,44],[40,42],[36,44],[34,46],[32,48],[30,50],
+      [28,52],[26,55],[28,58],[26,58],[24,58],[22,58],[20,60],
+      [20,63],[18,65],[16,66],[15,68],[18,70],[20,71],[24,70],
+      [26,71],[28,71]
+    ], L, C);
+
+    // Kamchatka peninsula
+    shape([[158,56],[162,58],[164,60],[162,62],[158,62],[156,60],
+           [154,58],[156,56],[158,56]], L, C);
+
+    // Sakhalin
+    shape([[142,54],[144,54],[144,50],[142,48],[140,50],[140,52],[142,54]], L, C);
+
+    // Japan (Honshu)
+    shape([[130,32],[132,33],[134,34],[136,35],[138,36],[140,38],
+           [141,40],[141,42],[140,44],[138,44],[136,42],[134,40],
+           [132,36],[130,34],[130,32]], L, C);
+    // Hokkaido
+    shape([[140,44],[142,44],[144,44],[144,42],[142,42],[140,42],[140,44]], L, C);
+    // Kyushu
+    shape([[130,32],[132,32],[132,30],[130,30],[130,32]], L, C);
+
+    // ── MIDDLE EAST / ARABIA ──────────────────────────────────────────
+    shape([
+      [26,38],[28,38],[32,36],[36,34],[40,30],[42,26],[44,22],
+      [46,24],[50,26],[52,24],[56,24],[58,24],[60,22],[60,20],
+      [56,16],[54,16],[52,14],[50,12],[46,12],[44,12],[44,14],
+      [42,15],[40,12],[38,14],[36,16],[38,20],[40,22],[44,24],
+      [46,24],[44,26],[42,28],[40,28],[38,28],[36,32],[34,30],
+      [36,28],[36,24],[34,22],[32,24],[30,28],[28,32],[26,36],[26,38]
+    ], L, C);
+
+    // Turkey
+    shape([[26,42],[28,42],[32,42],[36,42],[40,40],[42,40],[44,40],
+           [44,38],[42,36],[38,36],[34,36],[30,38],[28,38],[26,40],[26,42]], L, C);
+
+    // ── SOUTH ASIA ────────────────────────────────────────────────────
+    // Indian subcontinent
+    shape([
+      [60,24],[66,24],[68,24],[70,24],[72,24],[74,24],[76,24],
+      [78,22],[80,20],[80,16],[80,12],[80,10],[78,8],[76,8],
+      [74,8],[72,10],[70,12],[68,14],[66,18],[64,22],[62,24],[60,24]
+    ], L, C);
+    // Sri Lanka
+    shape([[80,10],[82,8],[82,6],[80,7],[80,10]], L, C);
+
+    // ── SOUTHEAST ASIA ────────────────────────────────────────────────
+    // Mainland SE Asia (Indochina)
+    shape([
+      [96,24],[98,24],[100,22],[102,20],[104,18],[106,16],[104,14],
+      [102,10],[102,6],[104,4],[104,2],[102,2],[100,2],[100,4],
+      [100,6],[98,6],[96,8],[94,10],[94,16],[94,20],[92,22],
+      [90,24],[92,24],[94,24],[96,24]
+    ], L, C);
+
+    // Malay Peninsula
+    shape([[100,6],[102,4],[104,2],[104,0],[102,2],[100,4],[100,6]], L, C);
+
+    // Borneo
+    shape([[108,0],[110,2],[114,4],[116,6],[118,6],[118,4],[116,2],
+           [116,0],[114,-2],[112,-4],[110,-4],[108,-2],[108,0]], L, C);
+
+    // Sumatra
+    shape([[96,4],[98,4],[100,2],[104,0],[106,-2],[106,-4],[104,-4],
+           [102,-2],[100,0],[98,2],[96,4]], L, C);
+
+    // Java
+    shape([[106,-6],[108,-6],[110,-6],[112,-6],[114,-8],[112,-8],
+           [110,-8],[108,-8],[106,-6]], L, C);
+
+    // Sulawesi
+    shape([[120,2],[122,2],[124,0],[122,-2],[120,-2],[118,0],[120,2]], L, C);
+
+    // Philippines (Luzon)
+    shape([[118,18],[120,18],[122,16],[122,14],[120,12],[118,12],
+           [116,14],[116,16],[118,18]], L, C);
+
+    // Taiwan
+    shape([[120,26],[122,24],[122,22],[120,22],[120,24],[120,26]], L, C);
+
+    // ── AUSTRALIA ─────────────────────────────────────────────────────
+    shape([
+      [114,-22],[116,-20],[118,-18],[122,-18],[124,-16],[126,-14],
+      [128,-14],[130,-12],[132,-12],[134,-12],[136,-12],[138,-12],
+      [140,-14],[142,-12],[144,-14],[146,-16],[148,-18],[150,-22],
+      [152,-24],[154,-28],[152,-30],[152,-32],[152,-34],[150,-36],
+      [148,-38],[146,-40],[144,-38],[142,-38],[140,-36],[138,-36],
+      [136,-36],[134,-34],[132,-34],[130,-34],[128,-34],[126,-34],
+      [122,-34],[118,-34],[116,-34],[114,-32],[112,-28],[112,-26],
+      [112,-24],[114,-22]
+    ], L, C);
+
+    // Tasmania
+    shape([[144,-40],[146,-40],[148,-42],[146,-44],[144,-44],[144,-42],[144,-40]], L, C);
+
+    // New Zealand (North Island)
+    shape([[172,-34],[174,-36],[178,-38],[178,-40],[176,-42],[174,-42],
+           [172,-40],[172,-38],[174,-36],[172,-34]], L, C);
+    // South Island
+    shape([[168,-44],[170,-44],[172,-44],[174,-46],[172,-48],[168,-46],[168,-44]], L, C);
+
+    // ── ANTARCTICA ────────────────────────────────────────────────────
+    shape([
+      [-180,-65],[-160,-66],[-140,-68],[-120,-66],[-100,-66],
+      [-80,-62],[-60,-64],[-40,-66],[-20,-68],[0,-68],[20,-68],
+      [40,-70],[60,-70],[80,-68],[100,-66],[120,-66],[140,-68],
+      [160,-66],[180,-65],[180,-90],[-180,-90],[-180,-65]
+    ], '#b8ccd8', '#8aaabb');
+
+    // Subtle land highlight pass
+    tx.save();
+    tx.globalAlpha=0.12;
+    tx.fillStyle='#6aba8a';
+    // Light up northern hemisphere land slightly
+    [
+      [[-168,72],[-140,70],[-120,68],[-100,62],[-80,56],[-70,50],[-80,50],[-100,52],[-120,52],[-140,60],[-168,66],[-168,72]],
+    ].forEach(pts => shape(pts,'#6aba8a',null));
+    tx.restore();
+
+    // ── THREE.JS SETUP ─────────────────────────────────────────────────
+    const earthTex = new THREE.CanvasTexture(tc);
+    earthTex.colorSpace = THREE.SRGBColorSpace;
+    earthTex.anisotropy = 16;
+
     const W=()=>window.innerWidth, H=()=>window.innerHeight;
-    const canvas=document.getElementById('c');
-    const renderer=new THREE.WebGLRenderer({canvas,antialias:true});
+    const canvas = document.getElementById('c');
+    const renderer = new THREE.WebGLRenderer({canvas,antialias:true});
     renderer.setPixelRatio(Math.min(devicePixelRatio,2));
     renderer.setSize(W(),H());
     renderer.setClearColor(0x04080f,1);
 
-    const scene=new THREE.Scene();
-    const camera=new THREE.PerspectiveCamera(30,W()/H(),0.1,500);
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(30,W()/H(),0.1,500);
     camera.position.set(0,0,4.4);
     window.addEventListener('resize',()=>{
       camera.aspect=W()/H(); camera.updateProjectionMatrix();
       renderer.setSize(W(),H());
     });
 
-    // STARS
+    // Stars
     {
       const N=12000;
       const pos=new Float32Array(N*3),phase=new Float32Array(N),
@@ -242,51 +454,49 @@
       window._starMat=sm;
     }
 
-    // LIGHTING
-    const sun=new THREE.DirectionalLight(0xfff0e0,2.8);
-    sun.position.set(6,2,4);
-    scene.add(sun);
+    // Lighting
+    const sun=new THREE.DirectionalLight(0xfff0e0,2.8); sun.position.set(6,2,4); scene.add(sun);
     scene.add(new THREE.AmbientLight(0x1a2a50,2.2));
-    const rim=new THREE.DirectionalLight(0x3050a0,0.4);
-    rim.position.set(-4,1,-3);
-    scene.add(rim);
+    const rim=new THREE.DirectionalLight(0x3050a0,0.4); rim.position.set(-4,1,-3); scene.add(rim);
 
-    // GLOBE
+    // Globe
     const R=1.0;
-    const globeGeo=new THREE.SphereGeometry(R,96,96);
-    const globeMat=new THREE.MeshPhongMaterial({
-      map:earthTex,
-      specular:new THREE.Color(0x223355),
-      shininess:18,
-    });
-    const globe=new THREE.Mesh(globeGeo,globeMat);
+    const globe=new THREE.Mesh(
+      new THREE.SphereGeometry(R,128,128),
+      new THREE.MeshPhongMaterial({
+        map:earthTex,
+        specular:new THREE.Color(0x112244),
+        shininess:14,
+      })
+    );
     scene.add(globe);
 
-    // ATMOSPHERE
+    // Atmosphere glow
     scene.add(new THREE.Mesh(
       new THREE.SphereGeometry(R*1.06,64,64),
       new THREE.ShaderMaterial({
         vertexShader:`varying vec3 vN;void main(){vN=normalize(normalMatrix*normal);gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}`,
         fragmentShader:`varying vec3 vN;void main(){
           float rim=1.0-clamp(dot(vN,vec3(0,0,1)),0.0,1.0);
-          gl_FragColor=vec4(0.18,0.44,0.90,pow(rim,5.5)*0.13);}`,
+          gl_FragColor=vec4(0.18,0.44,0.90,pow(rim,5.5)*0.14);}`,
         side:THREE.BackSide,transparent:true,depthWrite:false,
         blending:THREE.AdditiveBlending,
       })
     ));
 
-    // HELPERS
+    // lat/lon → 3D
     function ll2v(lat,lon,r){
-      const phi=(90-lat)*Math.PI/180,theta=(lon+180)*Math.PI/180;
+      const phi=(90-lat)*Math.PI/180, theta=(lon+180)*Math.PI/180;
       return new THREE.Vector3(
         -r*Math.sin(phi)*Math.cos(theta),
          r*Math.cos(phi),
          r*Math.sin(phi)*Math.sin(theta)
       );
     }
+
     function makeGlowTex(hex){
       const cv=document.createElement('canvas'); cv.width=cv.height=128;
-      const ctx=cv.getContext('2d'),c=new THREE.Color(hex);
+      const ctx=cv.getContext('2d'), c=new THREE.Color(hex);
       const rr=Math.round(c.r*255),gg=Math.round(c.g*255),bb=Math.round(c.b*255);
       const grd=ctx.createRadialGradient(64,64,0,64,64,64);
       grd.addColorStop(0,   `rgba(${rr},${gg},${bb},0.95)`);
@@ -297,27 +507,16 @@
       return new THREE.CanvasTexture(cv);
     }
 
-    // PINS
-    const pinMeshes=[],pinGroup=new THREE.Group();
-    scene.add(pinGroup);
+    // Pins
+    const pinMeshes=[], pinGroup=new THREE.Group(); scene.add(pinGroup);
     SITES.forEach((s,i)=>{
-      const pos=ll2v(s.lat,s.lon,R),norm=pos.clone().normalize();
-      const spike=new THREE.Mesh(
-        new THREE.CylinderGeometry(.0015,.007,.07,6),
-        new THREE.MeshBasicMaterial({color:s.color})
-      );
-      const dot=new THREE.Mesh(
-        new THREE.SphereGeometry(.018,16,16),
-        new THREE.MeshBasicMaterial({color:s.color})
-      );
+      const pos=ll2v(s.lat,s.lon,R), norm=pos.clone().normalize();
+      const spike=new THREE.Mesh(new THREE.CylinderGeometry(.0015,.007,.07,6),new THREE.MeshBasicMaterial({color:s.color}));
+      const dot=new THREE.Mesh(new THREE.SphereGeometry(.018,16,16),new THREE.MeshBasicMaterial({color:s.color}));
       dot.position.y=.046;
-      const glow=new THREE.Sprite(new THREE.SpriteMaterial({
-        map:makeGlowTex(s.color.getHex()),transparent:true,
-        blending:THREE.AdditiveBlending,depthWrite:false,opacity:0.9
-      }));
+      const glow=new THREE.Sprite(new THREE.SpriteMaterial({map:makeGlowTex(s.color.getHex()),transparent:true,blending:THREE.AdditiveBlending,depthWrite:false,opacity:0.9}));
       glow.scale.set(.16,.16,1);
-      const grp=new THREE.Group();
-      grp.add(spike,dot);
+      const grp=new THREE.Group(); grp.add(spike,dot);
       grp.position.copy(pos);
       grp.quaternion.setFromUnitVectors(new THREE.Vector3(0,1,0),norm);
       pinGroup.add(grp);
@@ -326,7 +525,7 @@
       pinMeshes.push({grp,dot,glow,site:s,phase:i*1.4});
     });
 
-    // PANEL
+    // Panel
     const panel=document.getElementById('panel');
     document.getElementById('pClose').addEventListener('click',()=>panel.classList.remove('open'));
     function openPanel(s){
@@ -339,14 +538,11 @@
       s.bullets.forEach(b=>{const li=document.createElement('li');li.textContent=b;ul.appendChild(li);});
       const bd=document.getElementById('pBod'); bd.innerHTML=''; bd.appendChild(ul);
       const lk=document.getElementById('pLnk'); lk.innerHTML='';
-      s.links.forEach(l=>{
-        const a=document.createElement('a'); a.href=l.href; a.target='_blank';
-        a.rel='noopener noreferrer'; a.textContent=l.label; lk.appendChild(a);
-      });
+      s.links.forEach(l=>{const a=document.createElement('a');a.href=l.href;a.target='_blank';a.rel='noopener noreferrer';a.textContent=l.label;lk.appendChild(a);});
       panel.classList.add('open');
     }
 
-    // DRAG / INERTIA / TOUCH
+    // Drag / touch / inertia
     let dragging=false,ox=0,oy=0,vx=0,vy=0,autoSpin=true,moved=false;
     function startDrag(x,y){dragging=true;ox=x;oy=y;autoSpin=false;moved=false;}
     function moveDrag(x,y){
@@ -373,8 +569,8 @@
       });
     }
 
-    // RAYCASTING
-    const rc=new THREE.Raycaster(),m2=new THREE.Vector2();
+    // Raycasting
+    const rc=new THREE.Raycaster(), m2=new THREE.Vector2();
     canvas.addEventListener('mouseup',e=>{
       if(moved)return;
       m2.set((e.clientX/W())*2-1,-(e.clientY/H())*2+1);
@@ -392,15 +588,14 @@
       if(hits.length){const pm=pinMeshes.find(p=>p.dot===hits[0].object);if(pm)openPanel(pm.site);}
     });
 
-    // RENDER LOOP
+    // Render loop
     const SPIN=0.00018;
     function animate(t){
       requestAnimationFrame(animate);
       const ts=t*.001;
       if(window._starMat)window._starMat.uniforms.time.value=ts;
       if(autoSpin){
-        globe.rotation.y+=SPIN; pinGroup.rotation.y+=SPIN;
-        syncGlows();
+        globe.rotation.y+=SPIN; pinGroup.rotation.y+=SPIN; syncGlows();
       } else if(!dragging){
         vx*=.91; vy*=.91;
         globe.rotation.y+=vy; pinGroup.rotation.y+=vy;
