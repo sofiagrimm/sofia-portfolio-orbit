@@ -45,7 +45,6 @@
     .card-scene.floating{
       animation:idleFloat 4.5s ease-in-out infinite;
     }
-    /* Permanently revealed: stays face-up, no interaction */
     .card-scene.revealed{
       cursor:default;
     }
@@ -61,7 +60,6 @@
     }
     .card-scene.flipped .card-flipper{ transform:rotateY(180deg); }
 
-    /* shared face */
     .card-face{
       position:absolute;inset:0;
       border-radius:14px;
@@ -195,7 +193,6 @@
         filter    .36s cubic-bezier(.55,0,.45,1);
     }
 
-    /* Close button */
     #cardPopupClose{
       position:absolute;
       top:-16px;right:-16px;
@@ -218,7 +215,6 @@
       box-shadow:0 6px 28px rgba(80,120,255,.4);
     }
 
-    /* The flipper inside the popup */
     #cardPopupFlipper{
       width:100%;height:100%;
       transform-style:preserve-3d;
@@ -294,11 +290,9 @@
         <g transform="translate(90,210)" style="animation:frameRotate 10s linear ${d}s infinite reverse;transform-box:fill-box;transform-origin:50% 50%;"><rect x="-5" y="-5" width="10" height="10" rx="1" fill="none" stroke="${sc}" stroke-width="0.9" stroke-opacity="0.55" transform="rotate(45)"/></g>
         <g style="animation:cornerTwinkle 2.5s ease-in-out ${d}s infinite">
           <text x="15" y="28" font-family="Georgia,serif" font-size="13" text-anchor="middle" fill="${sc}">${suit}</text>
-          <text x="15" y="41" font-family="Georgia,serif" font-size="9" text-anchor="middle" fill="rgba(180,200,255,0.45)">${rank}</text>
           <text x="165" y="28" font-family="Georgia,serif" font-size="13" text-anchor="middle" fill="${sc}">${suit}</text>
-          <text x="165" y="41" font-family="Georgia,serif" font-size="9" text-anchor="middle" fill="rgba(180,200,255,0.45)">${rank}</text>
-          <g transform="rotate(180,90,120)"><text x="-75" y="-93" font-family="Georgia,serif" font-size="13" text-anchor="middle" fill="${sc}">${suit}</text><text x="-75" y="-80" font-family="Georgia,serif" font-size="9" text-anchor="middle" fill="rgba(180,200,255,0.45)">${rank}</text></g>
-          <g transform="rotate(180,90,120)"><text x="75" y="-93" font-family="Georgia,serif" font-size="13" text-anchor="middle" fill="${sc}">${suit}</text><text x="75" y="-80" font-family="Georgia,serif" font-size="9" text-anchor="middle" fill="rgba(180,200,255,0.45)">${rank}</text></g>
+          <g transform="rotate(180,90,120)"><text x="-75" y="-93" font-family="Georgia,serif" font-size="13" text-anchor="middle" fill="${sc}">${suit}</text></g>
+          <g transform="rotate(180,90,120)"><text x="75" y="-93" font-family="Georgia,serif" font-size="13" text-anchor="middle" fill="${sc}">${suit}</text></g>
         </g>
         <rect x="32" y="52" width="116" height="136" rx="5" fill="rgba(20,35,100,0.22)" stroke="rgba(140,165,255,0.13)" stroke-width="0.8"/>
         <line x1="32" y1="120" x2="148" y2="120" stroke="rgba(140,165,255,0.05)" stroke-width="0.7"/>
@@ -338,7 +332,6 @@
       `;
     }
 
-    // ── Popup elements ──
     const popupOverlay = document.getElementById('cardPopupOverlay');
     const popupInner   = document.getElementById('cardPopupInner');
     const popupFlipper = document.getElementById('cardPopupFlipper');
@@ -351,7 +344,6 @@
     function buildPopupCard(idx) {
       popupFlipper.innerHTML = '';
       popupFlipper.classList.remove('flipped');
-
       const back = document.createElement('div');
       back.className = 'card-face card-back';
       back.innerHTML = makeCardBackSVG(idx);
@@ -366,11 +358,9 @@
       const burst = document.createElement('div');
       burst.className = 'cb-burst';
       back.appendChild(burst);
-
       const front = document.createElement('div');
       front.className = 'card-face card-front';
       front.innerHTML = makeFrontHTML(PROJECTS[idx]);
-
       popupFlipper.appendChild(back);
       popupFlipper.appendChild(front);
       return { burst };
@@ -381,12 +371,9 @@
       popupLocked = true;
       activeSceneEl = sceneEl;
       activeIdx = idx;
-
       const { burst } = buildPopupCard(idx);
       popupInner.classList.remove('dismissing');
       popupOverlay.classList.add('visible');
-
-      // After scale-in, flip to front
       setTimeout(() => {
         popupFlipper.classList.add('flipped');
         popupInner.classList.add('bursting');
@@ -400,18 +387,11 @@
     function closePopup() {
       if (popupLocked || !activeSceneEl) return;
       popupLocked = true;
-
-      // Skip the flip-back: go straight to scale-out dismiss
       popupInner.classList.add('dismissing');
-
       setTimeout(() => {
-        // Hide the overlay
         popupOverlay.classList.remove('visible');
         popupInner.classList.remove('dismissing');
-
-        // Mark the grid card as permanently flipped face-up
         activeSceneEl.classList.add('flipped', 'revealed');
-
         activeSceneEl = null;
         activeIdx = -1;
         popupLocked = false;
@@ -426,17 +406,13 @@
       if (e.key === 'Escape') closePopup();
     });
 
-    // ── Build grid ──
     const grid = document.getElementById('memoryGrid');
-
     PROJECTS.forEach((p, i) => {
       const scene = document.createElement('div');
       scene.className = 'card-scene';
       scene.style.animationDelay = (i*0.07)+'s';
-
       const flipper = document.createElement('div');
       flipper.className = 'card-flipper';
-
       const back = document.createElement('div');
       back.className = 'card-face card-back';
       back.innerHTML = makeCardBackSVG(i);
@@ -451,11 +427,9 @@
       const burst = document.createElement('div');
       burst.className = 'cb-burst';
       back.appendChild(burst);
-
       const front = document.createElement('div');
       front.className = 'card-face card-front';
       front.innerHTML = makeFrontHTML(p);
-
       flipper.appendChild(back);
       flipper.appendChild(front);
       scene.appendChild(flipper);
@@ -483,7 +457,6 @@
         if (scene.classList.contains('revealed')) return;
         flipper.style.transform = '';
       });
-
       scene.addEventListener('click', (e) => {
         if (e.target.closest('.fr-link')) return;
         if (scene.classList.contains('revealed')) return;
@@ -494,7 +467,7 @@
     });
   </script>
 
-  <!-- Three.js: stars + realistic procedural planets -->
+  <!-- Stars background only (planets live on the home page) -->
   <script type="module">
     import('https://unpkg.com/three@0.161.0/build/three.module.js').then(THREE=>{
       const renderer=new THREE.WebGLRenderer({antialias:true,alpha:false});
@@ -503,170 +476,19 @@
       renderer.setClearColor(0x060d18,1);
       document.body.appendChild(renderer.domElement);
       const scene=new THREE.Scene();
-      const camera=new THREE.PerspectiveCamera(36,window.innerWidth/window.innerHeight,.1,500);
+      const camera=new THREE.PerspectiveCamera(36,window.innerWidth/window.innerHeight,0.1,500);
       camera.position.set(0,0,46);camera.lookAt(0,0,0);
       window.addEventListener('resize',()=>{camera.aspect=window.innerWidth/window.innerHeight;camera.updateProjectionMatrix();renderer.setSize(window.innerWidth,window.innerHeight);});
-
-      scene.add(new THREE.AmbientLight(0x0d1a33,1.4));
-      const key=new THREE.DirectionalLight(0xffffff,1.1);
-      key.position.set(18,24,18);scene.add(key);
-      const rim=new THREE.DirectionalLight(0xaac4ff,1.2);
-      rim.position.set(-24,4,-20);scene.add(rim);
-
-      // ── Stars ──
       const N=7000,pos=new Float32Array(N*3),ph=new Float32Array(N),sp=new Float32Array(N),sz=new Float32Array(N);
       for(let i=0;i<N;i++){pos[i*3]=(Math.random()-.5)*220;pos[i*3+1]=(Math.random()-.5)*160;pos[i*3+2]=-Math.random()*260;ph[i]=Math.random()*Math.PI*2;sp[i]=.002+Math.random()*.005;sz[i]=.1+Math.random()*.2;}
-      const starGeo=new THREE.BufferGeometry();
-      starGeo.setAttribute('position',new THREE.BufferAttribute(pos,3));
-      starGeo.setAttribute('phase',new THREE.BufferAttribute(ph,1));
-      starGeo.setAttribute('speed',new THREE.BufferAttribute(sp,1));
-      starGeo.setAttribute('aSize',new THREE.BufferAttribute(sz,1));
-      const starMat=new THREE.ShaderMaterial({
-        uniforms:{time:{value:0}},
-        vertexShader:`attribute float aSize;attribute float phase;attribute float speed;uniform float time;varying float vB;void main(){float r=abs(sin(time*speed+phase));vB=.7+.3*pow(r,.3);vec4 mv=modelViewMatrix*vec4(position,1.);gl_PointSize=aSize*(1.+2.*max(0.,r-.75)/.25)*(300./-mv.z);gl_Position=projectionMatrix*mv;}`,
-        fragmentShader:`varying float vB;void main(){vec2 uv=gl_PointCoord-vec2(.5);if(length(uv)>.5)discard;float c=1.-smoothstep(0.,.45,length(uv));gl_FragColor=vec4(vec3(.75,.88,1.)*vB,c*vB);}`,
-        transparent:true,depthWrite:false
-      });
-      scene.add(new THREE.Points(starGeo,starMat));
-
-      // ── Ring texture helper ──
-      function makeRingTexture(glowBase){
-        const c=document.createElement('canvas');c.width=256;c.height=1;
-        const ctx=c.getContext('2d');
-        const grad=ctx.createLinearGradient(0,0,256,0);
-        grad.addColorStop(0,glowBase.replace('1)','0.0)'));
-        grad.addColorStop(0.08,glowBase.replace('1)','0.8)'));
-        grad.addColorStop(0.4,glowBase.replace('1)','0.55)'));
-        grad.addColorStop(0.65,glowBase.replace('1)','0.25)'));
-        grad.addColorStop(1,glowBase.replace('1)','0.0)'));
-        ctx.fillStyle=grad;ctx.fillRect(0,0,256,1);
-        return new THREE.CanvasTexture(c);
-      }
-
-      // ── Planet configs ──
-      const configs=[
-        {color:0x44ccff,emissive:0x0a2a44,glow:'rgba(60,200,255,',ringColor:'rgba(60,200,255,1)',ringTilt:{x:0.42,z:0.18},spinAxis:new THREE.Vector3(0.2,1,0.1).normalize(),spinSpeed:0.008},
-        {color:0x5588ff,emissive:0x080e38,glow:'rgba(80,120,255,',ringColor:'rgba(80,120,255,1)',ringTilt:{x:0.50,z:-0.14},spinAxis:new THREE.Vector3(-0.1,1,0.3).normalize(),spinSpeed:0.012},
-        {color:0xcc88ff,emissive:0x1a0830,glow:'rgba(200,120,255,',ringColor:'rgba(200,120,255,1)',ringTilt:{x:0.32,z:0.28},spinAxis:new THREE.Vector3(0.3,0.9,-0.2).normalize(),spinSpeed:0.006},
-        {color:0x44eeaa,emissive:0x042818,glow:'rgba(40,220,140,',ringColor:'rgba(40,220,140,1)',ringTilt:{x:0.46,z:0.08},spinAxis:new THREE.Vector3(-0.2,1,0.15).normalize(),spinSpeed:0.010},
-        {color:0xffcc44,emissive:0x281a00,glow:'rgba(255,200,50,',ringColor:'rgba(255,200,60,1)',ringTilt:{x:0.38,z:-0.22},spinAxis:new THREE.Vector3(0.15,0.95,0.25).normalize(),spinSpeed:0.007}
-      ];
-
-      const R=16.5,Z=-18,SPEED=0.0004;
-      const sphereGeo=new THREE.SphereGeometry(1.9,64,64);
-      const groups=[],meshes=[];
-      const quat=new THREE.Quaternion();
-
-      for(let i=0;i<5;i++){
-        const cfg=configs[i];
-        // Realistic surface: ShaderMaterial with procedural noise bands
-        const mat=new THREE.ShaderMaterial({
-          uniforms:{
-            uColor:{value:new THREE.Color(cfg.color)},
-            uEmissive:{value:new THREE.Color(cfg.emissive)},
-            uTime:{value:0}
-          },
-          vertexShader:`
-            varying vec3 vNormal;
-            varying vec3 vPos;
-            varying vec2 vUv;
-            void main(){
-              vNormal=normalize(normalMatrix*normal);
-              vPos=(modelMatrix*vec4(position,1.0)).xyz;
-              vUv=uv;
-              gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.0);
-            }`,
-          fragmentShader:`
-            uniform vec3 uColor;
-            uniform vec3 uEmissive;
-            uniform float uTime;
-            varying vec3 vNormal;
-            varying vec3 vPos;
-            varying vec2 vUv;
-            // Simple hash noise for surface detail
-            float hash(vec2 p){return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5453);}
-            float noise(vec2 p){
-              vec2 i=floor(p);vec2 f=fract(p);
-              vec2 u=f*f*(3.0-2.0*f);
-              return mix(mix(hash(i),hash(i+vec2(1,0)),u.x),mix(hash(i+vec2(0,1)),hash(i+vec2(1,1)),u.x),u.y);
-            }
-            float fbm(vec2 p){
-              float v=0.0,a=0.5;
-              for(int i=0;i<4;i++){v+=a*noise(p);p*=2.1;a*=0.5;}
-              return v;
-            }
-            void main(){
-              // Lighting
-              vec3 lightDir=normalize(vec3(18.0,24.0,18.0));
-              vec3 rimDir=normalize(vec3(-24.0,4.0,-20.0));
-              float diff=max(dot(vNormal,lightDir),0.0)*0.9+0.1;
-              float rimDot=1.0-max(dot(vNormal,normalize(vec3(0,0,1))),0.0);
-              float rim=pow(rimDot,3.0)*0.4;
-              // Procedural surface bands
-              vec2 sp=vec2(vUv.x*6.28318,vUv.y*3.14159);
-              float bands=sin(sp.y*8.0+fbm(sp*2.0+uTime*0.04)*2.0)*0.5+0.5;
-              float detail=fbm(sp*4.0+uTime*0.02);
-              vec3 base=mix(uColor*0.6,uColor*1.2,bands);
-              base=mix(base,uColor*0.3,detail*0.25);
-              // Specular
-              vec3 viewDir=normalize(vec3(0,0,46)-vPos);
-              vec3 halfVec=normalize(lightDir+viewDir);
-              float spec=pow(max(dot(vNormal,halfVec),0.0),32.0)*0.35;
-              vec3 col=base*diff+uEmissive*0.6+vec3(spec)+vec3(rim)*uColor*0.5;
-              gl_FragColor=vec4(col,1.0);
-            }`,
-          lights:false
-        });
-        meshes.push(mat); // store mat refs for time update
-
-        // Glow sprite
-        const gc=document.createElement('canvas');gc.width=gc.height=128;
-        const ctx=gc.getContext('2d');
-        const grad=ctx.createRadialGradient(64,64,0,64,64,64);
-        grad.addColorStop(0,cfg.glow+'0.7)');grad.addColorStop(0.4,cfg.glow+'0.22)');grad.addColorStop(1,cfg.glow+'0)');
-        ctx.fillStyle=grad;ctx.fillRect(0,0,128,128);
-        const sprite=new THREE.Sprite(new THREE.SpriteMaterial({map:new THREE.CanvasTexture(gc),transparent:true,depthWrite:false}));
-        sprite.scale.set(4.8,4.8,1);
-
-        // Ring
-        const ringGeo=new THREE.RingGeometry(2.8,3.5,128);
-        const rPos=ringGeo.attributes.position,rUv=ringGeo.attributes.uv,rv=new THREE.Vector3();
-        for(let j=0;j<rPos.count;j++){rv.fromBufferAttribute(rPos,j);rUv.setXY(j,(rv.length()-2.8)/(3.5-2.8),0.5);}
-        const planetRing=new THREE.Mesh(ringGeo,new THREE.MeshBasicMaterial({map:makeRingTexture(cfg.ringColor),side:THREE.DoubleSide,transparent:true,opacity:0.7,depthWrite:false}));
-        planetRing.rotation.x=cfg.ringTilt.x;planetRing.rotation.z=cfg.ringTilt.z;
-
-        const sphere=new THREE.Mesh(sphereGeo,mat);
-        const innerGroup=new THREE.Group();
-        innerGroup.add(sphere);innerGroup.add(sprite);
-        const group=new THREE.Group();
-        group.add(innerGroup);group.add(planetRing);
-        group.userData.angleOffset=i*(2*Math.PI/5);
-        group.userData.spinAxis=cfg.spinAxis;
-        group.userData.spinSpeed=cfg.spinSpeed;
-        group.userData.innerGroup=innerGroup;
-        group.userData.shaderMat=mat;
-        group.position.set(Math.cos(group.userData.angleOffset)*R,Math.sin(group.userData.angleOffset)*R,Z);
-        scene.add(group);
-        groups.push(group);
-      }
-
-      let lastTime=performance.now(),orbitAngle=0;
-      function animate(time){
-        requestAnimationFrame(animate);
-        const t=time??performance.now();
-        const dt=t-lastTime;lastTime=t;
-        orbitAngle+=SPEED*dt;
-        starMat.uniforms.time.value=t*0.001;
-        for(const g of groups){
-          const a=orbitAngle+g.userData.angleOffset;
-          g.position.set(Math.cos(a)*R,Math.sin(a)*R,Z);
-          quat.setFromAxisAngle(g.userData.spinAxis,g.userData.spinSpeed*(dt/16));
-          g.userData.innerGroup.quaternion.multiply(quat);
-          g.userData.shaderMat.uniforms.uTime.value=t*0.001;
-        }
-        renderer.render(scene,camera);
-      }
-      requestAnimationFrame(animate);
+      const geo=new THREE.BufferGeometry();
+      geo.setAttribute('position',new THREE.BufferAttribute(pos,3));
+      geo.setAttribute('phase',new THREE.BufferAttribute(ph,1));
+      geo.setAttribute('speed',new THREE.BufferAttribute(sp,1));
+      geo.setAttribute('aSize',new THREE.BufferAttribute(sz,1));
+      const mat=new THREE.ShaderMaterial({uniforms:{time:{value:0}},vertexShader:`attribute float aSize;attribute float phase;attribute float speed;uniform float time;varying float vB;void main(){float r=abs(sin(time*speed+phase));vB=.7+.3*pow(r,.3);vec4 mv=modelViewMatrix*vec4(position,1.);gl_PointSize=aSize*(1.+2.*max(0.,r-.75)/.25)*(300./-mv.z);gl_Position=projectionMatrix*mv;}`,fragmentShader:`varying float vB;void main(){vec2 uv=gl_PointCoord-vec2(.5);if(length(uv)>.5)discard;float c=1.-smoothstep(0.,.45,length(uv));gl_FragColor=vec4(vec3(.75,.88,1.)*vB,c*vB);}`,transparent:true,depthWrite:false});
+      scene.add(new THREE.Points(geo,mat));
+      (function loop(t){requestAnimationFrame(loop);mat.uniforms.time.value=t*.001;renderer.render(scene,camera);})(0);
     });
   </script>
 </body>
