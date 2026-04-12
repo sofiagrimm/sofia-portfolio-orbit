@@ -97,6 +97,19 @@
       font-size:10px;letter-spacing:0.18em;text-transform:uppercase;
       color:rgba(110,130,190,0.28);font-weight:300;pointer-events:none;
     }
+    .contact-bar{
+      position:fixed;bottom:32px;left:50%;transform:translateX(-50%);
+      z-index:20;display:flex;align-items:center;gap:20px;
+      pointer-events:auto;
+    }
+    .contact-bar a{
+      font-size:10px;letter-spacing:0.16em;text-transform:uppercase;
+      color:rgba(140,165,255,0.38);text-decoration:none;
+      transition:color .22s;
+      display:flex;align-items:center;gap:6px;
+    }
+    .contact-bar a:hover{color:rgba(200,220,255,0.75);}
+    .contact-bar .cb-divider{color:rgba(100,130,200,0.18);font-size:10px;pointer-events:none;}
     #planetHint{
       position:fixed;z-index:30;pointer-events:none;
       font-size:11px;letter-spacing:.12em;text-transform:uppercase;
@@ -181,7 +194,8 @@
       .card-rule { margin: 16px auto; }
       .card-sub { font-size: 11px; }
       .coords { left: 20px; bottom: 20px; }
-      .tagline { right: 20px; bottom: 20px; font-size: 9px; }
+      .tagline { display: none; }
+      .contact-bar { display: none; }
       #popupBox { padding: 28px 22px 24px; }
       .popup-title { font-size: 26px; }
       .popup-body { font-size: 12px; }
@@ -210,6 +224,11 @@
   </div>
   <div class="coords">41.3083&deg; N &nbsp; 72.9279&deg; W</div>
   <div class="tagline">science as an explorable universe</div>
+  <div class="contact-bar">
+    <a href="mailto:sofia.grimm@yale.edu">sofia.grimm@yale.edu</a>
+    <span class="cb-divider">&middot;</span>
+    <a href="https://www.linkedin.com/in/sofia-grimm/" target="_blank" rel="noopener noreferrer">LinkedIn</a>
+  </div>
 
   <div id="planetHint"></div>
 

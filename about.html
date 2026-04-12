@@ -258,43 +258,41 @@
     .tag:hover{color:rgba(210,228,255,0.9);border-color:rgba(140,170,255,0.38);background:rgba(30,55,130,0.40);}
     .coords{position:fixed;bottom:32px;left:48px;z-index:20;font-size:10px;letter-spacing:0.18em;color:rgba(110,130,190,0.28);font-weight:300;pointer-events:none;}
 
+    /* Contact footer */
+    .contact-footer{
+      display:flex;align-items:center;gap:20px;
+      margin-top:48px;margin-bottom:8px;padding-top:32px;
+      border-top:1px solid rgba(100,130,200,0.10);
+    }
+    .contact-footer a{
+      font-size:11px;letter-spacing:0.14em;text-transform:uppercase;
+      color:rgba(140,165,255,0.45);text-decoration:none;
+      transition:color .22s;
+    }
+    .contact-footer a:hover{color:rgba(200,220,255,0.80);}
+    .contact-footer .cf-divider{color:rgba(100,130,200,0.18);pointer-events:none;}
+
     /* ── MOBILE ─────────────────────────────────────────────── */
     @media (max-width: 768px) {
-      /* Hide film strips — they eat the whole screen */
       .strip-wrap { display: none; }
-
-      /* Nav: tighten padding, shrink name, hide dividers */
       nav { padding: 0 20px; height: 56px; }
       .nav-name { font-size: 22px; }
       .nav-links a { font-size: 11px; padding: 6px 9px; letter-spacing: 0.08em; }
       .nav-links .divider { display: none; }
-
-      /* Page content */
       .page { padding: 90px 20px 60px; }
       .page-title { font-size: 38px; margin-bottom: 28px; }
       .bio { font-size: 14px; line-height: 1.75; }
-
-      /* Cards: single column */
       .glance-grid { grid-template-columns: 1fr; gap: 14px; }
       .glance-card { padding: 22px 20px 18px; }
       .gc-stat { font-size: 32px; }
-
-      /* Awards: allow year to wrap below on very narrow */
       .award { padding: 14px 16px 14px 20px; }
       .award-name { font-size: 13px; }
       .award-year { font-size: 9px; margin-left: 10px; }
-
-      /* Section labels */
       .section-label { margin-top: 40px; margin-bottom: 20px; }
-
-      /* Tags */
       .tags { margin-top: 32px; margin-bottom: 40px; gap: 8px; }
-
-      /* Hide coords */
       .coords { display: none; }
     }
 
-    /* Very small phones */
     @media (max-width: 400px) {
       .nav-links a { font-size: 10px; padding: 5px 7px; }
       .page-title { font-size: 32px; }
@@ -327,7 +325,7 @@
     <h1 class="page-title">Hi, I'm <em>Sofia!</em></h1>
     <div class="rule"></div>
     <div class="bio">
-      <p>Born and raised in <strong>Hong Kong</strong> for the first fourteen years of my life before moving to <strong>Chicago</strong> for high school, I'm a student at <strong>Yale University</strong> pursuing a B.S. in <strong>Chemistry</strong> and <strong>Ethics, Politics &amp; Economics</strong>. I'm drawn to the places where <strong>science meets systems</strong>: whether that be a protein's folding behavior, a disease mechanism, or a policy question about emerging technology.</p>
+      <p>Born and raised in <strong>Hong Kong</strong> for the first fourteen years of my life before moving to <strong>Chicago</strong> for high school, I'm a student at <strong>Yale University</strong> pursuing a B.S. in <strong>Chemistry</strong> and <strong>Ethics, Politics &amp; Law</strong>. I'm drawn to the places where <strong>science meets systems</strong>: whether that be a protein's folding behavior, a disease mechanism, or a policy question about emerging technology.</p>
       <p>My research spans <strong>computational</strong> and <strong>wet labs</strong>, focusing on a broad range of subjects including <strong>neurodegenerative diseases</strong>, <strong>genetics</strong>, <strong>astrophysics</strong>, <strong>proteomics</strong>, <strong>machine learning</strong>, and <strong>mathematical optimization</strong>. Currently I'm at the <strong>Higley Lab</strong> at Yale School of Medicine, where I'm characterizing <strong>locus coeruleus axon degeneration</strong> in PPT1-deficient mice to investigate <strong>norepinephrine dysfunction</strong> in <strong>Parkinson's disease</strong>. I also work on the <strong>PCDD startup</strong> at Yale Engineering, developing business strategy for a patent-pending medication dispenser device.</p>
       <p>Outside the lab I consult, build, and write. I'm a <strong>Client Lead</strong> at <strong>Yale Healthcare Consulting Collective</strong> and an <strong>Online Editor</strong> at the <strong>Yale Undergraduate Law Journal</strong>. I speak <strong>English</strong>, <strong>Chinese</strong>, <strong>Spanish</strong>, and <strong>Latin</strong>.</p>
     </div>
@@ -347,7 +345,7 @@
         <div class="gc-stat-label">GPA &middot; Class of 2029</div>
         <div class="gc-value">
           <strong>Yale University</strong><br>
-          B.S. Chemistry &amp; EPE
+          B.S. Chemistry &amp; EPL
         </div>
       </div>
 
@@ -571,6 +569,14 @@
       <span class="tag">Consulting</span>
       <span class="tag">Global Affairs</span>
     </div>
+
+    <!-- Contact -->
+    <div class="contact-footer">
+      <a href="mailto:sofia.grimm@yale.edu">sofia.grimm@yale.edu</a>
+      <span class="cf-divider">&middot;</span>
+      <a href="https://www.linkedin.com/in/sofia-grimm/" target="_blank" rel="noopener noreferrer">LinkedIn</a>
+    </div>
+
   </main>
   <div class="coords">41.3083&deg; N &nbsp; 72.9279&deg; W</div>
 
