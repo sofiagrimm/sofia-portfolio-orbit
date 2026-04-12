@@ -22,126 +22,33 @@
     .page-title em{font-style:italic;color:rgba(190,210,255,.85);}
     .page-subtitle{font-size:13px;font-weight:300;color:rgba(160,190,255,.40);letter-spacing:.06em;margin-bottom:36px;}
     .rule{width:48px;height:1px;background:linear-gradient(90deg,rgba(140,170,255,.4),transparent);margin-bottom:44px;}
-
-    /* ═══ GRID ═══ */
     .memory-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:18px;}
-
-    /* ═══ CARD SCENE ═══ */
-    @keyframes cardEntrance {
-      0%   { opacity:0; transform:translateY(28px) scale(0.93); }
-      100% { opacity:1; transform:translateY(0)    scale(1); }
-    }
-    @keyframes idleFloat {
-      0%,100% { transform:translateY(0px); }
-      50%      { transform:translateY(-5px); }
-    }
-    .card-scene{
-      aspect-ratio:3/4;
-      perspective:900px;
-      cursor:pointer;
-      opacity:0;
-      animation:cardEntrance .6s cubic-bezier(.22,1,.36,1) forwards;
-    }
-    .card-scene.floating{
-      animation:idleFloat 4.5s ease-in-out infinite;
-    }
-    .card-scene.revealed{
-      cursor:pointer;
-    }
-
-    /* ═══ FLIPPER ═══ */
-    .card-flipper{
-      position:relative;
-      width:100%;height:100%;
-      transform-style:preserve-3d;
-      transition:transform .65s cubic-bezier(.22,1,.36,1);
-      border-radius:14px;
-      will-change:transform;
-    }
-    .card-scene.flipped .card-flipper{ transform:rotateY(180deg); }
-
-    .card-face{
-      position:absolute;inset:0;
-      border-radius:14px;
-      backface-visibility:hidden;
-      -webkit-backface-visibility:hidden;
-      overflow:hidden;
-    }
-
-    /* ═══ BACK FACE ═══ */
-    .card-back{
-      background:#0a1230;
-      border:1px solid rgba(130,155,255,.18);
-      display:flex;align-items:center;justify-content:center;
-      transition:box-shadow .22s, border-color .22s;
-    }
-    .card-scene:not(.flipped):hover .card-back,
-    .card-scene.revealed:hover .card-back{
-      box-shadow:0 14px 44px rgba(100,130,255,.30), 0 0 0 1px rgba(160,185,255,.20);
-      border-color:rgba(160,185,255,.38);
-    }
+    @keyframes cardEntrance{0%{opacity:0;transform:translateY(28px) scale(0.93);}100%{opacity:1;transform:translateY(0) scale(1);}}
+    @keyframes idleFloat{0%,100%{transform:translateY(0px);}50%{transform:translateY(-5px);}}
+    .card-scene{aspect-ratio:3/4;perspective:900px;cursor:pointer;opacity:0;animation:cardEntrance .6s cubic-bezier(.22,1,.36,1) forwards;}
+    .card-scene.floating{animation:idleFloat 4.5s ease-in-out infinite;}
+    .card-scene.revealed{cursor:pointer;}
+    .card-flipper{position:relative;width:100%;height:100%;transform-style:preserve-3d;transition:transform .65s cubic-bezier(.22,1,.36,1);border-radius:14px;will-change:transform;}
+    .card-scene.flipped .card-flipper{transform:rotateY(180deg);}
+    .card-face{position:absolute;inset:0;border-radius:14px;backface-visibility:hidden;-webkit-backface-visibility:hidden;overflow:hidden;}
+    .card-back{background:#0a1230;border:1px solid rgba(130,155,255,.18);display:flex;align-items:center;justify-content:center;transition:box-shadow .22s,border-color .22s;}
+    .card-scene:not(.flipped):hover .card-back,.card-scene.revealed:hover .card-back{box-shadow:0 14px 44px rgba(100,130,255,.30),0 0 0 1px rgba(160,185,255,.20);border-color:rgba(160,185,255,.38);}
     .card-back svg{width:100%;height:100%;position:absolute;inset:0;}
-
-    @keyframes shimmerSweep {
-      0%   { transform:translateX(-120%) rotate(22deg); opacity:0; }
-      10%  { opacity:1; }
-      90%  { opacity:1; }
-      100% { transform:translateX(220%) rotate(22deg); opacity:0; }
-    }
-    .card-back .cb-shimmer{
-      position:absolute;top:0;left:0;
-      width:28%;height:100%;
-      background:linear-gradient(90deg,transparent 0%,rgba(200,215,255,0.11) 50%,transparent 100%);
-      animation:shimmerSweep 4.2s ease-in-out infinite;
-      pointer-events:none;z-index:2;
-    }
-    @keyframes auroraWash {
-      0%   { background-position:0% 50%;   opacity:0.07; }
-      50%  { background-position:100% 50%; opacity:0.13; }
-      100% { background-position:0% 50%;   opacity:0.07; }
-    }
-    .card-back .cb-aurora{
-      position:absolute;inset:0;border-radius:14px;
-      background:linear-gradient(120deg,rgba(100,130,255,0),rgba(160,100,255,0.2),rgba(80,180,255,0.15),rgba(100,130,255,0));
-      background-size:300% 300%;
-      animation:auroraWash 6s ease-in-out infinite;
-      pointer-events:none;z-index:1;
-    }
-    @keyframes burstRing {
-      0%   { transform:scale(0.5); opacity:0.7; }
-      100% { transform:scale(2.2); opacity:0;   }
-    }
-    .card-back .cb-burst{
-      position:absolute;
-      width:60%;padding-top:60%;
-      top:50%;left:50%;
-      margin-top:-30%;margin-left:-30%;
-      border-radius:50%;
-      border:1.5px solid rgba(180,200,255,0.6);
-      pointer-events:none;z-index:3;
-      opacity:0;
-    }
-    .bursting .cb-burst{
-      animation:burstRing .55s cubic-bezier(.22,1,.36,1) forwards;
-    }
-    @keyframes suitPulse    { 0%,100%{opacity:.55;transform:scale(1);}     50%{opacity:.82;transform:scale(1.08);} }
-    @keyframes cornerTwinkle{ 0%,100%{opacity:.55;} 35%{opacity:.92;} 65%{opacity:.30;} }
-    @keyframes borderGlow   { 0%,100%{stroke-opacity:.20;} 50%{stroke-opacity:.58;} }
-    @keyframes particleDrift{ 0%{transform:translateY(0) translateX(0) scale(1);opacity:.65;} 33%{transform:translateY(-7px) translateX(4px) scale(1.4);opacity:1;} 66%{transform:translateY(5px) translateX(-4px) scale(.7);opacity:.45;} 100%{transform:translateY(0) translateX(0) scale(1);opacity:.65;} }
-    @keyframes frameRotate  { to{transform:rotate(360deg);} }
-    @keyframes orbitRing    { from{transform:rotate(0deg);}   to{transform:rotate(360deg);}  }
-    @keyframes orbitRingRev { from{transform:rotate(0deg);}   to{transform:rotate(-360deg);} }
-
-    /* ═══ FRONT FACE ═══ */
-    .card-front{
-      background:rgba(6,14,44,.92);
-      border:1px solid rgba(120,150,240,.18);
-      backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
-      transform:rotateY(180deg);
-      padding:14px 14px 12px;
-      display:flex;flex-direction:column;gap:5px;
-      box-shadow:0 16px 60px rgba(0,0,0,.7),inset 0 1px 0 rgba(200,210,255,.05);
-    }
+    @keyframes shimmerSweep{0%{transform:translateX(-120%) rotate(22deg);opacity:0;}10%{opacity:1;}90%{opacity:1;}100%{transform:translateX(220%) rotate(22deg);opacity:0;}}
+    .card-back .cb-shimmer{position:absolute;top:0;left:0;width:28%;height:100%;background:linear-gradient(90deg,transparent 0%,rgba(200,215,255,0.11) 50%,transparent 100%);animation:shimmerSweep 4.2s ease-in-out infinite;pointer-events:none;z-index:2;}
+    @keyframes auroraWash{0%{background-position:0% 50%;opacity:0.07;}50%{background-position:100% 50%;opacity:0.13;}100%{background-position:0% 50%;opacity:0.07;}}
+    .card-back .cb-aurora{position:absolute;inset:0;border-radius:14px;background:linear-gradient(120deg,rgba(100,130,255,0),rgba(160,100,255,0.2),rgba(80,180,255,0.15),rgba(100,130,255,0));background-size:300% 300%;animation:auroraWash 6s ease-in-out infinite;pointer-events:none;z-index:1;}
+    @keyframes burstRing{0%{transform:scale(0.5);opacity:0.7;}100%{transform:scale(2.2);opacity:0;}}
+    .card-back .cb-burst{position:absolute;width:60%;padding-top:60%;top:50%;left:50%;margin-top:-30%;margin-left:-30%;border-radius:50%;border:1.5px solid rgba(180,200,255,0.6);pointer-events:none;z-index:3;opacity:0;}
+    .bursting .cb-burst{animation:burstRing .55s cubic-bezier(.22,1,.36,1) forwards;}
+    @keyframes suitPulse{0%,100%{opacity:.55;transform:scale(1);}50%{opacity:.82;transform:scale(1.08);}}
+    @keyframes cornerTwinkle{0%,100%{opacity:.55;}35%{opacity:.92;}65%{opacity:.30;}}
+    @keyframes borderGlow{0%,100%{stroke-opacity:.20;}50%{stroke-opacity:.58;}}
+    @keyframes particleDrift{0%{transform:translateY(0) translateX(0) scale(1);opacity:.65;}33%{transform:translateY(-7px) translateX(4px) scale(1.4);opacity:1;}66%{transform:translateY(5px) translateX(-4px) scale(.7);opacity:.45;}100%{transform:translateY(0) translateX(0) scale(1);opacity:.65;}}
+    @keyframes frameRotate{to{transform:rotate(360deg);}}
+    @keyframes orbitRing{from{transform:rotate(0deg);}to{transform:rotate(360deg);}}
+    @keyframes orbitRingRev{from{transform:rotate(0deg);}to{transform:rotate(-360deg);}}
+    .card-front{background:rgba(6,14,44,.92);border:1px solid rgba(120,150,240,.18);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);transform:rotateY(180deg);padding:14px 14px 12px;display:flex;flex-direction:column;gap:5px;box-shadow:0 16px 60px rgba(0,0,0,.7),inset 0 1px 0 rgba(200,210,255,.05);}
     .fr-tag{font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:rgba(140,175,255,.6);font-weight:500;}
     .fr-date{font-size:11px;letter-spacing:.10em;color:rgba(140,165,220,.45);margin-top:0;}
     .fr-rule{width:32px;height:1px;background:linear-gradient(90deg,rgba(150,170,255,.35),transparent);margin:2px 0;}
@@ -149,84 +56,16 @@
     .fr-body{font-size:11.5px;font-weight:300;line-height:1.60;color:rgba(195,215,255,.60);flex:1;overflow:hidden;display:-webkit-box;-webkit-line-clamp:7;-webkit-box-orient:vertical;}
     .fr-link{font-size:10.5px;letter-spacing:.13em;text-transform:uppercase;color:rgba(160,195,255,.60);text-decoration:none;border-bottom:1px solid rgba(140,180,255,.18);align-self:flex-start;transition:color .2s;margin-top:2px;}
     .fr-link:hover{color:rgba(210,225,255,.9);}
-
-    /* Popup front face gets unclipped body text */
-    #cardPopupFlipper .fr-body{
-      -webkit-line-clamp:unset;
-      overflow:visible;
-    }
-
-    /* ═══ POPUP OVERLAY ═══ */
-    #cardPopupOverlay{
-      position:fixed;inset:0;z-index:100;
-      background:rgba(4,8,28,0);
-      display:flex;align-items:center;justify-content:center;
-      pointer-events:none;
-      transition:background .35s ease;
-    }
-    #cardPopupOverlay.visible{
-      background:rgba(4,8,28,0.72);
-      pointer-events:auto;
-      backdrop-filter:blur(4px);
-      -webkit-backdrop-filter:blur(4px);
-    }
-    #cardPopupInner{
-      position:relative;
-      width:min(320px,78vw);
-      aspect-ratio:3/4;
-      perspective:900px;
-      opacity:0;
-      transform:scale(0.45) translateY(30px);
-      filter:blur(6px);
-      transition:
-        opacity   .50s cubic-bezier(.22,1,.36,1),
-        transform .50s cubic-bezier(.22,1,.36,1),
-        filter    .50s cubic-bezier(.22,1,.36,1);
-    }
-    #cardPopupOverlay.visible #cardPopupInner{
-      opacity:1;
-      transform:scale(1) translateY(0);
-      filter:blur(0px);
-    }
-    #cardPopupInner.dismissing{
-      opacity:0;
-      transform:scale(0.45) translateY(30px);
-      filter:blur(6px);
-      transition:
-        opacity   .36s cubic-bezier(.55,0,.45,1),
-        transform .36s cubic-bezier(.55,0,.45,1),
-        filter    .36s cubic-bezier(.55,0,.45,1);
-    }
-    #cardPopupClose{
-      position:absolute;
-      top:-16px;right:-16px;
-      width:36px;height:36px;
-      background:rgba(12,22,80,0.90);
-      border:1px solid rgba(150,175,255,0.35);
-      border-radius:50%;
-      color:rgba(210,225,255,0.90);
-      font-size:14px;
-      display:flex;align-items:center;justify-content:center;
-      cursor:pointer;z-index:10;
-      transition:background .18s,color .18s,transform .18s,box-shadow .18s;
-      backdrop-filter:blur(10px);
-      box-shadow:0 4px 20px rgba(0,0,0,.5);
-    }
-    #cardPopupClose:hover{
-      background:rgba(80,100,220,0.60);
-      color:#fff;
-      transform:scale(1.15) rotate(90deg);
-      box-shadow:0 6px 28px rgba(80,120,255,.4);
-    }
-    #cardPopupFlipper{
-      width:100%;height:100%;
-      transform-style:preserve-3d;
-      transition:transform .65s cubic-bezier(.22,1,.36,1);
-      border-radius:14px;
-      will-change:transform;
-    }
-    #cardPopupFlipper.flipped{ transform:rotateY(180deg); }
-
+    #cardPopupFlipper .fr-body{-webkit-line-clamp:unset;overflow:visible;}
+    #cardPopupOverlay{position:fixed;inset:0;z-index:100;background:rgba(4,8,28,0);display:flex;align-items:center;justify-content:center;pointer-events:none;transition:background .35s ease;}
+    #cardPopupOverlay.visible{background:rgba(4,8,28,0.72);pointer-events:auto;backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);}
+    #cardPopupInner{position:relative;width:min(320px,78vw);aspect-ratio:3/4;perspective:900px;opacity:0;transform:scale(0.45) translateY(30px);filter:blur(6px);transition:opacity .50s cubic-bezier(.22,1,.36,1),transform .50s cubic-bezier(.22,1,.36,1),filter .50s cubic-bezier(.22,1,.36,1);}
+    #cardPopupOverlay.visible #cardPopupInner{opacity:1;transform:scale(1) translateY(0);filter:blur(0px);}
+    #cardPopupInner.dismissing{opacity:0;transform:scale(0.45) translateY(30px);filter:blur(6px);transition:opacity .36s cubic-bezier(.55,0,.45,1),transform .36s cubic-bezier(.55,0,.45,1),filter .36s cubic-bezier(.55,0,.45,1);}
+    #cardPopupClose{position:absolute;top:-16px;right:-16px;width:36px;height:36px;background:rgba(12,22,80,0.90);border:1px solid rgba(150,175,255,0.35);border-radius:50%;color:rgba(210,225,255,0.90);font-size:14px;display:flex;align-items:center;justify-content:center;cursor:pointer;z-index:10;transition:background .18s,color .18s,transform .18s,box-shadow .18s;backdrop-filter:blur(10px);box-shadow:0 4px 20px rgba(0,0,0,.5);}
+    #cardPopupClose:hover{background:rgba(80,100,220,0.60);color:#fff;transform:scale(1.15) rotate(90deg);box-shadow:0 6px 28px rgba(80,120,255,.4);}
+    #cardPopupFlipper{width:100%;height:100%;transform-style:preserve-3d;transition:transform .65s cubic-bezier(.22,1,.36,1);border-radius:14px;will-change:transform;}
+    #cardPopupFlipper.flipped{transform:rotateY(180deg);}
     .coords{position:fixed;bottom:32px;left:48px;z-index:20;font-size:10px;letter-spacing:.18em;color:rgba(110,130,190,.28);font-weight:300;pointer-events:none;}
   </style>
 </head>
@@ -249,24 +88,22 @@
     <div class="memory-grid" id="memoryGrid"></div>
   </main>
   <div class="coords">41.3083&deg; N &nbsp; 72.9279&deg; W</div>
-
   <div id="cardPopupOverlay">
     <div id="cardPopupInner">
       <button id="cardPopupClose" aria-label="Close card">&#x2715;</button>
       <div id="cardPopupFlipper"></div>
     </div>
   </div>
-
   <script>
     const PROJECTS = [
       { tag:"Startup · MedTech", date:"Mar 2026 – Present", title:"PCDD (Patient Controlled Dispenser & Deactivator)", body:"Developing business strategy for a patent-pending medication disposal device at Yale School of Engineering under Dr. Wiznia. Work spans ingress mechanisms, activated charcoal deactivation protocols, and go-to-market planning.", link:"#", linkLabel:"In progress →" },
       { tag:"Hackathon · React", date:"March 2026", title:"Vantage: Professional Analytics Terminal", body:"Professional analytics terminal built on live Polymarket prediction-market data. A React and TypeScript-based web app, Vantage included Central Limit Order Book-driven charts, payoff curves, Kelly sizing, portfolio analytics, and a perp-hedge overlay with funding drag. For my end-to-end deployment of Vantage over a single hackathon weekend, I was awarded Best Solo Hack, winning a Framework Laptop Computer.", link:"https://devpost.com/software/vantage-gnt2kb?ref_content=user-portfolio&ref_feature=in_progress", linkLabel:"View project →" },
       { tag:"Healthcare · Consulting", date:"Jan 2026 – Present", title:"Decision Support Tool for the American Red Cross", body:"Built for Yale Healthcare Consulting Collective's Red Cross Fleet Strategy engagement. A Python model that translates regional donation targets into minimum fleet requirements by solving demand-coverage constraints under variable vehicle utilization rates. The model computes required bloodmobile and support vehicle counts per region, diffs against current inventory to surface over- and under-capacity gaps, and runs sensitivity analysis across collection-rate distributions to bound uncertainty. An asset health module scores each vehicle for replacement priority using a weighted composite of depreciation, mileage, and incident history.", link:"#", linkLabel:"In progress →" },
-      { tag:"Strategy · Consulting", date:"Feb 2026 – Present", title:"ASEAN Market Expansion Strategy for Nicol David Organization", body:"Developed market strategy for the Nicol David Organization's cross-border expansion with Yale's Global Strategy Consulting group. Conducted a landscape analysis across ASEAN markets, assessing youth wellbeing gaps, education systems, funding ecosystems, and policy environments to identify demand for sports-for-development programming. Built a standardized country prioritization framework scoring markets on impact potential, ease of entry, funding access, and partnership ecosystem density. Identified Singapore as the optimal entry point, with strong institutional infrastructure, a dense CSR funding landscape, and government-backed youth programming. Recommended a Company Limited by Guarantee (CLG) legal structure registered via ACRA to maximize donor credibility and fundraising capability. Designed a phased hub-and-spoke expansion model with Singapore as regional HQ and micro-pilots in Indonesia as the next-stage market.", link:"#", linkLabel:"In progress →" },
+      { tag:"Strategy · Consulting", date:"Feb 2026 – Present", title:"ASEAN Market Expansion Strategy for Nicol David Organization", body:"Established a market strategy for the Nicol David Organization's cross-border expansion with Yale's Global Strategy Consulting group. Conducted a landscape analysis across ASEAN markets, assessing youth wellbeing gaps, education systems, funding ecosystems, and policy environments to identify demand for sports-for-development programming. Built a standardized country prioritization framework scoring markets on impact potential, ease of entry, funding access, and partnership ecosystem density. Identified Singapore as the optimal entry point, with strong institutional infrastructure, a dense CSR funding landscape, and government-backed youth programming. Recommended a Company Limited by Guarantee (CLG) legal structure registered via ACRA to maximize donor credibility and fundraising capability. Designed a phased hub-and-spoke expansion model with Singapore as regional HQ and micro-pilots in Indonesia as the next-stage market.", link:"#", linkLabel:"In progress →" },
       { tag:"ML · Astrophysics", date:"2023", title:"Gravitational Lens CNN Classifier — Fermilab", body:"Generated two 40,000-image benchmark datasets of double-source plane lenses and Einstein rings at Fermi National Accelerator Laboratory. Trained CNNs (PyTorch) for automated morphological classification. Published at AGU Annual Meeting.", link:"https://agu.confex.com/agu/fm23/meetingapp.cgi/Paper/1438256", linkLabel:"View publication →" },
-      { tag:"Operations Research · Policy", date:"2022 – 2023", title:"Green Vehicle Routing — CCIR", body:"Used a mixed-integer linear programming framework to optimize transportation routes for the Green Vehicle problem through the Cambridge Center for International Research Future Scholar Program.", link:"#", linkLabel:"CCIR Spotlight Scholar →" },
+      { tag:"Operations Research · Policy", date:"2022 – 2023", title:"Green Vehicle Routing — CCIR", body:"Established a mixed-integer linear programming framework in Julia to optimize public transportation routes under the Green Vehicle problem. Modeled route feasibility constraints across a network of stops and vehicles, minimizing operational cost while accounting for emissions and capacity bounds. Completed through the Cambridge Center for International Research Future Scholar Program, recognized as a Spotlight Scholar.", link:"#", linkLabel:"CCIR Spotlight Scholar →" },
       { tag:"Web · 3D Design", date:"April 2026", title:"This Interactive Portfolio", body:"An interactive 3D orbital homepage built with Three.js. Twinkling constellations, self-rotating ringed planets, and frosted-glass centre cards galore. Designed and iterated entirely from scratch.", link:"index.html", linkLabel:"View live →" },
-      { tag:"Hackathon · MedTech", date:"2025", title:"NeuroPrint", body:"A web-based computer vision platform for continuous Parkinson's disease monitoring, built end-to-end at HackDartmouth. NeuroPrint guides patients through structured movement tasks — sit-to-stand, standing balance, gait turns, shoulder ROM — while MediaPipe runs real-time skeletal landmark detection in-browser, computing motor metrics live without sending raw video to a server. A FastAPI + SQLite backend persists sessions and metrics, while a React/Vite clinician dashboard models motor progression over time, overlays patient trends against age-matched references, and flags movement anomalies for clinical review. Awarded an Apple AirPods 4 prize and earned a fast-track interview with Adaptional, a Y Combinator–backed startup.", link:"https://devpost.com/software/neuroprint-cky41g?ref_content=my-projects-tab&ref_feature=my_projects", linkLabel:"View on Devpost →" }
+      { tag:"Hackathon · MedTech", date:"2025", title:"NeuroPrint", body:"A web-based computer vision platform for continuous Parkinson's disease monitoring, built end-to-end at HackDartmouth. NeuroPrint guides patients through structured movement tasks (sit-to-stand, standing balance, gait turns, shoulder ROM) while MediaPipe runs real-time skeletal landmark detection in-browser, computing motor metrics live without sending raw video to a server. A FastAPI + SQLite backend persists sessions and metrics, while a React/Vite clinician dashboard models motor progression over time, overlays patient trends against age-matched references, and flags movement anomalies for clinical review. Placed 3rd overall, awarded an Apple AirPods 4 prize, and earned a fast-track interview with Adaptional, a Y Combinator-backed startup.", link:"https://devpost.com/software/neuroprint-cky41g?ref_content=my-projects-tab&ref_feature=my_projects", linkLabel:"View on Devpost →" }
     ];
 
     const SUITS       = ['\u2660','\u2665','\u2666','\u2663'];
@@ -274,13 +111,12 @@
     const RANKS       = ['I','II','III','IV','V','VI','VII','VIII','IX'];
     const ROW_SUITS   = [[0,1,2,3],[3,2,0,1],[1,0,3,2]];
 
-    function getSuitIdx(cardIdx) {
-      const row = Math.floor(cardIdx / 4);
-      const col = cardIdx % 4;
-      return ROW_SUITS[row % ROW_SUITS.length][col];
+    function getSuitIdx(cardIdx){
+      const row=Math.floor(cardIdx/4),col=cardIdx%4;
+      return ROW_SUITS[row%ROW_SUITS.length][col];
     }
 
-    function makeCardBackSVG(idx) {
+    function makeCardBackSVG(idx){
       const si=getSuitIdx(idx),suit=SUITS[si],sc=SUIT_COLORS[si],rank=RANKS[idx];
       const d=(idx*0.42).toFixed(2),pd=x=>(idx*0.31+x).toFixed(2);
       return `<svg viewBox="0 0 180 240" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice">
@@ -327,7 +163,7 @@
       </svg>`;
     }
 
-    function makeFrontHTML(p) {
+    function makeFrontHTML(p){
       const linkAttr=(p.link&&p.link!=='#')
         ?`href="${p.link}" target="_blank" rel="noopener"`
         :`href="${p.link}"`;
@@ -341,140 +177,87 @@
       `;
     }
 
-    const popupOverlay = document.getElementById('cardPopupOverlay');
-    const popupInner   = document.getElementById('cardPopupInner');
-    const popupFlipper = document.getElementById('cardPopupFlipper');
-    const popupClose   = document.getElementById('cardPopupClose');
+    const popupOverlay=document.getElementById('cardPopupOverlay');
+    const popupInner=document.getElementById('cardPopupInner');
+    const popupFlipper=document.getElementById('cardPopupFlipper');
+    const popupClose=document.getElementById('cardPopupClose');
+    let activeSceneEl=null,activeIdx=-1,popupLocked=false;
 
-    let activeSceneEl = null;
-    let activeIdx     = -1;
-    let popupLocked   = false;
-
-    function buildPopupCard(idx) {
-      popupFlipper.innerHTML = '';
+    function buildPopupCard(idx){
+      popupFlipper.innerHTML='';
       popupFlipper.classList.remove('flipped');
-      const back = document.createElement('div');
-      back.className = 'card-face card-back';
-      back.innerHTML = makeCardBackSVG(idx);
-      const aurora = document.createElement('div');
-      aurora.className = 'cb-aurora';
-      aurora.style.animationDelay = (idx*0.55)+'s';
-      back.appendChild(aurora);
-      const shimmer = document.createElement('div');
-      shimmer.className = 'cb-shimmer';
-      shimmer.style.animationDelay = (idx*0.60)+'s';
-      back.appendChild(shimmer);
-      const burst = document.createElement('div');
-      burst.className = 'cb-burst';
-      back.appendChild(burst);
-      const front = document.createElement('div');
-      front.className = 'card-face card-front';
-      front.innerHTML = makeFrontHTML(PROJECTS[idx]);
-      popupFlipper.appendChild(back);
-      popupFlipper.appendChild(front);
-      return { burst };
+      const back=document.createElement('div');
+      back.className='card-face card-back';
+      back.innerHTML=makeCardBackSVG(idx);
+      const aurora=document.createElement('div');aurora.className='cb-aurora';aurora.style.animationDelay=(idx*0.55)+'s';back.appendChild(aurora);
+      const shimmer=document.createElement('div');shimmer.className='cb-shimmer';shimmer.style.animationDelay=(idx*0.60)+'s';back.appendChild(shimmer);
+      const burst=document.createElement('div');burst.className='cb-burst';back.appendChild(burst);
+      const front=document.createElement('div');front.className='card-face card-front';front.innerHTML=makeFrontHTML(PROJECTS[idx]);
+      popupFlipper.appendChild(back);popupFlipper.appendChild(front);
+      return{burst};
     }
 
-    function openPopup(sceneEl, idx) {
-      if (popupLocked) return;
-      popupLocked = true;
-      activeSceneEl = sceneEl;
-      activeIdx = idx;
-      const { burst } = buildPopupCard(idx);
+    function openPopup(sceneEl,idx){
+      if(popupLocked)return;
+      popupLocked=true;activeSceneEl=sceneEl;activeIdx=idx;
+      const{burst}=buildPopupCard(idx);
       popupInner.classList.remove('dismissing');
       popupOverlay.classList.add('visible');
-      setTimeout(() => {
+      setTimeout(()=>{
         popupFlipper.classList.add('flipped');
         popupInner.classList.add('bursting');
-        burst.addEventListener('animationend', () => {
-          popupInner.classList.remove('bursting');
-        }, { once: true });
-        setTimeout(() => { popupLocked = false; }, 700);
-      }, 480);
+        burst.addEventListener('animationend',()=>{popupInner.classList.remove('bursting');},{once:true});
+        setTimeout(()=>{popupLocked=false;},700);
+      },480);
     }
 
-    function closePopup() {
-      if (popupLocked || !activeSceneEl) return;
-      popupLocked = true;
+    function closePopup(){
+      if(popupLocked||!activeSceneEl)return;
+      popupLocked=true;
       popupInner.classList.add('dismissing');
-      setTimeout(() => {
+      setTimeout(()=>{
         popupOverlay.classList.remove('visible');
         popupInner.classList.remove('dismissing');
-        activeSceneEl.classList.add('flipped', 'revealed');
-        activeSceneEl = null;
-        activeIdx = -1;
-        popupLocked = false;
-      }, 380);
+        activeSceneEl.classList.add('flipped','revealed');
+        activeSceneEl=null;activeIdx=-1;popupLocked=false;
+      },380);
     }
 
-    popupClose.addEventListener('click', closePopup);
-    popupOverlay.addEventListener('click', (e) => {
-      if (e.target === popupOverlay) closePopup();
-    });
-    document.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape') closePopup();
-    });
+    popupClose.addEventListener('click',closePopup);
+    popupOverlay.addEventListener('click',(e)=>{if(e.target===popupOverlay)closePopup();});
+    document.addEventListener('keydown',(e)=>{if(e.key==='Escape')closePopup();});
 
-    const grid = document.getElementById('memoryGrid');
-    PROJECTS.forEach((p, i) => {
-      const scene = document.createElement('div');
-      scene.className = 'card-scene';
-      scene.style.animationDelay = (i*0.07)+'s';
-      const flipper = document.createElement('div');
-      flipper.className = 'card-flipper';
-      const back = document.createElement('div');
-      back.className = 'card-face card-back';
-      back.innerHTML = makeCardBackSVG(i);
-      const aurora = document.createElement('div');
-      aurora.className = 'cb-aurora';
-      aurora.style.animationDelay = (i*0.55)+'s';
-      back.appendChild(aurora);
-      const shimmer = document.createElement('div');
-      shimmer.className = 'cb-shimmer';
-      shimmer.style.animationDelay = (i*0.60)+'s';
-      back.appendChild(shimmer);
-      const burst = document.createElement('div');
-      burst.className = 'cb-burst';
-      back.appendChild(burst);
-      const front = document.createElement('div');
-      front.className = 'card-face card-front';
-      front.innerHTML = makeFrontHTML(p);
-      flipper.appendChild(back);
-      flipper.appendChild(front);
-      scene.appendChild(flipper);
-      grid.appendChild(scene);
-
-      scene.addEventListener('animationend', (e) => {
-        if (e.animationName === 'cardEntrance') {
-          scene.style.opacity = '1';
-          scene.style.animation = 'none';
-          requestAnimationFrame(() => {
-            scene.style.animationDelay = (i*0.38)+'s';
-            scene.classList.add('floating');
-          });
+    const grid=document.getElementById('memoryGrid');
+    PROJECTS.forEach((p,i)=>{
+      const scene=document.createElement('div');scene.className='card-scene';scene.style.animationDelay=(i*0.07)+'s';
+      const flipper=document.createElement('div');flipper.className='card-flipper';
+      const back=document.createElement('div');back.className='card-face card-back';back.innerHTML=makeCardBackSVG(i);
+      const aurora=document.createElement('div');aurora.className='cb-aurora';aurora.style.animationDelay=(i*0.55)+'s';back.appendChild(aurora);
+      const shimmer=document.createElement('div');shimmer.className='cb-shimmer';shimmer.style.animationDelay=(i*0.60)+'s';back.appendChild(shimmer);
+      const burst=document.createElement('div');burst.className='cb-burst';back.appendChild(burst);
+      const front=document.createElement('div');front.className='card-face card-front';front.innerHTML=makeFrontHTML(p);
+      flipper.appendChild(back);flipper.appendChild(front);scene.appendChild(flipper);grid.appendChild(scene);
+      scene.addEventListener('animationend',(e)=>{
+        if(e.animationName==='cardEntrance'){
+          scene.style.opacity='1';scene.style.animation='none';
+          requestAnimationFrame(()=>{scene.style.animationDelay=(i*0.38)+'s';scene.classList.add('floating');});
         }
-      }, { once: true });
-
-      scene.addEventListener('mousemove', (e) => {
-        if (scene.classList.contains('revealed')) return;
-        const r = scene.getBoundingClientRect();
-        const mx = (e.clientX-r.left)/r.width-0.5;
-        const my = (e.clientY-r.top)/r.height-0.5;
-        flipper.style.transform = `rotateY(${mx*18}deg) rotateX(${-my*14}deg)`;
+      },{once:true});
+      scene.addEventListener('mousemove',(e)=>{
+        if(scene.classList.contains('revealed'))return;
+        const r=scene.getBoundingClientRect();
+        const mx=(e.clientX-r.left)/r.width-0.5,my=(e.clientY-r.top)/r.height-0.5;
+        flipper.style.transform=`rotateY(${mx*18}deg) rotateX(${-my*14}deg)`;
       });
-      scene.addEventListener('mouseleave', () => {
-        if (scene.classList.contains('revealed')) return;
-        flipper.style.transform = '';
-      });
-      scene.addEventListener('click', (e) => {
-        if (e.target.closest('.fr-link')) return;
-        if (popupLocked) return;
-        flipper.style.transform = '';
-        openPopup(scene, i);
+      scene.addEventListener('mouseleave',()=>{if(!scene.classList.contains('revealed'))flipper.style.transform='';});
+      scene.addEventListener('click',(e)=>{
+        if(e.target.closest('.fr-link'))return;
+        if(popupLocked)return;
+        flipper.style.transform='';
+        openPopup(scene,i);
       });
     });
   </script>
-
   <script type="module">
     import('https://unpkg.com/three@0.161.0/build/three.module.js').then(THREE=>{
       const renderer=new THREE.WebGLRenderer({antialias:true,alpha:false});
