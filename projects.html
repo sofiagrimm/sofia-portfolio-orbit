@@ -266,13 +266,14 @@
       { tag:"ML · Astrophysics", date:"2023", title:"Gravitational Lens CNN Classifier — Fermilab", body:"Generated two 40,000-image benchmark datasets of double-source plane lenses and Einstein rings at Fermi National Accelerator Laboratory. Trained CNNs (PyTorch) for automated morphological classification. Published at AGU Annual Meeting.", link:"https://agu.confex.com/agu/fm23/meetingapp.cgi/Paper/1438256", linkLabel:"View publication →" },
       { tag:"Operations Research · Policy", date:"2022 – 2023", title:"Green Vehicle Routing — CCIR", body:"Used a mixed-integer linear programming framework to optimize transportation routes for the Green Vehicle problem through the Cambridge Center for International Research Future Scholar Program.", link:"#", linkLabel:"CCIR Spotlight Scholar →" },
       { tag:"Web · 3D Design", date:"April 2026", title:"This Interactive Portfolio", body:"An interactive 3D orbital homepage built with Three.js. Twinkling constellations, self-rotating ringed planets, and frosted-glass centre cards galore. Designed and iterated entirely from scratch.", link:"index.html", linkLabel:"View live →" },
-      { tag:"Finance · Investing", date:"2022 – 2025", title:"Latin School Investment Fund", body:"Board member managing a $100,000 student-run stock portfolio as one of eleven voting members. Gave weekly portfolio stock reports and pitched new investments to the Board.", link:"#", linkLabel:"Details →" }
+      { tag:"Finance · Investing", date:"2022 – 2025", title:"Latin School Investment Fund", body:"Board member managing a $100,000 student-run stock portfolio as one of eleven voting members. Gave weekly portfolio stock reports and pitched new investments to the Board.", link:"#", linkLabel:"Details →" },
+      { tag:"Hackathon · Neurotechnology", date:"2025", title:"NeuroPrint", body:"A neurotechnology hackathon project exploring brain-computer interface concepts and neural signal decoding. Built and submitted as part of a competitive hackathon sprint and featured on Devpost.", link:"https://devpost.com/software/neuroprint-cky41g?ref_content=my-projects-tab&ref_feature=my_projects", linkLabel:"View on Devpost →" }
     ];
 
     const SUITS       = ['\u2660','\u2665','\u2666','\u2663'];
     const SUIT_COLORS = ['rgba(180,195,255,0.80)','rgba(255,140,160,0.80)','rgba(255,170,110,0.80)','rgba(140,225,175,0.80)'];
-    const RANKS       = ['I','II','III','IV','V','VI','VII','VIII'];
-    const ROW_SUITS   = [[0,1,2,3],[3,2,0,1]];
+    const RANKS       = ['I','II','III','IV','V','VI','VII','VIII','IX'];
+    const ROW_SUITS   = [[0,1,2,3],[3,2,0,1],[1,0,3,2]];
 
     function getSuitIdx(cardIdx) {
       const row = Math.floor(cardIdx / 4);
