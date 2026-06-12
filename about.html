@@ -1,667 +1,171 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>About — Sofia Grimm</title>
-  <style>
-    @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Inter:wght@300;400;500&display=swap');
-    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-    html,body{width:100%;min-height:100%;background:#060d18;font-family:'Inter',sans-serif;color:#e9f0ff;}
-    canvas{display:block;position:fixed;inset:0;z-index:0}
-    .nebula{
-      position:fixed;inset:0;z-index:1;pointer-events:none;
-      background:
-        radial-gradient(ellipse 55% 38% at 15% 55%, rgba(40,70,180,0.07) 0%, transparent 70%),
-        radial-gradient(ellipse 45% 32% at 82% 28%, rgba(30,80,200,0.07) 0%, transparent 70%),
-        radial-gradient(ellipse 50% 44% at 50% 50%, rgba(20,40,120,0.05) 0%, transparent 65%);
-    }
-    nav{
-      position:fixed;top:0;left:0;right:0;z-index:20;
-      display:flex;align-items:center;justify-content:space-between;
-      padding:0 48px;height:68px;
-    }
-    .nav-name{font-family:'Cormorant Garamond',serif;font-size:28px;font-weight:300;font-style:italic;
-      letter-spacing:0.06em;color:rgba(220,232,255,0.9);text-decoration:none;}
-    .nav-links{display:flex;align-items:center;gap:4px;}
-    .nav-links a{font-size:13px;font-weight:400;letter-spacing:0.13em;text-transform:uppercase;
-      color:rgba(160,190,255,0.5);text-decoration:none;padding:7px 16px;border-radius:4px;
-      transition:color .25s,background .25s;}
-    .nav-links a:hover,.nav-links a.active{color:rgba(220,235,255,0.9);background:rgba(100,140,255,0.08);}
-    .nav-links .divider{color:rgba(100,130,200,0.2);font-size:13px;user-select:none;}
-
-    /* Film strips */
-    .strip-wrap{
-      position:fixed;top:80px;bottom:80px;z-index:15;pointer-events:none;width:316px;overflow:hidden;
-    }
-    .strip-wrap.left  { left:0; }
-    .strip-wrap.right { right:0; }
-    .strip-track{
-      position:absolute;top:0;left:0;width:100%;
-      display:flex;flex-direction:column;align-items:center;gap:0;
-      will-change:transform;
-    }
-    .strip-rail{
-      position:absolute;inset:0;
-      background:rgba(5,3,18,0.72);
-      border-right:1px solid rgba(140,120,255,0.09);
-      backdrop-filter:blur(5px);-webkit-backdrop-filter:blur(5px);
-    }
-    .strip-wrap.right .strip-rail{border-right:none;border-left:1px solid rgba(140,120,255,0.09);}
-    .pb-frame{
-      width:280px;height:360px;border-radius:6px;overflow:hidden;flex-shrink:0;
-      border:1px solid rgba(160,140,255,0.18);position:relative;margin:0 auto;
-    }
-    .pb-frame img{
-      position:absolute;inset:0;width:100%;height:100%;object-fit:cover;
-    }
-    .pb-sprocket{
-      width:100%;height:28px;display:flex;align-items:center;
-      justify-content:space-around;padding:0 14px;flex-shrink:0;
-    }
-    .pb-hole{
-      width:11px;height:11px;border-radius:2px;
-      background:rgba(0,0,0,0.90);border:1px solid rgba(130,110,240,0.22);
-    }
-
-    /* Page layout */
-    .page{position:relative;z-index:10;max-width:720px;margin:0 auto;padding:130px 32px 80px;}
-    .page-eyebrow{font-size:11px;letter-spacing:0.22em;text-transform:uppercase;color:rgba(160,185,255,0.45);margin-bottom:20px;}
-    .page-title{font-family:'Cormorant Garamond',serif;font-size:54px;font-weight:300;line-height:1.08;color:#eef3ff;margin-bottom:40px;}
-    .page-title em{font-style:italic;color:rgba(190,210,255,0.85);}
-    .rule{width:48px;height:1px;background:linear-gradient(90deg,rgba(140,170,255,0.4),transparent);margin-bottom:40px;}
-    .bio{font-size:15px;font-weight:300;line-height:1.85;color:rgba(210,225,255,0.72);display:flex;flex-direction:column;gap:20px;}
-    .bio strong{font-weight:500;color:rgba(220,232,255,0.92);}
-
-    /* Section label */
-    .section-label{
-      font-size:10px;letter-spacing:0.22em;text-transform:uppercase;
-      color:rgba(140,170,255,0.45);margin-top:56px;margin-bottom:26px;
-      display:flex;align-items:center;gap:12px;
-    }
-    .section-label::after{
-      content:'';flex:1;height:1px;
-      background:linear-gradient(90deg,rgba(100,130,200,0.18),transparent);
-    }
-
-    /* AT A GLANCE */
-    .glance-grid{
-      display:grid;
-      grid-template-columns:1fr 1fr;
-      gap:18px;
-    }
-    .glance-card{
-      position:relative;overflow:hidden;
-      border-radius:16px;
-      padding:28px 26px 24px;
-      background:rgba(8,14,46,0.62);
-      border:1px solid rgba(100,130,220,0.13);
-      backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
-      transition:border-color .32s, transform .32s, box-shadow .32s;
-      cursor:default;
-    }
-    .glance-card::after{
-      content:'';
-      position:absolute;top:0;left:0;right:0;height:2px;
-      background:var(--card-stripe);
-      border-radius:16px 16px 0 0;
-    }
-    .glance-card::before{
-      content:'';
-      position:absolute;inset:0;
-      background:radial-gradient(ellipse 60% 50% at 20% 0%, var(--card-glow-color) 0%, transparent 70%);
-      opacity:0;transition:opacity .35s;
-      pointer-events:none;border-radius:16px;
-    }
-    .glance-card:hover::before{opacity:1;}
-    .glance-card:hover{
-      border-color:var(--card-border);
-      transform:translateY(-3px);
-      box-shadow:0 12px 48px rgba(0,0,0,0.5), 0 0 0 1px var(--card-border), 0 0 40px var(--card-outer-glow);
-    }
-    .gc-header{
-      display:flex;align-items:center;justify-content:space-between;
-      margin-bottom:18px;
-    }
-    .gc-label{
-      font-size:9px;font-weight:500;letter-spacing:0.22em;text-transform:uppercase;
-      color:var(--card-accent);
-    }
-    .gc-icon-wrap{
-      width:32px;height:32px;border-radius:8px;
-      background:var(--card-icon-bg);
-      border:1px solid var(--card-icon-border);
-      display:flex;align-items:center;justify-content:center;
-      flex-shrink:0;
-    }
-    .gc-icon-wrap svg{width:16px;height:16px;stroke:var(--card-accent);fill:none;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round;}
-    .gc-stat{
-      font-family:'Cormorant Garamond',serif;
-      font-size:38px;font-weight:300;line-height:1;
-      color:var(--card-accent);
-      margin-bottom:5px;
-      letter-spacing:-0.01em;
-    }
-    .gc-stat-label{
-      font-size:10px;font-weight:400;letter-spacing:0.14em;text-transform:uppercase;
-      color:rgba(180,200,255,0.42);margin-bottom:16px;
-    }
-    .gc-value{
-      font-size:13px;font-weight:300;line-height:1.7;
-      color:rgba(210,226,255,0.80);
-    }
-    .gc-value strong{font-weight:500;color:rgba(232,242,255,0.98);}
-    .gc-value .muted{color:var(--card-accent);font-size:11px;opacity:0.65;}
-    .gc-pills{display:flex;flex-wrap:wrap;gap:7px;margin-top:10px;}
-    .gc-pill{
-      font-size:10px;letter-spacing:0.10em;text-transform:uppercase;
-      color:var(--card-accent);
-      border:1px solid var(--card-icon-border);
-      padding:4px 11px;border-radius:20px;
-      background:var(--card-icon-bg);
-      transition:border-color .2s, background .2s;
-    }
-    .gc-pill:hover{border-color:var(--card-border);background:rgba(255,255,255,0.06);}
-    .gc-lang-row{
-      display:flex;align-items:center;justify-content:space-between;
-      padding:6px 0;
-      border-bottom:1px solid rgba(255,255,255,0.04);
-    }
-    .gc-lang-row:last-child{border-bottom:none;}
-    .gc-lang-name{font-size:13px;font-weight:500;color:rgba(230,240,255,0.92);}
-    .gc-lang-level{font-size:9px;letter-spacing:0.14em;text-transform:uppercase;color:var(--card-accent);opacity:0.75;}
-    .gc-lang-dots{display:flex;gap:3px;margin-left:10px;}
-    .gc-lang-dot{width:5px;height:5px;border-radius:50%;background:var(--card-accent);opacity:0.22;}
-    .gc-lang-dot.filled{opacity:0.85;}
-    .gc-cert-row{
-      display:flex;align-items:flex-start;gap:10px;
-      padding:7px 0;
-      border-bottom:1px solid rgba(255,255,255,0.04);
-    }
-    .gc-cert-row:last-child{border-bottom:none;}
-    .gc-cert-dot{width:6px;height:6px;border-radius:50%;background:var(--card-accent);flex-shrink:0;margin-top:5px;}
-    .gc-cert-text{font-size:12.5px;font-weight:300;color:rgba(220,234,255,0.80);line-height:1.5;}
-    .gc-cert-text strong{font-weight:500;color:rgba(235,244,255,0.96);}
-    .gc-cert-link{
-      color:inherit;text-decoration:none;
-      border-bottom:1px solid rgba(255,220,100,0.20);
-      transition:border-color .2s, color .2s;
-    }
-    .gc-cert-link:hover{color:rgba(255,235,160,0.96);border-color:rgba(255,220,100,0.55);}
-    .gc-act-row{
-      display:flex;flex-direction:column;
-      padding:7px 0;
-      border-bottom:1px solid rgba(255,255,255,0.04);
-    }
-    .gc-act-row:last-child{border-bottom:none;}
-    .gc-act-name{font-size:12.5px;font-weight:500;color:rgba(232,242,255,0.94);}
-    .gc-act-role{font-size:10.5px;color:var(--card-accent);opacity:0.75;margin-top:2px;letter-spacing:0.04em;}
-
-    /* Color themes */
-    .gc--blue   {--card-glow-color:rgba(80,140,255,0.12);--card-border:rgba(100,160,255,0.40);--card-outer-glow:rgba(80,140,255,0.08);--card-stripe:linear-gradient(90deg,rgba(80,140,255,0.8),rgba(120,180,255,0.5),rgba(80,140,255,0.1));--card-accent:rgba(140,190,255,0.88);--card-icon-bg:rgba(60,100,220,0.20);--card-icon-border:rgba(100,150,255,0.30);}
-    .gc--purple {--card-glow-color:rgba(180,100,255,0.12);--card-border:rgba(190,120,255,0.40);--card-outer-glow:rgba(160,80,255,0.08);--card-stripe:linear-gradient(90deg,rgba(180,100,255,0.8),rgba(210,150,255,0.5),rgba(180,100,255,0.1));--card-accent:rgba(210,165,255,0.88);--card-icon-bg:rgba(140,60,220,0.20);--card-icon-border:rgba(180,110,255,0.30);}
-    .gc--cyan   {--card-glow-color:rgba(40,210,255,0.10);--card-border:rgba(60,220,255,0.36);--card-outer-glow:rgba(40,200,255,0.07);--card-stripe:linear-gradient(90deg,rgba(40,210,255,0.8),rgba(80,230,255,0.5),rgba(40,210,255,0.1));--card-accent:rgba(100,225,255,0.88);--card-icon-bg:rgba(20,160,200,0.20);--card-icon-border:rgba(40,200,255,0.30);}
-    .gc--green  {--card-glow-color:rgba(40,220,140,0.10);--card-border:rgba(60,230,150,0.36);--card-outer-glow:rgba(40,200,120,0.07);--card-stripe:linear-gradient(90deg,rgba(40,220,140,0.8),rgba(80,240,170,0.5),rgba(40,220,140,0.1));--card-accent:rgba(80,235,165,0.88);--card-icon-bg:rgba(20,160,90,0.20);--card-icon-border:rgba(40,200,120,0.30);}
-    .gc--gold   {--card-glow-color:rgba(255,200,60,0.10);--card-border:rgba(255,215,90,0.36);--card-outer-glow:rgba(240,180,40,0.08);--card-stripe:linear-gradient(90deg,rgba(255,200,60,0.8),rgba(255,225,110,0.5),rgba(255,200,60,0.1));--card-accent:rgba(255,220,100,0.90);--card-icon-bg:rgba(180,130,10,0.22);--card-icon-border:rgba(240,190,50,0.30);}
-    .gc--rose   {--card-glow-color:rgba(255,100,160,0.10);--card-border:rgba(255,130,175,0.36);--card-outer-glow:rgba(240,80,140,0.07);--card-stripe:linear-gradient(90deg,rgba(255,100,160,0.8),rgba(255,150,195,0.5),rgba(255,100,160,0.1));--card-accent:rgba(255,155,190,0.88);--card-icon-bg:rgba(180,40,90,0.22);--card-icon-border:rgba(240,100,150,0.30);}
-
-    /* HONORS & AWARDS */
-    .awards{
-      display:flex;flex-direction:column;gap:10px;
-      margin-top:4px;
-    }
-    .award{
-      position:relative;overflow:hidden;
-      display:flex;align-items:center;gap:0;
-      padding:17px 20px 17px 24px;
-      border-radius:14px;
-      background:rgba(8,14,46,0.55);
-      border:1px solid rgba(100,130,220,0.12);
-      backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
-      transition:border-color .28s, transform .28s, box-shadow .28s, background .28s;
-    }
-    .award::before{
-      content:'';
-      position:absolute;left:0;top:0;bottom:0;width:3px;
-      background:linear-gradient(180deg, rgba(140,170,255,0.55), rgba(100,130,220,0.18));
-      border-radius:14px 0 0 14px;
-    }
-    .award:hover{
-      transform:translateX(3px);
-      background:rgba(12,20,58,0.70);
-      border-color:rgba(140,170,255,0.28);
-      box-shadow:0 8px 36px rgba(0,0,0,0.38), -4px 0 28px rgba(120,150,255,0.06);
-    }
-    .award-content{flex:1;min-width:0;}
-    .award-name{font-size:13.5px;font-weight:400;color:rgba(220,234,255,0.90);line-height:1.4;}
-    .award-org{font-size:10px;letter-spacing:0.10em;color:rgba(150,175,255,0.42);margin-top:3px;}
-    .award-year{
-      flex-shrink:0;
-      font-size:10px;letter-spacing:0.14em;font-weight:500;
-      color:rgba(160,190,255,0.70);
-      background:rgba(60,80,180,0.20);
-      border:1px solid rgba(100,130,220,0.20);
-      padding:4px 10px;border-radius:20px;
-      white-space:nowrap;margin-left:14px;
-    }
-
-    /* Skills tags */
-    .tags{display:flex;flex-wrap:wrap;gap:9px;margin-top:44px;margin-bottom:60px;}
-    .tag{
-      font-size:11px;letter-spacing:0.13em;text-transform:uppercase;
-      color:rgba(160,190,255,0.6);
-      border:1px solid rgba(100,130,200,0.18);
-      padding:6px 14px;border-radius:20px;
-      background:rgba(20,35,80,0.35);
-      transition:color .22s, border-color .22s, background .22s;
-    }
-    .tag:hover{color:rgba(210,228,255,0.9);border-color:rgba(140,170,255,0.38);background:rgba(30,55,130,0.40);}
-    .coords{position:fixed;bottom:32px;left:48px;z-index:20;font-size:10px;letter-spacing:0.18em;color:rgba(110,130,190,0.28);font-weight:300;pointer-events:none;}
-
-    /* Contact footer */
-    .contact-footer{
-      display:flex;align-items:center;gap:20px;
-      margin-top:48px;margin-bottom:8px;padding-top:32px;
-      border-top:1px solid rgba(100,130,200,0.10);
-    }
-    .contact-footer a{
-      font-size:11px;letter-spacing:0.14em;text-transform:uppercase;
-      color:rgba(140,165,255,0.45);text-decoration:none;
-      transition:color .22s;
-    }
-    .contact-footer a:hover{color:rgba(200,220,255,0.80);}
-    .contact-footer .cf-divider{color:rgba(100,130,200,0.18);pointer-events:none;}
-
-    /* ── MOBILE ─────────────────────────────────────────────── */
-    @media (max-width: 768px) {
-      .strip-wrap { display: none; }
-      nav { padding: 0 20px; height: 56px; }
-      .nav-name { font-size: 22px; }
-      .nav-links a { font-size: 11px; padding: 6px 9px; letter-spacing: 0.08em; }
-      .nav-links .divider { display: none; }
-      .page { padding: 90px 20px 60px; }
-      .page-title { font-size: 38px; margin-bottom: 28px; }
-      .bio { font-size: 14px; line-height: 1.75; }
-      .glance-grid { grid-template-columns: 1fr; gap: 14px; }
-      .glance-card { padding: 22px 20px 18px; }
-      .gc-stat { font-size: 32px; }
-      .award { padding: 14px 16px 14px 20px; }
-      .award-name { font-size: 13px; }
-      .award-year { font-size: 9px; margin-left: 10px; }
-      .section-label { margin-top: 40px; margin-bottom: 20px; }
-      .tags { margin-top: 32px; margin-bottom: 40px; gap: 8px; }
-      .coords { display: none; }
-    }
-
-    @media (max-width: 400px) {
-      .nav-links a { font-size: 10px; padding: 5px 7px; }
-      .page-title { font-size: 32px; }
-      .award { flex-wrap: wrap; }
-      .award-year { margin-left: 0; margin-top: 8px; }
-    }
-  </style>
+  <meta name="description" content="Hong Kong → Chicago → New Haven. Sofia Grimm studies MCDB and Ethics, Politics & Economics at Yale ('29), speaks four languages, and works where science meets systems.">
+  <meta property="og:title" content="About — Sofia Grimm">
+  <meta property="og:description" content="Hong Kong → Chicago → New Haven. Biology, EPE, and everything in between.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://www.sofiagrimm.com/about.html">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght,SOFT,WONK@0,9..144,400..700,0..100,0..1;1,9..144,400..700,0..100,0..1&family=Karla:wght@400;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <div class="nebula"></div>
-  <div class="strip-wrap left">
-    <div class="strip-rail"></div>
-    <div class="strip-track" id="trackLeft"></div>
+
+<nav class="nav">
+  <div class="nav-inner">
+    <a class="wordmark" href="index.html"><span class="star">✶</span> sofia grimm</a>
+    <ul class="nav-links">
+      <li><a href="index.html">home</a></li>
+      <li><a href="about.html" class="active">about</a></li>
+      <li><a href="research.html">research</a></li>
+      <li><a href="projects.html">projects</a></li>
+    </ul>
   </div>
-  <div class="strip-wrap right">
-    <div class="strip-rail"></div>
-    <div class="strip-track" id="trackRight"></div>
+</nav>
+
+<main class="wrap">
+
+  <section class="section">
+    <p class="mono" style="color:var(--coral); margin-top:40px;">origin story</p>
+    <h1>Hi, I'm <em>Sofia!</em></h1>
+
+    <div class="about-grid" style="margin-top:32px;">
+      <div class="bio">
+        <p class="big-first">
+          Born and raised in Hong Kong for my first fourteen years, then transplanted to Chicago
+          for high school, I'm now a student at Yale University pursuing a B.S. in
+          <strong>Molecular, Cellular &amp; Developmental Biology</strong> and a B.A. in
+          <strong>Ethics, Politics &amp; Economics</strong>. I'm drawn to the places where science
+          meets systems — a protein's folding behavior, a disease mechanism, a market for risk,
+          a policy question about emerging technology.
+        </p>
+        <p>
+          My research has wandered happily across computational and wet labs: neurodegeneration,
+          genetics, proteomics, astrophysics, machine learning, and mathematical optimization.
+          Right now I'm at the <strong>Higley Lab</strong> at Yale School of Medicine,
+          characterizing locus coeruleus axon degeneration in PPT1-deficient mice to investigate
+          norepinephrine dysfunction in Parkinson's disease.
+        </p>
+        <p>
+          Off campus, I'm a Product &amp; Strategy Associate at <strong>Adaptional</strong>
+          (Y Combinator S25), where we're building claims intelligence for the insurance
+          industry — including a 50-state, AI-queryable compliance library. Back at Yale
+          Engineering, I lead business development for the PCDD, a patent-pending
+          medication dispenser-deactivator.
+        </p>
+        <p>
+          Outside the lab I consult, edit, and occasionally win hackathons. I'm a Client Lead
+          at the Yale Healthcare Consulting Collective, Director of Social Events on the Yale
+          College Council, and an Online Editor at the Yale Undergraduate Law Journal.
+        </p>
+      </div>
+
+      <aside class="fact-stack">
+        <div class="fact">
+          <span class="mono" style="color:var(--coral);">education</span>
+          <div class="num">'29</div>
+          <ul>
+            <li><span>Yale University</span><span>B.S. MCDB · B.A. EPE</span></li>
+            <li><span>Latin School of Chicago</span><span>2021–2025</span></li>
+            <li><span>The ISF Academy, HK</span><span>IB MYP</span></li>
+          </ul>
+        </div>
+        <div class="fact">
+          <span class="mono" style="color:var(--coral);">languages</span>
+          <div class="num">4</div>
+          <ul>
+            <li><span>English</span><span>native</span></li>
+            <li><span>Chinese</span><span>native</span></li>
+            <li><span>Spanish</span><span>full professional</span></li>
+            <li><span>Latin</span><span>working</span></li>
+          </ul>
+        </div>
+        <div class="fact">
+          <span class="mono" style="color:var(--coral);">cities called home</span>
+          <div class="num">3</div>
+          <ul>
+            <li><span>Hong Kong SAR</span><span>2007–2021</span></li>
+            <li><span>Chicago, IL</span><span>2021–2025</span></li>
+            <li><span>New Haven, CT</span><span>now</span></li>
+          </ul>
+        </div>
+        <div class="fact">
+          <span class="mono" style="color:var(--coral);">leadership</span>
+          <div class="num">3</div>
+          <ul>
+            <li><span>Yale Healthcare Consulting Collective</span><span>Client Lead</span></li>
+            <li><span>Yale College Council</span><span>Dir. of Social Events</span></li>
+            <li><span>Yale Undergrad Law Journal</span><span>Online Editor</span></li>
+          </ul>
+        </div>
+        <div class="fact">
+          <span class="mono" style="color:var(--coral);">certifications</span>
+          <div class="num">2</div>
+          <ul>
+            <li><span><a href="https://www.coursera.org/account/accomplishments/professional-cert/certificate/RTJTDVWW8MMV">IBM Data Science Professional</a></span></li>
+            <li><span><a href="https://verified.sertifier.com/en/verify/99120184795450/?ref=email">Microsoft &amp; QubitxQubit Quantum Winter School</a></span></li>
+          </ul>
+        </div>
+      </aside>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="section-head">
+      <span class="mono">honors &amp; awards</span>
+      <span class="rule"></span>
+    </div>
+    <ul class="honor-list">
+      <li><span>Best Solo Hack — YHack, Yale's annual hackathon</span><span class="yr">2026</span></li>
+      <li><span>Gold — Hispanic Heritage Youth Award</span><span class="yr">2025</span></li>
+      <li><span>National Merit Finalist</span><span class="yr">2025</span></li>
+      <li><span>2nd Place — National Sophomore of the Year</span><span class="yr">2023</span></li>
+      <li><span>Honorable Mention — NCWIT Aspirations in Computing (national)</span><span class="yr">2024 · 2025</span></li>
+      <li><span>Gold — Presidential Volunteer Service Award</span><span class="yr">2024</span></li>
+      <li><span>RISE Global Finalist — Schmidt Futures &amp; Rhodes Trust</span><span class="yr">2023</span></li>
+      <li><span>CCIR STEM Scholarship &amp; Spotlight Scholar</span><span class="yr">2023</span></li>
+      <li><span>Best of SNO ×2 &amp; Leadership Award in Student Journalism</span><span class="yr">2023</span></li>
+      <li><span>Fan Favorite — Chicago Cubs STEAM Fair, Wrigley Field</span><span class="yr">2023</span></li>
+    </ul>
+  </section>
+
+  <section class="section">
+    <div class="section-head">
+      <span class="mono">lab &amp; computational toolkit</span>
+      <span class="rule"></span>
+    </div>
+    <div class="tag-cloud">
+      <span class="chip coral">immunohistochemistry</span>
+      <span class="chip">confocal microscopy</span>
+      <span class="chip">perfusions</span>
+      <span class="chip mint">mass spectrometry</span>
+      <span class="chip">capillary zone electrophoresis</span>
+      <span class="chip">liquid chromatography</span>
+      <span class="chip gold">PCR &amp; inverse PCR</span>
+      <span class="chip">Drosophila genetics</span>
+      <span class="chip peri">Python</span>
+      <span class="chip">R</span>
+      <span class="chip">JavaScript</span>
+      <span class="chip">PyTorch · TensorFlow</span>
+      <span class="chip">SQL</span>
+      <span class="chip">mixed-integer optimization</span>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  <div class="foot-inner">
+    <span class="mono coords">41.3083° N · 72.9279° W</span>
+    <span><a href="mailto:sofia.grimm@yale.edu">sofia.grimm@yale.edu</a> · <a href="https://www.linkedin.com/in/sofia-grimm/">LinkedIn</a></span>
+    <span class="mono coords">science as an explorable universe ✶</span>
   </div>
-  <nav>
-    <a class="nav-name" href="index.html">Sofia Grimm</a>
-    <div class="nav-links">
-      <a href="index.html">Home</a><span class="divider">|</span>
-      <a href="about.html" class="active">About</a><span class="divider">|</span>
-      <a href="research.html">Research</a><span class="divider">|</span>
-      <a href="projects.html">Projects</a>
-    </div>
-  </nav>
-  <main class="page">
-    <div class="page-eyebrow">About me</div>
-    <h1 class="page-title">Hi, I'm <em>Sofia!</em></h1>
-    <div class="rule"></div>
-    <div class="bio">
-      <p>Born and raised in <strong>Hong Kong</strong> for the first fourteen years of my life before moving to <strong>Chicago</strong> for high school, I'm a student at <strong>Yale University</strong> pursuing a B.S. in <strong>Chemistry</strong> and <strong>Ethics, Politics &amp; Law</strong>. I'm drawn to the places where <strong>science meets systems</strong>: whether that be a protein's folding behavior, a disease mechanism, or a policy question about emerging technology.</p>
-      <p>My research spans <strong>computational</strong> and <strong>wet labs</strong>, focusing on a broad range of subjects including <strong>neurodegenerative diseases</strong>, <strong>genetics</strong>, <strong>astrophysics</strong>, <strong>proteomics</strong>, <strong>machine learning</strong>, and <strong>mathematical optimization</strong>. Currently I'm at the <strong>Higley Lab</strong> at Yale School of Medicine, where I'm characterizing <strong>locus coeruleus axon degeneration</strong> in PPT1-deficient mice to investigate <strong>norepinephrine dysfunction</strong> in <strong>Parkinson's disease</strong>. I also work on the <strong>PCDD startup</strong> at Yale Engineering, developing business strategy for a patent-pending medication dispenser device.</p>
-      <p>Outside the lab I consult, build, and write. I'm a <strong>Client Lead</strong> at <strong>Yale Healthcare Consulting Collective</strong> and an <strong>Online Editor</strong> at the <strong>Yale Undergraduate Law Journal</strong>. I speak <strong>English</strong>, <strong>Chinese</strong>, <strong>Spanish</strong>, and <strong>Latin</strong>.</p>
-    </div>
+</footer>
 
-    <div class="section-label">At a glance</div>
-    <div class="glance-grid">
-
-      <!-- Education -->
-      <div class="glance-card gc--blue">
-        <div class="gc-header">
-          <span class="gc-label">Education</span>
-          <div class="gc-icon-wrap">
-            <svg viewBox="0 0 24 24"><path d="M22 10v6M2 10l10-5 10 5-10 5-10-5z"/><path d="M6 12v5c3.33 1.67 8.67 1.67 12 0v-5"/></svg>
-          </div>
-        </div>
-        <div class="gc-stat">3.83</div>
-        <div class="gc-stat-label">GPA &middot; Class of 2029</div>
-        <div class="gc-value">
-          <strong>Yale University</strong><br>
-          B.S. Chemistry &amp; EPL
-        </div>
-      </div>
-
-      <!-- Locations -->
-      <div class="glance-card gc--cyan">
-        <div class="gc-header">
-          <span class="gc-label">Locations</span>
-          <div class="gc-icon-wrap">
-            <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
-          </div>
-        </div>
-        <div class="gc-stat">3</div>
-        <div class="gc-stat-label">Cities called home</div>
-        <div class="gc-pills">
-          <span class="gc-pill">New Haven, CT</span>
-          <span class="gc-pill">Chicago, IL</span>
-          <span class="gc-pill">Hong Kong SAR</span>
-        </div>
-      </div>
-
-      <!-- Languages -->
-      <div class="glance-card gc--purple">
-        <div class="gc-header">
-          <span class="gc-label">Languages</span>
-          <div class="gc-icon-wrap">
-            <svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
-          </div>
-        </div>
-        <div class="gc-stat">4</div>
-        <div class="gc-stat-label">Languages spoken</div>
-        <div style="margin-top:4px;">
-          <div class="gc-lang-row">
-            <span class="gc-lang-name">English</span>
-            <div style="display:flex;align-items:center;gap:6px;">
-              <div class="gc-lang-dots"><div class="gc-lang-dot filled"></div><div class="gc-lang-dot filled"></div><div class="gc-lang-dot filled"></div><div class="gc-lang-dot filled"></div></div>
-              <span class="gc-lang-level">Native</span>
-            </div>
-          </div>
-          <div class="gc-lang-row">
-            <span class="gc-lang-name">Chinese</span>
-            <div style="display:flex;align-items:center;gap:6px;">
-              <div class="gc-lang-dots"><div class="gc-lang-dot filled"></div><div class="gc-lang-dot filled"></div><div class="gc-lang-dot filled"></div><div class="gc-lang-dot filled"></div></div>
-              <span class="gc-lang-level">Fluent</span>
-            </div>
-          </div>
-          <div class="gc-lang-row">
-            <span class="gc-lang-name">Spanish</span>
-            <div style="display:flex;align-items:center;gap:6px;">
-              <div class="gc-lang-dots"><div class="gc-lang-dot filled"></div><div class="gc-lang-dot filled"></div><div class="gc-lang-dot filled"></div><div class="gc-lang-dot"></div></div>
-              <span class="gc-lang-level">Heritage</span>
-            </div>
-          </div>
-          <div class="gc-lang-row">
-            <span class="gc-lang-name">Latin</span>
-            <div style="display:flex;align-items:center;gap:6px;">
-              <div class="gc-lang-dots"><div class="gc-lang-dot filled"></div><div class="gc-lang-dot filled"></div><div class="gc-lang-dot"></div><div class="gc-lang-dot"></div></div>
-              <span class="gc-lang-level">Working</span>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Programming -->
-      <div class="glance-card gc--green">
-        <div class="gc-header">
-          <span class="gc-label">Programming</span>
-          <div class="gc-icon-wrap">
-            <svg viewBox="0 0 24 24"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
-          </div>
-        </div>
-        <div class="gc-stat">6</div>
-        <div class="gc-stat-label">Languages &amp; frameworks</div>
-        <div class="gc-pills">
-          <span class="gc-pill">Python</span>
-          <span class="gc-pill">PyTorch</span>
-          <span class="gc-pill">TensorFlow</span>
-          <span class="gc-pill">SQL</span>
-          <span class="gc-pill">JavaScript</span>
-          <span class="gc-pill">NetLogo</span>
-        </div>
-      </div>
-
-      <!-- Certifications -->
-      <div class="glance-card gc--gold">
-        <div class="gc-header">
-          <span class="gc-label">Certifications</span>
-          <div class="gc-icon-wrap">
-            <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89L17 22l-5-3-5 3 1.523-9.11"/></svg>
-          </div>
-        </div>
-        <div class="gc-stat">2</div>
-        <div class="gc-stat-label">Professional certifications</div>
-        <div style="margin-top:6px;">
-          <div class="gc-cert-row">
-            <div class="gc-cert-dot"></div>
-            <div class="gc-cert-text">
-              <a class="gc-cert-link" href="https://www.coursera.org/account/accomplishments/professional-cert/certificate/RTJTDVWW8MMV" target="_blank" rel="noopener noreferrer"><strong>IBM</strong> Data Science Professional</a>
-            </div>
-          </div>
-          <div class="gc-cert-row">
-            <div class="gc-cert-dot"></div>
-            <div class="gc-cert-text">
-              <a class="gc-cert-link" href="https://verified.sertifier.com/en/verify/99120184795450/?ref=email" target="_blank" rel="noopener noreferrer"><strong>Microsoft &amp; QubitxQubit</strong> Intensive Quantum Winter School</a>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Activities -->
-      <div class="glance-card gc--rose">
-        <div class="gc-header">
-          <span class="gc-label">Activities</span>
-          <div class="gc-icon-wrap">
-            <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-          </div>
-        </div>
-        <div class="gc-stat">3</div>
-        <div class="gc-stat-label">Leadership roles</div>
-        <div style="margin-top:6px;">
-          <div class="gc-act-row">
-            <span class="gc-act-name">Yale Healthcare Consulting Collective</span>
-            <span class="gc-act-role">Client Lead</span>
-          </div>
-          <div class="gc-act-row">
-            <span class="gc-act-name">Yale College Council</span>
-            <span class="gc-act-role">Director of Social Events</span>
-          </div>
-          <div class="gc-act-row">
-            <span class="gc-act-name">Yale Undergraduate Law Journal</span>
-            <span class="gc-act-role">Online Editor</span>
-          </div>
-        </div>
-      </div>
-
-    </div><!-- /glance-grid -->
-
-    <!-- HONORS & AWARDS -->
-    <div class="section-label">Honors &amp; Awards</div>
-    <div class="awards">
-
-      <div class="award">
-        <div class="award-content">
-          <div class="award-name">Best Solo Hack, YHack</div>
-          <div class="award-org">Yale University Annual Hackathon</div>
-        </div>
-        <div class="award-year">2026</div>
-      </div>
-
-      <div class="award">
-        <div class="award-content">
-          <div class="award-name">Gold &mdash; Hispanic Heritage Youth Award</div>
-          <div class="award-org">National recognition</div>
-        </div>
-        <div class="award-year">2025</div>
-      </div>
-
-      <div class="award">
-        <div class="award-content">
-          <div class="award-name">National Merit Finalist</div>
-          <div class="award-org">National Merit Scholarship Corporation</div>
-        </div>
-        <div class="award-year">2025</div>
-      </div>
-
-      <div class="award">
-        <div class="award-content">
-          <div class="award-name">National Honorable Mention &mdash; NCWIT Aspirations in Computing</div>
-          <div class="award-org">National Center for Women &amp; IT</div>
-        </div>
-        <div class="award-year">2024 &amp; 2025</div>
-      </div>
-
-      <div class="award">
-        <div class="award-content">
-          <div class="award-name">Gold &mdash; Presidential Service Award</div>
-          <div class="award-org">The White House</div>
-        </div>
-        <div class="award-year">2024</div>
-      </div>
-
-      <div class="award">
-        <div class="award-content">
-          <div class="award-name">RISE Global Finalist</div>
-          <div class="award-org">Schmidt Futures &amp; Rhodes Trust</div>
-        </div>
-        <div class="award-year">2023</div>
-      </div>
-
-      <div class="award">
-        <div class="award-content">
-          <div class="award-name">Fan Favorite &mdash; Chicago Cubs STEAM Fair</div>
-          <div class="award-org">Wrigley Field, Chicago</div>
-        </div>
-        <div class="award-year">2023</div>
-      </div>
-
-      <div class="award">
-        <div class="award-content">
-          <div class="award-name">CCIR STEM Scholarship &amp; Spotlight Scholar</div>
-          <div class="award-org">Cambridge Centre for International Research</div>
-        </div>
-        <div class="award-year">2023</div>
-      </div>
-
-    </div><!-- /awards -->
-
-    <div class="section-label">Skills</div>
-    <div class="tags">
-      <span class="tag">Proteomics</span>
-      <span class="tag">Mass Spectrometry</span>
-      <span class="tag">Neuroscience</span>
-      <span class="tag">PCR</span>
-      <span class="tag">Immunohistochemistry</span>
-      <span class="tag">Perfusions</span>
-      <span class="tag">Genetics</span>
-      <span class="tag">Capillary Zone Electrophoresis</span>
-      <span class="tag">Liquid Chromatography</span>
-      <span class="tag">Machine Learning</span>
-      <span class="tag">Ethics</span>
-      <span class="tag">Policy</span>
-      <span class="tag">Consulting</span>
-      <span class="tag">Global Affairs</span>
-    </div>
-
-    <!-- Contact -->
-    <div class="contact-footer">
-      <a href="mailto:sofia.grimm@yale.edu">sofia.grimm@yale.edu</a>
-      <span class="cf-divider">&middot;</span>
-      <a href="https://www.linkedin.com/in/sofia-grimm/" target="_blank" rel="noopener noreferrer">LinkedIn</a>
-    </div>
-
-  </main>
-  <div class="coords">41.3083&deg; N &nbsp; 72.9279&deg; W</div>
-
-  <!-- Film strip script -->
-  <script>
-  const PHOTOS = [
-    '633A206B-E09F-4B4C-AF48-604EFAA9065E.jpg',
-    'C738E431-3996-47B9-B722-135265FF7B7F_(1).jpg',
-    'IMG_3326.jpg',
-    'IMG_3334_(1).jpg'
-  ];
-
-  const LEFT_PHOTOS  = [PHOTOS[0], PHOTOS[1], PHOTOS[0], PHOTOS[1], PHOTOS[0], PHOTOS[1]];
-  const RIGHT_PHOTOS = [PHOTOS[2], PHOTOS[3], PHOTOS[2], PHOTOS[3], PHOTOS[2], PHOTOS[3]];
-
-  function buildTrack(trackId, direction, speed, photos) {
-    const track = document.getElementById(trackId);
-
-    function makeSet(photoList) {
-      const frag = document.createDocumentFragment();
-      for (let i = 0; i < photoList.length; i++) {
-        const sp = document.createElement('div');
-        sp.className = 'pb-sprocket';
-        sp.innerHTML = '<div class="pb-hole"></div><div class="pb-hole"></div><div class="pb-hole"></div>';
-        frag.appendChild(sp);
-        const frame = document.createElement('div');
-        frame.className = 'pb-frame';
-        const img = document.createElement('img');
-        img.src = photoList[i];
-        img.alt = '';
-        img.loading = 'lazy';
-        frame.appendChild(img);
-        frag.appendChild(frame);
-      }
-      const sp = document.createElement('div');
-      sp.className = 'pb-sprocket';
-      sp.innerHTML = '<div class="pb-hole"></div><div class="pb-hole"></div><div class="pb-hole"></div>';
-      frag.appendChild(sp);
-      return frag;
-    }
-
-    track.appendChild(makeSet(photos));
-    track.appendChild(makeSet(photos));
-
-    requestAnimationFrame(() => {
-      const totalH = track.scrollHeight / 2;
-      let offset = direction === 'up' ? 0 : -totalH;
-      function tick() {
-        offset += direction === 'up' ? -speed : speed;
-        if (direction === 'up' && offset <= -totalH) offset = 0;
-        if (direction === 'down' && offset >= 0) offset = -totalH;
-        track.style.transform = `translateY(${offset}px)`;
-        requestAnimationFrame(tick);
-      }
-      tick();
-    });
-  }
-
-  buildTrack('trackLeft',  'up',   0.15, LEFT_PHOTOS);
-  buildTrack('trackRight', 'down', 0.12, RIGHT_PHOTOS);
-  </script>
-
-  <!-- Stars background -->
-  <script type="module">
-    import('https://unpkg.com/three@0.161.0/build/three.module.js').then(THREE=>{
-      const renderer=new THREE.WebGLRenderer({antialias:true,alpha:false});
-      renderer.setPixelRatio(Math.min(window.devicePixelRatio,2));
-      renderer.setSize(window.innerWidth,window.innerHeight);
-      renderer.setClearColor(0x060d18,1);
-      document.body.appendChild(renderer.domElement);
-      const scene=new THREE.Scene();
-      const camera=new THREE.PerspectiveCamera(36,window.innerWidth/window.innerHeight,0.1,500);
-      camera.position.set(0,0,46);camera.lookAt(0,0,0);
-      window.addEventListener('resize',()=>{camera.aspect=window.innerWidth/window.innerHeight;camera.updateProjectionMatrix();renderer.setSize(window.innerWidth,window.innerHeight);});
-      const N=7000,pos=new Float32Array(N*3),ph=new Float32Array(N),sp=new Float32Array(N),sz=new Float32Array(N);
-      for(let i=0;i<N;i++){pos[i*3]=(Math.random()-.5)*220;pos[i*3+1]=(Math.random()-.5)*160;pos[i*3+2]=-Math.random()*260;ph[i]=Math.random()*Math.PI*2;sp[i]=.002+Math.random()*.005;sz[i]=.1+Math.random()*.2;}
-      const geo=new THREE.BufferGeometry();
-      geo.setAttribute('position',new THREE.BufferAttribute(pos,3));
-      geo.setAttribute('phase',new THREE.BufferAttribute(ph,1));
-      geo.setAttribute('speed',new THREE.BufferAttribute(sp,1));
-      geo.setAttribute('aSize',new THREE.BufferAttribute(sz,1));
-      const mat=new THREE.ShaderMaterial({uniforms:{time:{value:0}},vertexShader:`attribute float aSize;attribute float phase;attribute float speed;uniform float time;varying float vB;void main(){float r=abs(sin(time*speed+phase));vB=.7+.3*pow(r,.3);vec4 mv=modelViewMatrix*vec4(position,1.);gl_PointSize=aSize*(1.+2.*max(0.,r-.75)/.25)*(300./-mv.z);gl_Position=projectionMatrix*mv;}`,fragmentShader:`varying float vB;void main(){vec2 uv=gl_PointCoord-vec2(.5);if(length(uv)>.5)discard;float c=1.-smoothstep(0.,.45,length(uv));gl_FragColor=vec4(vec3(.75,.88,1.)*vB,c*vB);}`,transparent:true,depthWrite:false});
-      scene.add(new THREE.Points(geo,mat));
-      (function loop(t){requestAnimationFrame(loop);mat.uniforms.time.value=t*.001;renderer.render(scene,camera);})(0);
-    });
-  </script>
 </body>
 </html>
