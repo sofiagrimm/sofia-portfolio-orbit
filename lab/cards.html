@@ -6,7 +6,7 @@
 <title>card catalog | Sofia Grimm</title>
 <meta name="robots" content="noindex">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Courier+Prime:ital,wght@0,400;0,700;1,400&family=Nanum+Pen+Script&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Courier+Prime:ital,wght@0,400;0,700;1,400&family=Nanum+Pen+Script&family=IM+Fell+English&display=swap">
 <style>
   :root{
     --sky:#060d18;
@@ -93,9 +93,16 @@
         radial-gradient(ellipse 50% 44% at 50% 50%, rgba(20,40,120,0.05) 0%, transparent 65%);
     }
   header,main,section,footer{position:relative;z-index:10}
+  /* decorative playing cards scattered across the page, like a table */
+  body{position:relative}
+  #table{position:absolute;left:0;top:0;width:100%;z-index:5;pointer-events:none;overflow:hidden}
+  #table .pc{position:absolute;filter:drop-shadow(0 8px 14px rgba(0,0,0,.5))}
+  #table .pc svg{display:block;width:100%;height:auto}
+
 </style>
 </head>
 <body>
+<div id="table" aria-hidden="true"></div>
 <div class="nebula"></div>
 <header>
   <nav aria-label="Site">
@@ -194,5 +201,73 @@ cards.forEach(c => {
       (function loop(t){requestAnimationFrame(loop);mat.uniforms.time.value=t*.001;renderer.render(scene,camera);})(0);
     });
   </script>
+<script>
+// Hand-inked, watercolor playing cards scattered like a table. Purely decorative.
+// Skips the combos already used for projects (3♦ 5♠ 4♥ 6♣ 7♠ 8♦ 9♥ and the Joker).
+(function(){
+  const SUIT={
+    heart:"M50 90 C20 68 5 52 5 33 C5 18 16 8 30 8 C40 8 46 14 50 23 C54 14 60 8 70 8 C84 8 95 18 95 33 C95 52 80 68 50 90Z",
+    diamond:"M50 3 L86 50 L50 97 L14 50Z",
+    spade:"M50 4 C64 25 93 40 93 61 C93 75 81 83 68 81 C62 80 57 77 54 72 C55 81 59 89 67 95 L33 95 C41 89 45 81 46 72 C43 77 38 80 32 81 C19 83 7 75 7 61 C7 40 36 25 50 4Z",
+    club:"M50 12 a17 17 0 1 1 -0.1 0Z M28 42 a17 17 0 1 1 -0.1 0Z M72 42 a17 17 0 1 1 -0.1 0Z M46 58 C46 76 42 86 33 95 L67 95 C58 86 54 76 54 58Z"
+  };
+  const RED="#cf4540",INK="#262838";
+  const col=s=>(s==='heart'||s==='diamond')?RED:INK;
+  let uid=0;
+  function card(rank,suit){
+    const f='t'+(uid++), c=col(suit);
+    const paint=(x,y,size,op)=>{const k=size/100;return `<g transform="translate(${x-size/2} ${y-size/2}) scale(${k})"><path d="${SUIT[suit]}" fill="${c}" opacity="${op||.82}" filter="url(#wc${f})"/><path d="${SUIT[suit]}" fill="none" stroke="${c}" stroke-width="${1.3/k}" opacity=".45" filter="url(#wc${f})"/></g>`;};
+    const corner=`<text x="30" y="50" font-family="'IM Fell English',Georgia,serif" font-size="34" fill="${c}" text-anchor="middle">${rank}</text>${paint(30,72,22,.9)}`;
+    let mid='';
+    if(rank==='A') mid=paint(125,170,120);
+    else if(['K','Q','J'].includes(rank)) mid=`<rect x="58" y="58" width="134" height="234" fill="none" stroke="${INK}" stroke-width="2" filter="url(#ink${f})"/>${paint(125,135,70)}<g transform="rotate(180 125 175)">${paint(125,135,70)}</g><text x="125" y="186" font-family="'IM Fell English',Georgia,serif" font-size="38" fill="${c}" text-anchor="middle" opacity=".85">${rank}</text>`;
+    else { const n=parseInt(rank,10), rows=Math.ceil(n/2); let pips='';
+      for(let i=0;i<n;i++){const colx=(n%2&&i===n-1)?125:(i%2?160:90), row=Math.floor(i/2); const y=(n%2&&i===n-1)?175:80+row*(190/Math.max(1,rows-1||1)); pips+=paint(colx,y,46);} mid=pips; }
+    return `<svg viewBox="0 0 250 350" xmlns="http://www.w3.org/2000/svg"><defs>
+      <filter id="wc${f}" x="-10%" y="-10%" width="120%" height="120%"><feTurbulence type="fractalNoise" baseFrequency=".035" numOctaves="3" seed="${uid}"/><feDisplacementMap in="SourceGraphic" scale="6"/><feGaussianBlur stdDeviation=".5"/></filter>
+      <filter id="ink${f}"><feTurbulence type="fractalNoise" baseFrequency=".03" numOctaves="2" seed="${uid+7}"/><feDisplacementMap in="SourceGraphic" scale="3"/></filter>
+      <linearGradient id="pp${f}" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fdfaf3"/><stop offset=".75" stop-color="#f5efe2"/><stop offset="1" stop-color="#e6ddca"/></linearGradient></defs>
+      <rect x="6" y="6" width="238" height="338" rx="16" fill="url(#pp${f})"/>
+      <path d="M234 24 L238 326" stroke="#b8b0a1" stroke-width="9" opacity=".3" filter="url(#wc${f})"/>
+      <rect x="6" y="6" width="238" height="338" rx="16" fill="none" stroke="#38342f" stroke-width="3" filter="url(#ink${f})"/>
+      ${corner}<g transform="rotate(180 125 175)">${corner}</g>${mid}</svg>`;
+  }
+  // fanned groups, like the references, plus loose cards
+  const LAYOUT=[
+    {fan:[['A','heart'],['A','spade'],['A','diamond'],['A','club']], x:0, y:19, w:108, rot:-14},
+    {fan:[['J','club'],['Q','heart'],['K','spade']], x:84, y:18, w:112, rot:12},
+    {one:['10','diamond'], x:86, y:4, w:104, rot:24},
+    {one:['2','club'], x:2, y:36, w:96, rot:-28},
+    {one:['K','diamond'], x:89, y:40, w:108, rot:-9},
+    {one:['Q','spade'], x:2, y:52, w:104, rot:17},
+    {one:['7','heart'], x:87, y:63, w:96, rot:31},
+    {fan:[['J','heart'],['10','spade']], x:4, y:74, w:100, rot:-6},
+    {one:['5','club'], x:84, y:86, w:94, rot:-22},
+    {one:['2','diamond'], x:70, y:94, w:90, rot:8}
+  ];
+  const table=document.getElementById('table');
+  function lay(){
+    const h=document.documentElement.scrollHeight, mobile=innerWidth<760;
+    table.style.height=h+'px'; table.innerHTML='';
+    LAYOUT.forEach((g,gi)=>{
+      if(mobile&&(gi%2||g.y<14)) return;            // fewer cards on phones, none over the nav
+      const scale=mobile?.62:1, w=g.w*scale;
+      const list=g.fan||[g.one];
+      list.forEach((rs,k)=>{
+        const el=document.createElement('div'); el.className='pc';
+        const spread=(k-(list.length-1)/2);
+        el.style.width=w+'px';
+        el.style.left=`calc(${g.x}% + ${spread*w*.42}px)`;
+        el.style.top=`calc(${g.y}% + ${Math.abs(spread)*8}px)`;
+        el.style.transform=`rotate(${g.rot+spread*11}deg)`;
+        el.style.transformOrigin='50% 110%';
+        el.innerHTML=card(rs[0],rs[1]);
+        table.appendChild(el);
+      });
+    });
+  }
+  addEventListener('load',lay); addEventListener('resize',()=>{clearTimeout(lay.t);lay.t=setTimeout(lay,150);});
+})();
+</script>
 </body>
 </html>
