@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Projects | Sofia Grimm</title>
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Inter:wght@300;400;500&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Inter:wght@300;400;500&family=DM+Serif+Display:ital@0;1&family=Courier+Prime:wght@400;700&family=Nanum+Pen+Script&display=swap');
     *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
     html,body{width:100%;min-height:100%;background:#060d18;font-family:'Inter',sans-serif;color:#e9f0ff;overflow-x:hidden;}
     canvas{display:block;position:fixed;inset:0;z-index:0}
@@ -28,9 +28,9 @@
     .rule{width:48px;height:1px;background:linear-gradient(90deg,rgba(140,170,255,.4),transparent);margin-bottom:44px;}
 
     /* ── GRID — 4 col desktop, 2 col tablet, 1 col mobile ── */
-    .memory-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:18px;}
-    @media(max-width:640px){.memory-grid{grid-template-columns:repeat(2,1fr);gap:14px;}}
-    @media(max-width:400px){.memory-grid{grid-template-columns:1fr;gap:12px;}}
+    .memory-grid{columns:4 200px;column-gap:20px;}
+    @media(max-width:640px){.memory-grid{columns:2;column-gap:14px;}}
+    
 
     /* ── MOBILE NAV ── */
     @media(max-width:600px){
@@ -86,6 +86,34 @@
     #cardPopupClose:hover{background:rgba(80,100,220,0.60);color:#fff;transform:scale(1.15) rotate(90deg);box-shadow:0 6px 28px rgba(80,120,255,.4);}
     #cardPopupFlipper{width:100%;height:100%;transform-style:preserve-3d;transition:transform .65s cubic-bezier(.22,1,.36,1);border-radius:14px;will-change:transform;}
     #cardPopupFlipper.flipped{transform:rotateY(180deg);}
+
+    /* ── PINS (paper card backs) ── */
+    .card-scene{display:inline-block;width:100%;margin:0 0 22px;break-inside:avoid;aspect-ratio:var(--ar,3/4)}
+    .card-scene:hover .card-flipper{transform:translateY(-4px)}
+    .card-scene.flipped:hover .card-flipper{transform:rotateY(180deg) translateY(-4px)}
+    .card-face{border-radius:10px}
+    .card-back{background:#efe7d6;border:0;display:block;box-shadow:0 14px 34px rgba(0,0,0,.5),0 2px 4px rgba(0,0,0,.35)}
+    .card-scene:not(.flipped):hover .card-back,.card-scene.revealed:hover .card-back{box-shadow:0 20px 44px rgba(0,0,0,.6),0 2px 4px rgba(0,0,0,.35);border:0}
+    .card-back .cb-aurora,.card-back .cb-shimmer,.card-back .cb-burst{display:none}
+    .pin{position:absolute;inset:0;display:flex;flex-direction:column;padding:10px 10px 12px}
+    .pin-art{flex:1;border-radius:6px;overflow:hidden;position:relative;background:var(--tone)}
+    .pin-art svg{position:absolute;inset:0;width:100%;height:100%}
+    .pin-title{font-family:'DM Serif Display',Georgia,serif;font-style:italic;font-size:clamp(17px,1.6vw,21px);line-height:1.1;color:#2b2620;margin:10px 4px 0}
+    .pin-note{font-family:'Nanum Pen Script',cursive;font-size:20px;line-height:1;color:#24306b;margin:3px 4px 0}
+    .pin-tape{position:absolute;top:-9px;left:50%;width:70px;height:20px;margin-left:-35px;background:rgba(236,226,198,.6);box-shadow:0 1px 2px rgba(0,0,0,.25);transform:rotate(var(--tilt,-3deg));z-index:3}
+    .card-flipper{border-radius:10px}
+    .card-front{background:radial-gradient(ellipse at 30% 20%,#f5efe2 0%,#efe7d6 60%,#e6dcc6 100%);border:0;backdrop-filter:none;-webkit-backdrop-filter:none;
+      padding:18px 18px 16px;gap:6px;box-shadow:0 14px 34px rgba(0,0,0,.5),0 2px 4px rgba(0,0,0,.35);border-radius:10px}
+    .fr-tag{font-family:'Courier Prime',monospace;font-size:11px;letter-spacing:.02em;text-transform:none;color:#6a6052;font-weight:400}
+    .fr-date{font-family:'Courier Prime',monospace;font-size:11px;letter-spacing:0;color:#8a7f6e}
+    .fr-rule{width:36px;height:1.5px;background:#b3473b;margin:4px 0}
+    .fr-title{font-family:'DM Serif Display',Georgia,serif;font-style:italic;font-weight:400;font-size:clamp(17px,1.7vw,21px);line-height:1.15;color:#2b2620}
+    .fr-body{font-family:'Courier Prime',monospace;font-size:11.5px;line-height:1.55;color:#3b342b}
+    .fr-link{font-family:'Nanum Pen Script',cursive;font-size:21px;letter-spacing:0;text-transform:none;color:#24306b;border-bottom:1px solid #24306b55}
+    .fr-link:hover{color:#16204f}
+    #cardPopupClose{background:#efe7d6;color:#2b2620;border:0}
+    #cardPopupClose:hover{background:#fff;color:#2b2620;box-shadow:0 6px 20px rgba(0,0,0,.4)}
+    @media (prefers-reduced-motion:reduce){.card-scene{animation:none;opacity:1}.card-flipper{transition:none}}
     .coords{position:fixed;bottom:32px;left:48px;z-index:20;font-size:10px;letter-spacing:.18em;color:rgba(110,130,190,.28);font-weight:300;pointer-events:none;}
     @media(max-width:600px){.coords{display:none;}}
   </style>
@@ -137,61 +165,45 @@
       { tag:"Hackathon · MedTech", date:"April 2026", title:"NeuroPrint", body:"A browser-based tool for tracking Parkinson's at home, built at HackDartmouth. Patients do movement tasks like sit-to-stand, standing balance, gait turns, and shoulder range of motion while MediaPipe tracks their joints in the browser, so raw video never leaves the device. A FastAPI and SQLite backend saves each session, and a React dashboard shows clinicians how a patient's movement changes over time against age-matched references. We placed 3rd overall, won AirPods, and got a fast-track interview with Adaptional, a YC-backed startup.", link:"https://devpost.com/software/neuroprint-cky41g?ref_content=my-projects-tab&ref_feature=my_projects", linkLabel:"View on Devpost →" }
     ];
 
-    const SUITS       = ['\u2660','\u2665','\u2666','\u2663'];
-    const SUIT_COLORS = ['rgba(180,195,255,0.80)','rgba(255,140,160,0.80)','rgba(255,170,110,0.80)','rgba(140,225,175,0.80)'];
-    const RANKS       = ['I','II','III','IV','V','VI','VII','VIII','IX'];
-    const ROW_SUITS   = [[0,1,2,3],[3,2,0,1],[1,0,3,2]];
-
-    function getSuitIdx(cardIdx){
-      const row=Math.floor(cardIdx/4),col=cardIdx%4;
-      return ROW_SUITS[row%ROW_SUITS.length][col];
-    }
-
+    // Each project gets a small printed illustration instead of a playing-card suit.
+    const PINS = [
+      {short:"PCDD", note:"14 carbons", tone:"#d5ddcc", ar:"3/4", art:"carbon"},
+      {short:"Vantage", note:"best solo hack", tone:"#efe2b8", ar:"4/5", art:"chart"},
+      {short:"Red Cross fleet model", note:"how many bloodmobiles?", tone:"#f0d4d8", ar:"2/3", art:"fleet"},
+      {short:"ASEAN expansion", note:"Singapore first", tone:"#c9d3e6", ar:"1/1", art:"islands"},
+      {short:"Gravitational lens CNN", note:"Fermilab, 2023", tone:"#dcd3e8", ar:"3/4", art:"lens"},
+      {short:"Green vehicle routing", note:"spotlight scholar", tone:"#d5ddcc", ar:"4/5", art:"routes"},
+      {short:"This website", note:"you are here", tone:"#c9d3e6", ar:"2/3", art:"planet"},
+      {short:"NeuroPrint", note:"3rd overall", tone:"#f0d4d8", ar:"3/4", art:"pose"}
+    ];
+    const INK="#24306b", ACC="#c4566f";
+    function dots(id){return `<defs><pattern id="${id}" width="6" height="6" patternUnits="userSpaceOnUse"><circle cx="3" cy="3" r=".9" fill="${INK}" opacity=".13"/></pattern></defs><rect width="200" height="200" fill="url(#${id})"/>`;}
+    const ART = {
+      carbon:()=>{let h='';const hx=(x,y)=>{const p=[...Array(6)].map((_,k)=>{const a=Math.PI/3*k+Math.PI/6;return `${(x+18*Math.cos(a)).toFixed(1)},${(y+18*Math.sin(a)).toFixed(1)}`}).join(' ');return `<polygon points="${p}" fill="none" stroke="${INK}" stroke-width="2"/>`;};
+        for(let r=0;r<5;r++)for(let c=0;c<5;c++){h+=hx(30+c*31.2+(r%2)*15.6,40+r*27);}
+        return h+`<circle cx="138" cy="122" r="7" fill="${ACC}"/><circle cx="60" cy="68" r="5" fill="${ACC}"/>`;},
+      chart:()=>{let h='';const v=[60,80,70,105,95,120,112,140,130,155];v.forEach((y,i)=>{const x=24+i*16,up=i%3!==1;h+=`<line x1="${x}" y1="${200-y-22}" x2="${x}" y2="${200-y+18}" stroke="${INK}" stroke-width="1.6"/><rect x="${x-5}" y="${200-y-10}" width="10" height="${up?24:16}" fill="${up?INK:ACC}"/>`;});
+        return h+`<path d="M20 160 C60 150 90 120 120 100 S170 60 184 52" fill="none" stroke="${ACC}" stroke-width="2" stroke-dasharray="4 4"/>`;},
+      fleet:()=>{let h='';for(let r=0;r<4;r++)for(let c=0;c<3;c++){const x=26+c*54,y=34+r*40,on=(r*3+c)%4!==2;h+=`<g transform="translate(${x} ${y})"><rect width="40" height="20" rx="4" fill="${on?INK:'none'}" stroke="${INK}" stroke-width="2"/><rect x="28" y="4" width="9" height="7" rx="1.5" fill="${on?'#f0d4d8':INK}"/><circle cx="9" cy="23" r="4" fill="${ACC}"/><circle cx="31" cy="23" r="4" fill="${ACC}"/></g>`;}return h;},
+      islands:()=>`<path d="M30 70 q14 -16 30 -4 q10 10 -4 18 q-18 8 -26 -14z" fill="${INK}"/><path d="M110 50 q18 -8 26 6 q4 14 -14 14 q-18 -2 -12 -20z" fill="${INK}"/><path d="M60 130 q20 -12 46 0 q22 12 6 22 q-30 14 -52 -22z" fill="${INK}"/><path d="M140 120 q16 -4 22 8 q2 14 -16 10 q-12 -6 -6 -18z" fill="${INK}"/>
+        <circle cx="100" cy="98" r="8" fill="${ACC}"/><g fill="none" stroke="${ACC}" stroke-width="1.8" stroke-dasharray="3 4"><path d="M100 98 Q70 70 46 74"/><path d="M100 98 Q115 70 124 60"/><path d="M100 98 Q90 125 82 140"/><path d="M100 98 Q130 110 150 130"/></g>`,
+      lens:()=>{let h='';for(let i=0;i<26;i++){h+=`<circle cx="${(i*37)%190+5}" cy="${(i*53)%190+5}" r="${1+(i%3)*.6}" fill="${INK}" opacity=".5"/>`;}
+        return h+`<circle cx="100" cy="100" r="54" fill="none" stroke="${INK}" stroke-width="7" stroke-dasharray="70 18 40 22"/><circle cx="100" cy="100" r="34" fill="none" stroke="${ACC}" stroke-width="4" stroke-dasharray="40 14"/><circle cx="100" cy="100" r="10" fill="${INK}"/>`;},
+      routes:()=>{const n=[[30,40],[80,30],[150,45],[45,100],[110,90],[170,110],[60,160],[120,150],[165,170]];let h=`<path d="M30 40 L80 30 L110 90 L170 110 L165 170 L120 150 L60 160 L45 100 Z" fill="none" stroke="${ACC}" stroke-width="3" stroke-linejoin="round"/>`;
+        [[0,3],[1,4],[2,4],[2,5],[3,6],[4,7],[6,7],[7,8],[5,8],[0,1],[1,2]].forEach(([a,b])=>{h+=`<line x1="${n[a][0]}" y1="${n[a][1]}" x2="${n[b][0]}" y2="${n[b][1]}" stroke="${INK}" stroke-width="1" opacity=".35"/>`;});
+        n.forEach(([x,y])=>{h+=`<circle cx="${x}" cy="${y}" r="7" fill="${INK}"/>`;});return h;},
+      planet:()=>{let h='';for(let i=0;i<30;i++){h+=`<circle cx="${(i*41)%196+2}" cy="${(i*67)%196+2}" r="${.8+(i%3)*.5}" fill="${INK}" opacity=".55"/>`;}
+        return h+`<circle cx="100" cy="104" r="38" fill="${INK}"/><ellipse cx="100" cy="104" rx="70" ry="16" fill="none" stroke="${ACC}" stroke-width="4" transform="rotate(-18 100 104)"/><path d="M62 92 a38 38 0 0 1 76 0" fill="none" stroke="#c9d3e6" stroke-width="2" opacity=".5"/><circle cx="160" cy="44" r="7" fill="${ACC}"/>`;},
+      pose:()=>{const p={h:[100,38],n:[100,64],ls:[78,70],rs:[122,70],le:[66,98],re:[136,92],lw:[60,124],rw:[150,74],hp:[100,112],lh:[88,116],rh:[112,116],lk:[82,150],rk:[120,148],la:[78,184],ra:[128,182]};
+        const L=[['n','ls'],['n','rs'],['ls','le'],['le','lw'],['rs','re'],['re','rw'],['n','hp'],['hp','lh'],['hp','rh'],['lh','lk'],['lk','la'],['rh','rk'],['rk','ra']];
+        let h=`<circle cx="100" cy="38" r="14" fill="none" stroke="${INK}" stroke-width="2.4"/>`;L.forEach(([a,b])=>{h+=`<line x1="${p[a][0]}" y1="${p[a][1]}" x2="${p[b][0]}" y2="${p[b][1]}" stroke="${INK}" stroke-width="2.4" stroke-linecap="round"/>`;});
+        Object.entries(p).forEach(([k,[x,y]])=>{if(k!=='h')h+=`<circle cx="${x}" cy="${y}" r="4.5" fill="${ACC}"/>`;});return h+`<path d="M146 70 a16 16 0 0 1 18 22" fill="none" stroke="${ACC}" stroke-width="1.8" stroke-dasharray="3 3"/>`;}
+    };
     function makeCardBackSVG(idx){
-      const si=getSuitIdx(idx),suit=SUITS[si],sc=SUIT_COLORS[si],rank=RANKS[idx];
-      const d=(idx*0.42).toFixed(2),pd=x=>(idx*0.31+x).toFixed(2);
-      return `<svg viewBox="0 0 180 240" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice">
-        <defs>
-          <pattern id="g${idx}" width="18" height="18" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><path d="M18 0L0 0 0 18" fill="none" stroke="rgba(140,165,255,0.07)" stroke-width="0.6"/></pattern>
-          <radialGradient id="vg${idx}" cx="50%" cy="50%" r="72%"><stop offset="0%" stop-color="rgba(30,50,120,0)"/><stop offset="100%" stop-color="rgba(4,8,30,0.55)"/></radialGradient>
-          <radialGradient id="cg${idx}" cx="50%" cy="50%" r="55%"><stop offset="0%" stop-color="rgba(100,130,255,0.07)"/><stop offset="100%" stop-color="rgba(20,40,110,0)"/></radialGradient>
-          <filter id="glow${idx}" x="-30%" y="-30%" width="160%" height="160%"><feGaussianBlur stdDeviation="3" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
-        </defs>
-        <rect width="180" height="240" fill="#0a1230"/>
-        <rect width="180" height="240" fill="url(#g${idx})"/>
-        <rect width="180" height="240" fill="url(#cg${idx})"/>
-        <rect x="7" y="7" width="166" height="226" rx="10" fill="none" stroke="${sc}" stroke-width="1.1" stroke-opacity="0.22" style="animation:borderGlow 3.5s ease-in-out ${d}s infinite"/>
-        <rect x="11" y="11" width="158" height="218" rx="8" fill="none" stroke="rgba(140,165,255,0.09)" stroke-width="0.5"/>
-        <g transform="translate(90,30)" style="animation:frameRotate 10s linear ${d}s infinite;transform-box:fill-box;transform-origin:50% 50%;"><rect x="-5" y="-5" width="10" height="10" rx="1" fill="none" stroke="${sc}" stroke-width="0.9" stroke-opacity="0.55" transform="rotate(45)"/></g>
-        <g transform="translate(90,210)" style="animation:frameRotate 10s linear ${d}s infinite reverse;transform-box:fill-box;transform-origin:50% 50%;"><rect x="-5" y="-5" width="10" height="10" rx="1" fill="none" stroke="${sc}" stroke-width="0.9" stroke-opacity="0.55" transform="rotate(45)"/></g>
-        <g style="animation:cornerTwinkle 2.5s ease-in-out ${d}s infinite">
-          <text x="15" y="28" font-family="Georgia,serif" font-size="13" text-anchor="middle" fill="${sc}">${suit}</text>
-          <text x="165" y="28" font-family="Georgia,serif" font-size="13" text-anchor="middle" fill="${sc}">${suit}</text>
-          <g transform="rotate(180,90,120)"><text x="-75" y="-93" font-family="Georgia,serif" font-size="13" text-anchor="middle" fill="${sc}">${suit}</text></g>
-          <g transform="rotate(180,90,120)"><text x="75" y="-93" font-family="Georgia,serif" font-size="13" text-anchor="middle" fill="${sc}">${suit}</text></g>
-        </g>
-        <rect x="32" y="52" width="116" height="136" rx="5" fill="rgba(20,35,100,0.22)" stroke="rgba(140,165,255,0.13)" stroke-width="0.8"/>
-        <line x1="32" y1="120" x2="148" y2="120" stroke="rgba(140,165,255,0.05)" stroke-width="0.7"/>
-        <line x1="90" y1="52" x2="90" y2="188" stroke="rgba(140,165,255,0.05)" stroke-width="0.7"/>
-        <g transform="translate(90,120)" style="animation:orbitRing 8s linear ${d}s infinite;transform-box:fill-box;transform-origin:50% 50%;"><ellipse cx="0" cy="0" rx="28" ry="10" fill="none" stroke="${sc}" stroke-width="0.5" stroke-opacity="0.22" stroke-dasharray="3 4"/></g>
-        <g transform="translate(90,120)" style="animation:orbitRingRev 12s linear ${d}s infinite;transform-box:fill-box;transform-origin:50% 50%;"><ellipse cx="0" cy="0" rx="22" ry="8" fill="none" stroke="${sc}" stroke-width="0.4" stroke-opacity="0.16" stroke-dasharray="2 5"/></g>
-        <g fill="${sc}" opacity="0.38" font-family="Georgia,serif" font-size="11" text-anchor="middle"><text x="50" y="76">${suit}</text><text x="130" y="76">${suit}</text><text x="50" y="183">${suit}</text><text x="130" y="183">${suit}</text></g>
-        <text x="90" y="120" font-family="Georgia,serif" font-size="54" text-anchor="middle" dominant-baseline="middle" fill="${sc}" filter="url(#glow${idx})" style="animation:suitPulse 3s ease-in-out ${d}s infinite;transform-box:fill-box;transform-origin:50% 50%;">${suit}</text>
-        <text x="90" y="120" font-family="Georgia,serif" font-style="italic" font-size="17" text-anchor="middle" dominant-baseline="middle" fill="rgba(210,220,255,0.16)">SG</text>
-        <line x1="40" y1="60" x2="140" y2="60" stroke="rgba(160,175,255,0.11)" stroke-width="0.6"/>
-        <line x1="40" y1="180" x2="140" y2="180" stroke="rgba(160,175,255,0.11)" stroke-width="0.6"/>
-        <circle cx="34" cy="120" r="2" fill="${sc}" opacity="0.26" style="animation:cornerTwinkle 2s ease-in-out ${pd(0.3)}s infinite"/>
-        <circle cx="146" cy="120" r="2" fill="${sc}" opacity="0.26" style="animation:cornerTwinkle 2s ease-in-out ${pd(0.7)}s infinite"/>
-        <circle cx="62" cy="88" r="1.2" fill="${sc}" opacity="0.50" style="animation:particleDrift 3.1s ease-in-out ${pd(0.0)}s infinite"/>
-        <circle cx="118" cy="98" r="1.0" fill="${sc}" opacity="0.40" style="animation:particleDrift 3.7s ease-in-out ${pd(0.5)}s infinite"/>
-        <circle cx="75" cy="157" r="1.3" fill="${sc}" opacity="0.45" style="animation:particleDrift 2.8s ease-in-out ${pd(1.1)}s infinite"/>
-        <circle cx="113" cy="147" r="1.0" fill="${sc}" opacity="0.35" style="animation:particleDrift 4.2s ease-in-out ${pd(0.8)}s infinite"/>
-        <circle cx="90" cy="74" r="0.9" fill="rgba(220,230,255,0.6)" style="animation:particleDrift 3.4s ease-in-out ${pd(1.4)}s infinite"/>
-        <circle cx="55" cy="140" r="0.8" fill="${sc}" opacity="0.30" style="animation:particleDrift 5.0s ease-in-out ${pd(2.0)}s infinite"/>
-        <circle cx="128" cy="155" r="0.9" fill="${sc}" opacity="0.32" style="animation:particleDrift 4.6s ease-in-out ${pd(1.7)}s infinite"/>
-        <rect width="180" height="240" fill="url(#vg${idx})" rx="12"/>
-        <text x="166" y="233" font-family="'Inter',sans-serif" font-size="7" text-anchor="end" fill="rgba(140,165,255,0.18)" letter-spacing="1">${String(idx+1).padStart(2,'0')}</text>
-      </svg>`;
+      const p=PINS[idx]||PINS[0];
+      return `<div class="pin" style="--tone:${p.tone}"><span class="pin-tape" style="--tilt:${(idx%2?3:-3)}deg"></span>
+        <div class="pin-art"><svg viewBox="0 0 200 200" preserveAspectRatio="xMidYMid slice" aria-hidden="true">${dots('ht'+idx+Math.random().toString(36).slice(2,6))}${ART[p.art]()}</svg></div>
+        <div class="pin-title">${p.short}</div><div class="pin-note">${p.note}</div></div>`;
     }
 
     function makeFrontHTML(p){
@@ -260,7 +272,7 @@
 
     const grid=document.getElementById('memoryGrid');
     PROJECTS.forEach((p,i)=>{
-      const scene=document.createElement('div');scene.className='card-scene';scene.style.animationDelay=(i*0.07)+'s';
+      const scene=document.createElement('div');scene.className='card-scene';scene.style.animationDelay=(i*0.07)+'s';scene.style.setProperty('--ar',(PINS[i]||{}).ar||'3/4');scene.tabIndex=0;scene.setAttribute('role','button');scene.setAttribute('aria-label',p.title);
       const flipper=document.createElement('div');flipper.className='card-flipper';
       const back=document.createElement('div');back.className='card-face card-back';back.innerHTML=makeCardBackSVG(i);
       const aurora=document.createElement('div');aurora.className='cb-aurora';aurora.style.animationDelay=(i*0.55)+'s';back.appendChild(aurora);
@@ -271,22 +283,15 @@
       scene.addEventListener('animationend',(e)=>{
         if(e.animationName==='cardEntrance'){
           scene.style.opacity='1';scene.style.animation='none';
-          requestAnimationFrame(()=>{scene.style.animationDelay=(i*0.38)+'s';scene.classList.add('floating');});
+          
         }
       },{once:true});
-      scene.addEventListener('mousemove',(e)=>{
-        if(scene.classList.contains('revealed'))return;
-        const r=scene.getBoundingClientRect();
-        const mx=(e.clientX-r.left)/r.width-0.5,my=(e.clientY-r.top)/r.height-0.5;
-        flipper.style.transform=`rotateY(${mx*18}deg) rotateX(${-my*14}deg)`;
-      });
-      scene.addEventListener('mouseleave',()=>{if(!scene.classList.contains('revealed'))flipper.style.transform='';});
       scene.addEventListener('click',(e)=>{
         if(e.target.closest('.fr-link'))return;
         if(popupLocked)return;
-        flipper.style.transform='';
         openPopup(scene,i);
       });
+      scene.addEventListener('keydown',(e)=>{if((e.key==='Enter'||e.key===' ')&&e.target===scene){e.preventDefault();if(!popupLocked)openPopup(scene,i);}});
     });
   </script>
   <script type="module">
