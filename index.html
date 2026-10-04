@@ -4,8 +4,11 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Sofia Grimm</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Inter:wght@300;400;500&display=swap">
+  <link rel="modulepreload" href="https://unpkg.com/three@0.161.0/build/three.module.js" crossorigin>
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Inter:wght@300;400;500&display=swap');
     *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
     html,body{width:100%;height:100%;overflow:hidden}
     body{background:#060d18;font-family:'Inter',sans-serif;color:#e9f0ff;}
@@ -39,7 +42,7 @@
       color:rgba(160,190,255,0.5);text-decoration:none;padding:7px 16px;border-radius:4px;
       transition:color .25s,background .25s;
     }
-    .nav-links a:hover,.nav-links a.active{color:rgba(220,235,255,0.9);background:rgba(100,140,255,0.08);}
+    .nav-links a:hover,.nav-links a.active{color:rgba(220,235,255,0.9);background:rgba(100,140,255,0.18);}
     .nav-links .divider{color:rgba(100,130,200,0.2);font-size:13px;user-select:none;}
     .ui{position:fixed;inset:0;z-index:10;pointer-events:none}
     .center-card{
@@ -51,7 +54,7 @@
       background:linear-gradient(135deg,rgba(8,16,45,0.65) 0%,rgba(6,14,38,0.72) 60%,rgba(8,14,42,0.60) 100%);
       border:1px solid rgba(100,130,220,0.12);
       box-shadow:0 0 0 1px rgba(60,90,180,0.06),0 8px 40px rgba(0,0,0,0.60),0 0 50px rgba(30,60,160,0.06),inset 0 1px 0 rgba(160,190,255,0.06);
-      backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
+      
     }
     .card-eyebrow{
       font-size:13px;font-weight:400;letter-spacing:0.2em;text-transform:uppercase;
@@ -114,7 +117,7 @@
       position:fixed;z-index:30;pointer-events:none;
       font-size:11px;letter-spacing:.12em;text-transform:uppercase;
       color:rgba(200,220,255,0.75);
-      background:rgba(8,14,40,0.72);backdrop-filter:blur(8px);
+      background:rgba(8,14,40,0.82);
       border:1px solid rgba(120,150,255,0.18);
       padding:6px 12px;border-radius:20px;
       opacity:0;transition:opacity .18s;
@@ -128,7 +131,7 @@
       transition:background .35s;
     }
     #popupOverlay.visible{
-      background:rgba(4,8,28,0.55);
+      background:rgba(4,8,28,0.65);
       pointer-events:auto;
     }
     #popupBox{
@@ -139,7 +142,7 @@
       border-radius:22px;
       padding:40px 36px 36px;
       box-shadow:0 24px 80px rgba(0,0,0,0.7),0 0 60px rgba(60,100,255,0.08),inset 0 1px 0 rgba(180,200,255,0.06);
-      backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);
+      
       opacity:0;
       transform:scale(0.82) translateY(22px);
       transition:opacity .38s cubic-bezier(.22,1,.36,1), transform .38s cubic-bezier(.22,1,.36,1);
@@ -151,12 +154,12 @@
     #popupClose{
       position:absolute;top:16px;right:16px;
       width:32px;height:32px;border-radius:50%;
-      background:rgba(100,130,220,0.12);border:1px solid rgba(120,150,255,0.18);
+      background:rgba(100,130,220,0.22);border:1px solid rgba(120,150,255,0.18);
       color:rgba(180,200,255,0.7);font-size:16px;line-height:32px;text-align:center;
       cursor:pointer;transition:background .18s,color .18s;
       display:flex;align-items:center;justify-content:center;
     }
-    #popupClose:hover{background:rgba(100,130,220,0.28);color:#fff;}
+    #popupClose:hover{background:rgba(100,130,220,0.38);color:#fff;}
     .popup-accent{
       display:inline-block;width:8px;height:8px;border-radius:50%;
       margin-bottom:14px;
@@ -322,7 +325,7 @@
       var key=new THREE.DirectionalLight(0xffffff,1.1); key.position.set(18,24,18); scene.add(key);
       var rim=new THREE.DirectionalLight(0xaac4ff,1.2); rim.position.set(-24,4,-20); scene.add(rim);
 
-      var STAR_COUNT=9000;
+      var STAR_COUNT=6000;
       var starPositions=new Float32Array(STAR_COUNT*3);
       var starPhase=new Float32Array(STAR_COUNT);
       var starSpeed=new Float32Array(STAR_COUNT);
@@ -409,7 +412,7 @@
       ];
 
       var R=16.5,Z=-18,SPEED=0.0004;
-      var sphereGeo=new THREE.SphereGeometry(1.9,64,64);
+      var sphereGeo=new THREE.SphereGeometry(1.9,48,40);
       var groups=[],meshes=[];
       var quat=new THREE.Quaternion();
 

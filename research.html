@@ -4,8 +4,10 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Research | Sofia Grimm</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Inter:wght@300;400;500&display=swap">
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Inter:wght@300;400;500&display=swap');
     *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
     html,body{width:100%;height:100%;background:#060d18;font-family:'Inter',sans-serif;color:#e9f0ff;}
 
@@ -30,7 +32,7 @@
     .nav-links a{font-size:13px;font-weight:400;letter-spacing:0.13em;text-transform:uppercase;
       color:rgba(160,190,255,0.5);text-decoration:none;padding:7px 16px;border-radius:4px;
       transition:color .25s,background .25s;}
-    .nav-links a:hover,.nav-links a.active{color:rgba(220,235,255,0.9);background:rgba(100,140,255,0.08);}
+    .nav-links a:hover,.nav-links a.active{color:rgba(220,235,255,0.9);background:rgba(100,140,255,0.18);}
     .nav-links .divider{color:rgba(100,130,200,0.2);font-size:13px;user-select:none;}
 
     .page-shell{
@@ -45,13 +47,13 @@
       padding:48px 28px 60px 40px;
       display:flex;flex-direction:column;
       border-right:1px solid rgba(100,130,220,0.10);
-      background:rgba(6,13,24,0.55);
-      backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
+      background:rgba(6,13,24,0.65);
+      
       scrollbar-width:thin;scrollbar-color:rgba(80,110,200,0.2) transparent;
     }
     .left-panel::-webkit-scrollbar{width:4px;}
     .left-panel::-webkit-scrollbar-track{background:transparent;}
-    .left-panel::-webkit-scrollbar-thumb{background:rgba(80,110,200,0.2);border-radius:2px;}
+    .left-panel::-webkit-scrollbar-thumb{background:rgba(80,110,200,0.30000000000000004);border-radius:2px;}
 
     .page-eyebrow{font-size:11px;letter-spacing:0.22em;text-transform:uppercase;color:rgba(160,185,255,0.45);margin-bottom:18px;}
     .page-title{font-family:'Cormorant Garamond',serif;font-size:46px;font-weight:300;line-height:1.08;color:#eef3ff;margin-bottom:28px;}
@@ -70,9 +72,9 @@
       position:relative;overflow:hidden;
       padding:18px 18px 16px 20px;
       border-radius:14px;
-      background:rgba(8,14,46,0.55);
+      background:rgba(8,14,46,0.65);
       border:1px solid rgba(100,130,220,0.13);
-      backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
+      
       transition:border-color .28s, transform .28s, box-shadow .28s, background .28s;
       cursor:pointer;
       margin-bottom:10px;
@@ -85,7 +87,7 @@
     }
     .entry.active,.entry:hover{
       transform:translateX(4px);
-      background:rgba(12,20,58,0.72);
+      background:rgba(12,20,58,0.82);
       border-color:var(--border);
       box-shadow:0 8px 36px rgba(0,0,0,0.38), -4px 0 28px var(--glow);
     }
@@ -122,7 +124,7 @@
       position:absolute;z-index:30;pointer-events:none;
       font-size:11px;letter-spacing:.10em;
       color:rgba(220,235,255,0.88);
-      background:rgba(6,12,40,0.88);backdrop-filter:blur(12px);
+      background:rgba(6,12,40,0.92);
       border:1px solid rgba(120,150,255,0.22);
       padding:8px 14px;border-radius:12px;
       opacity:0;transition:opacity .15s;
@@ -526,8 +528,11 @@
     let lastInteract=performance.now();
     ['mousedown','touchstart'].forEach(ev=>canvas.addEventListener(ev,()=>{lastInteract=performance.now();}));
     let lastT=performance.now();
+    let onScreen=true;
+    new IntersectionObserver(es=>{onScreen=es[0].isIntersecting;},{rootMargin:'100px'}).observe(renderer.domElement);
     function animate(t){
       requestAnimationFrame(animate);
+      if(!onScreen||document.hidden){lastT=t;return;}
       const dt=(t-lastT)/16;lastT=t;
       if(!isDragging){
         if(animating){rotX+=(targetRotX-rotX)*0.06;rotY+=(targetRotY-rotY)*0.06;if(Math.abs(targetRotX-rotX)<0.001&&Math.abs(targetRotY-rotY)<0.001)animating=false;}

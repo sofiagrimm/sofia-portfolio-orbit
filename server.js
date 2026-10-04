@@ -7,6 +7,8 @@ const http = require('http');
 const fs = require('fs');
 const path = require('path');
 const crypto = require('crypto');
+const zlib = require('zlib');
+const GZ = new Map();
 
 const ROOT = __dirname;
 const PORT = process.env.PORT || 3000;
@@ -21,7 +23,7 @@ const TYPES = {
   '.html': 'text/html; charset=utf-8', '.js': 'text/javascript; charset=utf-8', '.css': 'text/css; charset=utf-8',
   '.json': 'application/json', '.svg': 'image/svg+xml', '.png': 'image/png', '.jpg': 'image/jpeg', '.jpeg': 'image/jpeg',
   '.gif': 'image/gif', '.webp': 'image/webp', '.ico': 'image/x-icon', '.woff2': 'font/woff2', '.md': 'text/plain; charset=utf-8',
-  '.heic': 'image/heic', '.txt': 'text/plain; charset=utf-8'
+  '.heic': 'image/heic', '.txt': 'text/plain; charset=utf-8', '.webp': 'image/webp', '.woff': 'font/woff', '.mp4': 'video/mp4'
 };
 
 const sha256 = s => crypto.createHash('sha256').update(s).digest('hex');
@@ -100,7 +102,22 @@ http.createServer((req, res) => {
   if (!file.startsWith(ROOT) || BLOCKED.has(path.basename(file)) || path.basename(file).startsWith('.')) return send(res, 404, 'not found');
   fs.stat(file, (err, st) => {
     if (err || !st.isFile()) return send(res, 404, 'not found', { 'Content-Type': 'text/plain' });
-    res.writeHead(200, { 'Content-Type': TYPES[path.extname(file).toLowerCase()] || 'application/octet-stream', 'Cache-Control': 'private, max-age=300', 'X-Robots-Tag': 'noindex' });
+    const ext = path.extname(file).toLowerCase(), type = TYPES[ext] || 'application/octet-stream';
+    // a cheap fingerprint so browsers can ask "has this changed?" and get a tiny 304 back
+    const etag = 'W/"' + st.size.toString(16) + '-' + Math.floor(st.mtimeMs).toString(16) + '"';
+    const headers = { 'Content-Type': type, 'ETag': etag, 'X-Robots-Tag': 'noindex', 'Vary': 'Accept-Encoding',
+      // pages and scripts check back every time (so edits show up), pictures are reused for an hour
+      'Cache-Control': /\.(html|js|css|md|txt|json)$/.test(ext) ? 'private, no-cache' : 'private, max-age=3600' };
+    if (req.headers['if-none-match'] === etag) { res.writeHead(304, headers); return res.end(); }
+    // text is gzipped (a page like projects.html shrinks to about a quarter), kept in memory until it changes
+    const textual = /^(text\/|application\/json|image\/svg)/.test(type) || ext === '.js';
+    if (textual && /\bgzip\b/.test(req.headers['accept-encoding'] || '')) {
+      const hit = GZ.get(file);
+      const send = buf => { headers['Content-Encoding'] = 'gzip'; headers['Content-Length'] = buf.length; res.writeHead(200, headers); res.end(buf); };
+      if (hit && hit.etag === etag) return send(hit.buf);
+      return fs.readFile(file, (e, data) => { if (e) return res.end(); const buf = zlib.gzipSync(data, { level: 9 }); GZ.set(file, { etag, buf }); send(buf); });
+    }
+    headers['Content-Length'] = st.size; res.writeHead(200, headers);
     fs.createReadStream(file).pipe(res);
   });
 }).listen(PORT, () => console.log('listening on ' + PORT));

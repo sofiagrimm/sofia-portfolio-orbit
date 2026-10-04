@@ -4,8 +4,11 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>About | Sofia Grimm</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Inter:wght@300;400;500&display=swap">
+  <link rel="modulepreload" href="https://unpkg.com/three@0.161.0/build/three.module.js" crossorigin>
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Inter:wght@300;400;500&display=swap');
     *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
     html,body{width:100%;min-height:100%;background:#060d18;font-family:'Inter',sans-serif;color:#e9f0ff;}
     canvas{display:block;position:fixed;inset:0;z-index:0}
@@ -27,7 +30,7 @@
     .nav-links a{font-size:13px;font-weight:400;letter-spacing:0.13em;text-transform:uppercase;
       color:rgba(160,190,255,0.5);text-decoration:none;padding:7px 16px;border-radius:4px;
       transition:color .25s,background .25s;}
-    .nav-links a:hover,.nav-links a.active{color:rgba(220,235,255,0.9);background:rgba(100,140,255,0.08);}
+    .nav-links a:hover,.nav-links a.active{color:rgba(220,235,255,0.9);background:rgba(100,140,255,0.18);}
     .nav-links .divider{color:rgba(100,130,200,0.2);font-size:13px;user-select:none;}
 
     /* Film strips */
@@ -43,9 +46,9 @@
     }
     .strip-rail{
       position:absolute;inset:0;
-      background:rgba(5,3,18,0.72);
+      background:rgba(5,3,18,0.82);
       border-right:1px solid rgba(140,120,255,0.09);
-      backdrop-filter:blur(5px);-webkit-backdrop-filter:blur(5px);
+      
     }
     .strip-wrap.right .strip-rail{border-right:none;border-left:1px solid rgba(140,120,255,0.09);}
     .pb-frame{
@@ -61,7 +64,7 @@
     }
     .pb-hole{
       width:11px;height:11px;border-radius:2px;
-      background:rgba(0,0,0,0.90);border:1px solid rgba(130,110,240,0.22);
+      background:rgba(0,0,0,0.92);border:1px solid rgba(130,110,240,0.22);
     }
 
     /* Page layout */
@@ -94,9 +97,9 @@
       position:relative;overflow:hidden;
       border-radius:16px;
       padding:28px 26px 24px;
-      background:rgba(8,14,46,0.62);
+      background:rgba(8,14,46,0.72);
       border:1px solid rgba(100,130,220,0.13);
-      backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
+      
       transition:border-color .32s, transform .32s, box-shadow .32s;
       cursor:default;
     }
@@ -161,7 +164,7 @@
       background:var(--card-icon-bg);
       transition:border-color .2s, background .2s;
     }
-    .gc-pill:hover{border-color:var(--card-border);background:rgba(255,255,255,0.06);}
+    .gc-pill:hover{border-color:var(--card-border);background:rgba(255,255,255,0.16);}
     .gc-lang-row{
       display:flex;align-items:center;justify-content:space-between;
       padding:6px 0;
@@ -215,9 +218,9 @@
       display:flex;align-items:center;gap:0;
       padding:17px 20px 17px 24px;
       border-radius:14px;
-      background:rgba(8,14,46,0.55);
+      background:rgba(8,14,46,0.65);
       border:1px solid rgba(100,130,220,0.12);
-      backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
+      
       transition:border-color .28s, transform .28s, box-shadow .28s, background .28s;
     }
     .award::before{
@@ -228,7 +231,7 @@
     }
     .award:hover{
       transform:translateX(3px);
-      background:rgba(12,20,58,0.70);
+      background:rgba(12,20,58,0.7999999999999999);
       border-color:rgba(140,170,255,0.28);
       box-shadow:0 8px 36px rgba(0,0,0,0.38), -4px 0 28px rgba(120,150,255,0.06);
     }
@@ -239,7 +242,7 @@
       flex-shrink:0;
       font-size:10px;letter-spacing:0.14em;font-weight:500;
       color:rgba(160,190,255,0.70);
-      background:rgba(60,80,180,0.20);
+      background:rgba(60,80,180,0.30000000000000004);
       border:1px solid rgba(100,130,220,0.20);
       padding:4px 10px;border-radius:20px;
       white-space:nowrap;margin-left:14px;
@@ -252,10 +255,10 @@
       color:rgba(160,190,255,0.6);
       border:1px solid rgba(100,130,200,0.18);
       padding:6px 14px;border-radius:20px;
-      background:rgba(20,35,80,0.35);
+      background:rgba(20,35,80,0.44999999999999996);
       transition:color .22s, border-color .22s, background .22s;
     }
-    .tag:hover{color:rgba(210,228,255,0.9);border-color:rgba(140,170,255,0.38);background:rgba(30,55,130,0.40);}
+    .tag:hover{color:rgba(210,228,255,0.9);border-color:rgba(140,170,255,0.38);background:rgba(30,55,130,0.5);}
     .coords{position:fixed;bottom:32px;left:48px;z-index:20;font-size:10px;letter-spacing:0.18em;color:rgba(110,130,190,0.28);font-weight:300;pointer-events:none;}
 
     /* Contact footer */

@@ -5,8 +5,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>globe test | Sofia Grimm</title>
   <meta name="robots" content="noindex">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Inter:wght@300;400;500&family=Gwendolyn:wght@700&family=Courier+Prime:wght@400;700&family=Nanum+Pen+Script&display=swap">
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Inter:wght@300;400;500&family=Gwendolyn:wght@700&family=Courier+Prime:wght@400;700&family=Nanum+Pen+Script&display=swap');
     *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
     html,body{width:100%;height:100%;background:#060d18;font-family:'Inter',sans-serif;color:#e9f0ff;}
 
@@ -717,8 +719,11 @@
     let lastInteract=performance.now();
     ['mousedown','touchstart'].forEach(ev=>canvas.addEventListener(ev,()=>{lastInteract=performance.now();}));
     let lastT=performance.now();
+    let onScreen=true;
+    new IntersectionObserver(es=>{onScreen=es[0].isIntersecting;},{rootMargin:'100px'}).observe(renderer.domElement);
     function animate(t){
       requestAnimationFrame(animate);
+      if(!onScreen||document.hidden){lastT=t;return;}
       const dt=(t-lastT)/16;lastT=t;
       if(!isDragging){
         if(animating){rotX+=(targetRotX-rotX)*0.06;rotY+=(targetRotY-rotY)*0.06;if(Math.abs(targetRotX-rotX)<0.001&&Math.abs(targetRotY-rotY)<0.001)animating=false;}
@@ -745,7 +750,7 @@
     <button class="roll-close" id="rollClose" type="button" aria-label="Close camera roll">close</button>
     <h2 class="roll-title"><span>Camera roll:</span><em id="rollPlace"></em></h2>
     <div class="roll-film">
-      <img class="roll-can" src="img/roll/film-canister.png" alt="" width="172" height="302">
+      <img class="roll-can" src="img/roll/film-canister.webp" alt="" width="172" height="302">
       <div class="roll-strip" id="rollStrip"></div>
     </div>
     <div class="roll-stickers" id="rollStickers" aria-hidden="true"></div>
