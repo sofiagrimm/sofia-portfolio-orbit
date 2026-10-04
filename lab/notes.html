@@ -146,6 +146,13 @@
   .plane-flight .paper-plane{position:static;display:block;width:100%}
   @media (max-width:760px){.paper-plane{width:110px;right:0;top:70px}}
   @media (prefers-reduced-motion:reduce){.paper-plane{animation:none;transform:rotate(-6deg)}}
+  /* embroidered "hello my name is" patch */
+  .nametag{position:absolute;right:4%;top:clamp(320px,34vw,420px);width:clamp(220px,24vw,320px);z-index:6;display:block;transform:rotate(6deg);
+    filter:drop-shadow(0 14px 18px rgba(0,0,0,.45));transition:transform .25s}
+  .nametag svg{display:block;width:100%;height:auto}
+  .nametag:hover,.nametag:focus-visible{transform:rotate(3deg) scale(1.03);outline:none}
+  .nametag:focus-visible svg{outline:3px solid #9cc0ff;outline-offset:6px;border-radius:18px}
+  @media (max-width:900px){.nametag{position:relative;right:auto;top:auto;margin:26px auto 0;width:min(280px,80%);transform:rotate(4deg)}}
   footer{position:relative;z-index:10;padding-bottom:110px !important;}
   footer{text-align:center;padding:0 0 48px;color:#7f8fb8;font-size:13px}
   footer a{color:#c9d6ff}
@@ -172,7 +179,7 @@
 <body>
 <header>
   <nav aria-label="Site">
-    <a href="../index.html">./home</a><a href="../about.html">./about</a><a href="../research.html">./research</a><a href="../projects.html">./projects</a><a href="cards.html">./cards</a><a href="notes.html" aria-current="page">./notes</a><a href="globe.html">./globe</a><a href="lace.html">./tilt</a><a href="../contact.html">./contact</a>
+    <a href="../index.html">./home</a><a href="../about.html">./about</a><a href="../research.html">./research</a><a href="../projects.html">./projects</a><a href="cards.html">./cards</a><a href="notes.html" aria-current="page">./notes</a><a href="sofia-is.html">./sofia-is</a><a href="globe.html">./globe</a><a href="lace.html">./tilt</a><a href="../contact.html">./contact</a>
   </nav>
   <span class="coords">41.3083° N 72.9279° W</span>
 </header>
@@ -207,7 +214,25 @@
   <p class="wow">wow! look at all those stars <span aria-hidden="true">✩</span></p>
   <span class="hi">hi! i'm</span><br>
   <h1>sofia grimm<span class="tape" aria-hidden="true">that's me</span></h1>
-  <p class="is-a"><span aria-hidden="true">sofia is</span><span class="art" aria-hidden="true">a</span><span class="window" aria-hidden="true"><span class="word in">researcher</span></span><span class="sr-only">Sofia is a researcher, artist, writer, builder, archivist, editor, and consultant.</span></p>
+  <a class="nametag" href="sofia-is.html" aria-label="Hello, my name is Sofia. See what Sofia is">
+    <svg viewBox="0 0 500 350" aria-hidden="true">
+      <defs>
+        <pattern id="twill" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(-35)"><rect width="6" height="6" fill="#e5507b"/><path d="M0 1.5 H6" stroke="#f0789a" stroke-width="1.2"/><path d="M0 4.5 H6" stroke="#cf3f69" stroke-width=".8"/></pattern>
+        <pattern id="satin" width="5" height="5" patternUnits="userSpaceOnUse" patternTransform="rotate(55)"><rect width="5" height="5" fill="#e04776"/><path d="M0 1 H5" stroke="#f592b0" stroke-width="1.4"/></pattern>
+        <pattern id="thread" width="4" height="4" patternUnits="userSpaceOnUse" patternTransform="rotate(-20)"><rect width="4" height="4" fill="#fbf8f4"/><path d="M0 1 H4" stroke="#e2dcd4" stroke-width=".8"/></pattern>
+        <filter id="puff"><feDropShadow dx="0" dy="1.6" stdDeviation="1" flood-color="#8e1f45" flood-opacity=".55"/></filter>
+      </defs>
+      <rect x="10" y="10" width="480" height="330" rx="34" fill="url(#satin)"/>
+      <rect x="22" y="22" width="456" height="306" rx="26" fill="url(#twill)"/>
+      <rect x="34" y="150" width="432" height="164" rx="12" fill="url(#thread)" filter="url(#puff)"/>
+      <g filter="url(#puff)" font-family="'Trebuchet MS','Arial Rounded MT Bold',Arial,sans-serif" font-weight="700" fill="url(#thread)" text-anchor="middle">
+        <text x="250" y="82" font-size="70">Hello</text>
+        <text x="250" y="138" font-size="46">My Name Is</text>
+      </g>
+      <rect x="10" y="10" width="480" height="330" rx="34" fill="none" stroke="#b8305c" stroke-width="2" stroke-dasharray="4 3" opacity=".55"/>
+      <text x="250" y="270" text-anchor="middle" font-family="'Nanum Pen Script',cursive" font-size="118" fill="#24306b" transform="rotate(-3 250 250)">sofia</text>
+    </svg>
+  </a>
   <div class="paper paper-notebook">
     <img src="img/paper-notebook.png" alt="" width="647" height="673">
     <p class="paper-text">I study Molecular Biophysics &amp; Biochemistry and Ethics, Politics &amp; Economics at Yale. Most days I'm at a bench, in an archive, or somewhere in between. The work is all filed in the <a href="cards.html">card catalog</a>.</p>
