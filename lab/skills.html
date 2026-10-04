@@ -7,7 +7,7 @@
 <meta name="robots" content="noindex">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cherry+Bomb+One&family=Reenie+Beanie&family=Inter:wght@300;400;600;800&family=DM+Serif+Display:ital@0;1&family=Courier+Prime&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400;1,500;1,600&family=Inter:wght@300;400;500;600&family=Nanum+Pen+Script&display=swap">
 <style>
   :root{--paper:#efe8dc;--ink:#2b2724;--pink:#f3a1c4;--pink2:#e97fae;--grey:#8b8580;--frame:#a69d93}
   *{box-sizing:border-box;margin:0;padding:0}
@@ -16,7 +16,7 @@
   header{display:flex;justify-content:space-between;align-items:baseline;gap:12px;flex-wrap:wrap;padding:22px clamp(18px,4vw,48px);color:#fbf6ee}
   header a{color:#fbf6ee;text-decoration:none;font-size:13px;letter-spacing:.12em;text-transform:uppercase;opacity:.8}
   header a:hover,header a:focus-visible,header a[aria-current]{opacity:1;text-decoration:underline;text-underline-offset:4px}
-  header .brand{font-family:'DM Serif Display',Georgia,serif;font-style:italic;font-size:26px;letter-spacing:0;text-transform:none;opacity:1}
+  header .brand{font-family:'Cormorant Garamond',Georgia,serif;font-style:italic;font-size:26px;letter-spacing:0;text-transform:none;opacity:1}
   header nav{display:flex;flex-wrap:wrap;gap:4px 16px}
 
   /* every section is a sheet of paper, like slides laid out on a table */
@@ -24,8 +24,8 @@
     box-shadow:0 18px 30px rgba(40,30,20,.25);padding:clamp(28px,4vw,56px)}
   .sheet::before{content:"";position:absolute;inset:0;pointer-events:none;opacity:.35;mix-blend-mode:multiply;
     background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='2'/%3E%3CfeColorMatrix values='0 0 0 0 .55  0 0 0 0 .5  0 0 0 0 .42  0 0 0 .5 0'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)'/%3E%3C/svg%3E")}
-  .pen{font-family:'Reenie Beanie',cursive;font-size:clamp(26px,3vw,40px);line-height:1;color:var(--ink)}
-  .bubble{font-family:'Cherry Bomb One',cursive;color:var(--pink);line-height:.82;letter-spacing:-.01em;
+  .pen{font-family:'Nanum Pen Script',cursive;font-size:clamp(26px,3vw,40px);line-height:1;color:var(--ink)}
+  .bubble{font-family:'Cormorant Garamond',cursive;color:var(--pink);line-height:.82;letter-spacing:-.01em;
     text-shadow:0 2px 0 #f7c0d8,0 6px 14px rgba(233,127,174,.25)}
   .small{font-size:12px;color:#5b5550}
   .tape{position:absolute;width:86px;height:24px;background:rgba(240,226,190,.75);box-shadow:0 1px 2px rgba(0,0,0,.1)}
@@ -67,8 +67,8 @@
   .chart-labels span{width:34px;text-align:center}
   .hellos{list-style:none;margin-top:14px;display:grid;gap:10px}
   .hellos li{display:flex;align-items:baseline;gap:14px;border-bottom:1px dashed rgba(43,39,36,.25);padding-bottom:8px}
-  .hellos b{font-family:'Cherry Bomb One',cursive;font-weight:400;font-size:34px;color:var(--pink2)}
-  .hellos code{font:15px 'Courier Prime',monospace;background:#fbf8f2;padding:4px 8px;border-radius:4px;box-shadow:0 2px 4px rgba(0,0,0,.08)}
+  .hellos b{font-family:'Cormorant Garamond',cursive;font-weight:400;font-size:34px;color:var(--pink2)}
+  .hellos code{font:15px 'Inter',monospace;background:#fbf8f2;padding:4px 8px;border-radius:4px;box-shadow:0 2px 4px rgba(0,0,0,.08)}
   .hellos small{margin-left:auto;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:#7d7772}
   .photos{display:grid;grid-template-columns:1fr 1fr;gap:10px}
   .photos img{width:100%;aspect-ratio:4/3;object-fit:cover;display:block;box-shadow:0 6px 12px rgba(0,0,0,.18)}
@@ -87,7 +87,7 @@
   .phone.two{right:19%;top:16%;transform:rotate(-6deg);z-index:1}
   .tools{position:absolute;left:4%;bottom:5%;display:grid;grid-template-columns:repeat(2,minmax(0,220px));gap:14px 26px;z-index:2}
   .tools div{font-size:12px;line-height:1.45}
-  .tools b{display:block;font-family:'Reenie Beanie',cursive;font-size:24px;font-weight:400;color:var(--pink2)}
+  .tools b{display:block;font-family:'Nanum Pen Script',cursive;font-size:24px;font-weight:400;color:var(--pink2)}
   .film{position:absolute;right:5%;bottom:4%;display:flex;gap:6px;background:#161616;padding:10px 8px;border-radius:4px;transform:rotate(-3deg);z-index:2}
   .film img{width:72px;height:56px;object-fit:cover;filter:grayscale(1)}
 
@@ -102,7 +102,7 @@
   .work .art{aspect-ratio:4/3;background:#e9e2d6;overflow:hidden;display:grid;place-items:center}
   .work .art img{width:100%;height:100%;object-fit:cover}
   .work .art svg{width:80%;height:80%}
-  .work h3{font-family:'Reenie Beanie',cursive;font-weight:400;font-size:30px;margin-top:10px;line-height:1}
+  .work h3{font-family:'Nanum Pen Script',cursive;font-weight:400;font-size:30px;margin-top:10px;line-height:1}
   .work p{font-size:12px;line-height:1.5;color:#4c4743;margin-top:4px}
   .work .kind{position:absolute;right:12px;top:18px;background:var(--pink);color:#fff;font:600 10px 'Inter';letter-spacing:.08em;text-transform:uppercase;padding:3px 8px;border-radius:999px}
 
@@ -116,7 +116,7 @@
   .env{position:absolute;left:50%;top:52%;width:min(440px,60%);aspect-ratio:1.45;transform:translate(-50%,-50%)}
   .env .back{position:absolute;inset:0;background:var(--pink);clip-path:polygon(0 30%,50% 0,100% 30%,100% 100%,0 100%)}
   .env .note{position:absolute;left:12%;right:12%;top:-6%;bottom:30%;background:#fffdf8;transform:rotate(-3deg);padding:16px 18px;box-shadow:0 6px 12px rgba(0,0,0,.15);
-    background-image:repeating-linear-gradient(transparent 0 25px,#cfd9e6 25px 26px);font-family:'Reenie Beanie',cursive;font-size:22px;line-height:26px}
+    background-image:repeating-linear-gradient(transparent 0 25px,#cfd9e6 25px 26px);font-family:'Nanum Pen Script',cursive;font-size:22px;line-height:26px}
   .env .front{position:absolute;inset:auto 0 0 0;height:62%;background:#f6b5cf;clip-path:polygon(0 0,50% 48%,100% 0,100% 100%,0 100%)}
   @media (max-width:860px){.two,.wgrid{grid-template-columns:1fr}.board{min-height:auto;display:flex;flex-direction:column;gap:20px}.board>*{position:relative !important;inset:auto !important;transform:none !important}
     .board h2{order:-1}.cover .this,.cover .guide{display:none}.big.l1,.big.l2{text-align:left}}
@@ -189,7 +189,7 @@
       <div><i style="background:#f3b6c8"></i><small>blush</small></div><div><i style="background:#24306b"></i><small>ink</small></div><div><i style="background:#e2c27e"></i><small>gilt</small></div>
     </div>
     <div class="type" aria-label="Typefaces I use">
-      <b style="font-family:'DM Serif Display',serif;font-style:italic">Aa</b><b style="font-family:'Courier Prime',monospace">Aa</b><b style="font-family:'Reenie Beanie',cursive">Aa</b><b style="font-family:'Inter',sans-serif;font-weight:800">Aa</b>
+      <b style="font-family:'Cormorant Garamond',serif;font-style:italic">Aa</b><b style="font-family:'Inter',monospace">Aa</b><b style="font-family:'Nanum Pen Script',cursive">Aa</b><b style="font-family:'Inter',sans-serif;font-weight:800">Aa</b>
       <small>DM Serif</small><small>Courier</small><small>handwriting</small><small>Inter</small>
     </div>
     <h2 class="bubble" id="t2">code<br>&amp; words</h2>

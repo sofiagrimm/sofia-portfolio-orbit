@@ -16,11 +16,11 @@
     .arr-item.arr-off{opacity:.18 !important}
     .arr-item.arr-on{outline:2px solid #f3d38a;outline-offset:4px}
     #arrPanel{position:fixed;left:16px;bottom:16px;z-index:9999;background:#fbf6ee;color:#2b2620;border-radius:10px;padding:12px 14px;
-      font:13px/1.45 'Courier Prime',Courier,monospace;box-shadow:0 14px 30px rgba(0,0,0,.45);max-width:340px}
+      font:13px/1.45 'Inter',Courier,monospace;box-shadow:0 14px 30px rgba(0,0,0,.45);max-width:340px}
     #arrPanel b{font-family:'Nanum Pen Script',cursive;font-size:24px;font-weight:400;color:#24306b;display:block;margin-bottom:4px}
-    #arrPanel button{font:13px 'Courier Prime',monospace;margin:8px 6px 0 0;padding:5px 10px;border-radius:6px;border:1px solid #b9ab8a;background:#fff;cursor:pointer}
+    #arrPanel button{font:13px 'Inter',monospace;margin:8px 6px 0 0;padding:5px 10px;border-radius:6px;border:1px solid #b9ab8a;background:#fff;cursor:pointer}
     #arrPanel button.main{background:#24306b;color:#fff;border-color:#24306b}
-    #arrPanel textarea{width:100%;height:90px;margin-top:8px;font:11px monospace;display:none}
+    #arrPanel textarea{width:100%;height:90px;margin-top:8px;font:11px Inter,sans-serif;display:none}
   `;
   var st = document.createElement('style'); st.textContent = css; document.head.appendChild(st);
 

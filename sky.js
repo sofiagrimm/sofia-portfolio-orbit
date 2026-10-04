@@ -137,7 +137,7 @@
     for (var i = 0; i < field.length; i++) { var f = field[i], p = project(f.ra, f.dec, L); if (!p || p.x < -10 || p.x > W + 10) continue;
       dot(p.x, p.y, Math.max(0.45, (6.4 - f.m) * 0.38), f.c, twinkle(now, f) * 0.85, false); }
     pleiades.forEach(function (s, i) { var p = project(s[0], s[1], L); if (p) dot(p.x, p.y, 0.9, '#dfe9ff', 0.6 + 0.4 * Math.abs(Math.sin(now * 0.002 + i)), false); });
-    ctx.font = '11px "Courier Prime", Courier, monospace';
+    ctx.font = '11px "Inter", Courier, monospace';
     C.forEach(function (k) {
       var pts = k.stars.map(function (s) { return project(s[1], s[2], L); });
       // keep the figures out of the middle column where the page's text sits: any constellation

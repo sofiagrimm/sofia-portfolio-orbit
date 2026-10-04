@@ -39,24 +39,24 @@ function gatePage(wrong) {
   return `<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
 <title>under construction | Sofia Grimm</title><meta name="robots" content="noindex">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nanum+Pen+Script&family=Courier+Prime&family=DM+Serif+Display:ital@1&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400;1,500;1,600&family=Inter:wght@300;400;500;600&family=Nanum+Pen+Script&display=swap">
 <style>
   *{box-sizing:border-box;margin:0;padding:0}
   html,body{height:100%}
-  body{display:grid;place-items:center;padding:24px;color:#2b2620;font-family:'Courier Prime',monospace;
+  body{display:grid;place-items:center;padding:24px;color:#2b2620;font-family:'Inter',monospace;
     background:radial-gradient(1px 1px at 12% 18%,#fff9 50%,transparent 51%),radial-gradient(1px 1px at 78% 12%,#fff8 50%,transparent 51%),
       radial-gradient(1.5px 1.5px at 33% 70%,#fff7 50%,transparent 51%),radial-gradient(1px 1px at 88% 60%,#fff8 50%,transparent 51%),
       radial-gradient(1px 1px at 60% 40%,#fff6 50%,transparent 51%),linear-gradient(180deg,#0a1530,#163566 70%,#1b4a6e)}
   .note{width:min(440px,100%);background:#f4efe1;padding:34px 30px 30px;transform:rotate(-1.5deg);box-shadow:0 24px 50px rgba(0,0,0,.5);position:relative;
     background-image:repeating-linear-gradient(to bottom,transparent 0 27px,#cdd6e6 27px 28px);background-position:0 70px}
   .note::before{content:"";position:absolute;top:-14px;left:50%;width:110px;height:28px;margin-left:-55px;background:rgba(236,226,198,.75);transform:rotate(-3deg)}
-  h1{font-family:'DM Serif Display',Georgia,serif;font-style:italic;font-weight:400;font-size:40px;line-height:1;color:#24306b}
+  h1{font-family:'Cormorant Garamond',Georgia,serif;font-style:italic;font-weight:400;font-size:40px;line-height:1;color:#24306b}
   p{font-family:'Nanum Pen Script',cursive;font-size:26px;line-height:28px;color:#24306b;margin-top:14px}
   form{margin-top:22px;display:flex;gap:8px;flex-wrap:wrap}
-  input{flex:1;min-width:0;font:15px 'Courier Prime',monospace;padding:10px 12px;border:1px solid #b9b2a2;background:#fffdf7;border-radius:4px}
-  button{font:15px 'Courier Prime',monospace;padding:10px 16px;border:0;border-radius:4px;background:#24306b;color:#fff;cursor:pointer}
+  input{flex:1;min-width:0;font:15px 'Inter',monospace;padding:10px 12px;border:1px solid #b9b2a2;background:#fffdf7;border-radius:4px}
+  button{font:15px 'Inter',monospace;padding:10px 16px;border:0;border-radius:4px;background:#24306b;color:#fff;cursor:pointer}
   input:focus-visible,button:focus-visible{outline:3px solid #9cc0ff;outline-offset:2px}
-  .wrong{font-family:'Courier Prime',monospace;font-size:13px;color:#a1243a;margin-top:10px;line-height:1.4}
+  .wrong{font-family:'Inter',monospace;font-size:13px;color:#a1243a;margin-top:10px;line-height:1.4}
   .sig{text-align:right;margin-top:18px}
 </style></head><body>
 <main class="note">

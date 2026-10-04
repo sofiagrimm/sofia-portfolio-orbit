@@ -11,15 +11,15 @@
       box-shadow:0 30px 80px rgba(0,0,0,.7);transform:translateY(14px) scale(.98);transition:transform .3s cubic-bezier(.2,.8,.2,1);overflow:hidden}
     .gh-overlay.on .gh-win{transform:none}
     .gh-bar{display:flex;align-items:center;gap:8px;padding:10px 12px;background:#161b22;border-bottom:1px solid #30363d;
-      font:13px ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;color:#8b949e}
+      font:13px Inter,Helvetica,Arial,sans-serif;color:#8b949e}
     .gh-dot{width:12px;height:12px;border-radius:50%;border:0;padding:0}
     .gh-dot.r{background:#ff5f57;cursor:pointer}.gh-dot.y{background:#febc2e}.gh-dot.g{background:#28c840}
     .gh-title{flex:1;text-align:center;margin-right:48px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
     .gh-body{overflow:auto;-webkit-overflow-scrolling:touch}
     .gh-body img{display:block;width:100%;min-width:640px;height:auto;background:#000}
-    .gh-body .gh-wait{padding:40px;text-align:center;font:14px ui-monospace,Menlo,monospace;color:#3fb950}
+    .gh-body .gh-wait{padding:40px;text-align:center;font:14px Inter,Helvetica,Arial,sans-serif;color:#3fb950}
     .gh-foot{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:10px 14px;background:#0d1117;border-top:1px solid #30363d;
-      font:13px ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;color:#8b949e}
+      font:13px Inter,Helvetica,Arial,sans-serif;color:#8b949e}
     .gh-foot a{color:#58a6ff;text-decoration:none}.gh-foot a:hover,.gh-foot a:focus-visible{text-decoration:underline}
     .gh-close{background:none;border:1px solid #30363d;color:#c9d1d9;border-radius:6px;padding:4px 10px;font:inherit;cursor:pointer}
     .gh-close:hover,.gh-close:focus-visible{border-color:#8b949e;outline:none}
