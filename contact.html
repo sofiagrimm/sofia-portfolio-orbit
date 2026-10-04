@@ -208,6 +208,9 @@
   .nav-name,header .brand,.site>a:first-child{font-family:'Cormorant Garamond',Georgia,serif !important;font-weight:300 !important;font-style:italic !important;letter-spacing:.06em !important}
 </style>
   <script>document.documentElement.classList.add('js');</script>
+<style>/* readable contrast (WCAG AA) */
+.coords{color:rgba(251,246,234,.9) !important}
+</style>
 </head>
 <body>
   <div class="nebula"></div>
@@ -251,7 +254,7 @@
         <div class="panel pt" aria-hidden="true"><div class="pf"><div class="clip"></div></div><div class="pb"></div></div>
         <div class="panel pm" aria-hidden="true"><div class="pf"><div class="clip"></div></div><div class="pb"></div></div>
         <div class="panel pb-panel" aria-hidden="true"><div class="pf"><div class="clip"></div></div><div class="pb"></div></div>
-        <div class="flat" id="flat" aria-hidden="true"></div>
+        <div class="flat" id="flat" aria-hidden="true" inert></div>
       </div>
 
       <div class="envpart pocket"><svg viewBox="0 0 160 100" preserveAspectRatio="none" aria-hidden="true">
@@ -551,7 +554,7 @@
       // unfold, top then bottom
       sound.unfold();letter.classList.add('unfold-top');await wait(1200);
       sound.unfold();letter.classList.add('unfold-bottom');await wait(1200);
-      letter.classList.add('done');flat.removeAttribute('aria-hidden');
+      letter.classList.add('done');flat.removeAttribute('aria-hidden');flat.inert=false;
       sound.slide(.7);stage.style.setProperty('--stageH',(g.Yf+g.E*.18+(parseFloat(stage.style.getPropertyValue('--pcW'))/1.5)+60)+'px');$('postcard').classList.add('in');
       const first=flat.querySelector('a');if(first)first.focus({preventScroll:true});
     }

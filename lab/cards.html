@@ -96,6 +96,7 @@
 
   html,body{overflow-x:clip}
 </style>
+<style>.card{position:relative}.card .turn{position:absolute;inset:0;z-index:1;background:none;border:0;cursor:pointer;border-radius:inherit}.card .turn:focus-visible{outline:3px solid #f3a1c4;outline-offset:4px}.card .inner{position:relative;z-index:2;pointer-events:none}.card .link{pointer-events:auto}.card:has(.turn:focus-visible) .face{box-shadow:0 0 0 3px #9cc0ff,0 14px 30px rgba(0,0,0,.5)}.card .turn:focus-visible{outline:none}</style>
 </head>
 <body>
 <div class="nebula"></div>
@@ -151,8 +152,8 @@ cards.forEach(c => {
     drawer.appendChild(s); return;
   }
   const b = document.createElement('div');
-  b.className = 'card'; b.tabIndex = 0; b.setAttribute('role','button'); b.setAttribute('aria-expanded','false');
-  b.setAttribute('aria-label', c.title + ', tap to turn over');
+  // the whole card turns over, but through a real button laid over it, so the "see it" link inside isn't a control within a control
+  b.className = 'card'; b.setAttribute('aria-expanded','false');
   b.innerHTML = `
     <div class="inner">
       <div class="face front">
@@ -166,10 +167,11 @@ cards.forEach(c => {
         <div class="body">${c.body}</div>
         ${c.link ? `<a class="link" href="${c.link}" target="_blank" rel="noopener">see it</a>` : ''}
       </div>
-    </div>`;
-  const flip = () => b.setAttribute('aria-expanded', b.getAttribute('aria-expanded') === 'true' ? 'false' : 'true');
-  b.addEventListener('click', e => { if (!e.target.closest('a')) flip(); });
-  b.addEventListener('keydown', e => { if (e.target === b && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); flip(); } });
+    </div>
+    <button type="button" class="turn" aria-expanded="false" aria-label="${c.title}, turn over"></button>`;
+  const tb = b.querySelector('.turn');
+  const flip = () => { const v = b.getAttribute('aria-expanded') === 'true' ? 'false' : 'true'; b.setAttribute('aria-expanded', v); tb.setAttribute('aria-expanded', v); };
+  tb.addEventListener('click', flip);
   drawer.appendChild(b);
 });
 </script>

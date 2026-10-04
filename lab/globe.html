@@ -317,6 +317,9 @@
   /* the logo keeps its original look: light, spaced, italic Cormorant Garamond */
   .nav-name,header .brand,.site>a:first-child{font-family:'Cormorant Garamond',Georgia,serif !important;font-weight:300 !important;font-style:italic !important;letter-spacing:.06em !important}
 </style>
+<style>/* readable contrast (WCAG AA) */
+nav .nav-links a{color:rgba(43,39,36,.82) !important}.big.l1{color:#7f7973 !important}.ghead .note{color:#c4578a !important}
+</style>
 </head>
 <body>
   <div class="nebula"></div>
@@ -358,7 +361,7 @@
   <div class="horizon" aria-hidden="true"></div>
   <p class="pen spin" aria-hidden="true">spin me!<svg viewBox="0 0 80 60"><path d="M6 8 C30 4 52 18 58 46" fill="none" stroke="#2b2724" stroke-width="1.6" stroke-dasharray="4 4"/><path d="M50 40 L58 48 L64 38" fill="none" stroke="#2b2724" stroke-width="1.6"/></svg></p>
   <div class="page-shell">
-    <div class="left-panel">
+    <div class="left-panel" tabindex="0" aria-label="Projects, scroll sideways">
       <div class="rule"></div>
 
       <div class="section-label">Active</div>
