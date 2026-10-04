@@ -191,8 +191,8 @@ ICON.pater=BOOK('#5a2e2a','The Renaissance','Pater · 1873');
 ICON.dorian=BOOK('#2c2c34','Dorian Gray','Wilde · 1890');
 ICON.chevalier=BOOK('#2a4a7a','Girl with a','Pearl Earring');
 ICON.poe=BOOK('#3a2a2a','The Oval','Portrait · Poe');
-ICON.poliziano=BOOK('#7a5a2a','Stanze','Poliziano · 1478');
-ICON.iliad=BOOK('#4a3a24','The Iliad','Book V');
+ICON.idylls=BOOK('#3a5a4a','Idylls of','the King');
+ICON.malory=BOOK('#5a2a3a','Le Morte','d\'Arthur');
 // Landmarks for each painting, as fractions of its width/height: eye centres (x, y) with an eye
 // half-width, mouth corners, and the figure (centre + size) that stands out from the background.
 // 'ok' turns the eye and smile effects on only once the points have been placed on the real image
@@ -201,7 +201,7 @@ const LM = {
   0: { ok:false, eyes:[[.413,.272],[.535,.267]], eyeR:.03, mouth:[[.43,.345],[.52,.343]], mouthR:.035, fig:[.48,.42,.32,.4] },
   1: { ok:false, eyes:[[.365,.395],[.585,.375]], eyeR:.045, mouth:[[.43,.58],[.55,.57]], mouthR:.04, fig:[.5,.5,.36,.45] },
   2: { ok:true, eyes:[], mouth:[], fig:[.2,.55,.22,.5] },   // the cypress leans out of the sky
-  3: { ok:false, eyes:[[.487,.233],[.511,.230]], eyeR:.008, mouth:[[.493,.262],[.507,.261]], mouthR:.01, fig:[.5,.5,.14,.45] }
+  3: { ok:false, eyes:[[.33,.30],[.36,.30]], eyeR:.01, mouth:[[.335,.36],[.355,.36]], mouthR:.012, fig:[.36,.45,.2,.35] }   // The Lady of Shalott
 };
 const EYES = {};
 const PAINTINGS = [
@@ -217,10 +217,10 @@ const PAINTINGS = [
     blurb: 'Vincent wrote to his brother that the stars made him dream. Give him his letters; spare him the lecture hall.',
     good: { name: 'Letters to Theo', icon: 'letter', mood: '"The sight of the stars makes me dream," he wrote. The sky turns a little faster.' },
     bad:  { name: "Whitman's learn'd astronomer", icon: 'scroll', mood: 'Charts and columns of figures? Like Whitman, he slips outside to look up in silence.' } },
-  { img: W('Sandro_Botticelli_-_La_nascita_di_Venere_-_Google_Art_Project_-_edited.jpg'), title: 'Make her blush', sig: '– Venere', label: 'The Birth of Venus, Sandro Botticelli',
-    blurb: 'Botticelli likely painted her from a Florentine poem. Read her those verses, and skip the part of Homer where she gets hurt.',
-    good: { name: 'Poliziano, Stanze', icon: 'poliziano', mood: 'The poem that put her on the shell. A little pink in her cheeks.' },
-    bad:  { name: 'The Iliad, Book V', icon: 'iliad', mood: 'Diomedes wounds her hand and she flees the field. Too soon.' } }
+  { img: W('John_William_Waterhouse_-_The_Lady_of_Shalott_-_Google_Art_Project_edit.jpg'), title: 'Bring her to Camelot', sig: '– the Lady of Shalott', label: 'The Lady of Shalott, John William Waterhouse',
+    blurb: "Tennyson's lady has finally left her tower for the river. Offer her Camelot itself, not the story of the girl who died of love for Lancelot.",
+    good: { name: "Tennyson, Idylls of the King", icon: 'idylls', mood: 'Camelot, at last. The candles burn a little brighter.' },
+    bad:  { name: "Malory, Le Morte d'Arthur", icon: 'malory', mood: 'Elaine of Astolat again? She knows how that one ends.' } }
 ];
 
 (function(){
@@ -318,7 +318,7 @@ const PAINTINGS = [
   // ── frames, drawn to fit each painting: gilded baroque, pink enamel, painted blue, red lace
   // the real frames: each picture's window (left, top, width, height as fractions of the frame image)
   const FRAME_IMG={"gold": {"ar": 0.8497, "win": [0.1716, 0.1514, 0.6647, 0.7074]}, "pink": {"ar": 0.8187, "win": [0.1991, 0.1488, 0.6049, 0.693]}, "blue": {"ar": 1.2957, "win": [0.1546, 0.2004, 0.6912, 0.5981]}, "lace": {"ar": 0.8205, "win": [0.1015, 0.1026, 0.7994, 0.7979]}};
-  const FRAMES=['gold','lace','blue','pink'];   // Mona Lisa, Pearl Earring, Starry Night, Venus
+  const FRAMES=['gold','lace','blue','pink'];   // Mona Lisa, Pearl Earring, Starry Night, Lady of Shalott
   function frameSVG(kind,pw,ph){
     const t=Math.round(Math.min(pw,ph)*.2),W=pw+2*t,H=ph+2*t,id=kind+Math.random().toString(36).slice(2,7);
     const hole=`M${t} ${t}h${pw}v${ph}h${-pw}z`,outer=`M0 0h${W}v${H}h${-W}z`;
