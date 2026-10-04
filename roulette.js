@@ -27,7 +27,7 @@
     padding:12px 18px;font:300 13px/1.5 'Inter','Helvetica Neue',Arial,sans-serif;letter-spacing:.2em;text-transform:uppercase;box-shadow:0 14px 30px rgba(0,0,0,.5);opacity:0;transform:translateY(10px);
     transition:opacity .3s,transform .3s;pointer-events:none}
   #rouletteResult.on{opacity:1;transform:none}
-  #rouletteResult b{display:block;font:400 30px/1 'Cormorant Garamond',Georgia,serif;letter-spacing:.02em;text-transform:none;margin-bottom:4px}
+  #rouletteResult b{display:block;font:400 30px/1 'Cherry Bomb One',Georgia,serif;letter-spacing:.02em;text-transform:none;margin-bottom:4px}
   @media (max-width:760px){#roulette{width:220px;right:-80px;bottom:-80px}#rouletteResult{bottom:160px}}
   `;
   var st = document.createElement('style'); st.textContent = css; document.head.appendChild(st);
@@ -49,7 +49,7 @@
     var a0 = i * STEP - STEP / 2, a1 = a0 + STEP, col = n === 0 ? 'url(#rlGreen)' : (REDS.indexOf(n) >= 0 ? 'url(#rlRed)' : 'url(#rlDark)');
     ring += '<path d="' + wedge(146, 184, a0, a1) + '" fill="' + col + '"/>';
     var t = p(165, i * STEP);
-    ring += '<text x="' + t[0] + '" y="' + t[1] + '" fill="#fbf6ea" font-family="\'Cormorant Garamond\',\'Bodoni 72\',Didot,Georgia,serif" font-size="' + (n > 9 ? 17 : 19) + '" text-anchor="middle" dominant-baseline="central" transform="rotate(' + (i * STEP) + ' ' + t[0] + ' ' + t[1] + ')">' + n + '</text>';
+    ring += '<text x="' + t[0] + '" y="' + t[1] + '" fill="#fbf6ea" font-family="\'Inter\',\'Bodoni 72\',Didot,Georgia,serif" font-size="' + (n > 9 ? 17 : 19) + '" text-anchor="middle" dominant-baseline="central" transform="rotate(' + (i * STEP) + ' ' + t[0] + ' ' + t[1] + ')">' + n + '</text>';
     ring += '<path d="M' + p(146, a0) + ' L' + p(184, a0) + '" stroke="#e6c98a" stroke-width="1" opacity=".55"/>';
     pockets += '<path d="' + wedge(112, 146, a0, a1) + '" fill="' + (i % 2 ? 'url(#rlPocketA)' : 'url(#rlPocketB)') + '"/>';
     frets += '<path d="M' + p(110, a0) + ' L' + p(146, a0) + '" stroke="url(#rlGold)" stroke-width="3" stroke-linecap="round"/>' +

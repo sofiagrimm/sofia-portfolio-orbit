@@ -25,7 +25,7 @@
   @keyframes film{0%{transform:translate(0,0)}25%{transform:translate(-3%,2%)}50%{transform:translate(2%,-3%)}75%{transform:translate(-2%,-1%)}100%{transform:translate(1%,3%)}}
   #pool .flash{position:absolute;inset:0;pointer-events:none;background:#fff8e6;opacity:0}
   #pool .prompt{position:absolute;font:300 clamp(11px,1vw,13px)/1.7 'Inter','Helvetica Neue',Arial,sans-serif;letter-spacing:.28em;text-transform:uppercase;color:rgba(243,238,228,.75);pointer-events:none;transition:opacity .4s;z-index:2}
-  #pool .prompt b{font-family:'Cormorant Garamond',Georgia,serif;font-style:italic;font-weight:400;display:block;font-size:1.6em;color:#f3eee4;margin-bottom:10px;text-shadow:0 0 24px rgba(160,230,230,.25);text-transform:none;letter-spacing:.01em}
+  #pool .prompt b{font-family:'Inter',sans-serif;font-style:italic;font-weight:400;display:block;font-size:1.6em;color:#f3eee4;margin-bottom:10px;text-shadow:0 0 24px rgba(160,230,230,.25);text-transform:none;letter-spacing:.01em}
   #pool .banner{position:absolute;left:50%;top:clamp(18px,4vh,36px);transform:translateX(-50%);color:rgba(243,238,228,.72);font:300 clamp(10px,.9vw,12px) 'Inter','Helvetica Neue',Arial,sans-serif;letter-spacing:.55em;text-transform:uppercase;white-space:nowrap;transition:opacity .5s,transform .5s;z-index:4;text-shadow:0 1px 8px rgba(0,0,0,.6)}
   #pool .banner span{color:#9fd8d6}
   #pool .motes{position:absolute;inset:0;pointer-events:none;transition:opacity 1.2s}
@@ -33,7 +33,7 @@
   @keyframes mote{0%{transform:translate(0,0);opacity:0}15%{opacity:.5}85%{opacity:.35}100%{transform:translate(var(--mx),var(--my));opacity:0}}
   #pool .meter{position:absolute;width:12px;height:clamp(90px,16vh,140px);border:2px solid #f1e6cf;border-radius:8px;overflow:hidden;opacity:0;transition:opacity .2s;background:rgba(18,48,32,.5)}
   #pool .meter b{position:absolute;left:0;right:0;bottom:0;height:0;background:linear-gradient(0deg,#f3d38a,#cf4a3c)}
-  #pool .meter small{position:absolute;top:100%;left:50%;transform:translateX(-50%);margin-top:6px;font:12px 'Nanum Pen Script',cursive;color:#f1e6cf;white-space:nowrap}
+  #pool .meter small{position:absolute;top:100%;left:50%;transform:translateX(-50%);margin-top:6px;font:12px 'Reenie Beanie',cursive;color:#f1e6cf;white-space:nowrap}
   #pool .tag{position:absolute;font:300 clamp(12px,1.1vw,14px) 'Inter','Helvetica Neue',Arial,sans-serif;letter-spacing:.4em;text-transform:uppercase;color:#f3eee4;pointer-events:none;text-shadow:0 0 18px rgba(159,216,214,.5)}
   #pool .skip{position:absolute;right:clamp(18px,3vw,36px);bottom:clamp(18px,3vw,36px);font:13px 'Inter',Courier,monospace;color:#f6ecd6;background:rgba(20,40,25,.45);border:1px solid rgba(246,236,214,.5);border-radius:999px;padding:6px 14px;cursor:pointer;z-index:5}
   #pool .skip:hover,#pool .skip:focus-visible{background:rgba(20,40,25,.7);outline:none}
@@ -198,7 +198,7 @@
     var h0 = P(SU * .78, rail), h1 = P(SU * .78, SV - rail); el('line', { x1: h0.x, y1: h0.y, x2: h1.x, y2: h1.y, stroke: CREAM, 'stroke-width': 1.5, opacity: '.25', 'stroke-dasharray': '6 8' });
     var cap = function (u, v, txt, size, font, fill, rot, op) { var p = P(u, v), t = el('text', { x: p.x, y: p.y, 'text-anchor': 'middle', 'font-family': font, 'font-size': size, fill: fill, opacity: op, transform: 'rotate(' + rot + ' ' + p.x + ' ' + p.y + ')' }); t.textContent = txt; };
     var m = Math.min(SU, SV);
-    cap(SU * 1.3, SV * .76, 'sofia grimm\u2019s card table', m * .075, "'Cormorant Garamond',Georgia,serif", GOLD, -3, .22);
+    cap(SU * 1.3, SV * .76, 'sofia grimm\u2019s card table', m * .075, "'Inter',sans-serif", GOLD, -3, .22);
     cap(SU * 2.35, SV * .3, 'THIS WAY TO THE CARDS', m * .03, "'Inter','Helvetica Neue',Arial,sans-serif", CREAM, 0, .35);
     var a0 = P(SU * 2.62, SV * .4), a1 = P(SU * 2.84, SV * .4), hs = m * .025;
     el('path', { d: 'M' + a0.x + ' ' + a0.y + ' L' + a1.x + ' ' + a1.y, stroke: CREAM, 'stroke-width': 2, 'stroke-linecap': 'round', opacity: '.35' });

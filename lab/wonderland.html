@@ -7,7 +7,7 @@
 <meta name="robots" content="noindex">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400;1,500;1,600&family=Inter:wght@300;400;500;600&family=Nanum+Pen+Script&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cherry+Bomb+One&family=Inter:wght@300;400;500;600&family=Reenie+Beanie&display=swap">
 <style>
   :root{--night:#0c1726;--lime:#e7f07a;--cream:#f4ecd8;--gold:#c9a45a;--red:#b8242c}
   *{box-sizing:border-box;margin:0;padding:0}
@@ -16,7 +16,7 @@
   header{position:fixed;top:0;left:0;right:0;z-index:50;display:flex;justify-content:space-between;align-items:baseline;flex-wrap:wrap;gap:8px;padding:18px clamp(16px,4vw,44px);background:linear-gradient(rgba(12,23,38,.9),transparent)}
   header a{color:var(--cream);text-decoration:none;font-size:12px;letter-spacing:.14em;text-transform:uppercase;opacity:.7}
   header a:hover,header a:focus-visible,header a[aria-current]{opacity:1;text-decoration:underline;text-underline-offset:4px}
-  header .brand{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:24px;letter-spacing:0;text-transform:none;opacity:1}
+  header .brand{font-family:'Inter',serif;font-style:italic;font-size:24px;letter-spacing:0;text-transform:none;opacity:1}
   header nav{display:flex;flex-wrap:wrap;gap:4px 14px}
 
   /* the hole: a fixed stage everything falls past */
@@ -26,7 +26,7 @@
     border:solid rgba(70,52,32,.55);box-shadow:inset 0 0 60px rgba(0,0,0,.6),0 0 40px rgba(0,0,0,.5)}
   .thing{position:absolute;left:0;top:0;will-change:transform,opacity;transform-origin:50% 50%}
   .thing svg{display:block;width:100%;height:auto;filter:drop-shadow(0 10px 14px rgba(0,0,0,.45))}
-  .quote{font-family:'Cormorant Garamond',serif;font-style:italic;color:var(--lime);font-size:30px;line-height:1.2;text-align:center;width:520px;text-shadow:0 2px 12px rgba(0,0,0,.6)}
+  .quote{font-family:'Cherry Bomb One',cursive;font-style:italic;color:var(--lime);font-size:30px;line-height:1.2;text-align:center;width:520px;text-shadow:0 2px 12px rgba(0,0,0,.6)}
   .quote small{display:block;font-family:'Inter';font-style:normal;font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--cream);opacity:.6;margin-top:8px}
 
   /* works hang in gilded frames as you pass them */
@@ -34,7 +34,7 @@
   .work .frame{padding:18px;background:linear-gradient(135deg,#f3dc8e,#b8862e 35%,#f0d07c 55%,#8e6420 80%,#d9b25a);border-radius:6px;box-shadow:0 18px 30px rgba(0,0,0,.5),inset 0 0 0 3px rgba(90,60,14,.6)}
   .work .inner{background:#f6f0e2;color:#2a2219;padding:16px 18px;border:2px solid #5a3c0e;min-height:150px}
   .work .inner img{display:block;width:100%;aspect-ratio:16/10;object-fit:cover;margin-bottom:10px}
-  .work h3{font-variant:small-caps;font-family:'Cormorant Garamond',serif;font-weight:400;font-size:24px;line-height:1.05}
+  .work h3{font-variant:small-caps;font-family:'Inter',serif;font-weight:400;font-size:24px;line-height:1.05}
   .work p{font-size:12.5px;line-height:1.5;margin-top:6px;color:#4a4036}
   .work .go{display:inline-block;margin-top:8px;font:500 11px 'Inter';letter-spacing:.14em;text-transform:uppercase;color:var(--red)}
   .work:hover .frame,.work:focus-visible .frame{box-shadow:0 0 0 3px var(--lime),0 18px 30px rgba(0,0,0,.5)}
@@ -53,12 +53,12 @@
 
   /* titles and the fall counter */
   .title{position:fixed;left:0;right:0;top:8vh;z-index:30;text-align:center;pointer-events:none;transition:opacity .6s}
-  .title h1{font-variant:small-caps;font-family:'Cormorant Garamond',serif;font-weight:400;color:var(--lime);font-size:clamp(38px,6vw,84px);line-height:.95;text-shadow:0 4px 30px rgba(0,0,0,.6)}
-  .title p{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:clamp(16px,1.6vw,20px);margin-top:12px;color:var(--cream)}
+  .title h1{font-variant:small-caps;font-family:'Cherry Bomb One',cursive;font-weight:400;color:var(--lime);font-size:clamp(38px,6vw,84px);line-height:.95;text-shadow:0 4px 30px rgba(0,0,0,.6)}
+  .title p{font-family:'Inter',serif;font-style:italic;font-size:clamp(16px,1.6vw,20px);margin-top:12px;color:var(--cream)}
   .title .scroll{display:block;margin-top:18px;font:500 11px 'Inter';letter-spacing:.24em;text-transform:uppercase;opacity:.7}
-  .meter{position:fixed;left:clamp(14px,3vw,36px);bottom:clamp(14px,3vw,30px);z-index:30;font-family:'Cormorant Garamond',serif;font-size:15px;color:var(--cream);opacity:.85}
-  .meter b{font-variant:small-caps;font-family:'Cormorant Garamond',serif;font-size:30px;font-weight:400;color:var(--lime);display:block;line-height:1}
-  .toast{position:fixed;left:50%;top:22vh;z-index:40;transform:translate(-50%,0);font-family:'Cormorant Garamond',serif;font-style:italic;font-size:clamp(28px,4vw,48px);color:var(--lime);
+  .meter{position:fixed;left:clamp(14px,3vw,36px);bottom:clamp(14px,3vw,30px);z-index:30;font-family:'Inter',serif;font-size:15px;color:var(--cream);opacity:.85}
+  .meter b{font-variant:small-caps;font-family:'Cherry Bomb One',cursive;font-size:30px;font-weight:400;color:var(--lime);display:block;line-height:1}
+  .toast{position:fixed;left:50%;top:22vh;z-index:40;transform:translate(-50%,0);font-family:'Cherry Bomb One',cursive;font-style:italic;font-size:clamp(28px,4vw,48px);color:var(--lime);
     text-shadow:0 4px 20px rgba(0,0,0,.7);opacity:0;pointer-events:none;transition:opacity .4s,transform .6s;white-space:nowrap}
   .toast.on{opacity:1;transform:translate(-50%,-10px)}
 
@@ -72,12 +72,12 @@
   #signpost{position:fixed;right:clamp(16px,8vw,140px);bottom:4vh;z-index:35;width:min(330px,62vw);opacity:0;transform:translateY(40px);transition:opacity .6s,transform .6s;pointer-events:none}
   body.landed #signpost{opacity:1;transform:none;pointer-events:auto}
   #signpost .post{position:absolute;left:46%;top:0;bottom:0;width:22px;background:linear-gradient(90deg,#5a3a20,#7a5230,#5a3a20)}
-  #signpost a{position:relative;display:block;width:max-content;margin:0 0 10px;padding:8px 30px;font-family:'Cormorant Garamond',serif;font-size:22px;color:#3a2614;text-decoration:none;
+  #signpost a{position:relative;display:block;width:max-content;margin:0 0 10px;padding:8px 30px;font-family:'Inter',serif;font-size:22px;color:#3a2614;text-decoration:none;
     background:linear-gradient(180deg,#d9c29a,#c4a678);box-shadow:0 6px 10px rgba(0,0,0,.4)}
   #signpost a.r{clip-path:polygon(0 0,88% 0,100% 50%,88% 100%,0 100%);margin-left:12%;transform:rotate(-2deg)}
   #signpost a.l{clip-path:polygon(12% 0,100% 0,100% 100%,12% 100%,0 50%);transform:rotate(2deg)}
   #signpost a:hover,#signpost a:focus-visible{background:linear-gradient(180deg,#efe0bd,#d6ba8a);outline:none}
-  #signpost .smallcaps{font-variant:small-caps;font-family:'Cormorant Garamond',serif}
+  #signpost .smallcaps{font-variant:small-caps;font-family:'Inter',serif}
   #grin{position:fixed;left:12vw;top:22vh;z-index:6;width:min(320px,40vw);opacity:0;transition:opacity 2s;pointer-events:none}
   body.landed #grin{opacity:.9;animation:grin 7s ease-in-out infinite}
   @keyframes grin{0%,100%{opacity:.9}50%{opacity:.15}}
@@ -108,7 +108,7 @@
     transition:opacity .7s .35s,transform .7s .35s;pointer-events:none}
   #backup .pic{padding:8px}
   #backup img{display:block;width:100%;height:auto}
-  #backup span{display:block;text-align:center;margin-top:6px;font-family:'Cormorant Garamond',serif;font-style:italic;font-size:16px;color:var(--cream)}
+  #backup span{display:block;text-align:center;margin-top:6px;font-family:'Inter',serif;font-style:italic;font-size:16px;color:var(--cream)}
   body.landed #backup{opacity:1;transform:rotate(4deg);pointer-events:auto}
   #backup:focus-visible{outline:none}#backup:focus-visible span,#backup:hover span{text-decoration:underline}
   @media (max-width:760px){#backup{top:auto;bottom:34vh;right:4vw;width:22vw}}
@@ -127,7 +127,7 @@
   #queen:focus-visible{outline:3px solid var(--lime);outline-offset:6px;border-radius:12px}
   #invite{position:fixed;left:50%;bottom:6vh;z-index:34;width:min(260px,40vw);text-decoration:none;opacity:0;transform:translate(-50%,40px) rotate(-5deg);transition:opacity .7s .2s,transform .7s .2s;pointer-events:none}
   #invite img{display:block;width:100%;height:auto;filter:drop-shadow(0 12px 16px rgba(0,0,0,.5));transition:transform .3s}
-  #invite span{display:block;text-align:center;margin-top:6px;font-family:'Cormorant Garamond',serif;font-style:italic;font-size:17px;color:var(--cream)}
+  #invite span{display:block;text-align:center;margin-top:6px;font-family:'Inter',serif;font-style:italic;font-size:17px;color:var(--cream)}
   body.landed #invite{opacity:1;transform:translate(-50%,0) rotate(-5deg);pointer-events:auto}
   #invite:focus-visible{outline:none}
   #invite:hover img,#invite:focus-visible img{transform:rotate(3deg) translateY(-6px)}
@@ -200,7 +200,7 @@
   let cupN=0;
   const ART={
     card:(r,s)=>{const red=s==='heart'||s==='diamond',c=red?'#b8242c':'#1c1a1c';return `<svg viewBox="0 0 100 140"><rect x="2" y="2" width="96" height="136" rx="8" fill="#f8f3e6" stroke="#cdbf9f" stroke-width="2"/>
-      <text x="12" y="26" font-family="Cormorant Garamond,serif" font-size="20" fill="${c}">${r}</text><g transform="translate(26 40) scale(.48)"><path d="${SUITS[s]}" fill="${c}"/></g>
+      <text x="12" y="26" font-family="Inter,serif" font-size="20" fill="${c}">${r}</text><g transform="translate(26 40) scale(.48)"><path d="${SUITS[s]}" fill="${c}"/></g>
       <g transform="translate(88 114) rotate(180) scale(.2)"><path d="${SUITS[s]}" fill="${c}"/></g></svg>`;},
     cup:()=>`<img src="img/wonderland/teacups-${(cupN++%2)+1}.webp" alt="">`,
     pot:()=>`<svg viewBox="0 0 160 130"><path d="M40 40 C30 110 130 110 120 40Z" fill="#fbf8f2"/><path d="M40 40 C60 30 100 30 120 40" fill="#efe8da"/><circle cx="80" cy="28" r="8" fill="#c9a45a"/>
@@ -216,13 +216,13 @@
       <path d="M18 70 C10 60 34 50 40 66 L40 116 H24Z M142 70 C150 60 126 50 120 66 L120 116 H136Z" fill="#a8623a"/><rect x="22" y="96" width="116" height="30" rx="10" fill="#c9884a"/>
       <path d="M32 126 L26 166 M128 126 L134 166 M52 126 L50 156 M108 126 L110 156" stroke="#6a3a1e" stroke-width="7" stroke-linecap="round"/></svg>`,
     jar:()=>`<svg viewBox="0 0 110 130"><rect x="20" y="10" width="70" height="16" rx="4" fill="#b8913f"/><path d="M16 28 H94 C98 40 98 110 90 120 H20 C12 110 12 40 16 28Z" fill="#dfe9ec" opacity=".75" stroke="#b9c8cc" stroke-width="2"/>
-      <rect x="22" y="58" width="66" height="34" fill="#f4ecd8" stroke="#8a6a3a"/><text x="55" y="72" text-anchor="middle" font-family="Cormorant Garamond,serif" font-size="9" fill="#7a2a22">ORANGE</text><text x="55" y="85" text-anchor="middle" font-family="Cormorant Garamond,serif" font-size="9" fill="#7a2a22">MARMALADE</text></svg>`,
+      <rect x="22" y="58" width="66" height="34" fill="#f4ecd8" stroke="#8a6a3a"/><text x="55" y="72" text-anchor="middle" font-family="Inter,serif" font-size="9" fill="#7a2a22">ORANGE</text><text x="55" y="85" text-anchor="middle" font-family="Inter,serif" font-size="9" fill="#7a2a22">MARMALADE</text></svg>`,
     bottle:()=>`<svg viewBox="0 0 120 190"><rect x="48" y="4" width="24" height="16" rx="3" fill="#9a6a3a"/><path d="M50 20 H70 V48 C96 60 102 82 102 120 C102 168 84 182 60 182 C36 182 18 168 18 120 C18 82 24 60 50 48Z" fill="#7fc3d4" opacity=".75" stroke="#cfeaf0" stroke-width="3"/>
       <path d="M22 118 C30 132 90 132 98 118 C98 166 82 178 60 178 C38 178 22 166 22 118Z" fill="#c34a7a" opacity=".85"/><path d="M34 66 C30 86 30 110 34 130" stroke="#fff" stroke-width="5" opacity=".5" fill="none"/>
-      <path d="M70 34 C96 30 108 54 98 70" fill="none" stroke="#d8c49a" stroke-width="2"/><g transform="translate(76 66) rotate(14)"><rect width="64" height="34" rx="4" fill="#f4ecd8" stroke="#8a6a3a"/><text x="32" y="14" text-anchor="middle" font-family="Cormorant Garamond,serif" font-size="11" fill="#2a2219">DRINK</text><text x="32" y="28" text-anchor="middle" font-family="Cormorant Garamond,serif" font-size="11" fill="#2a2219">ME</text></g></svg>`,
+      <path d="M70 34 C96 30 108 54 98 70" fill="none" stroke="#d8c49a" stroke-width="2"/><g transform="translate(76 66) rotate(14)"><rect width="64" height="34" rx="4" fill="#f4ecd8" stroke="#8a6a3a"/><text x="32" y="14" text-anchor="middle" font-family="Inter,serif" font-size="11" fill="#2a2219">DRINK</text><text x="32" y="28" text-anchor="middle" font-family="Inter,serif" font-size="11" fill="#2a2219">ME</text></g></svg>`,
     cake:()=>`<svg viewBox="0 0 160 120"><ellipse cx="80" cy="102" rx="74" ry="14" fill="#fbf8f2"/><path d="M22 54 H138 V92 C138 102 22 102 22 92Z" fill="#e8c27a"/><ellipse cx="80" cy="54" rx="58" ry="16" fill="#f6e0ae"/>
       <path d="M22 70 C40 80 60 70 80 78 C100 70 120 80 138 70" stroke="#fbf3e2" stroke-width="7" fill="none"/>
-      <text x="80" y="60" text-anchor="middle" font-family="Cormorant Garamond,serif" font-size="17" fill="#5a2a1a" letter-spacing="3">EAT ME</text>${[[46,52],[112,50],[60,60],[100,62]].map(([x,y])=>`<circle cx="${x}" cy="${y}" r="2.4" fill="#4a1e14"/>`).join('')}</svg>`,
+      <text x="80" y="60" text-anchor="middle" font-family="Inter,serif" font-size="17" fill="#5a2a1a" letter-spacing="3">EAT ME</text>${[[46,52],[112,50],[60,60],[100,62]].map(([x,y])=>`<circle cx="${x}" cy="${y}" r="2.4" fill="#4a1e14"/>`).join('')}</svg>`,
     map:()=>`<svg viewBox="0 0 140 110"><path d="M8 14 L50 6 L92 14 L132 6 V96 L92 104 L50 96 L8 104Z" fill="#e9dcb8" stroke="#8a6a3a" stroke-width="2"/><path d="M50 6 V96 M92 14 V104" stroke="#b8a074" stroke-width="1.4"/>
       <path d="M20 70 C40 40 60 60 76 40 S110 30 122 54" stroke="#b8242c" stroke-width="2.4" stroke-dasharray="5 5" fill="none"/><path d="M116 50 l6 6 m0 -6 l-6 6" stroke="#b8242c" stroke-width="2.6"/></svg>`,
     rabbit:()=>`<svg viewBox="0 0 140 170"><path d="M52 60 C40 10 50 0 58 8 C66 18 64 44 62 62Z M80 62 C84 20 96 6 102 14 C108 24 96 50 88 64Z" fill="#fbf8f2" stroke="#d9d0bf" stroke-width="2"/>

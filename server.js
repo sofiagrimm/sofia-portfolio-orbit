@@ -39,7 +39,7 @@ function gatePage(wrong) {
   return `<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
 <title>under construction | Sofia Grimm</title><meta name="robots" content="noindex">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400;1,500;1,600&family=Inter:wght@300;400;500;600&family=Nanum+Pen+Script&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cherry+Bomb+One&family=Inter:wght@300;400;500;600&family=Reenie+Beanie&display=swap">
 <style>
   *{box-sizing:border-box;margin:0;padding:0}
   html,body{height:100%}
@@ -50,8 +50,8 @@ function gatePage(wrong) {
   .note{width:min(440px,100%);background:#f4efe1;padding:34px 30px 30px;transform:rotate(-1.5deg);box-shadow:0 24px 50px rgba(0,0,0,.5);position:relative;
     background-image:repeating-linear-gradient(to bottom,transparent 0 27px,#cdd6e6 27px 28px);background-position:0 70px}
   .note::before{content:"";position:absolute;top:-14px;left:50%;width:110px;height:28px;margin-left:-55px;background:rgba(236,226,198,.75);transform:rotate(-3deg)}
-  h1{font-family:'Cormorant Garamond',Georgia,serif;font-style:italic;font-weight:400;font-size:40px;line-height:1;color:#24306b}
-  p{font-family:'Nanum Pen Script',cursive;font-size:26px;line-height:28px;color:#24306b;margin-top:14px}
+  h1{font-family:'Cherry Bomb One',Georgia,serif;font-style:italic;font-weight:400;font-size:40px;line-height:1;color:#24306b}
+  p{font-family:'Reenie Beanie',cursive;font-size:26px;line-height:28px;color:#24306b;margin-top:14px}
   form{margin-top:22px;display:flex;gap:8px;flex-wrap:wrap}
   input{flex:1;min-width:0;font:15px 'Inter',monospace;padding:10px 12px;border:1px solid #b9b2a2;background:#fffdf7;border-radius:4px}
   button{font:15px 'Inter',monospace;padding:10px 16px;border:0;border-radius:4px;background:#24306b;color:#fff;cursor:pointer}
