@@ -402,6 +402,14 @@
         const base = isLand ? land : ocean, n = (Math.random() - 0.5) * 16;
         d[i] = Math.max(0, Math.min(255, base[0] + n)); d[i+1] = Math.max(0, Math.min(255, base[1] + n)); d[i+2] = Math.max(0, Math.min(255, base[2] + n)); d[i+3] = 255;
       }
+      // soft white ice caps; this also hides the smearing the flat map gets near the poles
+      for (let y = 0; y < H; y++) {
+        const lat = 90 - (y + .5) / H * 180;
+        for (let x = 0; x < W; x++) {
+          const lon = x / W * 360 - 180, capN = 76 + 1.6 * Math.sin(lon * Math.PI / 36) + .8 * Math.sin(lon * Math.PI / 11), capS = -69 + 1.8 * Math.sin(lon * Math.PI / 30) + .9 * Math.sin(lon * Math.PI / 9);
+          if (lat > capN || lat < capS) { const i = (y * W + x) * 4, n = (Math.random() - 0.5) * 10; d[i] = 244 + n; d[i+1] = 248 + n; d[i+2] = 252 + n; }
+        }
+      }
       ctx.putImageData(img, 0, 0);
       return c;
     }
@@ -450,35 +458,50 @@
 
     // ── Flights: a little white plane. Before any pin is picked it circles the earth;
     //    click a pin, then another, and it flies there while a dashed route draws behind it.
-    function makePlaneTexture(){
-      const c=document.createElement('canvas');c.width=c.height=256;const x=c.getContext('2d');
-      const ink='#3d4250',white='#fbfbf8',shade='#e3e6ee',glass='#bcd7ee';
-      x.lineJoin='round';x.lineCap='round';x.lineWidth=3.2;x.strokeStyle=ink;
-      // wings
-      x.fillStyle=white;
-      x.beginPath();x.moveTo(116,104);x.lineTo(18,160);x.quadraticCurveTo(14,172,26,172);x.lineTo(116,146);x.closePath();x.fill();x.stroke();
-      x.beginPath();x.moveTo(140,104);x.lineTo(238,160);x.quadraticCurveTo(242,172,230,172);x.lineTo(140,146);x.closePath();x.fill();x.stroke();
-      // engines
-      x.fillStyle=shade;[[70,136],[186,136]].forEach(([ex,ey])=>{x.beginPath();x.ellipse(ex,ey,7,14,0,0,7);x.fill();x.stroke();});
-      // tail
-      x.fillStyle=white;
-      x.beginPath();x.moveTo(120,200);x.lineTo(80,226);x.quadraticCurveTo(78,234,88,233);x.lineTo(122,222);x.closePath();x.fill();x.stroke();
-      x.beginPath();x.moveTo(136,200);x.lineTo(176,226);x.quadraticCurveTo(178,234,168,233);x.lineTo(134,222);x.closePath();x.fill();x.stroke();
-      // fuselage with a soft shaded side
-      x.beginPath();x.moveTo(128,14);x.bezierCurveTo(146,16,146,44,146,70);x.lineTo(144,226);x.quadraticCurveTo(128,246,112,226);x.lineTo(110,70);x.bezierCurveTo(110,44,110,16,128,14);x.closePath();
-      x.fillStyle=white;x.fill();x.save();x.clip();x.fillStyle=shade;x.fillRect(132,0,30,256);x.restore();x.stroke();
-      // windows and cockpit
-      x.fillStyle=glass;for(let y=64;y<200;y+=12){x.beginPath();x.arc(118,y,2.6,0,7);x.fill();x.beginPath();x.arc(138,y,2.6,0,7);x.fill();}
-      x.beginPath();x.moveTo(118,36);x.quadraticCurveTo(128,28,138,36);x.lineTo(136,44);x.quadraticCurveTo(128,40,120,44);x.closePath();x.fill();x.lineWidth=2;x.stroke();
-      // little highlight strokes, like the drawn reference
-      x.strokeStyle='#ffffff';x.lineWidth=2.4;x.beginPath();x.moveTo(36,160);x.lineTo(84,134);x.moveTo(116,90);x.lineTo(116,180);x.stroke();
+    function makePlaneTexture(mirror){
+      // traced from the free-to-use reference plane, recoloured white
+      const c=document.createElement('canvas');c.width=c.height=736;const x=c.getContext('2d');
+      if(mirror){x.translate(736,0);x.scale(-1,1);}
+      const body='#fbfaf7',shade='#e2e5ec',ink='#3b2f33',glass='#cfdcea';
+      x.lineJoin='round';x.lineCap='round';
+      const shape=(pts,fill)=>{x.beginPath();x.moveTo(pts[0][0],pts[0][1]);for(let i=1;i<pts.length;i++){const p=pts[i];if(p.length===4)x.quadraticCurveTo(p[0],p[1],p[2],p[3]);else x.lineTo(p[0],p[1]);}x.closePath();x.fillStyle=fill;x.fill();};
+      // far wing and far stabiliser (behind the body)
+      shape([[440,338],[560,292],[590,284,598,298],[592,312,540,350],[470,360]],shade);
+      shape([[150,268],[226,262],[238,266,226,274],[160,286]],shade);
+      // tail fin
+      shape([[96,262],[74,196],[72,180,92,184],[110,188,162,268]],body);
+      // fuselage
+      shape([[92,262],[300,300],[520,350],[640,372],[700,392,712,440],[716,486,664,492],[560,490],[420,452],[240,398],[110,302],[70,288,92,262]],body);
+      // soft shading along the belly
+      x.save();x.beginPath();x.moveTo(110,302);x.lineTo(240,398);x.lineTo(420,452);x.lineTo(560,490);x.lineTo(664,492);x.quadraticCurveTo(716,486,712,440);x.lineTo(700,470);x.lineTo(560,470);x.lineTo(420,432);x.lineTo(240,378);x.lineTo(120,296);x.closePath();x.fillStyle=shade;x.globalAlpha=.75;x.fill();x.restore();
+      // near stabiliser and near wing (in front)
+      shape([[112,292],[34,306],[22,314,34,320],[118,312]],body);
+      shape([[318,404],[440,440],[452,452,436,462],[300,500],[150,540],[104,550,110,528],[260,436]],body);
+      x.save();x.beginPath();x.moveTo(436,462);x.lineTo(300,500);x.lineTo(150,540);x.quadraticCurveTo(104,550,110,528);x.lineTo(140,530);x.lineTo(300,486);x.closePath();x.fillStyle=shade;x.globalAlpha=.8;x.fill();x.restore();
+      // windows, doors, cockpit
+      x.fillStyle=glass;
+      for(let i=0;i<16;i++){const t=i/15,wx=160+t*340,wy=302+t*112;if(Math.abs(wx-262)<16||Math.abs(wx-530)<14)continue;x.beginPath();x.ellipse(wx,wy,6,8,-.3,0,7);x.fill();}
+      x.beginPath();x.roundRect(250,322,22,36,6);x.fill();x.beginPath();x.roundRect(520,412,22,38,6);x.fill();
+      x.beginPath();x.roundRect(602,418,24,20,5);x.fill();x.beginPath();x.roundRect(630,412,24,20,5);x.fill();x.beginPath();x.roundRect(658,402,22,20,6);x.fill();
+      // dark accent strokes, like the reference
+      x.strokeStyle=ink;x.lineWidth=4;
+      x.beginPath();x.moveTo(98,262);x.quadraticCurveTo(130,268,160,270);x.stroke();
+      x.beginPath();x.moveTo(318,404);x.quadraticCurveTo(400,412,440,440);x.stroke();
+      x.beginPath();x.moveTo(452,336);x.quadraticCurveTo(500,340,540,350);x.stroke();
+      x.beginPath();x.moveTo(616,488);x.quadraticCurveTo(680,468,704,446);x.stroke();
+      x.lineWidth=2.4;x.beginPath();x.moveTo(434,456);x.lineTo(440,470);x.moveTo(258,496);x.lineTo(262,506);x.stroke();
+      // little highlights
+      x.strokeStyle='#ffffff';x.lineWidth=3;x.beginPath();x.moveTo(120,532);x.lineTo(140,528);x.moveTo(40,312);x.lineTo(56,310);x.moveTo(84,196);x.lineTo(92,214);x.stroke();
       const t=new THREE.CanvasTexture(c);t.colorSpace=THREE.SRGBColorSpace;t.anisotropy=4;return t;
     }
     function makeShadowTexture(){
       const c=document.createElement('canvas');c.width=c.height=64;const x=c.getContext('2d');const g=x.createRadialGradient(32,32,2,32,32,30);
       g.addColorStop(0,'rgba(20,30,60,.45)');g.addColorStop(1,'rgba(20,30,60,0)');x.fillStyle=g;x.fillRect(0,0,64,64);return new THREE.CanvasTexture(c);
     }
-    const plane=new THREE.Mesh(new THREE.PlaneGeometry(0.21,0.21),new THREE.MeshBasicMaterial({map:makePlaneTexture(),transparent:true,depthWrite:false,side:THREE.DoubleSide}));
+    // a billboard sprite that always faces you and turns to point the way it's flying
+    const planeTex=[makePlaneTexture(false),makePlaneTexture(true)];
+    const plane=new THREE.Sprite(new THREE.SpriteMaterial({map:planeTex[0],transparent:true,depthWrite:false}));plane.scale.set(0.26,0.26,1);
+    const NOSE=Math.atan2(-(460-232),700-80); // the drawing's nose points a little downhill
     const planeShadow=new THREE.Mesh(new THREE.PlaneGeometry(0.15,0.15),new THREE.MeshBasicMaterial({map:makeShadowTexture(),transparent:true,depthWrite:false}));
     plane.renderOrder=5;pinGroup.add(planeShadow,plane);
 
@@ -511,12 +534,17 @@
       if(drawLine){
         const N=160,pts=[];const lift=0.03+0.16*ang/Math.PI;
         for(let i=0;i<=N;i++){const t=i/N;pts.push(slerp(a,b,t).multiplyScalar(1.012+lift*Math.sin(Math.PI*t)*0.85));}
-        const geo=new THREE.BufferGeometry().setFromPoints(pts);
-        line=new THREE.Line(geo,new THREE.LineDashedMaterial({color:0xfffbf0,dashSize:0.022,gapSize:0.018,transparent:true,opacity:0.95,depthWrite:false}));
-        line.computeLineDistances();geo.setDrawRange(0,0);pinGroup.add(line);
+        // round white dots, evenly spaced, with a soft dark halo so they read on the pale ocean
+        const dotTex=(()=>{const c=document.createElement('canvas');c.width=c.height=64;const x=c.getContext('2d');
+          const g=x.createRadialGradient(32,32,0,32,32,32);g.addColorStop(0,'rgba(20,30,70,.55)');g.addColorStop(1,'rgba(20,30,70,0)');x.fillStyle=g;x.fillRect(0,0,64,64);
+          x.fillStyle='#fffdf7';x.beginPath();x.arc(32,32,15,0,7);x.fill();return new THREE.CanvasTexture(c);})();
+        const step=Math.max(2,Math.round(N/(ang*38+6)));const dots=pts.filter((_,i)=>i%step===0);
+        const geo=new THREE.BufferGeometry().setFromPoints(dots);
+        line=new THREE.Points(geo,new THREE.PointsMaterial({map:dotTex,size:15,sizeAttenuation:false,transparent:true,depthWrite:false,opacity:1}));
+        geo.setDrawRange(0,0);pinGroup.add(line);
         routes.push(line);
         while(routes.length>5){const old=routes.shift();pinGroup.remove(old);old.geometry.dispose();}
-        routes.forEach((r,i)=>{r.material.opacity=i===routes.length-1?1:0.4+0.1*i;});
+        routes.forEach((r,i)=>{r.material.opacity=i===routes.length-1?1:0.45+0.1*i;});
       }
       flight={a,b,ang,lift:0.03+0.16*ang/Math.PI,dur:900+ang*1700,start:performance.now(),line,to:toId};
       if(typeof faceDir==='function'){const mid=a.clone().add(b);faceDir(mid.lengthSq()>1e-4?mid.normalize():b);}
@@ -550,7 +578,15 @@
         const dirAt=a=>new THREE.Vector3(0.62*Math.cos(a),0.38*Math.sin(a*1.0)+0.08*Math.sin(a*2),1).normalize().applyQuaternion(inv);
         curDir=dirAt(idleA);curAlt=CRUISE+0.02;pos=curDir.clone().multiplyScalar(curAlt);ahead=dirAt(idleA+0.02).multiplyScalar(curAlt);
       }
-      placeMesh(plane,pos,ahead.clone().sub(pos));
+      plane.position.copy(pos);
+      // point the sprite along the direction of travel as seen on screen
+      pinGroup.updateMatrixWorld();
+      const sp=pos.clone().applyMatrix4(pinGroup.matrixWorld).project(camera),sa=ahead.clone().applyMatrix4(pinGroup.matrixWorld).project(camera);
+      const dx=sa.x-sp.x,dy=sa.y-sp.y;
+      if(Math.abs(dx)+Math.abs(dy)>1e-6){const left=dx<0;plane.material.map=planeTex[left?1:0];const ang=Math.atan2(dy,dx);const nose=left?Math.atan2(Math.sin(NOSE),-Math.cos(NOSE)):NOSE;plane.material.rotation=ang-nose;}
+      // hide the plane when it's round the back of the earth
+      const camLocal=camera.position.clone().applyMatrix4(new THREE.Matrix4().copy(pinGroup.matrixWorld).invert());
+      plane.visible=pos.clone().normalize().dot(camLocal.clone().normalize())>-0.15;
       placeMesh(planeShadow,curDir.clone().multiplyScalar(1.004),ahead.clone().sub(pos));
       const h=curAlt-1;planeShadow.material.opacity=Math.max(.25,1-h*3);
     }
