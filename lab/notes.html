@@ -304,7 +304,7 @@
       {x:Math.max(4,hi.l-W*.62),y:hi.b-Hh*.3},
       {x:-W*1.4,y:docH-288-Hh}];
     const ext=[{x:2*P[0].x-P[1].x,y:2*P[0].y-P[1].y},...P,{x:2*P[5].x-P[4].x,y:2*P[5].y-P[4].y+Hh*2}];
-    LOOP={r:Math.max(110,Math.min(190,vw*.13)),a:.12,b:.62};   // a big, slow loop in the first leg
+    LOOP={r:Math.max(200,Math.min(360,vw*.22)),a:.06,b:.8};   // a big, lazy loop across most of the first leg
     legs=[];
     for(let k=0;k<P.length-1;k++){
       const p0=ext[k],p1=ext[k+1],p2=ext[k+2],p3=ext[k+3];
@@ -323,7 +323,7 @@
   function at0(seg,t,k){
     const q=cubic(...seg.q,t);
     if(k===0&&LOOP&&t>LOOP.a&&t<LOOP.b){ // the loop eases in and out so the curve stays smooth
-      const s=(t-LOOP.a)/(LOOP.b-LOOP.a),e=s*s*(3-2*s),th=e*Math.PI*2;q.x+=Math.sin(th)*LOOP.r;q.y-=(1-Math.cos(th))*LOOP.r;}
+      const s=(t-LOOP.a)/(LOOP.b-LOOP.a),e=s*s*(3-2*s),th=e*Math.PI*2;q.x-=Math.sin(th)*LOOP.r;q.y+=(1-Math.cos(th))*LOOP.r;}
     return q;
   }
   // distance along the whole route (in px) for the current scroll position

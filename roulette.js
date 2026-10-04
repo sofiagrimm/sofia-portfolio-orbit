@@ -93,6 +93,9 @@
     for (var i = 0; i < n; i++) d[i] = (Math.random() * 2 - 1) * Math.exp(-i / (c.sampleRate * .003));
     var s = c.createBufferSource(); s.buffer = b; var bp = c.createBiquadFilter(); bp.type = 'bandpass'; bp.frequency.value = f || 3800; bp.Q.value = 2; var g = c.createGain(); g.gain.value = vol;
     s.connect(bp).connect(g).connect(c.destination); s.start(t); }
+  var BOX = [1046.5, 1174.66, 1318.51, 1567.98, 1760, 2093];
+  function plink(f, vol, delay) { var c = ac; if (!c) return; var t = c.currentTime + (delay || 0), o = c.createOscillator(), g = c.createGain(); o.type = 'sine'; o.frequency.setValueAtTime(f, t);
+    g.gain.setValueAtTime(.0001, t); g.gain.exponentialRampToValueAtTime(vol, t + .005); g.gain.exponentialRampToValueAtTime(.0001, t + .6); o.connect(g).connect(c.destination); o.start(t); o.stop(t + .65); }
   function whirr(on) { var c = ac; if (!c) return null; var n = c.sampleRate * 2, b = c.createBuffer(1, n, c.sampleRate), d = b.getChannelData(0);
     for (var i = 0; i < n; i++) d[i] = Math.random() * 2 - 1; var s = c.createBufferSource(); s.buffer = b; s.loop = true; var f = c.createBiquadFilter(); f.type = 'bandpass'; f.frequency.value = 900; f.Q.value = .7;
     var g = c.createGain(); g.gain.value = .05; s.connect(f).connect(g).connect(c.destination); s.start(); return { s: s, g: g }; }
@@ -116,11 +119,11 @@
       wheel.setAttribute('transform', 'rotate(' + wAng + ' 200 200)');
       var bp = p(r, bWorld - 0); ball.setAttribute('cx', bp[0]); ball.setAttribute('cy', bp[1]);
       var rel = Math.floor((((bWorld - wAng) % 360) + 360) % 360 / STEP);
-      if (drop > 0 && rel !== lastPocket) { lastPocket = rel; tick(.25 * (1 - drop * .6), 3000 + Math.random() * 1500); }
+      if (drop > 0 && rel !== lastPocket) { lastPocket = rel; tick(.12 * (1 - drop * .6), 3000 + Math.random() * 1500); plink(BOX[rel % BOX.length], .05 * (1 - drop * .5)); }
       if (noise) noise.g.gain.value = .05 * (1 - k);
       if (k < 1) return requestAnimationFrame(frame);
       if (noise) { try { noise.s.stop(); } catch (e) {} }
-      tick(.4, 1800);
+      tick(.3, 1800); [0, 2, 4, 5].forEach(function (k, j) { plink(BOX[k] / (j === 3 ? 1 : 2), .07, .05 + j * .11); });
       result.innerHTML = '<b>' + number + '</b>' + (number === 0 ? 'green' : '') + ' off to ' + page[0];
       result.classList.add('on');
       setTimeout(function () {

@@ -104,9 +104,15 @@
       s.connect(fl).connect(g).connect(audio.out()); s.start(); },
     tone: function (f, dur, gain, type) { var c = this.c; if (!c) return; var o = c.createOscillator(), g = c.createGain(), t = c.currentTime; o.type = type || 'sine'; o.frequency.setValueAtTime(f, t); o.frequency.exponentialRampToValueAtTime(f * .7, t + dur);
       g.gain.setValueAtTime(gain, t); g.gain.exponentialRampToValueAtTime(.0005, t + dur); o.connect(g).connect(audio.out()); o.start(); o.stop(t + dur + .02); },
-    clack: function (v) { v = Math.max(.15, Math.min(1, v)); this.noise(.04, 3000 + Math.random() * 900, 1.3, .5 * v); this.tone(1700 + Math.random() * 400, .06, .08 * v); this.tone(380, .05, .1 * v, 'triangle'); },
-    cue: function () { this.noise(.05, 1400, 1, .5); this.tone(220, .08, .2, 'triangle'); },
-    thump: function () { this.tone(110, .25, .35, 'sine'); this.noise(.08, 400, .7, .3, 'lowpass'); },
+    note: function (f, dur, gain, type, delay, glide) { var c = this.c; if (!c) return; var t = c.currentTime + (delay || 0), o = c.createOscillator(), g = c.createGain(); o.type = type || 'triangle';
+      o.frequency.setValueAtTime(f, t); if (glide) o.frequency.exponentialRampToValueAtTime(f * glide, t + dur * .7);
+      g.gain.setValueAtTime(.0001, t); g.gain.exponentialRampToValueAtTime(gain, t + .008); g.gain.exponentialRampToValueAtTime(.0001, t + dur); o.connect(g).connect(audio.out()); o.start(t); o.stop(t + dur + .05); },
+    PENTA: [261.63, 293.66, 329.63, 392, 440, 523.25, 587.33, 659.25, 783.99, 880],
+    clack: function (v) { this.note(this.PENTA[Math.floor(Math.random() * 10)] * (Math.random() < .5 ? 1 : 2), .3, .05 * Math.min(1, Math.max(.2, v)), 'triangle'); v = Math.max(.15, Math.min(1, v)); this.noise(.04, 3000 + Math.random() * 900, 1.3, .5 * v); this.tone(1700 + Math.random() * 400, .06, .08 * v); this.tone(380, .05, .1 * v, 'triangle'); },
+    cue: function () { this.note(196, .18, .06, 'sine', 0, 1.5); this.noise(.05, 1400, 1, .5); this.tone(220, .08, .2, 'triangle'); },
+    boing: function () { this.note(320, .45, .09, 'sine', 0, .45); this.note(640, .3, .03, 'sine', .02, .5); },
+    twinkle: function () { var self = this; [5, 7, 9, 8, 6].forEach(function (k, j) { self.note(self.PENTA[k] * 2, .5, .03, 'sine', j * .12); }); },
+    thump: function () { this.boing(); this.tone(110, .25, .35, 'sine'); this.noise(.08, 400, .7, .3, 'lowpass'); },
     rumble: null,
     roll: function (on) { var c = this.c; if (!c) return; if (on && !this.rumble) { var n = c.sampleRate * 2, b = c.createBuffer(1, n, c.sampleRate), d = b.getChannelData(0);
         for (var i = 0; i < n; i++) d[i] = Math.random() * 2 - 1; var s = c.createBufferSource(); s.buffer = b; s.loop = true; var f = c.createBiquadFilter(); f.type = 'lowpass'; f.frequency.value = 260;
@@ -372,7 +378,7 @@
     state = 'cruise'; audio.roll(true); audio.bass(true); pool.classList.remove('cine'); pool.querySelector('.shade').classList.add('gone');
     var wall = R * 2.1 + R * .45 + R, b0 = land ? { u: eight.x, v: eight.y } : { u: eight.y, v: eight.x };
     path = [b0, { u: SU * 1.6, v: wall }, { u: END - R * 2.8, v: SV * .6 }, { u: END + SU * .32, v: SV * .64 }, { u: END + SU * 1.5, v: SV * .7 }];
-    legs = [{ d: 3000, e: 'out' }, { d: 4300, e: 'lin' }, { d: 1400, e: 'hop' }, { d: 5200, e: 'heart' }];
+    legs = [{ d: 3000, e: 'out' }, { d: 4300, e: 'lin' }, { d: 1400, e: 'hop' }, { d: 6200, e: 'heart' }];
     heart = null;
     legIdx = 0; legT0 = now;
     var cand = balls.filter(function (b) { return b !== eight && b !== shooter; }).sort(function (a, b) { return (land ? b.x - a.x : b.y - a.y); })[0];
@@ -381,23 +387,27 @@
   }
   var pocketBall = null, pocketFrom, pocketAt, pocketT0, pocketed = false, heart = null;
   function buildHeart() {
-    // everything in world coordinates; the shape is laid out in screen terms so it's upright either way round
-    var view0 = P(END, 0), cx = view0.x + W * .5, cy = view0.y + H * .47, s = Math.min(W, H) * .62 / 34;
-    var start = { x: eight.x, y: eight.y }, tip = { x: cx, y: cy + 17 * s };
+    // one smooth spline (Catmull-Rom) through a handful of points: a sweep in from where the ball
+    // landed, up and round the right lobe, a soft dip at the top, round the left lobe, back through
+    // the crossing, and away. No corners anywhere, so the ball never jerks.
+    var view0 = P(END, 0), cx = view0.x + W * .5, cy = view0.y + H * .46, s = Math.min(W, H) * .036;
+    var H_ = function (x, y) { return { x: cx + x * s, y: cy + y * s }; };
+    var start = { x: eight.x, y: eight.y }, end = { x: view0.x + W * 1.3, y: view0.y - H * .1 };
+    var keys = [start, H_(-9, 11), H_(-1, 9.6), H_(6.5, 4), H_(11.5, -3.5), H_(10.5, -9.5), H_(5.5, -11.2), H_(1.2, -8.3), H_(0, -6.6),
+      H_(-1.2, -8.3), H_(-5.5, -11.2), H_(-10.5, -9.5), H_(-11.5, -3.5), H_(-6.5, 4), H_(1, 9.6), H_(9, 11.5), H_(17, 8), end];
+    var ext = [{ x: 2 * keys[0].x - keys[1].x, y: 2 * keys[0].y - keys[1].y }].concat(keys, [{ x: 2 * end.x - keys[keys.length - 2].x, y: 2 * end.y - keys[keys.length - 2].y }]);
     var pts = [], i, t;
-    // sweep in from the landing spot to the point of the heart
-    var c = { x: (start.x + tip.x) / 2 + W * .05, y: Math.max(start.y, tip.y) + H * .18 };
-    for (i = 0; i <= 40; i++) { t = i / 40; var u = 1 - t; pts.push({ x: u * u * start.x + 2 * u * t * c.x + t * t * tip.x, y: u * u * start.y + 2 * u * t * c.y + t * t * tip.y }); }
-    // round the heart: right lobe first, over the top dip, down the left lobe, back to the point
-    for (i = 1; i <= 200; i++) { t = Math.PI + i / 200 * Math.PI * 2; var hx = 16 * Math.pow(Math.sin(t), 3), hy = -(13 * Math.cos(t) - 5 * Math.cos(2 * t) - 2 * Math.cos(3 * t) - Math.cos(4 * t));
-      pts.push({ x: cx - hx * s, y: cy + hy * s }); }
-    // carry on through the point and away, up and off the right-hand side
-    var end = { x: view0.x + W * 1.35, y: view0.y - H * .15 }, c2 = { x: cx + W * .28, y: cy + 22 * s };
-    for (i = 1; i <= 50; i++) { t = i / 50; var u2 = 1 - t; pts.push({ x: u2 * u2 * tip.x + 2 * u2 * t * c2.x + t * t * end.x, y: u2 * u2 * tip.y + 2 * u2 * t * c2.y + t * t * end.y }); }
+    for (var k = 1; k < ext.length - 2; k++) {
+      var p0 = ext[k - 1], p1 = ext[k], p2 = ext[k + 1], p3 = ext[k + 2];
+      for (i = (k === 1 ? 0 : 1); i <= 24; i++) { t = i / 24; var t2 = t * t, t3 = t2 * t;
+        pts.push({ x: .5 * (2 * p1.x + (-p0.x + p2.x) * t + (2 * p0.x - 5 * p1.x + 4 * p2.x - p3.x) * t2 + (-p0.x + 3 * p1.x - 3 * p2.x + p3.x) * t3),
+                   y: .5 * (2 * p1.y + (-p0.y + p2.y) * t + (2 * p0.y - 5 * p1.y + 4 * p2.y - p3.y) * t2 + (-p0.y + 3 * p1.y - 3 * p2.y + p3.y) * t3) }); }
+    }
     var len = [0]; for (i = 1; i < pts.length; i++) len.push(len[i - 1] + Math.hypot(pts[i].x - pts[i - 1].x, pts[i].y - pts[i - 1].y));
     var line = el('path', { fill: 'none', stroke: '#f3e6cf', 'stroke-width': Math.max(2, R * .12), 'stroke-dasharray': (R * .55) + ' ' + (R * .45), 'stroke-linecap': 'round', opacity: '.75' });
     svg.insertBefore(line, balls[0].g);
     heart = { pts: pts, len: len, L: len[len.length - 1], line: line };
+    audio.twinkle();
   }
   function heartAt(f) { // f: 0..1 along the whole path at an even pace
     var d = f * heart.L, len = heart.len, i = 1; while (i < len.length - 1 && len[i] < d) i++;
@@ -422,7 +432,7 @@
     if (leg.e === 'heart') {
       if (!heart) buildHeart();
       // ease in at the start, a steady glide round the heart, and a little lift of speed as it leaves
-      var f = Math.max(0, Math.min(1, t < .12 ? (t * t) / (2 * .12) : (t - .06) / .94 * (1 - .06) + .06));
+      var f = t * t * (3 - 2 * t) * .35 + t * .65;   // smooth start and finish, steady in between
       var hp = heartAt(f); q = { x: hp.x, y: hp.y };
       var dpts = heart.pts.slice(0, hp.i).concat([hp]), dd = '';
       for (var j = 0; j < dpts.length; j += 2) dd += (j ? ' L' : 'M') + dpts[j].x.toFixed(1) + ' ' + dpts[j].y.toFixed(1);
