@@ -140,7 +140,7 @@
   /* decorative playing cards scattered across the page, like a table */
   body{position:relative}
   #table{position:absolute;left:0;top:0;width:100%;z-index:2;pointer-events:none;overflow:hidden}
-  #table .pc{position:absolute;opacity:.92;filter:drop-shadow(0 8px 12px rgba(40,0,0,.55))}
+  #table .pc{position:absolute;opacity:1;filter:drop-shadow(0 8px 12px rgba(40,0,0,.55))}
   #table .pc svg{display:block;width:100%;height:auto}
 
     /* red felt card table */
@@ -159,6 +159,15 @@
     .nav-links .divider{color:rgba(255,226,214,.25)}
     .nav-name{color:#fff6ee}
     .coords{color:rgba(255,226,214,.35)}
+
+    /* keep cards solid: only one face is ever painted, so nothing shows through */
+    .card-face{-webkit-backface-visibility:hidden;backface-visibility:hidden}
+    .card-scene:not(.flipped) .card-front{visibility:hidden}
+    .card-scene.flipped .card-back{visibility:hidden}
+    #cardPopupFlipper .card-front{visibility:hidden;transition:visibility 0s .32s}
+    #cardPopupFlipper.flipped .card-front{visibility:visible}
+    #cardPopupFlipper.flipped .card-back{visibility:hidden;transition:visibility 0s .32s}
+    .card-back svg rect:first-of-type{fill-opacity:1}
   </style>
   <style>
     /* six tabs: let the nav scroll sideways on small screens instead of spilling off */
