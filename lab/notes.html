@@ -23,16 +23,7 @@
   html{background:var(--sky)}
   body{
     min-height:100vh;color:#dfe7ff;font-family:'Courier Prime',Courier,monospace;overflow-x:hidden;
-    background:
-      radial-gradient(1px 1px at 14% 22%,#fff8 50%,transparent 51%),
-      radial-gradient(1px 1px at 82% 12%,#fff6 50%,transparent 51%),
-      radial-gradient(1.5px 1.5px at 38% 70%,#fff5 50%,transparent 51%),
-      radial-gradient(1px 1px at 93% 52%,#fff7 50%,transparent 51%),
-      radial-gradient(1px 1px at 58% 92%,#fff5 50%,transparent 51%),
-      radial-gradient(1.5px 1.5px at 4% 83%,#fff4 50%,transparent 51%),
-      radial-gradient(ellipse at 20% -10%,#14264d 0%,transparent 55%),
-      var(--sky);
-    background-attachment:fixed;
+    background:var(--sky);
   }
   header{max-width:1100px;margin:0 auto;padding:36px 28px 0;display:flex;justify-content:space-between;align-items:baseline;flex-wrap:wrap;gap:12px}
   nav{display:flex;flex-wrap:wrap;gap:2px 18px}
@@ -100,9 +91,19 @@
     figcaption{font-size:24px}
     .mobile-only{display:block}
   }
+    canvas{display:block;position:fixed;inset:0;z-index:0}
+    .nebula{
+      position:fixed;inset:0;z-index:1;pointer-events:none;
+      background:
+        radial-gradient(ellipse 55% 38% at 15% 55%, rgba(40,70,180,0.07) 0%, transparent 70%),
+        radial-gradient(ellipse 45% 32% at 82% 28%, rgba(30,80,200,0.07) 0%, transparent 70%),
+        radial-gradient(ellipse 50% 44% at 50% 50%, rgba(20,40,120,0.05) 0%, transparent 65%);
+    }
+  header,main,section,footer{position:relative;z-index:10}
 </style>
 </head>
 <body>
+<div class="nebula"></div>
 <header>
   <nav aria-label="Site">
     <a href="../index.html">./home</a><a href="../about.html">./about</a><a href="../research.html">./research</a><a href="../projects.html">./projects</a><a href="cards.html">./cards</a><a href="notes.html" aria-current="page">./notes</a>
@@ -128,5 +129,28 @@
 </main>
 
 <footer>sofia.grimm@yale.edu &nbsp; <a href="https://www.linkedin.com/in/sofia-grimm/">linkedin</a></footer>
+  <script type="module">
+    import('https://unpkg.com/three@0.161.0/build/three.module.js').then(THREE=>{
+      const renderer=new THREE.WebGLRenderer({antialias:true,alpha:false});
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio,2));
+      renderer.setSize(window.innerWidth,window.innerHeight);
+      renderer.setClearColor(0x060d18,1);
+      document.body.appendChild(renderer.domElement);
+      const scene=new THREE.Scene();
+      const camera=new THREE.PerspectiveCamera(36,window.innerWidth/window.innerHeight,0.1,500);
+      camera.position.set(0,0,46);camera.lookAt(0,0,0);
+      window.addEventListener('resize',()=>{camera.aspect=window.innerWidth/window.innerHeight;camera.updateProjectionMatrix();renderer.setSize(window.innerWidth,window.innerHeight);});
+      const N=7000,pos=new Float32Array(N*3),ph=new Float32Array(N),sp=new Float32Array(N),sz=new Float32Array(N);
+      for(let i=0;i<N;i++){pos[i*3]=(Math.random()-.5)*220;pos[i*3+1]=(Math.random()-.5)*160;pos[i*3+2]=-Math.random()*260;ph[i]=Math.random()*Math.PI*2;sp[i]=.002+Math.random()*.005;sz[i]=.1+Math.random()*.2;}
+      const geo=new THREE.BufferGeometry();
+      geo.setAttribute('position',new THREE.BufferAttribute(pos,3));
+      geo.setAttribute('phase',new THREE.BufferAttribute(ph,1));
+      geo.setAttribute('speed',new THREE.BufferAttribute(sp,1));
+      geo.setAttribute('aSize',new THREE.BufferAttribute(sz,1));
+      const mat=new THREE.ShaderMaterial({uniforms:{time:{value:0}},vertexShader:`attribute float aSize;attribute float phase;attribute float speed;uniform float time;varying float vB;void main(){float r=abs(sin(time*speed+phase));vB=.7+.3*pow(r,.3);vec4 mv=modelViewMatrix*vec4(position,1.);gl_PointSize=aSize*(1.+2.*max(0.,r-.75)/.25)*(300./-mv.z);gl_Position=projectionMatrix*mv;}`,fragmentShader:`varying float vB;void main(){vec2 uv=gl_PointCoord-vec2(.5);if(length(uv)>.5)discard;float c=1.-smoothstep(0.,.45,length(uv));gl_FragColor=vec4(vec3(.75,.88,1.)*vB,c*vB);}`,transparent:true,depthWrite:false});
+      scene.add(new THREE.Points(geo,mat));
+      (function loop(t){requestAnimationFrame(loop);mat.uniforms.time.value=t*.001;renderer.render(scene,camera);})(0);
+    });
+  </script>
 </body>
 </html>
