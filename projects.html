@@ -30,7 +30,7 @@
     .rule{width:48px;height:1px;background:linear-gradient(90deg,rgba(140,170,255,.4),transparent);margin-bottom:44px;}
 
     /* ── GRID — 4 col desktop, 2 col tablet, 1 col mobile ── */
-    .memory-grid{position:relative;height:clamp(380px,40vw,440px);margin-top:clamp(120px,14vw,200px)}
+    .memory-grid{--cw:clamp(170px,17.5vw,232px);position:relative;height:calc(var(--cw)*1.4 + 110px);margin-top:max(40px,calc(50vh - (var(--cw)*1.4 + 110px)/2 - 110px))}
     @media(max-width:760px){.memory-grid{height:auto;display:grid;grid-template-columns:1fr 1fr;gap:22px 16px}}
     
 
@@ -92,7 +92,7 @@
 
     /* taped ace of clubs poster */
     .page{position:relative}
-    .poster-card{position:absolute;right:clamp(40px,8vw,120px);top:70px;width:clamp(150px,15vw,190px);transform:rotate(5deg);z-index:12;filter:drop-shadow(0 12px 16px rgba(30,0,0,.5));margin:0}
+    .poster-card{position:absolute;right:clamp(10px,4vw,60px);top:calc(50vh + (var(--cwg,232px)*1.4 + 110px)/2 + 80px);width:clamp(150px,15vw,190px);transform:rotate(5deg);z-index:12;filter:drop-shadow(0 12px 16px rgba(30,0,0,.5));margin:0}
     .poster-card svg{display:block;width:100%;height:auto}
     .poster-card{position:absolute}
     .poster-base{position:absolute;inset:0}.poster-base svg{width:100%;height:100%}
@@ -101,7 +101,8 @@
     .feltprint{position:absolute;left:50%;bottom:22%;width:100vw;transform:translateX(-50%);z-index:30;pointer-events:none}
     @media(max-width:760px){.feltprint{display:none}}
     /* ── shuffle deck ── */
-    .deck-wrap{display:flex;align-items:center;gap:22px;margin:4px 0 26px}
+    .deck-wrap{display:flex;align-items:center;gap:22px;margin:60px 0 26px;position:relative}
+    .deck-wrap .poster-card{position:relative;right:auto;top:auto;margin-left:auto;flex:none}
     .deck{position:relative;width:clamp(110px,10vw,150px);aspect-ratio:5/7;border:0;background:none;padding:0;cursor:pointer;rotate:-10deg;flex:0 0 auto}
     .deck .back{position:absolute;inset:0;display:block;border-radius:6px;box-shadow:0 1px 0 #cfccc4,0 2px 3px rgba(0,0,0,.35)}
     .deck .back svg{display:block;width:100%;height:100%}
@@ -115,7 +116,7 @@
     .card-scene.drawn .card-back{box-shadow:0 0 0 3px #f3b6c8,0 22px 40px rgba(0,0,0,.55)}
     @media (prefers-reduced-motion:reduce){.deck.shuffling .back{animation:none}}
     /* ── HAND-PAINTED PLAYING CARDS ── */
-    .card-scene{aspect-ratio:5/7;position:absolute;left:var(--x);top:var(--y);width:clamp(140px,17vw,180px);
+    .card-scene{aspect-ratio:5/7;position:absolute;left:var(--x);top:var(--y);width:var(--cw,clamp(140px,17vw,180px));
       rotate:var(--r);transform-origin:50% 120%;translate:0 0;transition:translate .3s cubic-bezier(.2,.8,.2,1);z-index:var(--z)}
     .card-scene:hover,.card-scene:focus-visible{translate:0 -28px;z-index:20;outline:none}
     .card-scene:focus-visible .card-back{box-shadow:0 0 0 3px #9cc0ff,0 16px 30px rgba(0,0,0,.5)}
@@ -190,7 +191,7 @@
     .memory-grid .card-face{-webkit-backface-visibility:visible;backface-visibility:visible}
     .memory-grid .card-front{transform:none}
     .memory-grid .card-scene,.memory-grid .card-flipper{isolation:isolate}
-    @media(min-width:1200px){.page{min-height:1480px}}
+    @media(min-width:1200px){.page{min-height:1750px}}
     .sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
 
     /* chips you can pick up: the page box lets clicks through to the table except on its own controls */
@@ -241,6 +242,11 @@
     .movable.held .rast{box-shadow:0 22px 30px rgba(20,0,0,.5);scale:1.05;transition:scale .15s,box-shadow .15s}
     .movable .rast{transition:scale .2s,box-shadow .2s}
     @media (max-width:760px){#cardframe .fc.movable{touch-action:auto}}
+    #spot i{position:absolute;pointer-events:none;z-index:9}
+    #spot .pool{border-radius:50%;background:radial-gradient(ellipse at 50% 50%,rgba(255,228,180,.26),rgba(255,214,160,.12) 38%,transparent 68%)}
+    #spot .beam{clip-path:polygon(38% 0,62% 0,100% 100%,0 100%);background:linear-gradient(180deg,rgba(255,236,200,.13),rgba(255,236,200,.05) 70%,transparent);filter:blur(6px)}
+    /* the cards in the light read a touch brighter and cast deeper shadows */
+    @media(min-width:760px){#memoryGrid .card-scene{filter:brightness(1.05) drop-shadow(0 18px 22px rgba(20,0,0,.45))}}
   </style>
 </head>
 <body>
@@ -294,13 +300,13 @@
   
   <g transform="translate(206 26) rotate(32)"><path d="M-46 -14 L-40 -11 L-46 -7 L-41 -3 L-46 1 L-40 5 L-46 9 L-41 14 L46 14 L41 10 L46 6 L40 2 L46 -2 L41 -6 L46 -10 L40 -14Z" fill="#d9c69c" opacity=".82"/><path d="M-40 -8 L40 -8 M-40 6 L40 6" stroke="#fff" stroke-width="1" opacity=".25"/></g>
 </svg></figure>
+    <div class="memory-grid" id="memoryGrid"></div>
     <div class="deck-wrap">
       <button class="deck" id="deck" aria-label="Shuffle the deck and draw a random project">
         <span class="back b1"><svg viewBox="0 0 250 350" aria-hidden="true"><use href="#deckBack"/></svg></span><span class="back b2"><svg viewBox="0 0 250 350" aria-hidden="true"><use href="#deckBack"/></svg></span><span class="back b3"><svg viewBox="0 0 250 350" aria-hidden="true"><use href="#deckBack"/></svg></span><span class="back b4"><svg viewBox="0 0 250 350" aria-hidden="true"><use href="#deckBack"/></svg></span><span class="back b5"><svg viewBox="0 0 250 350" aria-hidden="true"><use href="#deckBack"/></svg></span>
       </button>
       <p class="deck-label">shuffle?</p>
     </div>
-    <div class="memory-grid" id="memoryGrid"></div>
   </main>
   <div class="coords">41.3083&deg; N &nbsp; 72.9279&deg; W</div>
   <div id="cardPopupOverlay">
@@ -543,7 +549,7 @@
         popupInner.classList.add('bursting');
         burst.addEventListener('animationend',()=>{popupInner.classList.remove('bursting');},{once:true});
         setTimeout(()=>{popupLocked=false;},700);
-      },480);
+      },2200);
     }
 
     function closePopup(){
@@ -565,7 +571,7 @@
 
     const grid=document.getElementById('memoryGrid');
     PROJECTS.forEach((p,i)=>{
-      const scene=document.createElement('div');scene.className='card-scene';scene.style.animationDelay=(i*0.07)+'s';const n=PROJECTS.length,c=(n-1)/2,off=i-c;scene.style.setProperty('--r',(off*6.5)+'deg');scene.style.setProperty('--x',`calc(50% - clamp(70px,8.5vw,90px) + ${off}*clamp(74px,9vw,98px))`);scene.style.setProperty('--y',(Math.abs(off)*Math.abs(off)*3+20)+'px');scene.style.setProperty('--z',i+1);scene.style.setProperty('--rm',((i%2?1:-1)*(1.5+i%3))+'deg');scene.tabIndex=0;scene.setAttribute('role','button');scene.setAttribute('aria-label',p.title);
+      const scene=document.createElement('div');scene.className='card-scene';scene.style.animationDelay=(i*0.07)+'s';const n=PROJECTS.length,c=(n-1)/2,off=i-c;scene.style.setProperty('--r',(off*6.5)+'deg');scene.style.setProperty('--x',`calc(50% - var(--cw)/2 + ${off}*var(--cw)*.56)`);scene.style.setProperty('--y',(Math.abs(off)*Math.abs(off)*4+24)+'px');scene.style.setProperty('--z',i+1);scene.style.setProperty('--rm',((i%2?1:-1)*(1.5+i%3))+'deg');scene.tabIndex=0;scene.setAttribute('role','button');scene.setAttribute('aria-label',p.title);
       const flipper=document.createElement('div');flipper.className='card-flipper';
       const back=document.createElement('div');back.className='card-face card-back';back.innerHTML=makeCardBackSVG(i);
       const aurora=document.createElement('div');aurora.className='cb-aurora';aurora.style.animationDelay=(i*0.55)+'s';back.appendChild(aurora);
@@ -883,8 +889,8 @@
 
   // piles of green-backed cards, chip stacks, dice and a few face-up cards
   const LAYOUT=[
-    {prop:'box', x:42, y:3, w:176, rot:-8},
-    {chips:[[24,30,1,3]], x:35, y:21, w:240, rot:0},
+    {prop:'box', anchor:'deck', dx:330, dy:-30, w:176, rot:-8},
+    {chips:[[24,30,1,3]], anchor:'deck', dx:210, dy:150, w:240, rot:0},
     {prop:'dealer', x:28, y:66, w:124, rot:0},
     {prop:'tray', x:6, y:70, w:330, rot:-24, wide:1},
     {prop:'pad', x:60, y:60, w:200, rot:5, wide:1},
@@ -897,6 +903,11 @@
     {chips:[[24,30,2,4],[52,48,1,0]], x:84, y:32, w:220, rot:0, wide:1}
   ];
   const table=document.getElementById('table');
+  // props either sit at a spot on the table (percentages) or next to the shuffle deck
+  function placeAt(el,g){
+    if(g.anchor==='deck'){const d=document.querySelector('.deck');if(d){const r=d.getBoundingClientRect();el.style.left=(r.left+scrollX+g.dx)+'px';el.style.top=(r.top+scrollY+g.dy)+'px';return;}}
+    el.style.left=g.x+'%';el.style.top=g.y+'%';
+  }
   function lay(){
     const h=Math.max(document.documentElement.scrollHeight,innerHeight), mobile=innerWidth<760;
     table.style.height=h+'px'; table.innerHTML='';
@@ -904,8 +915,8 @@
       if(mobile&&(gi%2||g.y<14)) return;
       if(g.wide&&innerWidth<1200) return;   // only where there's room beside the hand            // fewer cards on phones, none over the nav
       const scale=mobile?.42:1, w=g.w*scale;
-      if(g.prop){const el=document.createElement('div');el.className='pc';el.dataset.spec=JSON.stringify(g);el.style.width=(g.w*scale)+'px';el.style.left=g.x+'%';el.style.top=g.y+'%';el.style.transform=`rotate(${g.rot}deg)`;el.innerHTML={box:deckBox,dealer:dealer,pad:scorepad,tray:chipTray}[g.prop]();table.appendChild(el);return;}
-      if(g.chips||g.dice){const el=document.createElement('div');el.className='pc';el.dataset.spec=JSON.stringify(g);el.style.width=(g.w*scale)+'px';el.style.left=g.x+'%';el.style.top=g.y+'%';el.style.transform=`rotate(${g.rot}deg)`;el.innerHTML=g.chips?chips(g.chips):dice();table.appendChild(el);return;}
+      if(g.prop){const el=document.createElement('div');el.className='pc';el.dataset.spec=JSON.stringify(g);el.style.width=(g.w*scale)+'px';placeAt(el,g);el.style.transform=`rotate(${g.rot}deg)`;el.innerHTML={box:deckBox,dealer:dealer,pad:scorepad,tray:chipTray}[g.prop]();table.appendChild(el);return;}
+      if(g.chips||g.dice){const el=document.createElement('div');el.className='pc';el.dataset.spec=JSON.stringify(g);el.style.width=(g.w*scale)+'px';placeAt(el,g);el.style.transform=`rotate(${g.rot}deg)`;el.innerHTML=g.chips?chips(g.chips):dice();table.appendChild(el);return;}
       const list=g.pile?Array.from({length:g.pile},()=>null):(g.fan||[g.one]);
       list.forEach((rs,k)=>{
         const el=document.createElement('div'); el.className='pc';el.dataset.spec=JSON.stringify(g);
@@ -987,6 +998,14 @@
   document.body.insertBefore(arch,document.body.firstChild);
   let A=null;
   const docBox=el=>{const r=el.getBoundingClientRect();return{l:r.left+scrollX,t:r.top+scrollY,r:r.right+scrollX,b:r.bottom+scrollY};};
+  function spotlight(){
+    let sp=document.getElementById('spot');if(!sp){sp=document.createElement('div');sp.id='spot';sp.setAttribute('aria-hidden','true');sp.innerHTML='<i class="beam"></i><i class="pool"></i>';document.body.appendChild(sp);}
+    const sc=[...document.querySelectorAll('#memoryGrid .card-scene')].map(docBox);if(!sc.length||innerWidth<760){sp.style.display='none';return;}
+    sp.style.display='';const l=Math.min(...sc.map(b=>b.l)),r=Math.max(...sc.map(b=>b.r)),t=Math.min(...sc.map(b=>b.t)),bt=Math.max(...sc.map(b=>b.b));
+    const cx=(l+r)/2,cy=(t+bt)/2,w=(r-l)*1.25,h=(bt-t)*1.7;
+    Object.assign(sp.querySelector('.pool').style,{left:(cx-w/2)+'px',top:(cy-h/2)+'px',width:w+'px',height:h+'px'});
+    Object.assign(sp.querySelector('.beam').style,{left:(cx-w*.45)+'px',top:'0px',width:(w*.9)+'px',height:(cy+h*.35)+'px'});
+  }
   function fitArch(){
     const scenes=[...document.querySelectorAll('#memoryGrid .card-scene')];
     if(!scenes.length||innerWidth<760){arch.innerHTML='';A=null;return;}
@@ -1177,7 +1196,8 @@
     const fanBottom=Math.max(...HAND.map(b=>b.b));
     const docH=document.documentElement.scrollHeight,bottomRow=[...frameEl.querySelectorAll('.fc:not(.extra)')].map(docBox).filter(b=>b.t>docH-h*1.4);
     const floor=bottomRow.length?Math.min(...bottomRow.map(b=>b.t)):docH-40;
-    const props=propBoxes();
+    // the shuffle deck, its label, the card box and the poster count as things to keep clear of
+    const props=propBoxes().concat([...document.querySelectorAll('.deck-wrap > *, .poster-card')].map(docBox));
     let placed=0;const top=fanBottom-h*.3,span=floor-top-h;
     if(span<h*.3)return;
     // try lots of spots, working out each card's tilted footprint with arithmetic, and only add the keepers
@@ -1364,13 +1384,14 @@
           el.animate([{scale:'0 1'},{scale:'1 1'}],{duration:150,easing:'ease-out'});});});
     });
   }
+  {const pc=document.querySelector('.poster-card'),dw=document.querySelector('.deck-wrap');if(pc&&dw&&innerWidth>=760)dw.appendChild(pc);}
   function layoutTable(){
     if(window.__arranging&&layoutTable.done)return;layoutTable.done=true;
     // measure the table where it really sits, even while the opening is sliding it into view
     const de=document.documentElement,pm=de.classList.contains('pool-moving');
     const kids=[...document.body.children],saved=kids.map(k=>k.style.transform);
     if(pm){de.classList.remove('pool-moving');kids.forEach(k=>{if(k.id!=='pool')k.style.transform='';});}
-    cornerSpill();lay();buildFrame();fitArch();clearArch();fillEmpty();wireChips();wireDice();wireBox();wireLooseChips();wireCardDrag();
+    cornerSpill();lay();buildFrame();fitArch();clearArch();fillEmpty();spotlight();wireChips();wireDice();wireBox();wireLooseChips();wireCardDrag();
     if(pm){de.classList.add('pool-moving');kids.forEach((k,i)=>{if(k.id!=='pool')k.style.transform=saved[i];});}
   }
   if(/[?&]buildart\b/.test(location.search))window.__tableArt={card,back,chipSrc,artURL,CHIP_COL};
