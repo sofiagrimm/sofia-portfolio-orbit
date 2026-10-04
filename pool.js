@@ -4,7 +4,7 @@
 // where the camera settles and the ball rolls on out of frame. About fifteen seconds.
 (function () {
   var still = matchMedia('(prefers-reduced-motion: reduce)').matches;
-  if (still || sessionStorage.getItem('sg-pool-done')) return;
+  if (still || sessionStorage.getItem('sg-pool-done') || /[?&]arrange\b/.test(location.search)) return;
 
   var css = `
   #pool{position:fixed;inset:0;z-index:500;overflow:hidden;touch-action:none;cursor:grab;-webkit-user-select:none;user-select:none;outline:none}

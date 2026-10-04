@@ -196,7 +196,11 @@
       .page-title { font-size: 30px; }
       .entry-loc { display: none; }
     }
-  </style>
+    /* ten tabs: keep them on one line on laptop widths */
+  .nav-links a{white-space:nowrap}
+  @media (max-width:1400px){.nav-links a{padding:7px 10px;letter-spacing:.1em}}
+  @media (max-width:1240px){.nav-links a{padding:6px 7px;font-size:12px;letter-spacing:.07em}.nav-links .divider{display:none}}
+</style>
   <style>
     /* six tabs: let the nav scroll sideways on small screens instead of spilling off */
     @media (max-width:640px){

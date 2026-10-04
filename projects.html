@@ -194,7 +194,11 @@
     .page .card-scene,.page .deck,.page a,.page button,.page .deck-wrap{pointer-events:auto}
     #table .stack{pointer-events:auto;cursor:grab}
     #table .chip{transform-box:view-box}
-  </style>
+    /* ten tabs: keep them on one line on laptop widths */
+  .nav-links a{white-space:nowrap}
+  @media (max-width:1400px){.nav-links a{padding:7px 10px;letter-spacing:.1em}}
+  @media (max-width:1240px){.nav-links a{padding:6px 7px;font-size:12px;letter-spacing:.07em}.nav-links .divider{display:none}}
+</style>
   <style>
     /* six tabs: let the nav scroll sideways on small screens instead of spilling off */
     @media (max-width:640px){
@@ -591,13 +595,46 @@
   const RED="#cf4540",INK="#262838";
   const col=s=>(s==='heart'||s==='diamond')?RED:INK;
   let uid=0;
+
+  // hand-inked court figures: a crowned king, a queen with a flower, a jack in a feathered cap,
+  // drawn once and mirrored top-to-bottom the way real court cards are
+  function court(rank,suit,c,f){
+    const robe=c, trim='#e2b54e', skin='#f6dcc4', hair={K:'#e8e2d4',Q:'#d9a441',J:'#7a4a2a'}[rank];
+    const hat={
+      K:`<path d="M96 66 L100 46 L110 58 L125 40 L140 58 L150 46 L154 66Z" fill="${trim}" stroke="${INK}" stroke-width="1.6"/><circle cx="125" cy="52" r="3" fill="${c}"/><circle cx="104" cy="56" r="2" fill="${c}"/><circle cx="146" cy="56" r="2" fill="${c}"/>`,
+      Q:`<path d="M100 66 Q103 50 112 54 Q118 42 125 50 Q132 42 138 54 Q147 50 150 66Z" fill="${trim}" stroke="${INK}" stroke-width="1.6"/><circle cx="125" cy="50" r="3" fill="#fff"/>`,
+      J:`<path d="M98 68 Q104 46 128 46 Q150 48 154 68Z" fill="${c}" stroke="${INK}" stroke-width="1.6"/><path d="M146 50 Q170 30 178 52 Q164 44 150 58" fill="${trim}" stroke="${INK}" stroke-width="1.4"/>`}[rank];
+    const held={
+      K:`<path d="M168 98 L168 168" stroke="${INK}" stroke-width="3"/><path d="M160 104 H176" stroke="${INK}" stroke-width="3"/><path d="M168 98 L168 70" stroke="#c9ccd2" stroke-width="5" stroke-linecap="round"/>`,
+      Q:`<path d="M78 120 Q74 100 84 96" stroke="#5c8a4a" stroke-width="2.4" fill="none"/><circle cx="84" cy="92" r="7" fill="#e58fa5" stroke="${INK}" stroke-width="1.2"/><circle cx="84" cy="92" r="2.4" fill="${trim}"/>`,
+      J:`<path d="M82 166 L92 82" stroke="${INK}" stroke-width="2.4"/><path d="M92 82 L86 72 L98 76Z" fill="#c9ccd2" stroke="${INK}" stroke-width="1.2"/>`}[rank];
+    const beard=rank==='K'?`<path d="M110 92 Q125 118 140 92 Q134 104 125 106 Q116 104 110 92Z" fill="${hair}" stroke="${INK}" stroke-width="1.2"/>`:'';
+    const half=`
+      <g filter="url(#ink${f})" transform="translate(125 175) scale(.86) translate(-125 -170)">
+        <path d="M84 175 Q86 130 104 116 Q125 108 146 116 Q164 130 166 175Z" fill="${robe}" opacity=".85" stroke="${INK}" stroke-width="1.8"/>
+        <path d="M104 116 L125 175 L146 116" fill="#f4efe4" stroke="${INK}" stroke-width="1.4"/>
+        <path d="M112 122 L125 160 L138 122" fill="none" stroke="${trim}" stroke-width="3"/>
+        ${[0,1,2,3].map(k=>`<circle cx="${92+k*22}" cy="${150+(k%2)*8}" r="3" fill="${trim}"/>`).join('')}
+        <path d="M100 66 Q100 98 112 104 Q125 112 138 104 Q150 98 150 66Z" fill="${hair}" stroke="${INK}" stroke-width="1.4"/>
+        <ellipse cx="125" cy="84" rx="17" ry="20" fill="${skin}" stroke="${INK}" stroke-width="1.6"/>
+        <path d="M117 82 q3 -3 6 0 M127 82 q3 -3 6 0" stroke="${INK}" stroke-width="1.4" fill="none"/>
+        <path d="M121 94 q4 3 8 0" stroke="#b5554f" stroke-width="1.6" fill="none"/>
+        <circle cx="114" cy="90" r="3" fill="#ef9a9a" opacity=".6"/><circle cx="136" cy="90" r="3" fill="#ef9a9a" opacity=".6"/>
+        ${beard}${hat}${held}
+      </g>`;
+    return `<rect x="58" y="58" width="134" height="234" rx="4" fill="#fbf7ee" stroke="${INK}" stroke-width="2" filter="url(#ink${f})"/>
+      <clipPath id="cc${f}"><rect x="60" y="60" width="130" height="230"/></clipPath>
+      <g clip-path="url(#cc${f})">${half}<g transform="rotate(180 125 175)">${half}</g></g>
+      <path d="M60 175 H190" stroke="${INK}" stroke-width="1.4" filter="url(#ink${f})"/>
+      <g transform="translate(160 64) scale(.2)"><path d="${SUIT[suit]}" fill="${c}"/></g><g transform="rotate(180 125 175) translate(160 64) scale(.2)"><path d="${SUIT[suit]}" fill="${c}"/></g>`;
+  }
   function card(rank,suit){
     const f='t'+(uid++), c=col(suit);
     const paint=(x,y,size,op)=>{const k=size/100;return `<g transform="translate(${x-size/2} ${y-size/2}) scale(${k})"><path d="${SUIT[suit]}" fill="${c}" opacity="${op||.82}" filter="url(#wc${f})"/><path d="${SUIT[suit]}" fill="none" stroke="${c}" stroke-width="${1.3/k}" opacity=".45" filter="url(#wc${f})"/></g>`;};
     const corner=`<text x="30" y="50" font-family="'IM Fell English',Georgia,serif" font-size="34" fill="${c}" text-anchor="middle">${rank}</text>${paint(30,72,22,.9)}`;
     let mid='';
     if(rank==='A') mid=paint(125,170,120);
-    else if(['K','Q','J'].includes(rank)) mid=`<rect x="58" y="58" width="134" height="234" fill="none" stroke="${INK}" stroke-width="2" filter="url(#ink${f})"/>${paint(125,135,70)}<g transform="rotate(180 125 175)">${paint(125,135,70)}</g><text x="125" y="186" font-family="'IM Fell English',Georgia,serif" font-size="38" fill="${c}" text-anchor="middle" opacity=".85">${rank}</text>`;
+    else if(['K','Q','J'].includes(rank)) mid=court(rank,suit,c,f);
     else { mid=(PIPS[rank]||[]).map(([col,y])=>paint(PIP[col],y,38)).join(''); }
     return `<svg viewBox="0 0 250 350" xmlns="http://www.w3.org/2000/svg"><defs>
       <filter id="wc${f}" x="-10%" y="-10%" width="120%" height="120%"><feTurbulence type="fractalNoise" baseFrequency=".035" numOctaves="3" seed="${uid}"/><feDisplacementMap in="SourceGraphic" scale="6"/><feGaussianBlur stdDeviation=".5"/></filter>
@@ -741,11 +778,11 @@
       if(mobile&&(gi%2||g.y<14)) return;
       if(g.wide&&innerWidth<1200) return;   // only where there's room beside the hand            // fewer cards on phones, none over the nav
       const scale=mobile?.42:1, w=g.w*scale;
-      if(g.prop){const el=document.createElement('div');el.className='pc';el.style.width=(g.w*scale)+'px';el.style.left=g.x+'%';el.style.top=g.y+'%';el.style.transform=`rotate(${g.rot}deg)`;el.innerHTML={box:deckBox,dealer:dealer,pad:scorepad}[g.prop]();table.appendChild(el);return;}
-      if(g.chips||g.dice){const el=document.createElement('div');el.className='pc';el.style.width=(g.w*scale)+'px';el.style.left=g.x+'%';el.style.top=g.y+'%';el.style.transform=`rotate(${g.rot}deg)`;el.innerHTML=g.chips?chips(g.chips):dice();table.appendChild(el);return;}
+      if(g.prop){const el=document.createElement('div');el.className='pc';el.dataset.spec=JSON.stringify(g);el.style.width=(g.w*scale)+'px';el.style.left=g.x+'%';el.style.top=g.y+'%';el.style.transform=`rotate(${g.rot}deg)`;el.innerHTML={box:deckBox,dealer:dealer,pad:scorepad}[g.prop]();table.appendChild(el);return;}
+      if(g.chips||g.dice){const el=document.createElement('div');el.className='pc';el.dataset.spec=JSON.stringify(g);el.style.width=(g.w*scale)+'px';el.style.left=g.x+'%';el.style.top=g.y+'%';el.style.transform=`rotate(${g.rot}deg)`;el.innerHTML=g.chips?chips(g.chips):dice();table.appendChild(el);return;}
       const list=g.pile?Array.from({length:g.pile},()=>null):(g.fan||[g.one]);
       list.forEach((rs,k)=>{
-        const el=document.createElement('div'); el.className='pc';
+        const el=document.createElement('div'); el.className='pc';el.dataset.spec=JSON.stringify(g);
         const spread=(k-(list.length-1)/2);
         el.style.width=w+'px';
         const off=g.pile?k*3:spread*w*.42, tilt=g.pile?(k%2?4:-3):spread*11;
@@ -793,17 +830,23 @@
   function buildFrame(){
     const vw=innerWidth,mobile=vw<760,w=mobile?72:138,h=w*1.4;frame.innerHTML='';let i=0;
     const vh=Math.max(document.documentElement.scrollHeight,innerHeight);frame.style.height=vh+'px';
-    const place=(x,y,rot)=>{const [r,s]=BORDER_CARDS[i%BORDER_CARDS.length];const el=document.createElement('div');el.className='fc';el.style.width=w+'px';
+    const place=(x,y,rot)=>{const [r,s]=BORDER_CARDS[i%BORDER_CARDS.length];const el=document.createElement('div');el.className='fc';el.dataset.card=r+'|'+s;el.style.width=w+'px';
       el.style.left=x+'px';el.style.top=y+'px';el.style.transform=`rotate(${rot}deg)`;el.innerHTML=card(r,s);frame.appendChild(el);i++;};
     // left edge, top to bottom
-    if(vw>=1200) for(let y=78;y<vh-h*1.75;y+=h*1.18){place(-w*.48+rnd(i+1)*w*.12,y,(rnd(i+7)-.5)*14);}
+    // a messy spill down each side: two loose layers, overlapping, every card at its own angle
+    if(vw>=1100){
+      for(let y=70;y<vh-h*.9;y+=h*.5){place(-w*.55+rnd(i+1)*w*.35,y+rnd(i+2)*h*.2,(rnd(i+7)-.5)*60);}
+      for(let y=100;y<vh-h*.9;y+=h*.62){place(-w*.2+rnd(i+3)*w*.3,y+rnd(i+4)*h*.2,(rnd(i+8)-.5)*70);}
+      for(let y=90;y<vh-h*.9;y+=h*.58){place(vw-w*.45-rnd(i+5)*w*.3,y+rnd(i+6)*h*.2,(rnd(i+9)-.5)*60);}
+    }
     // bottom edge, left to right
     // bottom row sits below the hand; if there isn't room under it, leave the row out
     if(mobile) return;
     const fanBottom=document.getElementById('memoryGrid').getBoundingClientRect().bottom+scrollY+12;
     const rowTop=Math.max(vh-h*.5,fanBottom);
     if(vh-rowTop>=h*.28){
-      for(let x=w*.15;x<vw;x+=w*1.32){place(x,rowTop+rnd(i+3)*h*.05,(rnd(i+11)-.5)*12);}
+      for(let x=-w*.3;x<vw;x+=w*.62){place(x,rowTop+rnd(i+3)*h*.12,(rnd(i+11)-.5)*50);}
+      for(let x=-w*.05;x<vw;x+=w*.75){place(x,rowTop-h*.38+rnd(i+4)*h*.18,(rnd(i+12)-.5)*60);}
     }
   }
   const pb=document.querySelector('.poster-base');if(pb)pb.innerHTML=card('A','club');
@@ -889,50 +932,75 @@
   //    move away and they drop back one at a time, each with a little clack.
   const chipAudio={ctx:null,
     init(){if(!this.ctx){try{this.ctx=new (window.AudioContext||window.webkitAudioContext)();}catch(e){}}if(this.ctx&&this.ctx.state==='suspended')this.ctx.resume();},
-    clack(i,n){
+    clack(i,n,vol=1){
       const c=this.ctx;if(!c||c.state!=='running')return;const t=c.currentTime,pitch=1+(Math.random()-.5)*.12-i*.006;
       // the click of clay on clay: a bright tick, a short knock and a tiny ring
       const len=Math.ceil(c.sampleRate*.05),buf=c.createBuffer(1,len,c.sampleRate),d=buf.getChannelData(0);
       for(let k=0;k<len;k++)d[k]=(Math.random()*2-1)*Math.exp(-k/(c.sampleRate*.004));
       const src=c.createBufferSource();src.buffer=buf;const bp=c.createBiquadFilter();bp.type='bandpass';bp.frequency.value=3200*pitch;bp.Q.value=1.4;
-      const g1=c.createGain();g1.gain.value=.42;src.connect(bp).connect(g1).connect(c.destination);src.start(t);
+      const g1=c.createGain();g1.gain.value=.42*vol;src.connect(bp).connect(g1).connect(c.destination);src.start(t);
       const o=c.createOscillator(),g2=c.createGain();o.type='sine';o.frequency.setValueAtTime(2350*pitch,t);o.frequency.exponentialRampToValueAtTime(1900*pitch,t+.06);
       g2.gain.setValueAtTime(.06,t);g2.gain.exponentialRampToValueAtTime(.0005,t+.09);o.connect(g2).connect(c.destination);o.start(t);o.stop(t+.1);
       const k2=c.createOscillator(),g3=c.createGain();k2.type='triangle';k2.frequency.setValueAtTime(420*pitch,t);g3.gain.setValueAtTime(.08,t);g3.gain.exponentialRampToValueAtTime(.0005,t+.05);
       k2.connect(g3).connect(c.destination);k2.start(t);k2.stop(t+.06);
     },
+    // cards: a soft paper slide, a crisp snap when one flips, a riffle for the shuffle
+    paper(dur,f,gain){const c=this.ctx;if(!c||c.state!=='running')return;const t=c.currentTime,len=Math.ceil(c.sampleRate*dur),buf=c.createBuffer(1,len,c.sampleRate),d=buf.getChannelData(0);
+      for(let k=0;k<len;k++)d[k]=(Math.random()*2-1)*Math.sin(Math.PI*k/len);const s=c.createBufferSource();s.buffer=buf;const fl=c.createBiquadFilter();fl.type='bandpass';fl.frequency.value=f;fl.Q.value=.8;
+      const g=c.createGain();g.gain.value=gain;s.connect(fl).connect(g).connect(c.destination);s.start(t);},
+    slide(){this.paper(.12,2400,.035);},
+    snap(){const c=this.ctx;if(!c||c.state!=='running')return;this.paper(.05,3600,.22);const o=c.createOscillator(),g=c.createGain(),t=c.currentTime;o.type='triangle';o.frequency.setValueAtTime(900,t);o.frequency.exponentialRampToValueAtTime(300,t+.05);g.gain.setValueAtTime(.08,t);g.gain.exponentialRampToValueAtTime(.0005,t+.06);o.connect(g).connect(c.destination);o.start(t);o.stop(t+.07);},
+    riffle(){for(let k=0;k<26;k++)setTimeout(()=>this.paper(.018,3000+Math.random()*1500,.1),240+k*22+Math.random()*8);setTimeout(()=>this.paper(.08,1800,.12),240+26*22+60);},
     lift(){const c=this.ctx;if(!c||c.state!=='running')return;const t=c.currentTime,len=Math.ceil(c.sampleRate*.18),buf=c.createBuffer(1,len,c.sampleRate),d=buf.getChannelData(0);
       for(let k=0;k<len;k++)d[k]=(Math.random()*2-1)*.5*Math.sin(Math.PI*k/len);const s=c.createBufferSource();s.buffer=buf;const f=c.createBiquadFilter();f.type='highpass';f.frequency.value=2500;
       const g=c.createGain();g.gain.value=.05;s.connect(f).connect(g).connect(c.destination);s.start(t);}
   };
+  // card sounds: brush past a card, flip one, shuffle the deck
+  let lastSlide=0;
+  document.querySelectorAll('#memoryGrid .card-scene').forEach(sc=>sc.addEventListener('pointerenter',()=>{const t=performance.now();if(t-lastSlide>90){lastSlide=t;chipAudio.slide();}}));
+  document.addEventListener('click',e=>{if(e.target.closest('#memoryGrid .card-scene, #cardPopupFlipper'))setTimeout(()=>chipAudio.snap(),e.target.closest('#cardPopupFlipper')?0:420);},true);
+  const deckEl=document.getElementById('deck');if(deckEl)deckEl.addEventListener('click',()=>{chipAudio.init();chipAudio.riffle();},true);
   // browsers only allow sound after a click or key press, so the first one anywhere switches it on
   ['pointerdown','keydown'].forEach(ev=>addEventListener(ev,()=>chipAudio.init(),{once:false,passive:true}));
   const stillChips=matchMedia('(prefers-reduced-motion: reduce)').matches;
+  // each stack runs a tiny physics sim: springs lift the chips into a loose fan, then on
+  // release each chip falls under gravity, bounces once or twice, and clacks as it lands
   function wireChips(){
     document.querySelectorAll('#table .stack').forEach(st=>{
       if(st.dataset.wired)return;st.dataset.wired='1';
-      const chips=[...st.querySelectorAll('.chip')].sort((a,b)=>b.dataset.j-a.dataset.j); // bottom first
-      const n=chips.length;let up=false,timers=[];
+      const els=[...st.querySelectorAll('.chip')].sort((a,b)=>b.dataset.j-a.dataset.j); // bottom first
+      const n=els.length,c0=els[0].querySelector('circle'),cx=+c0.getAttribute('cx');
+      const chips=els.map((el,i)=>({el,i,y:0,v:0,x:0,vx:0,r:0,mode:'rest',cy:+el.querySelector('circle').getAttribute('cy')}));
+      let running=false,timers=[];
+      const render=c=>c.el.setAttribute('transform',`translate(${c.x.toFixed(2)} ${c.y.toFixed(2)}) rotate(${c.r.toFixed(2)} ${cx} ${c.cy})`);
+      function loop(){
+        let busy=false;
+        chips.forEach(c=>{
+          if(c.mode==='lift'){ // springy rise to a fanned height, with a little sway
+            const ty=-(10+c.i*7.5+(c.i*c.i)*.35),tx=Math.sin(c.i*1.7)*1.6;
+            c.v+=(ty-c.y)*.16;c.v*=.72;c.y+=c.v;c.vx+=(tx-c.x)*.12;c.vx*=.7;c.x+=c.vx;c.r=c.vx*3+Math.sin(c.i)*2;
+            if(Math.abs(c.v)>.02||Math.abs(ty-c.y)>.05)busy=true;
+          }else if(c.mode==='fall'){ // gravity, a bounce or two, settle
+            c.v+=.55;c.y+=c.v;c.x*=.9;c.r*=.85;
+            if(c.y>=0){c.y=0;if(c.v>1.2){chipAudio.clack(c.i,n,Math.min(1,c.v/7));c.v=-c.v*.26;}else{c.v=0;c.x=0;c.r=0;c.mode='rest';}}
+            busy=true;
+          }
+          render(c);
+        });
+        if(busy)requestAnimationFrame(loop);else running=false;
+      }
+      const go=()=>{if(!running){running=true;requestAnimationFrame(loop);}};
       const clear=()=>{timers.forEach(clearTimeout);timers=[];};
-      const raise=()=>{
-        if(up)return;up=true;clear();chipAudio.lift();
-        chips.forEach((c,i)=>{const rise=14+i*9;c.getAnimations().forEach(a=>a.cancel());
-          c.animate([{transform:'translate(0,0)'},{transform:`translate(${(i%2?1:-1)*1.2}px,${-rise}px)`}],{duration:stillChips?0:260+i*30,easing:'cubic-bezier(.2,.8,.25,1)',fill:'forwards'});});
-      };
-      const drop=()=>{
-        if(!up)return;up=false;clear();
-        // bottom chip lands first, then each one on top of it: count them down
-        chips.forEach((c,i)=>{timers.push(setTimeout(()=>{
-          const from=getComputedStyle(c).transform;
-          c.getAnimations().forEach(a=>a.cancel());
-          const a=c.animate([{transform:from==='none'?'translate(0,0)':from},{transform:'translate(0,1.2px)',offset:.82},{transform:'translate(0,-1px)',offset:.92},{transform:'translate(0,0)'}],
-            {duration:stillChips?0:170,easing:'cubic-bezier(.55,0,.9,.5)',fill:'forwards'});
-          setTimeout(()=>chipAudio.clack(i,n),stillChips?0:140);
-        },stillChips?0:i*95));});
-      };
+      const raise=()=>{clear();chipAudio.lift();
+        if(stillChips){chips.forEach(c=>{c.y=-(10+c.i*7.5);render(c);});return;}
+        chips.forEach(c=>{c.mode='lift';c.v-=1.5+c.i*.3;});go();};
+      const drop=()=>{clear();
+        if(stillChips){chips.forEach(c=>{c.y=0;c.x=0;c.r=0;render(c);});chipAudio.clack(0,n,.6);return;}
+        // count them down: the bottom chip lets go first, then each one on top of it
+        chips.forEach((c,k)=>timers.push(setTimeout(()=>{c.mode='fall';c.v=Math.min(c.v,0)*.2;go();},k*85)));};
       st.addEventListener('pointerenter',raise);
       st.addEventListener('pointerleave',drop);
-      st.addEventListener('pointerdown',e=>{chipAudio.init();if(e.pointerType!=='mouse'){raise();timers.push(setTimeout(drop,650));}});
+      st.addEventListener('pointerdown',e=>{chipAudio.init();if(e.pointerType!=='mouse'){raise();timers.push(setTimeout(drop,700));}});
     });
   }
   // fill open felt between the hand and the bottom row with more loose cards, wherever nothing else is
@@ -947,16 +1015,17 @@
     let n=0,placed=0;
     const top=fanBottom-h*.3,span=floor-top-h;
     if(span<h*.3)return;
-    for(let k=0;k<420&&placed<14;k++){
+    for(let k=0;k<700&&placed<34;k++){
       const x=w*.1+rnd(k+101)*(vw-w*1.2),y=top+rnd(k+211)*span;
       const [r,s]=BORDER_CARDS[(k*7+3)%BORDER_CARDS.length];
-      const el=document.createElement('div');el.className='fc extra';el.style.width=w+'px';
-      el.style.left=x+'px';el.style.top=y+'px';el.style.transform=`rotate(${(rnd(k+37)-.5)*30}deg)`;
+      const el=document.createElement('div');el.className='fc extra';el.dataset.card=r+'|'+s;el.style.width=w+'px';
+      el.style.left=x+'px';el.style.top=y+'px';el.style.transform=`rotate(${(rnd(k+37)-.5)*80}deg)`;
       el.innerHTML=card(r,s);frameEl.appendChild(el);
-      if(overlapsHand(el)||touchesBand(el)||overlapsAny(el,'#table .pc',4)||overlapsAny(el,'#cardframe .fc',6)||docBox(el).b>floor+6)el.remove();else placed++;
+      if(overlapsHand(el)||touchesBand(el)||overlapsAny(el,'#table .pc',4)||docBox(el).b>floor+h*.4)el.remove();else placed++;
     }
   }
   function layoutTable(){
+    if(window.__arranging&&layoutTable.done)return;layoutTable.done=true;
     // measure the table where it really sits, even while the opening is sliding it into view
     const de=document.documentElement,pm=de.classList.contains('pool-moving');if(pm)de.classList.remove('pool-moving');
     lay();buildFrame();fitArch();clearArch();fillEmpty();wireChips();
@@ -968,5 +1037,6 @@
 })();
 </script>
 <script src="gh.js"></script>
+<script src="arrange.js"></script>
 </body>
 </html>
