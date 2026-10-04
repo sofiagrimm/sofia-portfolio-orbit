@@ -118,19 +118,19 @@
 
   // the planets: one per language. r is size, len is how far it hangs below its orbit
   const LANGS = [
-    {id:'en',  name:'English',    kind:'spoken', r:83, len:360, look:'swirl',   colors:['#24438f','#3462c4','#5f93e0','#e9eef7','#1d3878','#8db5ee'],
+    {id:'en',  name:'English',    kind:'spoken', r:83, len:380, look:'swirl',   colors:['#24438f','#3462c4','#5f93e0','#e9eef7','#1d3878','#8db5ee'],
      hello:'hello', note:'The one this whole site is written in, from the Chicago suburbs to New Haven.'},
     {id:'es',  name:'Español',    kind:'spoken', r:65, len:470, look:'bands',   colors:['#9d1f27','#c0352a','#7d1820','#d9573b','#b02a26'],
      hello:'hola', note:'Fluent. A grandmother in Spanish, and the clinic in Sevilla where I shadowed doctors.'},
-    {id:'zh',  name:'中文',        kind:'spoken', r:73, len:300, look:'bands',   colors:['#2f8f7a','#57b39a','#1f6b5c','#9fd6c0','#c9a24a','#3c9e86'],
+    {id:'zh',  name:'中文',        kind:'spoken', r:73, len:330, look:'bands',   colors:['#2f8f7a','#57b39a','#1f6b5c','#9fd6c0','#c9a24a','#3c9e86'],
      hello:'你好', note:'Fluent. A friend in Chinese, and the sound of Hong Kong, where I grew up.'},
-    {id:'html',name:'HTML',       kind:'code',   r:49, len:240, look:'bands',   colors:['#9a5a2c','#c27a3c','#6e3d1d','#e0a463','#b0682f'],
+    {id:'html',name:'HTML',       kind:'code',   r:49, len:200, look:'bands',   colors:['#9a5a2c','#c27a3c','#6e3d1d','#e0a463','#b0682f'],
      hello:'<h1>hello</h1>', note:'The bones of every page here.'},
-    {id:'css', name:'CSS',        kind:'code',   r:57, len:520, look:'speckle', colors:['#3aa6d9','#7cc7ea','#2a7fb8','#b8e2f4','#5bb6e2'],
+    {id:'css', name:'CSS',        kind:'code',   r:57, len:560, look:'speckle', colors:['#3aa6d9','#7cc7ea','#2a7fb8','#b8e2f4','#5bb6e2'],
      hello:'h1 { color: #f3a1c4 }', note:'The felt, the night sky, the paper, the lamp light. And the thread on this page.'},
-    {id:'js',  name:'JavaScript', kind:'code',   r:62, len:330, look:'bands',   colors:['#e7c27a','#f3dca0','#c99a4e','#fff0c8','#b9853f','#dcb066'],
+    {id:'js',  name:'JavaScript', kind:'code',   r:62, len:290, look:'bands',   colors:['#e7c27a','#f3dca0','#c99a4e','#fff0c8','#b9853f','#dcb066'],
      hello:'console.log("hello")', note:'The pool break, the chips, the roulette, the paper airplane, and this mobile turning.'},
-    {id:'glsl',name:'GLSL',       kind:'code',   r:55, len:600, look:'bands',   colors:['#e7b86a','#f6d79a','#c98d45','#fbe7bf','#d8a257'], ringed:true,
+    {id:'glsl',name:'GLSL',       kind:'code',   r:55, len:620, look:'bands',   colors:['#e7b86a','#f6d79a','#c98d45','#fbe7bf','#d8a257'], ringed:true,
      hello:'gl_FragColor = vec4(1.0);', note:"The shaders that let old masters' eyes follow you around the Arts page."},
   ];
   // little things that hang between the planets
@@ -214,6 +214,10 @@
     el('path', Object.assign({d: d(0, Math.PI)}, st), ringFront[i]);
     el('path', Object.assign({d: d(0, Math.PI)}, st, {stroke: '#7a4f17', 'stroke-dasharray': '2 9', 'stroke-dashoffset': 3, 'stroke-width': R.w * .6}), ringFront[i]);
     R.layer = {back: el('g', {}, ringBack[i]), front: el('g', {}, ringFront[i])};
+    R.orn = [];
+    for (let k = 0; k < R.beads; k++) R.orn.push({off: k / R.beads * Math.PI * 2, node: el('circle', {r: k % 3 ? 2.4 : 4, fill: k % 3 ? '#c8902f' : '#e9b94f'}), dy: 0});
+    R.moons.forEach(m => R.orn.push({off: m, node: el('path', {fill: '#e7c56b'}), shape: 'moon'}));
+    R.stars.forEach(m => R.orn.push({off: m, node: el('path', {fill: '#f2cf6b'}), shape: 'star'}));
   });
 
   function moonPath(x, y, s) { return `M${x + s * .3} ${y - s}A${s} ${s} 0 1 0 ${x + s * .3} ${y + s}A${s * .78} ${s * .78} 0 1 1 ${x + s * .3} ${y - s}Z`; }
@@ -230,6 +234,7 @@
     it.g = g;
     it.thread = el('path', {fill: 'none', stroke: '#b8893a', 'stroke-width': 1.3, 'stroke-dasharray': '5 3'}, g);
     it.beads = el('g', {fill: '#d9a944'}, g);
+    it.bead = [1, 2, 3].map(() => el('circle', {r: 2.6}, it.beads));
     if (it.L) {
       const L = it.L, body = el('g', {class: 'planet', tabindex: 0, role: 'button', 'aria-label': `${L.name}, a language I ${L.kind === 'spoken' ? 'speak' : 'code in'}`, 'data-id': L.id}, g);
       it.body = body;
@@ -251,7 +256,8 @@
   });
 
   // ── turning ──
-  let rot = 0, vel = still ? 0 : .0016, target = null, dragging = false, last = performance.now();
+  let rot = 0, vel = still ? 0 : .0016, target = null, dragging = false, last = performance.now(), lastKey = '', visible = true, running = true;
+  new IntersectionObserver(es => { visible = es[0].isIntersecting; if (visible && !running) { running = true; last = performance.now(); requestAnimationFrame(frame); } }).observe(svg);
   const BIG = RINGS[0];
   function frame(now) {
     const dt = Math.min(50, now - last) / 16.7; last = now;
@@ -263,10 +269,13 @@
     }
     // beads, moons and stars ride every ring at its own pace
     RINGS.forEach((R, i) => {
-      const a0 = rot * R.speed, b = R.layer.back, f = R.layer.front; b.innerHTML = ''; f.innerHTML = '';
-      for (let k = 0; k < R.beads; k++) { const a = a0 + k / R.beads * Math.PI * 2, [x, y] = onRing(R, a); el('circle', {cx: x, cy: y, r: k % 3 ? 2.4 : 4, fill: k % 3 ? '#c8902f' : '#e9b94f'}, Math.sin(a) > 0 ? f : b); }
-      R.moons.forEach(m => { const a = a0 + m, [x, y] = onRing(R, a); el('path', {d: moonPath(x, y - 10, 10), fill: '#e7c56b'}, Math.sin(a) > 0 ? f : b); });
-      R.stars.forEach(m => { const a = a0 + m, [x, y] = onRing(R, a); el('path', {d: starPath(x, y - 12, 9), fill: '#f2cf6b'}, Math.sin(a) > 0 ? f : b); });
+      const a0 = rot * R.speed;
+      for (const o of R.orn) {
+        const a = a0 + o.off, [x, y] = onRing(R, a), side = Math.sin(a) > 0 ? R.layer.front : R.layer.back;
+        if (o.node.parentNode !== side) side.appendChild(o.node);
+        if (!o.shape) { o.node.setAttribute('cx', x.toFixed(1)); o.node.setAttribute('cy', y.toFixed(1)); }
+        else o.node.setAttribute('d', o.shape === 'moon' ? moonPath(x, y - 10, 10) : starPath(x, y - 12, 9));
+      }
     });
     // the hanging things: front ones larger and brighter, back ones smaller, dimmer, and behind the sun
     const t = now / 1000, order = [];
@@ -276,8 +285,7 @@
       const len = (it.L ? it.L.len : it.C.len) * (.86 + .14 * (depth + 1) / 2);
       const swing = still ? 0 : Math.sin(t * it.sw + it.phase) * .035, bx = ax + Math.sin(swing) * len, by = ay + Math.cos(swing) * len;
       it.thread.setAttribute('d', `M${ax.toFixed(1)} ${ay.toFixed(1)}L${bx.toFixed(1)} ${by.toFixed(1)}`);
-      it.beads.innerHTML = '';
-      for (let k = 1; k <= 3; k++) { const q = k / 4.2; el('circle', {cx: ax + (bx - ax) * q * .55, cy: ay + (by - ay) * q * .55, r: 2.6}, it.beads); }
+      it.bead.forEach((c, k) => { const q = (k + 1) / 4.2 * .55; c.setAttribute('cx', (ax + (bx - ax) * q).toFixed(1)); c.setAttribute('cy', (ay + (by - ay) * q).toFixed(1)); });
       it.body.setAttribute('transform', `translate(${bx.toFixed(1)} ${by.toFixed(1)}) scale(${s.toFixed(3)})`);
       if (it.shade) it.shade.setAttribute('opacity', (.5 * (1 - (depth + 1) / 2)).toFixed(3));
       if (it.L && it.L.ringed) {
@@ -287,8 +295,10 @@
       }
       order.push([depth, it]);
     });
-    order.sort((p, q) => p[0] - q[0]).forEach(([d, it]) => (d < 0 ? hangBack : hangFront).appendChild(it.g));
-    requestAnimationFrame(frame);
+    order.sort((p, q) => p[0] - q[0]);
+    const key = order.map(([d, it]) => (d < 0 ? 'b' : 'f') + items.indexOf(it)).join();
+    if (key !== lastKey) { order.forEach(([d, it]) => (d < 0 ? hangBack : hangFront).appendChild(it.g)); lastKey = key; }
+    if (visible) requestAnimationFrame(frame); else running = false;
   }
 
   // ── choosing a planet brings it round to the front and opens its patch ──
@@ -331,5 +341,6 @@
 })();
 </script>
 <script src="../gh.js"></script>
+<script src="../nav.js" defer></script>
 </body>
 </html>

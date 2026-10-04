@@ -14,7 +14,8 @@
     .nebula{position:fixed;inset:0;z-index:1;pointer-events:none;background:radial-gradient(ellipse 50% 35% at 20% 60%,rgba(30,70,170,.07) 0%,transparent 70%),radial-gradient(ellipse 40% 30% at 80% 30%,rgba(20,80,190,.07) 0%,transparent 70%),radial-gradient(ellipse 50% 44% at 50% 50%,rgba(15,35,110,.05) 0%,transparent 65%);}
 
     /* ── NAV ── */
-    nav{position:fixed;top:0;left:0;right:0;z-index:50;display:flex;align-items:center;justify-content:space-between;padding:0 48px;height:68px;}
+    /* the pool table (z 500) used to sit over the menu, leaving no way off this page */
+    nav{position:fixed;top:0;left:0;right:0;z-index:520;display:flex;align-items:center;justify-content:space-between;padding:0 48px;height:68px;}
     .nav-name{font-family:'Cormorant Garamond',Georgia,serif;font-style:italic;font-size:28px;font-weight:300;font-style:italic;letter-spacing:.06em;color:rgba(220,232,255,.9);text-decoration:none;white-space:nowrap;}
     .nav-links{display:flex;align-items:center;gap:4px;}
     .nav-links a{font-size:13px;font-weight:400;letter-spacing:.13em;text-transform:uppercase;color:rgba(160,190,255,.5);text-decoration:none;padding:7px 16px;border-radius:4px;transition:color .25s,background .25s;}
@@ -267,7 +268,7 @@
   .nav-name,header .brand,.site>a:first-child{font-family:'Cormorant Garamond',Georgia,serif !important;font-weight:300 !important;font-style:italic !important;letter-spacing:.06em !important}
 </style>
 </head>
-<body>
+<body data-menu="compact">
 <script src="pool.js"></script>
 <div id="table" aria-hidden="true"></div>
 <div id="cardframe" aria-hidden="true"></div>
@@ -352,14 +353,14 @@
     // Each project is a different card; the number of pips in each scene matches the rank.
     // Suits are SVG paths (not text) so phones never turn them into emoji.
     const HAND = [
-      {rank:"3", suit:"diamond", label:"PCDD", scene:"lab", img:"img/cards/card-3-diamonds.jpg"},
-      {rank:"5", suit:"spade",   label:"Vantage", scene:"laptop", img:"img/cards/card-5-spades.jpg"},
-      {rank:"4", suit:"heart",   label:"Red Cross fleet", scene:"car", img:"img/cards/card-4-hearts.jpg"},
-      {rank:"6", suit:"club",    label:"ASEAN expansion", scene:"islands", img:"img/cards/card-6-clubs.jpg"},
-      {rank:"7", suit:"spade",   label:"Fermilab lenses", scene:"telescope", img:"img/cards/card-7-spades.jpg"},
-      {rank:"8", suit:"diamond", label:"green routing", scene:"bus", img:"img/cards/card-8-diamonds.jpg"},
-      {rank:"JOKER", suit:null,  label:"this website", scene:"joker", img:"img/cards/card-joker.jpg"},
-      {rank:"9", suit:"heart",   label:"NeuroPrint", scene:"stretch", img:"img/cards/card-9-hearts.jpg"}
+      {rank:"3", suit:"diamond", label:"PCDD", scene:"lab", img:"img/cards/card-3-diamonds.webp"},
+      {rank:"5", suit:"spade",   label:"Vantage", scene:"laptop", img:"img/cards/card-5-spades.webp"},
+      {rank:"4", suit:"heart",   label:"Red Cross fleet", scene:"car", img:"img/cards/card-4-hearts.webp"},
+      {rank:"6", suit:"club",    label:"ASEAN expansion", scene:"islands", img:"img/cards/card-6-clubs.webp"},
+      {rank:"7", suit:"spade",   label:"Fermilab lenses", scene:"telescope", img:"img/cards/card-7-spades.webp"},
+      {rank:"8", suit:"diamond", label:"green routing", scene:"bus", img:"img/cards/card-8-diamonds.webp"},
+      {rank:"JOKER", suit:null,  label:"this website", scene:"joker", img:"img/cards/card-joker.webp"},
+      {rank:"9", suit:"heart",   label:"NeuroPrint", scene:"stretch", img:"img/cards/card-9-hearts.webp"}
     ];
     const SUIT_PATH = {
       heart:"M50 90 C20 68 5 52 5 33 C5 18 16 8 30 8 C40 8 46 14 50 23 C54 14 60 8 70 8 C84 8 95 18 95 33 C95 52 80 68 50 90Z",
@@ -1435,5 +1436,6 @@
 <script src="gh.js"></script>
 <script src="arrange.js"></script>
 <script src="roulette.js"></script>
+<script src="nav.js" defer></script>
 </body>
 </html>
