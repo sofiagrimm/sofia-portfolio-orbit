@@ -264,6 +264,42 @@
     /* thirteen tabs: tighter on laptops so the menu stays on one line */
   @media (max-width:1700px){.nav-links a{padding:6px 8px !important;font-size:12px !important;letter-spacing:.07em !important}}
   @media (max-width:1380px){.nav-links a{padding:5px 5px !important;font-size:11px !important;letter-spacing:.04em !important}.nav-links .divider{display:none !important}}
+
+  /* ── refinements: a proper top sheet, stats, statement, doodles, and a smaller sunrise globe ── */
+  .ghead{position:fixed;top:64px;left:0;right:0;z-index:11;display:flex;justify-content:space-between;align-items:flex-start;gap:24px;padding:6px 3.4vw 0;pointer-events:none}
+  .ghead *{pointer-events:auto}
+  .pen{font-family:'Reenie Beanie',cursive;color:#2b2724;line-height:1}
+  .ghead .hi{font-size:clamp(22px,2vw,28px);margin-bottom:2px}
+  .ghead .page-title{width:auto !important;font-size:clamp(46px,5.4vw,82px) !important;white-space:nowrap}
+  .stats{display:flex;gap:18px;margin-top:10px}
+  .stats span{display:flex;align-items:baseline;gap:6px}
+  .stats b{font-family:'Cherry Bomb One',cursive;font-weight:400;font-size:34px;color:#e97fae;line-height:1}
+  .stats i{font-family:'Reenie Beanie',cursive;font-style:normal;font-size:22px;color:#2b2724}
+  .ghead-right{text-align:right}
+  .big{font-family:'Inter',sans-serif;font-weight:800;letter-spacing:-.04em;line-height:.92;color:#7d7772;margin:0}
+  .big.l1{font-size:clamp(22px,2.6vw,38px);color:#9a948e}
+  .big.l2{font-size:clamp(28px,3.4vw,50px)}
+  .ghead .note{font-size:24px;margin-top:10px;color:#e97fae}
+  /* the strip of cards sits under the heading */
+  .left-panel{top:clamp(230px,26vh,270px) !important;padding:16px 3.4vw 22px !important;scrollbar-width:none;
+    -webkit-mask:linear-gradient(90deg,transparent 0,#000 2.5vw,#000 calc(100% - 4vw),transparent 100%);mask:linear-gradient(90deg,transparent 0,#000 2.5vw,#000 calc(100% - 4vw),transparent 100%)}
+  .left-panel::-webkit-scrollbar{display:none}
+  .strip-nav{position:fixed;right:3.4vw;top:clamp(212px,24vh,250px);z-index:12;display:flex;gap:6px}
+  .strip-nav button{width:30px;height:30px;border-radius:50%;border:1.5px solid #2b2724;background:#fbf8f2;color:#2b2724;font:600 14px 'Inter',sans-serif;cursor:pointer}
+  .strip-nav button:hover,.strip-nav button:focus-visible{background:#f3a1c4;color:#fff;border-color:#f3a1c4;outline:none}
+  /* a smaller globe so the top of the sheet has room to breathe */
+  .right-panel{width:min(96vw,118vh) !important;height:min(96vw,118vh) !important}
+  .right-panel::before{inset:7.5%;box-shadow:0 -24px 50px rgba(120,90,60,.16),0 0 0 2px rgba(43,39,36,.06)}
+  .horizon{position:fixed;left:50%;bottom:0;width:calc(min(96vw,118vh)*.92);height:calc(min(96vw,118vh)*.92);transform:translate(-50%,50%);border-radius:50%;
+    border:2px dashed rgba(233,127,174,.55);z-index:4;pointer-events:none}
+  .globe-label{display:none !important}
+  .spin{position:fixed;z-index:11;left:calc(50% - min(96vw,118vh)*.43 - 30px);bottom:calc(min(96vw,118vh)*.29);font-size:30px;transform:rotate(-8deg);pointer-events:none}
+  .spin svg{display:block;width:70px;height:52px;margin:4px 0 0 30px}
+  .page-eyebrow,.section-label{display:none !important}
+  .entry .entry-loc::before{content:"\2192 ";color:#2b2724}
+  @media (max-width:900px){.ghead{flex-direction:column}.ghead-right{display:none}.left-panel{top:250px !important}.strip-nav,.spin{display:none}}
+  .entry::before{left:auto !important;right:14px !important;margin-left:0 !important;width:64px !important;top:-12px !important}
+  .ghead .note{padding-right:84px}
 </style>
 </head>
 <body>
@@ -288,10 +324,25 @@
     </div>
   </nav>
 
+  <header class="ghead">
+    <div class="ghead-left">
+      <p class="pen hi">hi! pull up a chair, this is</p>
+      <h1 class="page-title">where I've explored</h1>
+      <div class="stats" aria-label="At a glance">
+        <span><b>8</b><i>projects</i></span><span><b>6</b><i>cities</i></span><span><b>3</b><i>countries</i></span>
+      </div>
+    </div>
+    <div class="ghead-right">
+      <p class="big l1">it's not just a map,</p>
+      <p class="big l2">it's where the work happened.</p>
+      <p class="pen note">hover a card for the story &rarr;</p>
+    </div>
+  </header>
+  <div class="strip-nav" aria-hidden="true"><button type="button" id="stripL">&larr;</button><button type="button" id="stripR">&rarr;</button></div>
+  <div class="horizon" aria-hidden="true"></div>
+  <p class="pen spin" aria-hidden="true">spin me!<svg viewBox="0 0 80 60"><path d="M6 8 C30 4 52 18 58 46" fill="none" stroke="#2b2724" stroke-width="1.6" stroke-dasharray="4 4"/><path d="M50 40 L58 48 L64 38" fill="none" stroke="#2b2724" stroke-width="1.6"/></svg></p>
   <div class="page-shell">
     <div class="left-panel">
-      <div class="page-eyebrow">Research</div>
-      <h1 class="page-title">where I've explored</h1>
       <div class="rule"></div>
 
       <div class="section-label">Active</div>
@@ -915,6 +966,12 @@
   window.ROLLS = {
     higley:[], cushing:[], pcdd:[], fermilab:[], msu:[], stanford:[], sevilla:[], cambridge:[]
   };
+</script>
+
+<script>
+  // arrows scroll the strip of cards a card at a time
+  (function(){const p=document.querySelector('.left-panel');const go=d=>p.scrollBy({left:d*280,behavior:'smooth'});
+    document.getElementById('stripL').onclick=()=>go(-1);document.getElementById('stripR').onclick=()=>go(1);})();
 </script>
 </body>
 </html>
