@@ -3,10 +3,13 @@
 // lands decides which page of the site you go to next.
 (function () {
   if (/[?&]arrange\b/.test(location.search)) return;
-  var PAGES = [
-    ['home', 'index.html'], ['about', 'about.html'], ['research', 'research.html'], ['the card catalog', 'lab/cards.html'],
-    ['notes', 'lab/notes.html'], ['sofia is', 'lab/sofia-is.html'], ['the globe', 'lab/globe.html'], ['tilt', 'lab/lace.html'], ['a letter', 'contact.html']
+  var ROOT = (document.currentScript && document.currentScript.src || location.href).replace(/[^/]*$/, '');
+  var ALL = [
+    ['home', 'index.html'], ['about', 'about.html'], ['research', 'research.html'], ['the card table', 'projects.html'], ['the card catalog', 'lab/cards.html'],
+    ['notes', 'lab/notes.html'], ['sofia is', 'lab/sofia-is.html'], ['arts', 'lab/arts.html'], ['the globe', 'lab/globe.html'], ['tilt', 'lab/lace.html'], ['a letter', 'contact.html']
   ];
+  var here = location.pathname.replace(/\/$/, '/index.html');
+  var PAGES = ALL.filter(function (p) { return !here.endsWith('/' + p[1]); }).map(function (p) { return [p[0], ROOT + p[1]]; });
   // European wheel order, starting at 0
   var ORDER = [0, 32, 15, 19, 4, 21, 2, 25, 17, 34, 6, 27, 13, 36, 11, 30, 8, 23, 10, 5, 24, 16, 33, 1, 20, 14, 31, 9, 22, 18, 29, 7, 28, 12, 35, 3, 26];
   var N = ORDER.length, STEP = 360 / N;
@@ -15,10 +18,11 @@
   var css = `
   #roulette{position:fixed;right:clamp(-120px,-7vw,-60px);bottom:clamp(-120px,-7vw,-60px);width:clamp(220px,22vw,330px);aspect-ratio:1;z-index:40;cursor:pointer;border:0;padding:0;background:none;
     filter:drop-shadow(-14px -6px 30px rgba(0,0,0,.6));will-change:transform;transition:transform .3s cubic-bezier(.2,.8,.2,1)}
-  #roulette:hover,#roulette:focus-visible{transform:translate(-6px,-6px) scale(1.02);outline:none}
+  #roulette{transform:none !important}
+  #roulette:hover,#roulette:focus-visible{outline:none;filter:drop-shadow(-14px -6px 30px rgba(0,0,0,.6)) drop-shadow(0 0 16px rgba(255,214,140,.45))}
   #roulette svg{width:100%;height:100%;display:block;overflow:visible;transform:perspective(900px) rotateX(28deg) rotateZ(-8deg);transform-origin:50% 60%}
   #roulette .hint{position:absolute;left:4%;top:-6%;font:300 12px/1.4 'Inter','Helvetica Neue',Arial,sans-serif;letter-spacing:.3em;text-transform:uppercase;color:rgba(255,236,214,.85);
-    white-space:nowrap;text-shadow:0 1px 6px rgba(0,0,0,.7);transform:rotate(-8deg);pointer-events:none;transition:opacity .3s}
+    white-space:nowrap;text-shadow:none;background:rgba(24,12,10,.6);padding:4px 10px;border-radius:999px;transform:rotate(-8deg);pointer-events:none;transition:opacity .3s}
   #rouletteResult{position:fixed;right:clamp(16px,3vw,40px);bottom:clamp(170px,17vw,260px);z-index:41;background:#0f0f12;color:#f3eee4;border:1px solid #c9a45a;
     padding:12px 18px;font:300 13px/1.5 'Inter','Helvetica Neue',Arial,sans-serif;letter-spacing:.2em;text-transform:uppercase;box-shadow:0 14px 30px rgba(0,0,0,.5);opacity:0;transform:translateY(10px);
     transition:opacity .3s,transform .3s;pointer-events:none}
