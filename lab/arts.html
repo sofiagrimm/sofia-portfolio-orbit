@@ -100,7 +100,7 @@
   .gallery,.gallery *{cursor:auto}.gallery button,.gallery button *{cursor:pointer}
   .follower{display:none !important}
   .framed{margin:0}.cell{width:100%;display:flex;flex-direction:column;align-items:center}
-  .framed.happy .pic{filter:saturate(1.15) brightness(1.06)}.framed.sad .pic{filter:saturate(.45) brightness(.82)}.framed .pic{transition:filter .5s}
+.framed .pic{transition:filter .5s}
   .offers2{display:flex;justify-content:center;gap:12px;margin-top:12px;flex-wrap:wrap}
   .offers2 button{display:flex;align-items:center;gap:8px;padding:6px 14px 6px 8px;border-radius:999px;border:1px solid rgba(42,34,25,.25);background:rgba(255,255,255,.45);font:13px 'Inter',sans-serif;color:var(--ink);cursor:pointer;transition:background .2s,transform .2s}
   .offers2 button:hover,.offers2 button:focus-visible{background:rgba(255,255,255,.8);transform:translateY(-2px);outline:none}
@@ -266,15 +266,52 @@ const PAINTINGS = [
   // nothing around it does. The mouth corners are lifted for a smile or dropped for a frown.
   const VS='attribute vec2 a;varying vec2 v;void main(){v=vec2(a.x*.5+.5,.5-a.y*.5);gl_Position=vec4(a,0.,1.);}';
   const FS=`precision mediump float;varying vec2 v;uniform sampler2D T;uniform vec4 uMap;uniform vec2 uPar,uLook;uniform float uMood,uAR,uOn;
-    uniform vec4 uFig;uniform vec3 uE1,uE2,uM1,uM2;
+    uniform vec4 uFig;uniform vec3 uE1,uE2,uM1,uM2,uB1,uB2;uniform vec4 uFace;uniform vec2 uChin;
+    vec2 iso(vec2 x){return vec2(x.x*uAR,x.y);} vec2 unIso(vec2 x){return vec2(x.x/uAR,x.y);}
+    float bump(vec2 p,vec3 c,float sq){vec2 q=(p-c.xy)/vec2(c.z,c.z*sq*uAR);return max(0.,1.-dot(q,q));}
     void main(){vec2 p=uMap.xy*v+uMap.zw;
       vec2 d=(p-uFig.xy)/uFig.zw;float depth=exp(-dot(d,d)*1.4);p-=uPar*(.003+depth*.016);
       if(uOn>.5){
-        vec2 q=(p-uE1.xy)/vec2(uE1.z,uE1.z*.6*uAR);float f=max(0.,1.-dot(q,q));p-=uLook*uE1.z*.28*f*f;
-        q=(p-uE2.xy)/vec2(uE2.z,uE2.z*.6*uAR);f=max(0.,1.-dot(q,q));p-=uLook*uE2.z*.28*f*f;
-        q=(p-uM1.xy)/vec2(uM1.z,uM1.z*uAR);f=max(0.,1.-dot(q,q));p.y+=uMood*uM1.z*uAR*.45*f*f;
-        q=(p-uM2.xy)/vec2(uM2.z,uM2.z*uAR);f=max(0.,1.-dot(q,q));p.y+=uMood*uM2.z*uAR*.45*f*f;}
+        float up=max(uMood,0.),down=max(-uMood,0.);
+        // posture: pleased, the whole figure leans in a touch (grows from its base); put out, it draws back
+        vec2 base=vec2(uFig.x,uFig.y+uFig.w*.9);float wb=exp(-dot(d,d)*.9);
+        p=base+(p-base)*(1.-.035*uMood*wb);
+        // head: tilts toward you, chin up, when pleased; tips away and down when not (pivoting at the chin)
+        vec2 fc=iso(p-uFace.xy);float wf=exp(-dot(fc,fc)/(uFace.z*uFace.z*uAR*uAR*2.2));
+        float ang=(up*.06-down*.07)*wf;vec2 r=iso(p-uChin);r=vec2(r.x*cos(ang)-r.y*sin(ang),r.x*sin(ang)+r.y*cos(ang));p=uChin+unIso(r);
+        p.y+=down*uFace.z*uAR*.06*wf;
+        // eyes follow the cursor; a pleased squint lifts the lower lids a little
+        float f=bump(p,uE1,.6);p-=uLook*uE1.z*.28*f*f;p.y+=up*uE1.z*uAR*.10*f;
+        f=bump(p,uE2,.6);p-=uLook*uE2.z*.28*f*f;p.y+=up*uE2.z*uAR*.10*f;
+        // brows: knit down and in when cross, lift softly when pleased
+        f=bump(p,uB1,.55);p.y+=(up*.16-down*.32)*uB1.z*uAR*f*f;p.x+=down*.18*uB1.z*f*f*sign(uFace.x-uB1.x)*-1.;
+        f=bump(p,uB2,.55);p.y+=(up*.16-down*.32)*uB2.z*uAR*f*f;p.x+=down*.18*uB2.z*f*f*sign(uFace.x-uB2.x)*-1.;
+        // mouth corners: up into a smile, down into a frown; cheeks rise with the smile
+        f=bump(p,uM1,1.);p.y+=uMood*uM1.z*uAR*.55*f*f;
+        f=bump(p,uM2,1.);p.y+=uMood*uM2.z*uAR*.55*f*f;
+        f=bump(p,vec3(uM1.x-uM1.z*.4,uM1.y-uM1.z*uAR*.8,uM1.z*1.4),.8);p.y+=up*uM1.z*uAR*.18*f;
+        f=bump(p,vec3(uM2.x+uM2.z*.4,uM2.y-uM2.z*uAR*.8,uM2.z*1.4),.8);p.y+=up*uM2.z*uAR*.18*f;}
       gl_FragColor=texture2D(T,clamp(p,0.,1.));}`;
+  // A small face-landmark model (face-api) finds each sitter's eyes, brows, mouth and chin right
+  // in the browser, so nothing has to be placed by hand. It runs once per painting and is remembered.
+  let faceApi=null;
+  function loadFaceApi(){if(faceApi)return faceApi;faceApi=new Promise((res,rej)=>{const sc=document.createElement('script');
+      sc.src='https://cdn.jsdelivr.net/npm/@vladmandic/face-api@1.7.13/dist/face-api.js';sc.onload=async()=>{try{const M='https://cdn.jsdelivr.net/npm/@vladmandic/face-api@1.7.13/model/';
+        try{await faceapi.tf.setBackend('webgl');}catch(e){await faceapi.tf.setBackend('cpu');}await faceapi.tf.ready();
+        await faceapi.nets.ssdMobilenetv1.loadFromUri(M);await faceapi.nets.faceLandmark68Net.loadFromUri(M);res(faceapi);}catch(e){rej(e);}};sc.onerror=rej;document.head.appendChild(sc);});return faceApi;}
+  async function findFace(img,lm,key){
+    const cache='sg-face-v1-'+key;try{const c=JSON.parse(localStorage.getItem(cache)||'null');if(c){Object.assign(lm,c);return true;}}catch(e){}
+    try{const fa=await loadFaceApi();const W=img.naturalWidth,H=img.naturalHeight,s=Math.min(1,900/Math.max(W,H));
+      const cv=document.createElement('canvas');cv.width=Math.round(W*s);cv.height=Math.round(H*s);cv.getContext('2d').drawImage(img,0,0,cv.width,cv.height);
+      const det=await fa.detectSingleFace(cv,new fa.SsdMobilenetv1Options({minConfidence:.2})).withFaceLandmarks();if(!det)return false;
+      const P=det.landmarks.positions.map(q=>[q.x/cv.width,q.y/cv.height]),avg=ids=>ids.reduce((a,i)=>[a[0]+P[i][0]/ids.length,a[1]+P[i][1]/ids.length],[0,0]);
+      const e1=avg([36,37,38,39,40,41]),e2=avg([42,43,44,45,46,47]),eyeW=(Math.hypot(P[39][0]-P[36][0],(P[39][1]-P[36][1])/(W/H))+Math.hypot(P[45][0]-P[42][0],(P[45][1]-P[42][1])/(W/H)))/4;
+      const faceW=Math.abs(P[16][0]-P[0][0]),nose=P[30],chin=P[8];
+      const found={ok:true,eyes:[e1,e2],eyeR:eyeW*1.25,mouth:[P[48],P[54]],mouthR:Math.abs(P[54][0]-P[48][0])*.42,
+        brows:[avg([18,19,20]),avg([23,24,25])],browR:faceW*.16,face:[nose[0],nose[1],faceW*.6],chin:[chin[0],chin[1]],
+        fig:[nose[0],Math.min(.85,nose[1]+faceW*.9),faceW*1.4,faceW*2.2/(W/H)]};
+      Object.assign(lm,found);try{localStorage.setItem(cache,JSON.stringify(found));}catch(e){}return true;}catch(e){return false;}
+  }
   const lives=[];let mouseX=innerWidth/2,mouseY=innerHeight/2;
   function Living(cv,lm,cover){
     const gl=cv.getContext('webgl',{premultipliedAlpha:false,antialias:false});if(!gl)return null;
@@ -287,7 +324,8 @@ const PAINTINGS = [
     L.load=(url,lm2)=>{if(lm2)L.lm=lm2;L.ready=false;const im=new Image();im.crossOrigin='anonymous';im.onload=()=>{
       gl.bindTexture(gl.TEXTURE_2D,tex);gl.texImage2D(gl.TEXTURE_2D,0,gl.RGBA,gl.RGBA,gl.UNSIGNED_BYTE,im);
       [gl.TEXTURE_WRAP_S,gl.TEXTURE_WRAP_T].forEach(k=>gl.texParameteri(gl.TEXTURE_2D,k,gl.CLAMP_TO_EDGE));gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MIN_FILTER,gl.LINEAR);
-      L.ar=im.naturalWidth/im.naturalHeight;L.ready=true;L.size();kick();};im.src=url;};
+      L.ar=im.naturalWidth/im.naturalHeight;L.ready=true;L.size();kick();
+      if(L.lm&&!L.lm.ok&&L.lm.face!==false)findFace(im,L.lm,url.split('/').pop().slice(0,60)).then(ok=>{if(ok)kick();});};im.src=url;};
     L.size=()=>{const r=cv.getBoundingClientRect(),dpr=Math.min(1.5,devicePixelRatio||1);cv.width=Math.max(2,r.width*dpr);cv.height=Math.max(2,r.height*dpr);gl.viewport(0,0,cv.width,cv.height);};
     L.draw=()=>{if(!L.ready)return;const r=cv.getBoundingClientRect(),lm=L.lm;
       // 'cover' crop for the big panel (painting fills the box, anchored 30% from the top), exact fit in the frames
@@ -296,6 +334,9 @@ const PAINTINGS = [
       gl.uniform4f(U('uFig'),...lm.fig);const e=lm.eyes,m=lm.mouth;
       gl.uniform3f(U('uE1'),...(e[0]||[0,0]),lm.eyeR||0);gl.uniform3f(U('uE2'),...(e[1]||[0,0]),lm.eyeR||0);
       gl.uniform3f(U('uM1'),...(m[0]||[0,0]),lm.mouthR||0);gl.uniform3f(U('uM2'),...(m[1]||[0,0]),lm.mouthR||0);
+      const br=lm.brows||[],fa=lm.face||[.5,.3,.1],ch=lm.chin||[.5,.4];
+      gl.uniform3f(U('uB1'),...(br[0]||[0,0]),lm.browR||0);gl.uniform3f(U('uB2'),...(br[1]||[0,0]),lm.browR||0);
+      gl.uniform4f(U('uFace'),fa[0],fa[1],fa[2],0);gl.uniform2f(U('uChin'),ch[0],ch[1]);
       gl.uniform2f(U('uPar'),...L.par);gl.uniform2f(U('uLook'),...L.look);gl.uniform1f(U('uMood'),L.mood);
       gl.drawArrays(gl.TRIANGLE_STRIP,0,4);};
     // where on screen this painting's eyes are, to aim the gaze
