@@ -282,9 +282,9 @@
     // Each project is a different card; the number of pips in each scene matches the rank.
     // Suits are SVG paths (not text) so phones never turn them into emoji.
     const HAND = [
-      {rank:"3", suit:"diamond", label:"PCDD", scene:"lab"},
-      {rank:"5", suit:"spade",   label:"Vantage", scene:"laptop"},
-      {rank:"4", suit:"heart",   label:"Red Cross fleet", scene:"car"},
+      {rank:"3", suit:"diamond", label:"PCDD", scene:"lab", img:"img/cards/card-3-diamonds.jpg"},
+      {rank:"5", suit:"spade",   label:"Vantage", scene:"laptop", img:"img/cards/card-5-spades.jpg"},
+      {rank:"4", suit:"heart",   label:"Red Cross fleet", scene:"car", img:"img/cards/card-4-hearts.jpg"},
       {rank:"6", suit:"club",    label:"ASEAN expansion", scene:"islands"},
       {rank:"7", suit:"spade",   label:"Fermilab lenses", scene:"telescope"},
       {rank:"8", suit:"diamond", label:"green routing", scene:"bus"},
@@ -418,7 +418,9 @@
         corners=c+`<g transform="rotate(180 125 175)">${c}</g>`;
       }
       const label=`<text x="125" y="324" font-family="'Nanum Pen Script',cursive" font-size="22" fill="#6a6560" text-anchor="middle">${h.label}</text>`;
-      return `<svg viewBox="0 0 250 350" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">${defs}${paper}${corners}${SCENES[h.scene]()}${label}</svg>`;
+      // drawn illustration if we have one; otherwise the code-drawn scene
+      const art=h.img?`<image href="${h.img}" x="4" y="4" width="242" height="342" preserveAspectRatio="xMidYMid slice" clip-path="url(#clip${f})"/>`:SCENES[h.scene]();
+      return `<svg viewBox="0 0 250 350" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">${defs}${paper}${art}${corners}${label}</svg>`;
     }
 
     // Winding road with little cars, for the back of the Red Cross card.
