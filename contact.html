@@ -34,10 +34,6 @@
     :root{--kraft:#e7dcc6;--kraft-2:#d9caad;--kraft-edge:#c4b190;--ink:#2b2620;--navy:#24306b;--wax:#e7a0b2;--wax-hi:#fbe1e7;--wax-lo:#c97a8e}
 
     .lead{font-family:'Nanum Pen Script',cursive;font-size:32px;line-height:1;color:#f1ecdc;transform:rotate(-2deg);margin:0 0 6px 4px}
-    .readout{display:flex;flex-wrap:wrap;gap:4px 14px;margin:0 0 14px 4px;font-family:'Courier Prime',monospace;font-size:11px;letter-spacing:.06em;color:rgba(200,215,255,.35)}
-    .readout span{transition:color .3s}
-    .readout span.on{color:#f1ecdc}
-    .readout span.done{color:rgba(200,215,255,.6)}
     .controls{display:flex;gap:10px;margin:0 0 6px 4px}
     .ctl{font-family:'Courier Prime',monospace;font-size:12px;color:#c9d6ff;background:none;border:1px solid rgba(200,215,255,.25);border-radius:20px;padding:4px 12px;cursor:pointer}
     .ctl:hover,.ctl:focus-visible{border-color:#c9d6ff;outline:none}
@@ -106,6 +102,8 @@
     .seal:focus-visible{outline:3px solid #9cc0ff;outline-offset:6px;border-radius:50%}
     .seal.ready:hover .halves{transform:scale(1.04) rotate(-3deg)}
     .seal svg{width:100%;height:100%;overflow:visible}
+    .seal{transform-origin:50% 88%}
+    .residue{position:absolute;z-index:7;border-radius:50%;pointer-events:none;background:radial-gradient(circle,rgba(240,178,192,.0) 52%,rgba(232,160,178,.55) 62%,rgba(232,160,178,.0) 72%);opacity:.55}
     .halves{transition:transform .25s}
     .half{transition:transform .9s cubic-bezier(.2,.7,.3,1),opacity .9s}
     .seal.cracked .h1{transform:translate(-9px,4px) rotate(-14deg)}
@@ -193,7 +191,6 @@
   </nav>
   <main class="page">
     <p class="lead">there's a letter here for you</p>
-    <div class="readout" id="readout" aria-hidden="true"><span>01 letter in</span><span>02 fold</span><span>03 wax</span><span>04 press</span><span>05 post</span></div>
     <div class="controls">
       <button class="ctl" id="skip" type="button">skip</button>
       <button class="ctl" id="sound" type="button" aria-pressed="true">sound: on</button>
@@ -308,7 +305,7 @@
     const $=id=>document.getElementById(id);
     const stage=$('stage'),letter=$('letter'),flat=$('flat'),flap=$('flap'),flapwrap=$('flapwrap'),seal=$('seal'),hint=$('hint');
     const still=matchMedia('(prefers-reduced-motion: reduce)').matches;
-    const steps=[...$('readout').children];
+    const steps=[];
     const T=ms=>still?0:ms, wait=ms=>new Promise(r=>setTimeout(r,T(ms)));
     let skipped=false;
 
@@ -358,6 +355,8 @@
         const gn=c.createGain(),t=c.currentTime;gn.gain.setValueAtTime(0,t);gn.gain.linearRampToValueAtTime(gain,t+attack);gn.gain.setValueAtTime(gain,t+Math.max(attack,dur-release));gn.gain.linearRampToValueAtTime(0,t+dur);
         src.connect(fl).connect(gn).connect(c.destination);src.start();},
       thump(freq=90,gain=.25){if(!this.on||!this.ctx)return;const c=this.ctx,o=c.createOscillator(),gn=c.createGain(),t=c.currentTime;o.frequency.setValueAtTime(freq,t);o.frequency.exponentialRampToValueAtTime(40,t+.18);gn.gain.setValueAtTime(gain,t);gn.gain.exponentialRampToValueAtTime(.001,t+.2);o.connect(gn).connect(c.destination);o.start();o.stop(t+.22);},
+      peel(dur){this.noise(dur,{f:900,q:.7,gain:.13,attack:.25,release:.2,wobble:22});this.noise(dur*.8,{f:2600,q:1.2,gain:.05,attack:.3,release:.2,wobble:31});},
+      pop(){this.noise(.03,{f:1800,q:1.5,gain:.18,attack:.002,release:.02});},
       crack(){this.noise(.05,{f:3500,q:1.2,gain:.5,attack:.001,release:.04});setTimeout(()=>this.noise(.03,{f:5200,q:2,gain:.3,attack:.001,release:.025}),45);},
       crumbs(){for(let i=0;i<7;i++)setTimeout(()=>this.noise(.012,{f:4000+Math.random()*3000,q:3,gain:.12,attack:.001,release:.01}),120+i*(40+Math.random()*50));},
       paper(dur){this.noise(dur,{f:2600,q:.6,gain:.09,attack:.15,release:.3,wobble:9});},
@@ -439,10 +438,21 @@
       if(!seal.classList.contains('ready'))return;
       seal.classList.remove('ready');seal.disabled=true;hint.classList.remove('on');
       sound.init();
-      // crack the wax
-      sound.crack();seal.classList.add('cracking');await wait(380);
-      seal.classList.add('cracked');crumbs();sound.crumbs();await wait(650);
-      seal.classList.add('gone');
+      // peel the wax off: one edge lifts, it curls back and comes away
+      const residue=document.createElement('div');residue.className='residue';stage.appendChild(residue);
+      const sb=seal.getBoundingClientRect(),sr=stage.getBoundingClientRect();
+      residue.style.width=residue.style.height=sb.width*.82+'px';residue.style.left=(sb.left-sr.left+sb.width*.09)+'px';residue.style.top=(sb.top-sr.top+sb.height*.09)+'px';
+      sound.peel(1.25);
+      await seal.animate([
+        {transform:'perspective(420px) rotateX(0deg) rotateZ(0deg) translate(0,0)',offset:0},
+        {transform:'perspective(420px) rotateX(-14deg) rotateZ(-2deg) translate(0,-1px) scaleY(1.02)',offset:.25},
+        {transform:'perspective(420px) rotateX(-38deg) rotateZ(-5deg) translate(4px,-6px) scaleY(1.05)',offset:.55},
+        {transform:'perspective(420px) rotateX(-62deg) rotateZ(10deg) translate(26px,-34px) scaleY(1.03)',offset:.82,opacity:1},
+        {transform:'perspective(420px) rotateX(-75deg) rotateZ(24deg) translate(60px,-70px)',opacity:0}
+      ],{duration:T(1400),easing:'cubic-bezier(.45,.05,.3,1)',fill:'forwards'}).finished;
+      seal.style.opacity=0;sound.pop();
+      residue.animate([{opacity:.55},{opacity:0}],{duration:T(900),fill:'forwards'});setTimeout(()=>residue.remove(),T(950));
+      await wait(250);
       // peel the flap open, slowly
       sound.paper(1.6);$('sheen').classList.remove('go');void $('sheen').offsetWidth;$('sheen').classList.add('go');
       const peel=A(flap,[{transform:'rotateX(0deg)'},{transform:'rotateX(180deg)'}],{duration:1600,easing:'cubic-bezier(.45,0,.25,1)'});
