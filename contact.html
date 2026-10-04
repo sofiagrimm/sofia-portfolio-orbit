@@ -295,16 +295,28 @@
             <clipPath id="leftHalf"><path d="M-10 -10 L52 -10 L46 20 L55 38 L44 55 L54 72 L47 110 L-10 110Z"/></clipPath>
             <clipPath id="rightHalf"><path d="M52 -10 L110 -10 L110 110 L47 110 L54 72 L44 55 L55 38 L46 20Z"/></clipPath>
             <g id="sealArt">
-              <path d="M50 4 C62 3 66 10 76 12 C86 15 90 24 93 33 C97 42 94 50 97 60 C98 71 90 77 84 84 C77 92 68 93 58 96 C47 99 38 95 29 92 C19 88 12 82 7 72 C3 63 5 54 3 44 C3 33 9 25 16 17 C25 9 38 5 50 4Z" fill="url(#waxG)"/>
-              <circle cx="50" cy="51" r="32" fill="none" stroke="#c97a8e" stroke-width="2.4" opacity=".8"/>
-              <circle cx="50" cy="50" r="32" fill="none" stroke="#fde6eb" stroke-width="1.4" opacity=".85"/>
-              <circle cx="50" cy="51" r="26" fill="#eeadbc"/><path d="M30 44 C38 34 52 38 54 46 C56 54 66 56 70 48 M34 62 C42 66 50 58 58 64" fill="none" stroke="#fff" stroke-width="1.6" opacity=".35" stroke-linecap="round"/>
-              <text x="50.8" y="61.6" text-anchor="middle" font-family="'DM Serif Display',Georgia,serif" font-size="27" fill="#fde9ee" opacity=".9">SG</text>
-              <text x="50" y="61" text-anchor="middle" font-family="'DM Serif Display',Georgia,serif" font-size="27" fill="#c06a80">SG</text>
-              <path d="M24 32 C30 22 40 18 50 18" fill="none" stroke="#ffffff" stroke-width="2.4" stroke-linecap="round" opacity=".6"/>
+              <!-- pearly pink wax, thick puffy rim, sunken disc with marbling and a raised script monogram -->
+              <path d="M50 3 C61 2 67 8 77 10 C88 13 92 23 95 32 C99 42 96 50 98 60 C99 71 92 78 85 85 C78 93 68 94 58 97 C47 100 37 96 28 93 C18 89 11 83 6 72 C2 63 4 54 2 44 C2 33 8 24 15 16 C24 8 38 4 50 3Z" fill="url(#sealBase)"/>
+              <path d="M50 3 C61 2 67 8 77 10 C88 13 92 23 95 32 C99 42 96 50 98 60 C99 71 92 78 85 85 C78 93 68 94 58 97 C47 100 37 96 28 93 C18 89 11 83 6 72 C2 63 4 54 2 44 C2 33 8 24 15 16 C24 8 38 4 50 3Z" fill="url(#sealSheen)"/>
+              <path d="M50 3 C61 2 67 8 77 10 C88 13 92 23 95 32 C99 42 96 50 98 60 C99 71 92 78 85 85 C78 93 68 94 58 97 C47 100 37 96 28 93 C18 89 11 83 6 72 C2 63 4 54 2 44 C2 33 8 24 15 16 C24 8 38 4 50 3Z" fill="none" stroke="#d58a9e" stroke-width="1.2" opacity=".7"/>
+              <path d="M18 30 C24 18 36 11 50 10 M86 28 C90 36 91 44 90 52" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" opacity=".55"/>
+              <path d="M14 64 C18 76 28 86 42 90 M70 90 C80 86 87 78 90 70" fill="none" stroke="#c97489" stroke-width="2.2" stroke-linecap="round" opacity=".45"/>
+              <circle cx="50" cy="51" r="33" fill="#e39aad"/>
+              <circle cx="50" cy="50" r="33" fill="none" stroke="#fbdde5" stroke-width="1.6" opacity=".9"/>
+              <circle cx="50" cy="51" r="30" fill="url(#sealDisc)"/>
+              <circle cx="50" cy="51" r="27.5" fill="none" stroke="#fde4eb" stroke-width="1.1" opacity=".9"/>
+              <circle cx="50" cy="51.6" r="27.5" fill="none" stroke="#cf7f94" stroke-width=".8" opacity=".6"/>
+              <path d="M30 40 C38 30 52 34 54 44 C56 54 68 56 72 46 M32 62 C40 70 50 60 60 66 C64 68 68 66 70 62" fill="none" stroke="#fff" stroke-width="1.8" opacity=".32" stroke-linecap="round"/>
+              <circle cx="32" cy="46" r="1.8" fill="#fff" opacity=".45"/><circle cx="35" cy="42" r="1.1" fill="#fff" opacity=".45"/><circle cx="66" cy="58" r="1.3" fill="#fff" opacity=".35"/>
+              <text x="51.2" y="65.2" text-anchor="middle" font-family="'Pinyon Script',cursive" font-size="40" fill="#b8647a" opacity=".55">S</text>
+              <text x="49.2" y="62.8" text-anchor="middle" font-family="'Pinyon Script',cursive" font-size="40" fill="#fff" opacity=".7">S</text>
+              <text x="50" y="64" text-anchor="middle" font-family="'Pinyon Script',cursive" font-size="40" fill="#e79bb0">S</text>
             </g>
+            <radialGradient id="sealBase" cx="40%" cy="35%" r="75%"><stop offset="0" stop-color="#f9d3dd"/><stop offset=".55" stop-color="#f0afc0"/><stop offset="1" stop-color="#d98ca1"/></radialGradient>
+            <linearGradient id="sealSheen" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fff" stop-opacity=".55"/><stop offset=".35" stop-color="#fff" stop-opacity=".05"/><stop offset=".7" stop-color="#fff" stop-opacity="0"/><stop offset="1" stop-color="#b86a80" stop-opacity=".15"/></linearGradient>
+            <radialGradient id="sealDisc" cx="42%" cy="38%" r="70%"><stop offset="0" stop-color="#f8d0da"/><stop offset=".6" stop-color="#efb1c1"/><stop offset="1" stop-color="#e49db0"/></radialGradient>
           </defs>
-          <g class="halves">
+          <g class="halves"><use href="#sealArt"/>
             <g class="half h1"><g clip-path="url(#leftHalf)"><use href="#sealArt"/></g></g>
             <g class="half h2"><g clip-path="url(#rightHalf)"><use href="#sealArt"/></g></g>
             <path class="crack" d="M52 0 L46 20 L55 38 L44 55 L54 72 L47 100" fill="none" stroke="#b8687c" stroke-width="1.6" stroke-linejoin="round"/>

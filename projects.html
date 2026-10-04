@@ -28,7 +28,7 @@
     .rule{width:48px;height:1px;background:linear-gradient(90deg,rgba(140,170,255,.4),transparent);margin-bottom:44px;}
 
     /* ── GRID — 4 col desktop, 2 col tablet, 1 col mobile ── */
-    .memory-grid{position:relative;height:clamp(380px,40vw,440px);margin-top:10px}
+    .memory-grid{position:relative;height:clamp(380px,40vw,440px);margin-top:clamp(120px,14vw,200px)}
     @media(max-width:760px){.memory-grid{height:auto;display:grid;grid-template-columns:1fr 1fr;gap:22px 16px}}
     
 
@@ -92,20 +92,21 @@
     .page{position:relative}
     .poster-card{position:absolute;right:clamp(40px,8vw,120px);top:70px;width:clamp(150px,15vw,190px);transform:rotate(5deg);z-index:12;filter:drop-shadow(0 12px 16px rgba(30,0,0,.5));margin:0}
     .poster-card svg{display:block;width:100%;height:auto}
+    .poster-card{position:absolute}
+    .poster-base{position:absolute;inset:0}.poster-base svg{width:100%;height:100%}
+    .poster-ink{position:relative}
     @media(max-width:760px){.poster-card{position:relative;right:auto;top:auto;width:150px;margin:0 auto 18px;transform:rotate(4deg)}}
-    .feltprint{position:absolute;left:50%;top:-46%;width:118%;transform:translateX(-50%);z-index:0;pointer-events:none}
+    .feltprint{position:absolute;left:50%;bottom:22%;width:100vw;transform:translateX(-50%);z-index:30;pointer-events:none}
     @media(max-width:760px){.feltprint{display:none}}
     /* ── shuffle deck ── */
     .deck-wrap{display:flex;align-items:center;gap:22px;margin:4px 0 26px}
-    .deck{position:relative;width:78px;aspect-ratio:5/7;border:0;background:none;padding:0;cursor:pointer;rotate:-10deg;flex:0 0 auto}
+    .deck{position:relative;width:clamp(110px,10vw,150px);aspect-ratio:5/7;border:0;background:none;padding:0;cursor:pointer;rotate:-10deg;flex:0 0 auto}
     .deck .back{position:absolute;inset:0;display:block;border-radius:6px;box-shadow:0 1px 0 #cfccc4,0 2px 3px rgba(0,0,0,.35)}
     .deck .back svg{display:block;width:100%;height:100%}
     .deck .b1{translate:0 8px}.deck .b2{translate:1px 6px}.deck .b3{translate:2px 4px}.deck .b4{translate:2px 2px}.deck .b5{translate:3px 0;box-shadow:0 10px 18px rgba(0,0,0,.45)}
     .deck:hover .b5,.deck:focus-visible .b5{translate:3px -6px}
     .deck:focus-visible{outline:3px solid #9cc0ff;outline-offset:8px;border-radius:8px}
     .deck .back{transition:translate .25s ease}
-    .deck.shuffling .b2,.deck.shuffling .b4{animation:cutLeft .7s ease-in-out}
-    .deck.shuffling .b3,.deck.shuffling .b5{animation:cutRight .7s ease-in-out}
     @keyframes cutLeft{0%,100%{transform:none}40%{transform:translateX(-62%) rotate(-10deg)}60%{transform:translateX(-62%) rotate(-10deg)}}
     @keyframes cutRight{0%,100%{transform:none}40%{transform:translateX(62%) rotate(10deg)}60%{transform:translateX(62%) rotate(10deg)}}
     .deck-label{font-family:'Nanum Pen Script',cursive;font-size:34px;line-height:1;color:#f1ecdc;transform:rotate(-3deg)}
@@ -147,7 +148,7 @@
   /* decorative playing cards scattered across the page, like a table */
   body{position:relative}
   #table{position:absolute;left:0;top:0;width:100%;z-index:2;pointer-events:none;overflow:hidden}
-  #cardframe{position:fixed;inset:0;z-index:3;pointer-events:none;overflow:hidden}
+  #cardframe{position:absolute;left:0;top:0;width:100%;z-index:3;pointer-events:none;overflow:hidden}
   #cardframe .fc{position:absolute;filter:drop-shadow(0 6px 10px rgba(30,0,0,.5))}
   #cardframe .fc svg{display:block;width:100%;height:auto}
   #table .pc{position:absolute;opacity:1;filter:drop-shadow(0 8px 12px rgba(40,0,0,.55))}
@@ -185,6 +186,8 @@
     .memory-grid .card-face{-webkit-backface-visibility:visible;backface-visibility:visible}
     .memory-grid .card-front{transform:none}
     .memory-grid .card-scene,.memory-grid .card-flipper{isolation:isolate}
+    @media(min-width:1200px){.page{min-height:1480px}}
+    .sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
   </style>
   <style>
     /* six tabs: let the nav scroll sideways on small screens instead of spilling off */
@@ -213,9 +216,7 @@
     </div>
   </nav>
   <main class="page">
-    <div class="page-eyebrow">Projects</div>
-    <h1 class="page-title">Things I've <em>built.</em></h1>
-    <p class="page-subtitle">Click any card to reveal it, and again to flip it back. The code lives on <a href="https://github.com/sofiagrimm" data-gh style="color:inherit">GitHub</a>.</p>
+    <h1 class="sr-only">Projects: click a card to see what it is, and again to flip it back</h1>
 <svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
       <pattern id="deckLattice" width="14" height="14" patternUnits="userSpaceOnUse"><rect width="14" height="14" fill="#2e7656"/><path d="M7 1.5 L12.5 7 L7 12.5 L1.5 7Z" fill="none" stroke="#e9f2e6" stroke-width=".9"/></pattern>
       <symbol id="deckBack" viewBox="0 0 250 350">
@@ -227,7 +228,7 @@
           <path d="M0 -62 C-20 -80 -40 -70 -36 -52 M0 -62 C20 -80 40 -70 36 -52 M0 62 C-20 80 -40 70 -36 52 M0 62 C20 80 40 70 36 52"/>
           <circle r="6" fill="#f3f7ef"/></g>
       </symbol></defs></svg>
-    <figure class="poster-card"><svg viewBox="0 0 250 350" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Ace of clubs: take a look around!">
+    <figure class="poster-card"><div class="poster-base" aria-hidden="true"></div><svg class="poster-ink" viewBox="0 0 250 350" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Ace of clubs: take a look around!">
   <defs>
     <filter id="grime" x="0" y="0" width="100%" height="100%"><feTurbulence type="fractalNoise" baseFrequency=".02" numOctaves="3" seed="4"/><feColorMatrix type="matrix" values="0 0 0 0 .5  0 0 0 0 .45  0 0 0 0 .35  0 0 0 -1.3 .55"/><feComposite in2="SourceGraphic" operator="in"/></filter>
     <filter id="speck" x="0" y="0" width="100%" height="100%"><feTurbulence type="fractalNoise" baseFrequency=".9" numOctaves="2" seed="9"/><feColorMatrix type="matrix" values="0 0 0 0 .3  0 0 0 0 .27  0 0 0 0 .22  0 0 0 -2.4 1.4"/><feComposite in2="SourceGraphic" operator="in"/></filter>
@@ -235,18 +236,7 @@
     <radialGradient id="aged" cx="45%" cy="42%" r="80%"><stop offset="0" stop-color="#f3efe5"/><stop offset=".7" stop-color="#ebe5d6"/><stop offset="1" stop-color="#d8cfba"/></radialGradient>
     <clipPath id="cardclip"><rect x="5" y="5" width="240" height="340" rx="12"/></clipPath>
   </defs>
-  <g clip-path="url(#cardclip)">
-    <rect x="5" y="5" width="240" height="340" fill="url(#aged)"/>
-    <rect x="5" y="5" width="240" height="340" fill="#fff" filter="url(#grime)" opacity=".5"/>
-    <rect x="5" y="5" width="240" height="340" fill="#fff" filter="url(#speck)" opacity=".12"/>
-    
-  </g>
-  <rect x="5.5" y="5.5" width="239" height="339" rx="12" fill="none" stroke="#b8ad95" stroke-width="1.2"/>
-  <g filter="url(#inkwear)">
-    <text x="26" y="44" text-anchor="middle" font-family="'IM Fell English',Georgia,serif" font-size="32" fill="#2a2426">A</text><path d="M50 12 a17 17 0 1 1 -0.1 0Z M28 42 a17 17 0 1 1 -0.1 0Z M72 42 a17 17 0 1 1 -0.1 0Z M46 58 C46 76 42 86 33 95 L67 95 C58 86 54 76 54 58Z" fill="#2a2426" transform="translate(26 64) rotate(0) translate(-10.0 -10.0) scale(0.2)"/>
-    <g transform="rotate(180 125 175)"><text x="26" y="44" text-anchor="middle" font-family="'IM Fell English',Georgia,serif" font-size="32" fill="#2a2426">A</text><path d="M50 12 a17 17 0 1 1 -0.1 0Z M28 42 a17 17 0 1 1 -0.1 0Z M72 42 a17 17 0 1 1 -0.1 0Z M46 58 C46 76 42 86 33 95 L67 95 C58 86 54 76 54 58Z" fill="#2a2426" transform="translate(26 64) rotate(0) translate(-10.0 -10.0) scale(0.2)"/></g>
-    <path d="M50 12 a17 17 0 1 1 -0.1 0Z M28 42 a17 17 0 1 1 -0.1 0Z M72 42 a17 17 0 1 1 -0.1 0Z M46 58 C46 76 42 86 33 95 L67 95 C58 86 54 76 54 58Z" fill="#2a2426" transform="translate(125 176) rotate(0) translate(-31.0 -31.0) scale(0.62)"/>
-  </g>
+
 <text x="66.0" y="81.2" transform="rotate(1.8 66.0 81.2)" text-anchor="middle" font-family="'Nanum Pen Script',cursive" font-size="40" fill="#24306b">t</text><text x="83.0" y="83.9" transform="rotate(5.5 83.0 83.9)" text-anchor="middle" font-family="'Nanum Pen Script',cursive" font-size="40" fill="#24306b">a</text><text x="100.0" y="82.4" transform="rotate(-3.2 100.0 82.4)" text-anchor="middle" font-family="'Nanum Pen Script',cursive" font-size="40" fill="#24306b">k</text><text x="121.2" y="78.2" transform="rotate(-4.6 121.2 78.2)" text-anchor="middle" font-family="'Nanum Pen Script',cursive" font-size="40" fill="#24306b">e</text><text x="147.6" y="78.1" transform="rotate(3.5 147.6 78.1)" text-anchor="middle" font-family="'Nanum Pen Script',cursive" font-size="40" fill="#24306b">a</text><text x="134.0" y="114.7" transform="rotate(5.3 134.0 114.7)" text-anchor="middle" font-family="'Nanum Pen Script',cursive" font-size="42" fill="#c8413b">l</text><text x="153.0" y="114.4" transform="rotate(2.0 153.0 114.4)" text-anchor="middle" font-family="'Nanum Pen Script',cursive" font-size="42" fill="#c8413b">o</text><text x="172.0" y="111.5" transform="rotate(-5.9 172.0 111.5)" text-anchor="middle" font-family="'Nanum Pen Script',cursive" font-size="42" fill="#c8413b">o</text><text x="191.0" y="109.1" transform="rotate(-0.5 191.0 109.1)" text-anchor="middle" font-family="'Nanum Pen Script',cursive" font-size="42" fill="#c8413b">k</text><text x="48.0" y="296.5" transform="rotate(5.5 48.0 296.5)" text-anchor="middle" font-family="'Nanum Pen Script',cursive" font-size="46" fill="#24306b">a</text><text x="70.0" y="292.2" transform="rotate(-3.2 70.0 292.2)" text-anchor="middle" font-family="'Nanum Pen Script',cursive" font-size="46" fill="#24306b">r</text><text x="92.0" y="287.6" transform="rotate(-4.6 92.0 287.6)" text-anchor="middle" font-family="'Nanum Pen Script',cursive" font-size="46" fill="#24306b">o</text><text x="114.0" y="287.8" transform="rotate(4.4 114.0 287.8)" text-anchor="middle" font-family="'Nanum Pen Script',cursive" font-size="46" fill="#24306b">u</text><text x="136.0" y="292.6" transform="rotate(3.5 136.0 292.6)" text-anchor="middle" font-family="'Nanum Pen Script',cursive" font-size="46" fill="#24306b">n</text><text x="158.0" y="296.7" transform="rotate(-5.3 158.0 296.7)" text-anchor="middle" font-family="'Nanum Pen Script',cursive" font-size="46" fill="#24306b">d</text><text x="180.0" y="295.7" transform="rotate(-2.1 180.0 295.7)" text-anchor="middle" font-family="'Nanum Pen Script',cursive" font-size="46" fill="#24306b">!</text><g fill="none" stroke="#24306b" stroke-width="1.6" stroke-linecap="round" opacity=".85">
     <path d="M40 302 C80 312 150 312 206 298"/>
     <path d="M176 128 C200 140 206 160 192 176 C182 188 164 184 160 172" stroke-dasharray="3 4"/><path d="M158 166 l1 8 l7 -3"/>
@@ -262,12 +252,11 @@
       </button>
       <p class="deck-label">shuffle?</p>
     </div>
-    <div class="rule"></div>
-    <div class="memory-grid" id="memoryGrid"><svg class="feltprint" viewBox="0 0 1000 420" aria-hidden="true">
-      <defs><path id="arcText" d="M120 330 A400 260 0 0 1 880 330"/></defs>
-      <path d="M80 360 A440 300 0 0 1 920 360" fill="none" stroke="#d6b36a" stroke-width="2.4" opacity=".55"/>
-      <path d="M150 360 A370 230 0 0 1 850 360" fill="none" stroke="#d6b36a" stroke-width="1.2" opacity=".45"/>
-      <text font-family="'DM Serif Display',Georgia,serif" font-size="26" letter-spacing="6" fill="#d6b36a" opacity=".6"><textPath href="#arcText" startOffset="50%" text-anchor="middle">PICK A CARD · ANY CARD · EVERY ONE IS A PROJECT</textPath></text>
+    <div class="memory-grid" id="memoryGrid"><svg class="feltprint" viewBox="0 0 1440 560" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
+      <defs><path id="arcText" d="M120 560 A600 470 0 0 1 1320 560"/></defs>
+      <path d="M0 560 A720 520 0 0 1 1440 560" fill="none" stroke="#d6b36a" stroke-width="3" opacity=".6"/>
+      <path d="M60 560 A660 470 0 0 1 1380 560" fill="none" stroke="#d6b36a" stroke-width="1.4" opacity=".45"/>
+      <text font-family="'DM Serif Display',Georgia,serif" font-size="30" letter-spacing="9" fill="#e2c27e" opacity=".85"><textPath href="#arcText" startOffset="50%" text-anchor="middle">PICK A CARD · ANY CARD · EVERY ONE IS A PROJECT</textPath></text>
     </svg></div>
   </main>
   <div class="coords">41.3083&deg; N &nbsp; 72.9279&deg; W</div>
@@ -570,9 +559,19 @@
       deck.addEventListener('click',()=>{
         if(busy||popupLocked)return; busy=true;
         let i; do{i=Math.floor(Math.random()*scenes.length);}while(scenes.length>1&&i===last); last=i;
-        deck.classList.remove('shuffling'); void deck.offsetWidth; deck.classList.add('shuffling');
         scenes.forEach(s=>s.classList.remove('drawn'));
-        setTimeout(()=>{deck.classList.remove('shuffling');scenes[i].classList.add('drawn');openPopup(scenes[i],i);busy=false;},still?0:750);
+        const finish=()=>{scenes[i].classList.add('drawn');openPopup(scenes[i],i);busy=false;};
+        if(still){finish();return;}
+        // riffle: split into two halves, then drop the cards back in alternately, each one landing on top
+        const backs=[...deck.querySelectorAll('.back')];
+        const split=backs.map((b,k)=>b.animate([{transform:'none'},{transform:`translateX(${k%2?58:-58}%) rotate(${k%2?9:-9}deg)`}],{duration:240,easing:'ease-out',fill:'forwards'}));
+        Promise.all(split.map(a=>a.finished)).then(()=>{
+          let z=10;const order=[1,2,3,4,0];
+          order.forEach((k,n)=>setTimeout(()=>{const b=backs[k];b.style.zIndex=z++;
+            const a=b.animate([{transform:`translateX(${k%2?58:-58}%) rotate(${k%2?9:-9}deg)`},{transform:'translateY(-6px)'},{transform:'none'}],{duration:170,easing:'ease-in',fill:'forwards'});
+            if(n===order.length-1)a.finished.then(()=>{backs.forEach(x=>{x.getAnimations().forEach(an=>an.cancel());x.style.zIndex='';});finish();});
+          },n*110));
+        });
       });
     })();
   </script>
@@ -637,42 +636,46 @@
 
   // more things on the table: the card case, a dealer button, a score pad and loose chips
   function deckBox(){
-    // a proper tuck box: portrait front, a little depth on the side, the top flap folded open
-    // and a thumb notch showing the card backs inside
-    return `<svg viewBox="0 0 170 240" xmlns="http://www.w3.org/2000/svg">
+    // tuck box at playing-card scale: open flap, thumb notch, a little depth, gold-foil details
+    const corner=(x,y,r)=>`<g transform="translate(${x} ${y}) rotate(${r})" fill="none" stroke="#d8b46a" stroke-width="1.1" stroke-linecap="round"><path d="M0 0 C10 0 14 4 14 12 M0 0 C0 10 4 14 12 14"/><circle cx="4" cy="4" r="1.6" fill="#d8b46a"/></g>`;
+    return `<svg viewBox="0 0 180 250" xmlns="http://www.w3.org/2000/svg">
       <defs>
-        <pattern id="tbLat" width="10" height="10" patternUnits="userSpaceOnUse"><rect width="10" height="10" fill="${GREEN}"/><path d="M5 1 L9 5 L5 9 L1 5Z" fill="none" stroke="#e9f2e6" stroke-width=".7"/></pattern>
-        <clipPath id="tbFront"><path d="M12 40 H72 A12 12 0 0 0 96 40 H150 V232 H12Z"/></clipPath>
+        <pattern id="tbLat" width="10" height="10" patternUnits="userSpaceOnUse"><rect width="10" height="10" fill="#2e7656"/><path d="M5 1 L9 5 L5 9 L1 5Z" fill="none" stroke="#e9f2e6" stroke-width=".6"/></pattern>
+        <linearGradient id="tbSide" x1="0" x2="1"><stop offset="0" stop-color="#173f2f"/><stop offset="1" stop-color="#0f2e22"/></linearGradient>
+        <linearGradient id="tbFlap" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f1ebde"/><stop offset="1" stop-color="#ddd4c1"/></linearGradient>
+        <linearGradient id="tbFoil" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#f3dc9a"/><stop offset=".5" stop-color="#c99a45"/><stop offset="1" stop-color="#f0d38a"/></linearGradient>
+        <linearGradient id="tbSheen" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fff" stop-opacity=".22"/><stop offset=".35" stop-color="#fff" stop-opacity="0"/></linearGradient>
+        <clipPath id="tbFront"><path d="M12 42 H76 A14 14 0 0 0 104 42 H160 V242 H12Z"/></clipPath>
       </defs>
-      <!-- open flap, folded back behind the box -->
-      <path d="M14 40 L24 10 Q26 4 32 4 H130 Q136 4 138 10 L150 40Z" fill="#e7e1d3" stroke="#cfc6b3" stroke-width="1.2"/>
-      <path d="M58 6 Q84 -2 108 6" fill="none" stroke="#cfc6b3" stroke-width="1.2"/>
-      <!-- cards inside, seen through the top -->
-      <path d="M16 40 H148 V48 H16Z" fill="#f7f3ea"/>${[0,1,2,3].map(i=>`<path d="M16 ${41+i*2} H148" stroke="#ddd6c6" stroke-width=".7"/>`).join('')}
-      <!-- side of the box -->
-      <path d="M150 40 L162 32 V224 L150 232Z" fill="#1b4634"/><path d="M150 40 L162 32" stroke="#2a5d46" stroke-width="1"/>
-      <!-- front panel -->
+      <ellipse cx="90" cy="246" rx="82" ry="6" fill="#000" opacity=".25"/>
+      <!-- flap folded back -->
+      <path d="M14 42 L24 10 Q26 3 33 3 H139 Q146 3 148 10 L160 42Z" fill="url(#tbFlap)" stroke="#cfc6b3" stroke-width="1.1"/>
+      <path d="M62 5 Q90 -4 116 5" fill="none" stroke="#cfc6b3" stroke-width="1.1"/>
+      <path d="M14 42 L160 42" stroke="#b9ae97" stroke-width="1.4"/>
+      <!-- cards inside -->
+      <path d="M16 42 H158 V52 H16Z" fill="#f7f3ea"/>${[0,1,2,3,4].map(i=>`<path d="M16 ${43+i*2} H158" stroke="#ddd6c6" stroke-width=".6"/>`).join('')}
+      <!-- side -->
+      <path d="M160 42 L172 34 V234 L160 242Z" fill="url(#tbSide)"/>${[70,110,150,190].map(y=>`<path d="M160 ${y} L172 ${y-8}" stroke="#2a5d46" stroke-width=".6"/>`).join('')}
+      <!-- front -->
       <g clip-path="url(#tbFront)">
-        <rect x="12" y="40" width="138" height="192" fill="#f7f3ea"/>
-        <rect x="20" y="48" width="122" height="176" rx="4" fill="url(#tbLat)"/>
-        <rect x="20" y="48" width="122" height="176" rx="4" fill="none" stroke="#f1f6ee" stroke-width="1.6"/>
-        <rect x="26" y="54" width="110" height="164" rx="2" fill="none" stroke="#c9a45a" stroke-width="1"/>
-        <!-- card backs peeking through the thumb notch -->
-        <rect x="70" y="38" width="28" height="16" fill="${GREEN}"/><path d="M74 44 L84 50 L94 44" fill="none" stroke="#e9f2e6" stroke-width=".8"/>
+        <rect x="12" y="42" width="148" height="200" fill="#f7f3ea"/>
+        <rect x="20" y="50" width="132" height="184" rx="4" fill="url(#tbLat)"/>
+        <rect x="20" y="50" width="132" height="184" rx="4" fill="none" stroke="#f1f6ee" stroke-width="1.6"/>
+        <rect x="27" y="57" width="118" height="170" rx="2" fill="none" stroke="url(#tbFoil)" stroke-width="1.4"/>
+        <rect x="74" y="40" width="30" height="18" fill="#2e7656"/><path d="M78 47 L89 54 L100 47" fill="none" stroke="#e9f2e6" stroke-width=".8"/>
+        <rect x="12" y="42" width="148" height="200" fill="url(#tbSheen)"/>
       </g>
-      <path d="M12 40 H72 A12 12 0 0 0 96 40 H150 V232 H12Z" fill="none" stroke="#d8d0bf" stroke-width="1.4"/>
+      <path d="M12 42 H76 A14 14 0 0 0 104 42 H160 V242 H12Z" fill="none" stroke="#d8d0bf" stroke-width="1.4"/>
+      ${corner(32,62,0)}${corner(140,62,90)}${corner(140,222,180)}${corner(32,222,270)}
       <!-- label -->
-      <ellipse cx="81" cy="134" rx="48" ry="40" fill="#f7f3ea" stroke="#c9a45a" stroke-width="2"/>
-      <ellipse cx="81" cy="134" rx="42" ry="34" fill="none" stroke="#c9a45a" stroke-width=".8"/>
-      <text x="81" y="128" text-anchor="middle" font-family="'DM Serif Display',Georgia,serif" font-size="17" fill="#1f4f3a">Sofia</text>
-      <text x="81" y="146" text-anchor="middle" font-family="'DM Serif Display',Georgia,serif" font-size="17" fill="#1f4f3a">Grimm</text>
-      <text x="81" y="160" text-anchor="middle" font-family="Courier New,monospace" font-size="5.6" letter-spacing="1.4" fill="#8a6a2c">PLAYING CARDS</text>
-      <path d="M81 96 l5 6 l-5 6 l-5 -6z M81 162 l5 6 l-5 6 l-5 -6z" fill="#c9a45a" transform="translate(0 -4)"/>
-      <path d="M81 186 l4 5 l-4 5 l-4 -5z" fill="#c9a45a" opacity="0"/>
-      <rect x="40" y="200" width="82" height="13" rx="2" fill="#f7f3ea"/>
-      <text x="81" y="209.5" text-anchor="middle" font-family="Courier New,monospace" font-size="6" letter-spacing="1.2" fill="#1f4f3a">NEW HAVEN, CT</text>
-      <!-- a soft sheen across the front -->
-      <path d="M12 40 L60 40 L12 120Z" fill="#fff" opacity=".08"/>
+      <ellipse cx="86" cy="140" rx="52" ry="44" fill="#f7f3ea" stroke="url(#tbFoil)" stroke-width="2.4"/>
+      <ellipse cx="86" cy="140" rx="45" ry="37" fill="none" stroke="#c99a45" stroke-width=".8"/>
+      <path d="M86 103 l5 6 l-5 6 l-5 -6z" fill="url(#tbFoil)"/>
+      <text x="86" y="133" text-anchor="middle" font-family="'DM Serif Display',Georgia,serif" font-size="19" fill="#1f4f3a">Sofia</text>
+      <text x="86" y="153" text-anchor="middle" font-family="'DM Serif Display',Georgia,serif" font-size="19" fill="#1f4f3a">Grimm</text>
+      <text x="86" y="167" text-anchor="middle" font-family="Courier New,monospace" font-size="5.6" letter-spacing="1.6" fill="#8a6a2c">PLAYING CARDS</text>
+      <rect x="44" y="206" width="84" height="14" rx="2" fill="#f7f3ea"/>
+      <text x="86" y="216" text-anchor="middle" font-family="Courier New,monospace" font-size="6.2" letter-spacing="1.2" fill="#1f4f3a">NEW HAVEN, CT</text>
     </svg>`;
   }
   function dealer(){
@@ -694,24 +697,18 @@
   }
   // piles of green-backed cards, chip stacks, dice and a few face-up cards
   const LAYOUT=[
-    {chips:[[30,40,4],[78,30,3,1],[104,72,5,2]], x:84, y:12, w:140, rot:0, wide:1},
-    {prop:'box', x:50, y:5, w:92, rot:-8},
-    {prop:'dealer', x:53, y:31, w:62, rot:0},
-    {prop:'pad', x:75, y:25, w:118, rot:9, wide:1},
-    {chips:[[24,30,1,3]], x:41, y:30, w:56, rot:0},
-    {chips:[[24,30,1,1]], x:61, y:6, w:52, rot:0},
-    {chips:[[24,30,2,2],[60,40,1,1],[40,70,3,4]], x:28, y:42, w:90, rot:0},
-    {dice:1, x:92, y:30, w:70, rot:-20},
-    {pile:3, x:86, y:40, w:96, rot:16, wide:1},
-    {one:['K','diamond'], x:89, y:55, w:84, rot:-12, wide:1},
-    {dice:1, x:72, y:60, w:84, rot:30},
-    {chips:[[24,30,5,2],[60,42,3,3],[96,30,2,5]], x:60, y:36, w:110, rot:0},
-    {chips:[[24,30,1,4]], x:47, y:23, w:46, rot:0},
-    {dice:1, x:35, y:33, w:70, rot:12},
-    {chips:[[24,30,2,5],[52,48,1,0]], x:10, y:42, w:64, rot:0},
-    {dice:1, x:10, y:58, w:60, rot:-34},
-    {chips:[[30,40,6,3],[66,46,4,2],[100,32,2,1],[80,80,3,0]], x:85, y:74, w:100, rot:0, wide:1},
-    {chips:[[24,30,4,1]], x:96, y:52, w:50, rot:0}
+    {prop:'box', x:42, y:3, w:176, rot:-8},
+    {chips:[[30,40,4],[78,30,3,1],[104,72,5,2]], x:80, y:4, w:300, rot:0, wide:1},
+    {chips:[[24,30,1,3]], x:35, y:21, w:240, rot:0},
+    {prop:'dealer', x:28, y:66, w:124, rot:0},
+    {prop:'pad', x:60, y:62, w:210, rot:7, wide:1},
+    {chips:[[24,30,5,2],[60,42,3,3],[96,30,2,5]], x:40, y:70, w:300, rot:0},
+    {dice:1, x:16, y:74, w:150, rot:12},
+    {pile:3, x:80, y:62, w:168, rot:14, wide:1},
+    {one:['K','diamond'], x:12, y:58, w:160, rot:-14, wide:1},
+    {dice:1, x:72, y:82, w:140, rot:-28},
+    {chips:[[30,40,6,3],[66,46,4,2],[100,32,2,1]], x:47, y:77, w:280, rot:0, wide:1},
+    {chips:[[24,30,2,4],[52,48,1,0]], x:84, y:32, w:220, rot:0, wide:1}
   ];
   const table=document.getElementById('table');
   function lay(){
@@ -720,7 +717,7 @@
     LAYOUT.forEach((g,gi)=>{
       if(mobile&&(gi%2||g.y<14)) return;
       if(g.wide&&innerWidth<1200) return;   // only where there's room beside the hand            // fewer cards on phones, none over the nav
-      const scale=mobile?.62:1, w=g.w*scale;
+      const scale=mobile?.42:1, w=g.w*scale;
       if(g.prop){const el=document.createElement('div');el.className='pc';el.style.width=(g.w*scale)+'px';el.style.left=g.x+'%';el.style.top=g.y+'%';el.style.transform=`rotate(${g.rot}deg)`;el.innerHTML={box:deckBox,dealer:dealer,pad:scorepad}[g.prop]();table.appendChild(el);return;}
       if(g.chips||g.dice){const el=document.createElement('div');el.className='pc';el.style.width=(g.w*scale)+'px';el.style.left=g.x+'%';el.style.top=g.y+'%';el.style.transform=`rotate(${g.rot}deg)`;el.innerHTML=g.chips?chips(g.chips):dice();table.appendChild(el);return;}
       const list=g.pile?Array.from({length:g.pile},()=>null):(g.fan||[g.one]);
@@ -771,7 +768,8 @@
   const frame=document.getElementById('cardframe');
   function rnd(seed){let x=Math.sin(seed*99.13)*43758.5453;return x-Math.floor(x);}
   function buildFrame(){
-    const vw=innerWidth,vh=innerHeight,mobile=vw<760,w=mobile?72:138,h=w*1.4;frame.innerHTML='';let i=0;
+    const vw=innerWidth,mobile=vw<760,w=mobile?72:138,h=w*1.4;frame.innerHTML='';let i=0;
+    const vh=Math.max(document.documentElement.scrollHeight,innerHeight);frame.style.height=vh+'px';
     const place=(x,y,rot)=>{const [r,s]=BORDER_CARDS[i%BORDER_CARDS.length];const el=document.createElement('div');el.className='fc';el.style.width=w+'px';
       el.style.left=x+'px';el.style.top=y+'px';el.style.transform=`rotate(${rot}deg)`;el.innerHTML=card(r,s);frame.appendChild(el);i++;};
     // left edge, top to bottom
@@ -779,10 +777,11 @@
     // bottom edge, left to right
     // bottom row sits below the hand; if there isn't room under it, leave the row out
     if(mobile) return;
-    const fanBottom=document.getElementById('memoryGrid').getBoundingClientRect().bottom+12;
+    const fanBottom=document.getElementById('memoryGrid').getBoundingClientRect().bottom+scrollY+12;
     const rowTop=Math.max(vh-h*.5,fanBottom);
     if(vh-rowTop>=h*.28) for(let x=w*.15;x<vw;x+=w*1.32){place(x,rowTop+rnd(i+3)*h*.05,(rnd(i+11)-.5)*12);}
   }
+  const pb=document.querySelector('.poster-base');if(pb)pb.innerHTML=card('A','club');
   addEventListener('load',buildFrame); buildFrame(); addEventListener('resize',()=>{clearTimeout(buildFrame.t);buildFrame.t=setTimeout(buildFrame,150);});
 
 })();
