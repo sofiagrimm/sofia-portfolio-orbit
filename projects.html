@@ -93,6 +93,8 @@
     .poster-card{position:absolute;right:clamp(40px,8vw,120px);top:70px;width:clamp(150px,15vw,190px);transform:rotate(5deg);z-index:12;filter:drop-shadow(0 12px 16px rgba(30,0,0,.5));margin:0}
     .poster-card svg{display:block;width:100%;height:auto}
     @media(max-width:760px){.poster-card{position:relative;right:auto;top:auto;width:150px;margin:0 auto 18px;transform:rotate(4deg)}}
+    .feltprint{position:absolute;left:50%;top:-46%;width:118%;transform:translateX(-50%);z-index:0;pointer-events:none}
+    @media(max-width:760px){.feltprint{display:none}}
     /* ── shuffle deck ── */
     .deck-wrap{display:flex;align-items:center;gap:22px;margin:4px 0 26px}
     .deck{position:relative;width:78px;aspect-ratio:5/7;border:0;background:none;padding:0;cursor:pointer;rotate:-10deg;flex:0 0 auto}
@@ -251,7 +253,12 @@
       <p class="deck-label">shuffle?</p>
     </div>
     <div class="rule"></div>
-    <div class="memory-grid" id="memoryGrid"></div>
+    <div class="memory-grid" id="memoryGrid"><svg class="feltprint" viewBox="0 0 1000 420" aria-hidden="true">
+      <defs><path id="arcText" d="M120 330 A400 260 0 0 1 880 330"/></defs>
+      <path d="M80 360 A440 300 0 0 1 920 360" fill="none" stroke="#d6b36a" stroke-width="2.4" opacity=".55"/>
+      <path d="M150 360 A370 230 0 0 1 850 360" fill="none" stroke="#d6b36a" stroke-width="1.2" opacity=".45"/>
+      <text font-family="'DM Serif Display',Georgia,serif" font-size="26" letter-spacing="6" fill="#d6b36a" opacity=".6"><textPath href="#arcText" startOffset="50%" text-anchor="middle">PICK A CARD · ANY CARD · EVERY ONE IS A PROJECT</textPath></text>
+    </svg></div>
   </main>
   <div class="coords">41.3083&deg; N &nbsp; 72.9279&deg; W</div>
   <div id="cardPopupOverlay">
@@ -605,9 +612,48 @@
     const die=(x,y,r,v)=>`<g transform="translate(${x} ${y}) rotate(${r})"><rect x="-13" y="-10" width="28" height="28" rx="6" fill="#8e1c22"/><rect x="-15" y="-14" width="28" height="28" rx="6" fill="#d3383f"/><rect x="-12" y="-11" width="10" height="5" rx="2" fill="#fff" opacity=".25"/>${pipsAt[v].map(([a,b])=>`<circle cx="${a-1}" cy="${b}" r="2.6" fill="#fff"/>`).join('')}</g>`;
     return `<svg viewBox="0 0 90 60" xmlns="http://www.w3.org/2000/svg">${die(24,28,-14,5)}${die(62,32,22,3)}</svg>`;
   }
+
+  // more things on the table: the card case, a dealer button, a score pad and loose chips
+  function deckBox(){
+    return `<svg viewBox="0 0 160 220" xmlns="http://www.w3.org/2000/svg">
+      <rect x="22" y="6" width="116" height="40" rx="4" fill="#f7f3ea" stroke="#d8d0bf" stroke-width="2" transform="rotate(-4 80 26)"/>
+      <rect x="28" y="2" width="116" height="40" rx="4" fill="${GREEN}" stroke="#e9f2e6" stroke-width="2" transform="rotate(5 86 22)"/>
+      <rect x="10" y="30" width="140" height="184" rx="8" fill="#1f4f3a"/>
+      <rect x="18" y="38" width="124" height="168" rx="5" fill="none" stroke="#c9a45a" stroke-width="2"/>
+      <rect x="24" y="44" width="112" height="156" rx="3" fill="none" stroke="#c9a45a" stroke-width=".8"/>
+      <path d="M10 30 h140 v18 q-70 14 -140 0z" fill="#174030"/>
+      <text x="80" y="104" text-anchor="middle" font-family="'DM Serif Display',Georgia,serif" font-size="20" fill="#e8d3a0">Sofia Grimm</text>
+      <text x="80" y="124" text-anchor="middle" font-family="Courier New,monospace" font-size="9" letter-spacing="2" fill="#c9a45a">PLAYING CARDS</text>
+      <path d="M80 140 L92 156 L80 172 L68 156Z" fill="none" stroke="#c9a45a" stroke-width="1.6"/><circle cx="80" cy="156" r="3" fill="#c9a45a"/>
+      <text x="80" y="192" text-anchor="middle" font-family="Courier New,monospace" font-size="8" letter-spacing="1.5" fill="#c9a45a">NEW HAVEN, CT</text></svg>`;
+  }
+  function dealer(){
+    return `<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><circle cx="50" cy="54" r="44" fill="#00000055"/><circle cx="50" cy="50" r="44" fill="#f7f4ec" stroke="#d4ccbb" stroke-width="2"/>
+      <circle cx="50" cy="50" r="36" fill="none" stroke="#1d1d1d" stroke-width="1.4"/>
+      <text x="50" y="57" text-anchor="middle" font-family="'DM Serif Display',Georgia,serif" font-size="19" letter-spacing="1" fill="#1d1d1d">DEALER</text></svg>`;
+  }
+  function scorepad(){
+    const tallies=(x,y,n)=>{let t='';for(let i=0;i<n;i++){const grp=Math.floor(i/5),k=i%5;t+=k<4?`<path d="M${x+grp*22+k*4} ${y-11} l1 12" stroke="#24306b" stroke-width="1.6" stroke-linecap="round"/>`:`<path d="M${x+grp*22-2} ${y-2} l18 -9" stroke="#24306b" stroke-width="1.6" stroke-linecap="round"/>`;}return t;};
+    return `<svg viewBox="0 0 150 190" xmlns="http://www.w3.org/2000/svg">
+      <rect x="6" y="8" width="138" height="176" rx="4" fill="#fbf8ef" stroke="#d8d0bf" stroke-width="1.5"/>
+      <rect x="6" y="8" width="138" height="18" rx="4" fill="#c9524b"/>
+      ${[...Array(9)].map((_,i)=>`<path d="M14 ${48+i*15} h122" stroke="#9fb6d6" stroke-width=".8"/>`).join('')}<path d="M34 30 v150" stroke="#e7a3a3" stroke-width=".8"/>
+      <text x="40" y="44" font-family="'Nanum Pen Script',cursive" font-size="20" fill="#24306b">score</text>
+      <text x="40" y="74" font-family="'Nanum Pen Script',cursive" font-size="16" fill="#24306b">projects</text>${tallies(92,74,8)}
+      <text x="40" y="104" font-family="'Nanum Pen Script',cursive" font-size="16" fill="#24306b">labs</text>${tallies(92,104,5)}
+      <text x="40" y="134" font-family="'Nanum Pen Script',cursive" font-size="16" fill="#24306b">coffees</text><text x="96" y="136" font-family="'Nanum Pen Script',cursive" font-size="22" fill="#24306b">∞</text>
+      <g transform="rotate(-28 90 160)"><rect x="40" y="156" width="96" height="9" rx="2" fill="#e8b93a"/><path d="M136 156 l14 4.5 l-14 4.5z" fill="#e6c79a"/><path d="M146 159 l4 1.5 l-4 1.5z" fill="#333"/><rect x="34" y="156" width="8" height="9" rx="1.5" fill="#d98a9a"/><rect x="41" y="156" width="3" height="9" fill="#b9b9b9"/></g></svg>`;
+  }
   // piles of green-backed cards, chip stacks, dice and a few face-up cards
   const LAYOUT=[
     {chips:[[30,40,4],[78,30,3,1],[104,72,5]], x:84, y:12, w:140, rot:0},
+    {prop:'box', x:50, y:6, w:96, rot:-10},
+    {prop:'dealer', x:53, y:31, w:62, rot:0},
+    {prop:'pad', x:75, y:25, w:118, rot:9},
+    {chips:[[24,30,1]], x:41, y:30, w:56, rot:0},
+    {chips:[[24,30,1,1]], x:61, y:6, w:52, rot:0},
+    {chips:[[24,30,2],[60,40,1,1]], x:29, y:43, w:80, rot:0},
+    {dice:1, x:92, y:30, w:70, rot:-20},
     {pile:3, x:86, y:40, w:96, rot:16},
     {one:['K','diamond'], x:88, y:62, w:90, rot:-12},
     {dice:1, x:72, y:60, w:84, rot:30}
@@ -619,6 +665,7 @@
     LAYOUT.forEach((g,gi)=>{
       if(mobile&&(gi%2||g.y<14)) return;            // fewer cards on phones, none over the nav
       const scale=mobile?.62:1, w=g.w*scale;
+      if(g.prop){const el=document.createElement('div');el.className='pc';el.style.width=(g.w*scale)+'px';el.style.left=g.x+'%';el.style.top=g.y+'%';el.style.transform=`rotate(${g.rot}deg)`;el.innerHTML={box:deckBox,dealer:dealer,pad:scorepad}[g.prop]();table.appendChild(el);return;}
       if(g.chips||g.dice){const el=document.createElement('div');el.className='pc';el.style.width=(g.w*scale)+'px';el.style.left=g.x+'%';el.style.top=g.y+'%';el.style.transform=`rotate(${g.rot}deg)`;el.innerHTML=g.chips?chips(g.chips):dice();table.appendChild(el);return;}
       const list=g.pile?Array.from({length:g.pile},()=>null):(g.fan||[g.one]);
       list.forEach((rs,k)=>{
@@ -672,7 +719,7 @@
     const place=(x,y,rot)=>{const [r,s]=BORDER_CARDS[i%BORDER_CARDS.length];const el=document.createElement('div');el.className='fc';el.style.width=w+'px';
       el.style.left=x+'px';el.style.top=y+'px';el.style.transform=`rotate(${rot}deg)`;el.innerHTML=printed(r,s);frame.appendChild(el);i++;};
     // left edge, top to bottom
-    if(!mobile) for(let y=64;y<vh-h*.4;y+=h*.62){place(-w*.45+rnd(i+1)*w*.3,y,(rnd(i+7)-.5)*50);}
+    if(vw>=1200) for(let y=64;y<vh-h*.4;y+=h*.62){place(-w*.45+rnd(i+1)*w*.3,y,(rnd(i+7)-.5)*50);}
     // bottom edge, left to right
     for(let x=-w*.2;x<vw;x+=w*.72){place(x,vh-h*.62+rnd(i+3)*h*.18,(rnd(i+11)-.5)*44);}
   }
