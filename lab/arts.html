@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>arts | Sofia Grimm</title>
+<meta name="robots" content="noindex">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Pinyon+Script&family=Inter:wght@300;400;500&family=Cormorant+Garamond:ital,wght@1,500&display=swap">
+<style>
+  :root{--sun:#f2c75c;--ink:#2a2219;--glass:rgba(255,255,255,.16);--edge:rgba(255,255,255,.35)}
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{overflow-x:clip}
+  body{min-height:100vh;background:var(--sun);font-family:'Inter',Helvetica,Arial,sans-serif;color:#fff;display:flex;flex-direction:column;align-items:center}
+  /* the Vitruvian sketch, faint behind everything */
+  .sketch{position:fixed;inset:0;background:url('https://commons.wikimedia.org/wiki/Special:FilePath/Da_Vinci_Vitruve_Luc_Viatour.jpg?width=1400') center/min(95vh,1000px) no-repeat;
+    opacity:.16;mix-blend-mode:multiply;pointer-events:none;filter:sepia(.6) contrast(1.2)}
+  .site{position:relative;z-index:2;width:100%;display:flex;justify-content:space-between;align-items:baseline;padding:22px clamp(18px,4vw,48px) 0;color:var(--ink);font-size:13px;letter-spacing:.12em;text-transform:uppercase}
+  .site a{color:var(--ink);text-decoration:none;opacity:.7}.site a:hover,.site a:focus-visible{opacity:1}
+  .site nav{display:flex;flex-wrap:wrap;gap:4px 18px}
+
+  .hero{position:relative;z-index:2;width:min(1180px,92vw);height:min(720px,calc(100vh - 120px));min-height:520px;margin:clamp(16px,4vh,40px) 0 60px;border-radius:26px;overflow:hidden;
+    box-shadow:0 40px 80px rgba(80,50,0,.35),0 8px 18px rgba(80,50,0,.25);cursor:none;isolation:isolate}
+  .canvas{position:absolute;inset:-4%;background-size:cover;background-position:center 30%;transition:filter .6s,transform .9s cubic-bezier(.2,.8,.2,1),opacity .6s;will-change:transform}
+  .canvas.fade{opacity:0}
+  .hero::after{content:"";position:absolute;inset:0;pointer-events:none;background:linear-gradient(180deg,rgba(0,0,0,.35),transparent 22%,transparent 50%,rgba(0,0,0,.6))}
+  .hero.happy .canvas{filter:saturate(1.2) brightness(1.08) sepia(.08)}
+  .hero.sad .canvas{filter:saturate(.35) brightness(.78) contrast(1.05)}
+  .glow{position:absolute;inset:0;pointer-events:none;z-index:1;opacity:0;transition:opacity .6s;background:radial-gradient(circle at 50% 35%,rgba(255,214,140,.35),transparent 55%)}
+  .hero.happy .glow{opacity:1}
+  .hero.sad.shake .canvas{animation:shake .45s}
+  @keyframes shake{20%{translate:-6px 0}40%{translate:5px 0}60%{translate:-3px 0}80%{translate:2px 0}}
+
+  .bar{position:absolute;z-index:3;left:0;right:0;top:0;display:flex;align-items:center;justify-content:space-between;padding:22px 26px}
+  .logo{font-family:'Pinyon Script',cursive;font-size:32px;line-height:1;color:#fff}
+  .links{display:flex;gap:30px;font-size:13px;color:rgba(255,255,255,.85)}
+  .links a,.pill{color:inherit;text-decoration:none}
+  .pill{background:var(--glass);border:1px solid var(--edge);border-radius:999px;padding:8px 16px;font-size:13px;backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
+
+  /* the two things you can offer her: glass cards that drift toward your cursor */
+  .offer{position:absolute;z-index:3;width:clamp(120px,12vw,160px);aspect-ratio:1;border-radius:20px;background:var(--glass);border:1px solid var(--edge);
+    backdrop-filter:blur(12px) saturate(1.2);-webkit-backdrop-filter:blur(12px) saturate(1.2);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;
+    font-size:13px;color:#fff;text-shadow:0 1px 6px rgba(0,0,0,.4);box-shadow:0 18px 36px rgba(0,0,0,.25);transition:background .3s,border-color .3s,scale .3s;will-change:transform}
+  .offer svg{width:62%;height:auto;filter:drop-shadow(0 8px 10px rgba(0,0,0,.35))}
+  .offer:hover,.offer:focus-visible{background:rgba(255,255,255,.26);border-color:rgba(255,255,255,.7);scale:1.05;outline:none}
+  .offer.a{left:12%;top:28%}.offer.b{right:9%;top:36%}
+
+  .copy{position:absolute;z-index:3;left:clamp(20px,3.4vw,44px);bottom:clamp(24px,5vh,46px);max-width:min(520px,80%)}
+  .copy h1{font-family:'Pinyon Script',cursive;font-weight:400;font-size:clamp(52px,7vw,92px);line-height:.95;color:#f6ead2;text-shadow:0 4px 24px rgba(0,0,0,.45)}
+  .copy p{margin-top:12px;font-size:14px;line-height:1.55;color:rgba(255,255,255,.88);max-width:44ch}
+  .mood{display:block;margin-top:10px;font-family:'Cormorant Garamond',serif;font-style:italic;font-size:22px;color:#ffe2a8;min-height:1.3em;transition:opacity .3s}
+  .others{display:inline-flex;align-items:center;gap:10px;margin-top:16px;cursor:pointer}
+  .others .faces{display:flex}
+  .others .faces span{width:30px;height:30px;border-radius:50%;border:2px solid rgba(255,255,255,.75);background-size:cover;background-position:center 25%;margin-left:-9px}
+  .others .faces span:first-child{margin-left:0}
+  .sig{position:absolute;z-index:3;right:clamp(20px,3vw,40px);bottom:clamp(24px,5vh,46px);font-family:'Cormorant Garamond',serif;font-style:italic;font-size:22px;color:#f6ead2}
+
+  /* the cursor follower: a soft glass ring that trails the pointer and carries a word */
+  .follower{position:absolute;z-index:5;left:0;top:0;width:64px;height:64px;margin:-32px 0 0 -32px;border-radius:50%;pointer-events:none;
+    background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.55);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);
+    display:grid;place-items:center;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:#fff;transition:width .25s,height .25s,margin .25s,background .25s;will-change:transform}
+  .follower.big{width:96px;height:96px;margin:-48px 0 0 -48px;background:rgba(255,255,255,.22)}
+  .credit{position:relative;z-index:2;margin:-40px 0 30px;font-size:11px;color:rgba(42,34,25,.6);text-align:center;padding:0 20px}
+  @media (max-width:760px){.links{display:none}.offer.a{left:6%;top:20%}.offer.b{right:6%;top:24%}.hero{cursor:auto}.follower{display:none}}
+  @media (prefers-reduced-motion:reduce){.canvas,.offer{transition:none}.hero.sad.shake .canvas{animation:none}}
+</style>
+</head>
+<body>
+<div class="sketch" aria-hidden="true"></div>
+<header class="site">
+  <a href="../index.html" style="opacity:1;font-family:'Pinyon Script',cursive;font-size:26px;text-transform:none;letter-spacing:0">Sofia Grimm</a>
+  <nav aria-label="Site"><a href="../index.html">Home</a><a href="../about.html">About</a><a href="../research.html">Research</a><a href="../projects.html">Projects</a><a href="cards.html">Cards</a><a href="notes.html">Notes</a><a href="sofia-is.html">Sofia is</a><a href="arts.html" aria-current="page" style="opacity:1">Arts</a><a href="globe.html">Globe</a><a href="lace.html">Tilt</a><a href="../contact.html">Contact</a></nav>
+</header>
+
+<main class="hero" id="hero">
+  <div class="canvas" id="canvas" role="img" aria-label=""></div>
+  <div class="glow"></div>
+  <div class="bar"><span class="logo">s. Grimm</span><nav class="links" aria-label="Arts"><a href="#" id="nextLink">Gallery</a><a href="sofia-is.html">About me</a></nav><a class="pill" href="../contact.html">Contact me</a></div>
+
+  <button class="offer a" id="offerA" type="button"></button>
+  <button class="offer b" id="offerB" type="button"></button>
+
+  <div class="copy">
+    <h1 id="title"></h1>
+    <p id="blurb"></p>
+    <span class="mood" id="mood" aria-live="polite"></span>
+    <button class="others pill" id="others" type="button"><span class="faces" id="faces"></span><span>Try my other paintings</span></button>
+  </div>
+  <span class="sig" id="sig"></span>
+  <div class="follower" id="follower" aria-hidden="true"></div>
+</main>
+<p class="credit">Paintings: public domain, via Wikimedia Commons.</p>
+
+<script>
+// ── the paintings and what each one would love, or hate, to be offered.
+//    To show your own work, add entries here: img (any image path), title, blurb, signature,
+//    and two offers (good = makes them happy, bad = upsets them) with a little drawing each.
+const W = f => 'https://commons.wikimedia.org/wiki/Special:FilePath/' + f + '?width=1600';
+const ICON = {
+  pasta:`<svg viewBox="0 0 120 80"><g transform="rotate(-24 60 40)"><rect x="8" y="30" width="48" height="18" rx="4" fill="#e8b14d"/><rect x="66" y="28" width="46" height="18" rx="4" fill="#e8b14d"/>${[0,1,2,3,4].map(i=>`<path d="M${14+i*8} 30 v18 M${72+i*8} 28 v18" stroke="#c98a2a" stroke-width="2"/>`).join('')}<path d="M56 30 l4 6 l-3 4 l5 8 M66 28 l-3 7 l4 4 l-4 7" stroke="#fff3c9" stroke-width="2" fill="none"/></g><circle cx="62" cy="62" r="2" fill="#f2d28a"/><circle cx="70" cy="66" r="1.5" fill="#f2d28a"/><circle cx="56" cy="68" r="1.4" fill="#f2d28a"/></svg>`,
+  tiramisu:`<svg viewBox="0 0 120 90"><ellipse cx="60" cy="74" rx="52" ry="10" fill="#f4f0e8"/><path d="M22 34 L60 22 L98 34 L98 66 L60 76 L22 66Z" fill="#f3e6cc"/><path d="M22 44 L60 54 L98 44 L98 50 L60 60 L22 50Z" fill="#7a4a26"/><path d="M22 58 L60 68 L98 58 L98 64 L60 74 L22 64Z" fill="#7a4a26"/><path d="M22 34 L60 46 L98 34 L60 22Z" fill="#5a331a"/>${[0,1,2,3,4,5,6].map(i=>`<circle cx="${34+i*8}" cy="${30+((i*7)%5)}" r="1.4" fill="#3a2010"/>`).join('')}</svg>`,
+  pearl:`<svg viewBox="0 0 100 100"><path d="M50 10 C54 22 54 28 50 34" stroke="#d9c7a0" stroke-width="3" fill="none"/><circle cx="50" cy="60" r="26" fill="url(#pg)"/><defs><radialGradient id="pg" cx="38%" cy="32%" r="70%"><stop offset="0" stop-color="#fff"/><stop offset=".55" stop-color="#e6e1d6"/><stop offset="1" stop-color="#9f9789"/></radialGradient></defs><ellipse cx="41" cy="50" rx="7" ry="5" fill="#fff" opacity=".9"/></svg>`,
+  milk:`<svg viewBox="0 0 110 90"><path d="M20 30 L44 26 L50 66 L28 70Z" fill="#cfe3ef" opacity=".85" transform="rotate(62 36 48)"/><path d="M38 60 C60 58 86 62 96 70 C82 76 50 76 34 70Z" fill="#fbfbf8"/><circle cx="92" cy="58" r="3" fill="#fbfbf8"/><circle cx="84" cy="50" r="2" fill="#fbfbf8"/></svg>`,
+  telescope:`<svg viewBox="0 0 110 100"><g transform="rotate(-28 55 40)"><rect x="18" y="32" width="70" height="16" rx="3" fill="#c9a45a"/><rect x="82" y="29" width="14" height="22" rx="3" fill="#8a6a2c"/><rect x="10" y="35" width="10" height="10" fill="#8a6a2c"/></g><path d="M55 48 L36 92 M55 48 L55 94 M55 48 L74 92" stroke="#4a3a2a" stroke-width="4" stroke-linecap="round"/><circle cx="96" cy="10" r="3" fill="#fff6c8"/><circle cx="84" cy="4" r="2" fill="#fff6c8"/></svg>`,
+  lamp:`<svg viewBox="0 0 100 100"><rect x="46" y="30" width="8" height="66" fill="#3a3a40"/><path d="M28 30 h44 l-8 -14 h-28z" fill="#3a3a40"/><ellipse cx="50" cy="34" rx="26" ry="8" fill="#ffe9a0"/><path d="M24 36 L6 96 H94 L76 36Z" fill="#ffe9a0" opacity=".35"/></svg>`,
+  shell:`<svg viewBox="0 0 110 90"><path d="M55 80 C20 76 8 46 18 28 C28 12 82 12 92 28 C102 46 90 76 55 80Z" fill="#f4c9b8"/>${[-40,-24,-8,8,24,40].map(a=>`<path d="M55 78 L${55+Math.sin(a*Math.PI/180)*44} ${78-Math.cos(a*Math.PI/180)*60}" stroke="#d99a86" stroke-width="2.2"/>`).join('')}<path d="M44 80 h22 v6 h-22z" fill="#e9b3a1"/></svg>`,
+  wind:`<svg viewBox="0 0 110 80"><path d="M10 30 H70 C86 30 86 10 72 12 M10 46 H88 C104 46 104 66 90 64 M18 60 H52" stroke="#e9f3f8" stroke-width="5" fill="none" stroke-linecap="round"/></svg>`
+};
+const PAINTINGS = [
+  { img: W('Mona_Lisa,_by_Leonardo_da_Vinci,_from_C2RMF_retouched.jpg'), title: 'Make her smile', sig: '– La Gioconda', label: 'Mona Lisa, Leonardo da Vinci',
+    blurb: "Gioconda is a true Italian. She'll melt for a proper tiramisu, but never, ever snap her pasta.",
+    good: { name: 'Perfect tiramisu', icon: 'tiramisu', mood: 'There it is. The smile.' }, bad: { name: 'Broken pasta', icon: 'pasta', mood: 'You did not just break the spaghetti.' } },
+  { img: W('Johannes_Vermeer_(1632-1675)_-_The_Girl_With_The_Pearl_Earring_(1665).jpg'), title: 'Catch her eye', sig: '– het meisje', label: 'Girl with a Pearl Earring, Johannes Vermeer',
+    blurb: 'She turned around for a reason. Offer her something luminous, and keep the spills away from the silk.',
+    good: { name: 'A single pearl', icon: 'pearl', mood: 'She glances back, just for you.' }, bad: { name: 'Spilled milk', icon: 'milk', mood: 'Not on the turban.' } },
+  { img: W('Van_Gogh_-_Starry_Night_-_Google_Art_Project.jpg'), title: 'Keep him up all night', sig: '– Vincent', label: 'The Starry Night, Vincent van Gogh',
+    blurb: 'Vincent wants the sky to swirl until morning. Hand him a telescope; hide the streetlights.',
+    good: { name: 'A telescope', icon: 'telescope', mood: 'The stars spin a little faster.' }, bad: { name: 'Streetlights', icon: 'lamp', mood: 'Too bright. The sky goes flat.' } },
+  { img: W('Sandro_Botticelli_-_La_nascita_di_Venere_-_Google_Art_Project_-_edited.jpg'), title: 'Make her blush', sig: '– Venere', label: 'The Birth of Venus, Sandro Botticelli',
+    blurb: 'Venus just arrived on a seashell. Bring her another one, and spare her the cold sea wind.',
+    good: { name: 'A seashell', icon: 'shell', mood: 'A little pink in her cheeks.' }, bad: { name: 'A cold breeze', icon: 'wind', mood: 'Brr. She pulls her hair closer.' } }
+];
+
+(function(){
+  const hero=document.getElementById('hero'),canvas=document.getElementById('canvas'),A=document.getElementById('offerA'),B=document.getElementById('offerB');
+  const fol=document.getElementById('follower'),mood=document.getElementById('mood');
+  const still=matchMedia('(prefers-reduced-motion: reduce)').matches;
+  let i=0;
+  function show(k,instant){
+    const p=PAINTINGS[k];i=k;
+    const set=()=>{canvas.style.backgroundImage=`url("${p.img}")`;canvas.setAttribute('aria-label',p.label);canvas.classList.remove('fade');};
+    if(instant||still)set();else{canvas.classList.add('fade');setTimeout(set,380);}
+    document.getElementById('title').textContent=p.title;document.getElementById('blurb').textContent=p.blurb;document.getElementById('sig').textContent=p.sig;mood.textContent='';
+    // which side the good and bad offers sit on changes, so it's a little game
+    const [L,Rr]=k%2?[p.good,p.bad]:[p.bad,p.good];
+    [[A,L],[B,Rr]].forEach(([el,o])=>{el.innerHTML=ICON[o.icon]+`<span>${o.name}</span>`;el.dataset.kind=o===p.good?'good':'bad';el.dataset.mood=o.mood;el.setAttribute('aria-label',`Offer ${p.label.split(',')[0]}: ${o.name}`);});
+    document.getElementById('faces').innerHTML=PAINTINGS.filter((_,j)=>j!==k).slice(0,3).map(q=>`<span style="background-image:url('${q.img.replace('width=1600','width=120')}')"></span>`).join('');
+    hero.classList.remove('happy','sad');
+    PAINTINGS.forEach(q=>{const im=new Image();im.src=q.img;}); // warm up the others
+  }
+  const react=el=>{const kind=el.dataset.kind;hero.classList.remove('happy','sad','shake');void hero.offsetWidth;hero.classList.add(kind==='good'?'happy':'sad');if(kind==='bad')hero.classList.add('shake');mood.textContent=el.dataset.mood;};
+  const calm=()=>{hero.classList.remove('happy','sad','shake');mood.textContent='';};
+  [A,B].forEach(el=>{el.addEventListener('pointerenter',()=>{react(el);fol.classList.add('big');fol.textContent=el.dataset.kind==='good'?'offer':'hmm';});
+    el.addEventListener('pointerleave',()=>{calm();fol.classList.remove('big');fol.textContent='';});
+    el.addEventListener('focus',()=>react(el));el.addEventListener('blur',calm);el.addEventListener('click',()=>react(el));});
+  document.getElementById('others').addEventListener('click',()=>show((i+1)%PAINTINGS.length));
+  document.getElementById('nextLink').addEventListener('click',e=>{e.preventDefault();show((i+1)%PAINTINGS.length);});
+
+  // cursor follower and a gentle parallax: the painting leans away, the offers lean toward you
+  let mx=.5,my=.5,fx=0,fy=0,tx=0,ty=0,raf=0;
+  hero.addEventListener('pointermove',e=>{const r=hero.getBoundingClientRect();tx=e.clientX-r.left;ty=e.clientY-r.top;mx=tx/r.width;my=ty/r.height;if(!raf)raf=requestAnimationFrame(loop);});
+  hero.addEventListener('pointerleave',()=>{mx=.5;my=.5;if(!raf)raf=requestAnimationFrame(loop);});
+  let px=0,py=0;
+  function loop(){raf=0;fx+=(tx-fx)*.18;fy+=(ty-fy)*.18;fol.style.transform=`translate(${fx}px,${fy}px)`;
+    const gx=(mx-.5),gy=(my-.5);px+=(gx-px)*.08;py+=(gy-py)*.08;
+    if(!still){canvas.style.transform=`translate(${-px*18}px,${-py*12}px) scale(1.02)`;
+      A.style.transform=`translate(${px*26}px,${py*18}px)`;B.style.transform=`translate(${px*30}px,${py*22}px)`;}
+    if(Math.abs(tx-fx)+Math.abs(ty-fy)>.5||Math.abs(gx-px)+Math.abs(gy-py)>.002)raf=requestAnimationFrame(loop);}
+  show(0,true);
+})();
+</script>
+<script src="../gh.js"></script>
+</body>
+</html>
