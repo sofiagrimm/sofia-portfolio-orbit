@@ -196,6 +196,14 @@
       .entry-loc { display: none; }
     }
   </style>
+  <style>
+    /* six tabs: let the nav scroll sideways on small screens instead of spilling off */
+    @media (max-width:640px){
+      .nav-links{overflow-x:auto;max-width:calc(100vw - 120px);scrollbar-width:none;-webkit-overflow-scrolling:touch}
+      .nav-links::-webkit-scrollbar{display:none}
+      .nav-links a{flex-shrink:0}
+    }
+  </style>
 </head>
 <body>
   <div class="nebula"></div>
@@ -205,7 +213,9 @@
       <a href="index.html">Home</a><span class="divider">|</span>
       <a href="about.html">About</a><span class="divider">|</span>
       <a href="research.html" class="active">Research</a><span class="divider">|</span>
-      <a href="projects.html">Projects</a>
+      <a href="projects.html">Projects</a><span class="divider">|</span>
+      <a href="lab/cards.html">Cards</a><span class="divider">|</span>
+      <a href="lab/notes.html">Notes</a>
     </div>
   </nav>
 

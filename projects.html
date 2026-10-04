@@ -89,6 +89,14 @@
     .coords{position:fixed;bottom:32px;left:48px;z-index:20;font-size:10px;letter-spacing:.18em;color:rgba(110,130,190,.28);font-weight:300;pointer-events:none;}
     @media(max-width:600px){.coords{display:none;}}
   </style>
+  <style>
+    /* six tabs: let the nav scroll sideways on small screens instead of spilling off */
+    @media (max-width:640px){
+      .nav-links{overflow-x:auto;max-width:calc(100vw - 120px);scrollbar-width:none;-webkit-overflow-scrolling:touch}
+      .nav-links::-webkit-scrollbar{display:none}
+      .nav-links a{flex-shrink:0}
+    }
+  </style>
 </head>
 <body>
   <div class="nebula"></div>
@@ -98,7 +106,9 @@
       <a href="index.html">Home</a><span class="divider">|</span>
       <a href="about.html">About</a><span class="divider">|</span>
       <a href="research.html">Research</a><span class="divider">|</span>
-      <a href="projects.html" class="active">Projects</a>
+      <a href="projects.html" class="active">Projects</a><span class="divider">|</span>
+      <a href="lab/cards.html">Cards</a><span class="divider">|</span>
+      <a href="lab/notes.html">Notes</a>
     </div>
   </nav>
   <main class="page">
