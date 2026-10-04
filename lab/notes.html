@@ -273,9 +273,10 @@
   })();
 </script>
 <script>
-// As you scroll, the paper airplane flies from stop to stop: under the big clipped note, past
-// "bench day", "looking up" and "email me", resting a moment at each, then swoops down and
-// climbs away off the left edge a little before the end of the page. It leaves a dashed trail.
+// The paper airplane follows one smooth curve through its stops (under the clipped note, past
+// "bench day", "looking up" and "email me", then off the left edge near the bottom), opening with
+// one big, lazy loop. Its place on the curve is tied to how far you've scrolled, measured along
+// the curve's length so it moves at an even pace, and it can never go faster than a gentle glide.
 (function(){
   const svg=document.querySelector('.paper-plane');
   const Q=sel=>document.querySelector(sel);
@@ -286,103 +287,98 @@
   const start=svg.getBoundingClientRect(), sx=start.left+scrollX, sy=start.top+scrollY, w=start.width;
   wrap.style.width=w+'px'; svg.parentNode.removeChild(svg); wrap.appendChild(svg); document.body.appendChild(wrap);
   const NOSE=Math.atan2(-282,306);
-  let segs=[],marks=[],W=w,Hh=w*.78,cur=0,target=0;
   const box=el=>{const r=el.getBoundingClientRect();return{l:r.left+scrollX,t:r.top+scrollY,r:r.right+scrollX,b:r.bottom+scrollY};};
-  const DWELL=140; // px of scrolling the plane sits still at each stop
+  const DWELL=160;          // px of scrolling the plane rests at each stop
+  const MAXSPEED=7;         // px per frame, at most
+  let W=w,Hh=w*.78,legs=[],marks=[],LOOP=null;
+
+  // ── the route: a Catmull-Rom spline (one continuous, smooth curve through every stop)
+  function cubic(a,b,c,d,t){const u=1-t;return{x:u*u*u*a.x+3*u*u*t*b.x+3*u*t*t*c.x+t*t*t*d.x,y:u*u*u*a.y+3*u*u*t*b.y+3*u*t*t*c.y+t*t*t*d.y};}
   function plan(){
     W=wrap.offsetWidth;Hh=W*.78;const vw=document.documentElement.clientWidth,docH=document.documentElement.scrollHeight;
     const [nb,p1,p4,hi]=stopsEl.map(box);
-    const pts=[
-      {x:sx,y:sy},
-      {x:Math.min(vw-W*.9,nb.r-W*.55),y:nb.b+8},          // just below the clipped note, lower right
-      {x:Math.max(4,p1.l-W*.62),y:p1.b-Hh*.35},            // lower left of "bench day"
-      {x:Math.max(4,p4.l-W*.62),y:p4.b-Hh*.35},            // lower left of "looking up"
-      {x:Math.max(4,hi.l-W*.62),y:hi.b-Hh*.3},             // lower left of "email me"
-      {x:-W*1.3,y:docH-288-Hh}                             // off the left edge, ~3 inches above the bottom
-    ];
-    segs=[];
-    for(let k=1;k<pts.length;k++){
-      const a=pts[k-1],b=pts[k],dx=b.x-a.x,dy=b.y-a.y,side=(k%2?1:-1)*Math.min(vw*.28,Math.abs(dy)*.6+80);
-      let c1={x:a.x+dx*.2+side,y:a.y+dy*.15},c2={x:b.x-dx*.15+side*.8,y:b.y-dy*.3};
-      if(k===pts.length-1){c1={x:a.x-vw*.05,y:a.y+Math.max(160,(b.y-a.y)*.8)+Hh};c2={x:b.x+vw*.35,y:b.y+Hh*1.2};} // dip down, then climb away
-      segs.push([a,c1,c2,b]);
+    const P=[{x:sx,y:sy},
+      {x:Math.min(vw-W*.9,nb.r-W*.55),y:nb.b+8},
+      {x:Math.max(4,p1.l-W*.62),y:p1.b-Hh*.35},
+      {x:Math.max(4,p4.l-W*.62),y:p4.b-Hh*.35},
+      {x:Math.max(4,hi.l-W*.62),y:hi.b-Hh*.3},
+      {x:-W*1.4,y:docH-288-Hh}];
+    const ext=[{x:2*P[0].x-P[1].x,y:2*P[0].y-P[1].y},...P,{x:2*P[5].x-P[4].x,y:2*P[5].y-P[4].y+Hh*2}];
+    LOOP={r:Math.max(110,Math.min(190,vw*.13)),a:.12,b:.62};   // a big, slow loop in the first leg
+    legs=[];
+    for(let k=0;k<P.length-1;k++){
+      const p0=ext[k],p1=ext[k+1],p2=ext[k+2],p3=ext[k+3];
+      const c1={x:p1.x+(p2.x-p0.x)/6,y:p1.y+(p2.y-p0.y)/6},c2={x:p2.x-(p3.x-p1.x)/6,y:p2.y-(p3.y-p1.y)/6};
+      const seg={q:[p1,c1,c2,p2],len:[0]};
+      // arc length table so the plane moves at an even pace along the curve
+      let prev=at0(seg,0,k),L=0;for(let i=1;i<=120;i++){const q=at0(seg,i/120,k);L+=Math.hypot(q.x-prev.x,q.y-prev.y);seg.len.push(L);prev=q;}
+      seg.L=L;legs.push(seg);
     }
-    // scroll positions where each stop is reached; the plane rests there for a beat
-    const maxS=Math.max(1,docH-innerHeight);
-    marks=[0];
-    pts.slice(1,-1).forEach(p=>marks.push(Math.max(marks[marks.length-1]+DWELL+80,p.y-innerHeight*.55)));
-    // leave room at the end for the exit; squeeze the stops proportionally if the page is short
-    const room=maxS-DWELL-260;if(marks[marks.length-1]>room){const f=room/marks[marks.length-1];marks=marks.map(m=>m*f);}
+    // scroll positions for each stop: the stop sits near the middle of the screen when reached
+    const maxS=Math.max(1,docH-innerHeight);marks=[0];
+    P.slice(1,-1).forEach(p=>marks.push(Math.max(marks[marks.length-1]+DWELL+120,p.y-innerHeight*.5)));
+    const room=maxS-DWELL-240;if(marks[marks.length-1]>room){const f=room/marks[marks.length-1];marks=marks.map(m=>m*f);}
     marks.push(maxS);
   }
-  const bez=(q,t)=>{const u=1-t;return{x:u*u*u*q[0].x+3*u*u*t*q[1].x+3*u*t*t*q[2].x+t*t*t*q[3].x,y:u*u*u*q[0].y+3*u*u*t*q[1].y+3*u*t*t*q[2].y+t*t*t*q[3].y};};
-  function pt(k,t){
-    const q=bez(segs[k],t);
-    if(k===0){const s=(t-.16)/.2;if(s>0&&s<1){const r=Math.min(70,innerWidth*.06),th=s*Math.PI*2;q.x+=Math.sin(th)*r;q.y-=(1-Math.cos(th))*r;}}
+  function at0(seg,t,k){
+    const q=cubic(...seg.q,t);
+    if(k===0&&LOOP&&t>LOOP.a&&t<LOOP.b){ // the loop eases in and out so the curve stays smooth
+      const s=(t-LOOP.a)/(LOOP.b-LOOP.a),e=s*s*(3-2*s),th=e*Math.PI*2;q.x+=Math.sin(th)*LOOP.r;q.y-=(1-Math.cos(th))*LOOP.r;}
     return q;
   }
-  // progress p runs 0..segs.length; fractional part is how far along that leg
-  function progress(){
-    const y=scrollY;
-    for(let k=0;k<segs.length;k++){const s0=marks[k]+(k?DWELL:0),s1=marks[k+1];if(y<s1)return k+Math.max(0,Math.min(1,(y-s0)/(s1-s0)));}
-    return segs.length;
+  // distance along the whole route (in px) for the current scroll position
+  const total=()=>legs.reduce((a,l)=>a+l.L,0);
+  function targetDist(){
+    const y=scrollY;let base=0;
+    for(let k=0;k<legs.length;k++){const s0=marks[k]+(k?DWELL:0),s1=marks[k+1];
+      if(y<s1)return base+legs[k].L*Math.max(0,Math.min(1,(y-s0)/(s1-s0)));base+=legs[k].L;}
+    return base;
   }
-  function at(p){
-    const k=Math.min(segs.length-1,Math.floor(p)),t=Math.min(1,p-k);
-    const a=pt(k,t),b=pt(k,Math.min(1,t+.01)),c=t>=.99?pt(k,t-.01):null;
-    return{x:a.x,y:a.y,ang:c?Math.atan2(a.y-c.y,a.x-c.x):Math.atan2(b.y-a.y,b.x-a.x)};
+  function locate(d){ // distance → which leg, how far through it
+    let k=0;while(k<legs.length-1&&d>legs[k].L){d-=legs[k].L;k++;}
+    const L=legs[k].len;let i=1;while(i<L.length-1&&L[i]<d)i++;
+    const f=(d-L[i-1])/Math.max(1e-6,L[i]-L[i-1]),t=Math.min(1,Math.max(0,(i-1+f)/120));return{k,t};
   }
   const NSs='http://www.w3.org/2000/svg',trailSvg=document.createElementNS(NSs,'svg');trailSvg.setAttribute('aria-hidden','true');
   trailSvg.style.cssText='position:absolute;left:0;top:0;z-index:14;pointer-events:none;overflow:visible';
   const trail=document.createElementNS(NSs,'path');
   [['fill','none'],['stroke','#fff4dc'],['stroke-width','2.6'],['stroke-dasharray','12 10'],['stroke-linecap','round'],['opacity','.85']].forEach(([k,v])=>trail.setAttribute(k,v));
   trailSvg.appendChild(trail);document.body.appendChild(trailSvg);
-  function drawTrail(p){
+  function place(d){
+    const {k,t}=locate(d),q=at0(legs[k],t,k),q2=at0(legs[k],Math.min(1,t+.004),k),q0=at0(legs[k],Math.max(0,t-.004),k);
+    const ang=Math.atan2(q2.y-q0.y,q2.x-q0.x),lean=Math.min(1,d/120),rest=-6*Math.PI/180,rot=(1-lean)*rest+lean*(ang-NOSE);
+    // the trail: this leg so far
     trailSvg.setAttribute('width',document.documentElement.scrollWidth);trailSvg.setAttribute('height',document.documentElement.scrollHeight);
-    // only the current leg's trail shows, so each hop draws its own dashed line
-    const k=Math.min(segs.length-1,Math.floor(p)),t=Math.min(1,p-k),steps=Math.max(2,Math.round(t*160));let d='';
-    for(let i=0;i<=steps;i++){const q=pt(k,t*i/steps);d+=(i?' L':'M')+(q.x+W*.42).toFixed(1)+' '+(q.y+Hh*.62).toFixed(1);}
-    trail.setAttribute('d',t>.01?d:'');
-  }
-  let rested=0;
-  function place(p){
-    drawTrail(Math.max(0,p-.015));
-    const q=at(p),frac=p-Math.floor(p);
-    // at rest the nose eases back toward a level glide
-    const restLean=(frac<.02||p>=segs.length)?.35:1, rest=-6*Math.PI/180;
-    const lean=Math.min(1,p*6)*restLean,rot=(1-lean)*rest+lean*(q.ang-NOSE);
-    // always keep the plane inside the part of the page you're looking at (except as it flies off at the very end)
-    const top=scrollY+80,bottom=scrollY+innerHeight-Hh-30,exiting=p>segs.length-.35;
-    let x=q.x,y=Math.max(top,Math.min(bottom,q.y));
-    if(!exiting)x=Math.max(8,Math.min(document.documentElement.clientWidth-W-8,x));
+    const steps=Math.max(2,Math.round(t*140));let path='';
+    for(let i=0;i<=steps;i++){const p=at0(legs[k],t*i/steps,k);path+=(i?' L':'M')+(p.x+W*.42).toFixed(1)+' '+(p.y+Hh*.62).toFixed(1);}
+    trail.setAttribute('d',t>.01?path:'');
+    // gentle guard so it never ends up off screen (not needed in normal scrolling)
+    const exiting=d>total()-legs[legs.length-1].L*.4;
+    let x=q.x,y=Math.max(scrollY+70,Math.min(scrollY+innerHeight-Hh-20,q.y));
+    if(!exiting)x=Math.max(8,Math.min(document.documentElement.clientWidth-W-8,x));else y=q.y;
     wrap.style.transform=`translate(${x}px,${y}px) rotate(${rot}rad)`;
   }
-  let ticking=false;
-  let lastT=0;
+  // ── motion: ease toward the scroll position, never faster than MAXSPEED px a frame;
+  //    only ever forward — scroll back up a long way and a new plane takes over
+  let cur=0,target=0,maxD=0,ticking=false,lastT=0,retiring=false;
   function tick(now){const dt=Math.min(50,now-(lastT||now))/16.7;lastT=now;
-    const step=(target-cur)*(1-Math.pow(1-.045,dt)),cap=.011*dt;
-    cur+=Math.max(-cap,Math.min(cap,step));place(cur);
-    if(Math.abs(target-cur)>.0005)requestAnimationFrame(tick);else{ticking=false;lastT=0;}}
-  // the plane only ever flies forward. Scroll back up a good way and it doesn't reverse: it
-  // sails off and fades, and a fresh one appears where you are (at the top, its starting spot)
-  let maxP=0,retiring=false;
+    const step=(target-cur)*(1-Math.pow(1-.06,dt)),cap=MAXSPEED*dt;cur+=Math.max(-cap,Math.min(cap,step));place(cur);
+    if(Math.abs(target-cur)>.5)requestAnimationFrame(tick);else{ticking=false;lastT=0;}}
   function retire(){
     retiring=true;ticking=false;
-    wrap.animate([{translate:'0 0',opacity:1},{translate:'160px -120px',opacity:0}],{duration:still?1:550,easing:'ease-in',fill:'forwards'}).finished.then(()=>{
-      cur=target=maxP=progress();trail.setAttribute('d','');place(cur);
-      wrap.getAnimations().forEach(a=>a.cancel());
+    wrap.animate([{translate:'0 0',opacity:1},{translate:'160px -120px',opacity:0}],{duration:still?1:600,easing:'ease-in',fill:'forwards'}).finished.then(()=>{
+      cur=target=maxD=targetDist();trail.setAttribute('d','');place(cur);wrap.getAnimations().forEach(a=>a.cancel());
       wrap.animate([{opacity:0,scale:.4},{opacity:1,scale:1}],{duration:still?1:500,easing:'cubic-bezier(.2,.8,.2,1)'}).finished.then(()=>{retiring=false;});
     });
   }
   function onScroll(){
-    if(retiring)return;
-    const pr=progress();
-    if(pr<maxP-.3){retire();return;}
-    maxP=Math.max(maxP,pr);target=maxP;
+    if(retiring)return;const d=targetDist();
+    if(d<maxD-innerHeight*.9){retire();return;}
+    maxD=Math.max(maxD,d);target=maxD;
     if(still){cur=target;place(cur);return;}
     place(cur);if(!ticking){ticking=true;requestAnimationFrame(tick);}
   }
-  plan();cur=target=maxP=progress();place(cur);
+  plan();cur=target=maxD=targetDist();place(cur);
   addEventListener('scroll',onScroll,{passive:true});
   addEventListener('resize',()=>{plan();onScroll();});
   addEventListener('load',()=>{plan();onScroll();});
