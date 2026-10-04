@@ -57,8 +57,12 @@
 
   // ── WebGL ──
   var VS = 'attribute vec2 aPos;attribute vec2 aUv;varying vec2 vUv;void main(){vUv=aUv;gl_Position=vec4(aPos.x*2.-1.,1.-aPos.y*2.,0.,1.);}';
-  var FS = 'precision mediump float;varying vec2 vUv;uniform sampler2D uTex,uMask;uniform vec2 uLook;uniform float uIris,uAR,uHasMask;' +
-    'void main(){vec2 uv=vUv;if(uHasMask>.5){float m=texture2D(uMask,uv).r;uv-=vec2(uLook.x,uLook.y*uAR)*uIris*.38*m;}gl_FragColor=texture2D(uTex,clamp(uv,0.,1.));}';
+  var FS = 'precision mediump float;varying vec2 vUv;uniform sampler2D uTex,uMask;uniform vec2 uLook,uI1,uI2;uniform float uIris,uAR,uHasMask,uT,uTw;' +
+    'float glint(vec2 c,float ph){vec2 g=c+vec2(uLook.x,uLook.y*uAR)*uIris*.38+vec2(-.28*uIris,-.32*uIris*uAR);vec2 d=(vUv-g)*vec2(uAR,1.);float r=uIris*uAR*.21;' +
+    'float core=exp(-dot(d,d)/(r*r));float s=pow(.5+.5*sin(uT*1.7+ph),10.);float star=(exp(-abs(d.x)/(r*.22))*exp(-abs(d.y)/(r*2.6))+exp(-abs(d.y)/(r*.22))*exp(-abs(d.x)/(r*2.6)));' +
+    'return core*(.55+.45*sin(uT*2.3+ph))+star*s*.9;}' +
+    'void main(){vec2 uv=vUv;float m=0.;if(uHasMask>.5){m=texture2D(uMask,uv).r;uv-=vec2(uLook.x,uLook.y*uAR)*uIris*.38*m;}vec4 c=texture2D(uTex,clamp(uv,0.,1.));' +
+    'if(uTw>0.){float gl=(glint(uI1,0.)+glint(uI2,2.1))*uTw;c.rgb=mix(c.rgb,vec3(1.,.985,.94),clamp(gl,0.,.9));}gl_FragColor=c;}';
   var OVAL = [10,338,297,332,284,251,389,356,454,323,361,288,397,365,379,378,400,377,152,148,176,149,150,136,172,58,132,93,234,127,162,21,54,103,67,109];
   var EYE_L = [33, 7, 163, 144, 145, 153, 154, 155, 133, 173, 157, 158, 159, 160, 161, 246], EYE_R = [263, 249, 390, 373, 374, 380, 381, 382, 362, 398, 384, 385, 386, 387, 388, 466];
 
@@ -89,7 +93,7 @@
       gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE); gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE); gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR); gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR); };
     gl.uniform1i(U('uTex'), 0); gl.uniform1i(U('uMask'), 1);
 
-    var L = { ready: false, ar: 1, P: null, mood: 0, moodT: 0, look: [0, 0], par: [0, 0], last: 0, hasMask: 0, iris: 0 };
+    var L = { tw: 0, ready: false, ar: 1, P: null, mood: 0, moodT: 0, look: [0, 0], par: [0, 0], last: 0, hasMask: 0, iris: 0 };
     var F = 0, C = {}, fig = fallbackFig || [.5, .55, .35, .45], faceW = null, T0 = performance.now();
     L.setMood = function (v) { L.moodT = v; kick(); };
     L.size = function () { var r = cv.getBoundingClientRect(), dpr = Math.min(2, devicePixelRatio || 1); cv.width = Math.max(2, r.width * dpr); cv.height = Math.max(2, r.height * dpr); gl.viewport(0, 0, cv.width, cv.height); };
@@ -109,7 +113,7 @@
       [EYE_L, EYE_R].forEach(function (E) { x.beginPath(); E.forEach(function (n, q) { var p = Lm[n]; q ? x.lineTo(p[0] * MW, p[1] * MH) : x.moveTo(p[0] * MW, p[1] * MH); }); x.closePath(); x.fill(); });
       setTex(maskTex, 1, mc); L.hasMask = 1;
       var ir = Lm.length > 470 ? Math.hypot(Lm[469][0] - Lm[471][0], (Lm[469][1] - Lm[471][1]) / L.ar) / 2 : F / L.ar * .035;
-      L.iris = ir;
+      L.iris = ir; L.I1 = Lm[468] || Lm[159]; L.I2 = Lm[473] || Lm[386]; L.tw = 1;
       // how much each grid point belongs to the face: 1 inside the face outline, fading to 0 just
       // outside it, so hair, neck and background never get pulled along
       var poly = OVAL.map(X), feather = F * .09;
@@ -196,10 +200,13 @@
       var moving = false, ease = function (a, b, rate) { var n = a + (b - a) * (1 - Math.exp(-rate * dt)); if (Math.abs(b - n) > .0015) moving = true; return n; };
       L.look = [ease(L.look[0], tl[0], 9), ease(L.look[1], tl[1], 9)]; L.par = [ease(L.par[0], tp[0], 5), ease(L.par[1], tp[1], 5)]; L.mood = ease(L.mood, L.moodT, 4);
       if (still) { L.look = [0, 0]; L.par = [0, 0]; }
-      deform(); gl.bindBuffer(gl.ARRAY_BUFFER, bPos); gl.bufferSubData(gl.ARRAY_BUFFER, 0, pos);
+      if (moving || !L.drawn || mode !== 'face') { deform(); gl.bindBuffer(gl.ARRAY_BUFFER, bPos); gl.bufferSubData(gl.ARRAY_BUFFER, 0, pos); L.drawn = true; }
+      var twOn = mode === 'face' && L.I1 && !still;
+      gl.uniform1f(U('uT'), (now - T0) / 1000); gl.uniform1f(U('uTw'), twOn ? .8 + .35 * Math.max(0, L.mood) : 0);
+      if (twOn) { gl.uniform2f(U('uI1'), L.I1[0], L.I1[1]); gl.uniform2f(U('uI2'), L.I2[0], L.I2[1]); }
       gl.uniform2f(U('uLook'), L.look[0], L.look[1]); gl.uniform1f(U('uIris'), L.iris); gl.uniform1f(U('uAR'), L.ar); gl.uniform1f(U('uHasMask'), L.hasMask);
       gl.clearColor(0, 0, 0, 0); gl.clear(gl.COLOR_BUFFER_BIT); gl.drawElements(gl.TRIANGLES, idx.length, gl.UNSIGNED_SHORT, 0);
-      return moving || (mode !== 'face' && Math.abs(L.mood) > .01);
+      return moving || (mode !== 'face' && Math.abs(L.mood) > .01) || !!twOn;
     };
 
     var im = new Image(); im.crossOrigin = 'anonymous';
