@@ -363,8 +363,26 @@
     const step=(target-cur)*(1-Math.pow(1-.045,dt)),cap=.011*dt;
     cur+=Math.max(-cap,Math.min(cap,step));place(cur);
     if(Math.abs(target-cur)>.0005)requestAnimationFrame(tick);else{ticking=false;lastT=0;}}
-  function onScroll(){target=progress();if(still){cur=target;place(cur);return;}place(cur);if(!ticking){ticking=true;requestAnimationFrame(tick);}}
-  plan();cur=target=progress();place(cur);
+  // the plane only ever flies forward. Scroll back up a good way and it doesn't reverse: it
+  // sails off and fades, and a fresh one appears where you are (at the top, its starting spot)
+  let maxP=0,retiring=false;
+  function retire(){
+    retiring=true;ticking=false;
+    wrap.animate([{translate:'0 0',opacity:1},{translate:'160px -120px',opacity:0}],{duration:still?1:550,easing:'ease-in',fill:'forwards'}).finished.then(()=>{
+      cur=target=maxP=progress();trail.setAttribute('d','');place(cur);
+      wrap.getAnimations().forEach(a=>a.cancel());
+      wrap.animate([{opacity:0,scale:.4},{opacity:1,scale:1}],{duration:still?1:500,easing:'cubic-bezier(.2,.8,.2,1)'}).finished.then(()=>{retiring=false;});
+    });
+  }
+  function onScroll(){
+    if(retiring)return;
+    const pr=progress();
+    if(pr<maxP-.3){retire();return;}
+    maxP=Math.max(maxP,pr);target=maxP;
+    if(still){cur=target;place(cur);return;}
+    place(cur);if(!ticking){ticking=true;requestAnimationFrame(tick);}
+  }
+  plan();cur=target=maxP=progress();place(cur);
   addEventListener('scroll',onScroll,{passive:true});
   addEventListener('resize',()=>{plan();onScroll();});
   addEventListener('load',()=>{plan();onScroll();});
