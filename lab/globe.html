@@ -562,6 +562,26 @@
       if(typeof faceDir==='function'){const mid=a.clone().add(b);faceDir(mid.lengthSq()>1e-4?mid.normalize():b);}
       parked=null;
     }
+
+  const ICON={
+    tree:`<svg viewBox="0 0 60 70"><rect x="27" y="40" width="6" height="26" rx="2" fill="#4a3a2a"/><path d="M30 4 C46 4 56 16 54 30 C53 42 44 48 30 48 C16 48 7 42 6 30 C4 16 14 4 30 4Z" fill="#2f6a4b"/><path d="M18 20 C22 12 30 10 36 12 M40 18 C44 22 46 28 44 34" fill="none" stroke="#3f8360" stroke-width="3" stroke-linecap="round"/></svg>`,
+    tree2:`<svg viewBox="0 0 50 70"><rect x="22" y="44" width="5" height="22" rx="2" fill="#4a3a2a"/><path d="M25 2 C38 6 46 20 44 34 C42 46 34 50 25 50 C16 50 8 46 6 34 C4 20 12 6 25 2Z" fill="#265c40"/><path d="M16 22 C18 14 24 10 30 10" fill="none" stroke="#3a7a57" stroke-width="3" stroke-linecap="round"/></svg>`,
+    chalet:`<svg viewBox="0 0 160 100"><path d="M10 50 L80 8 L150 50Z" fill="#7d4429"/><path d="M18 50 L80 14 L142 50Z" fill="#f7ede4"/><rect x="22" y="48" width="116" height="42" fill="#efb5a2"/><path d="M14 52 L80 12 L146 52" fill="none" stroke="#7d4429" stroke-width="5" stroke-linejoin="round"/>${[0,1,2,3,4].map(i=>`<rect x="${30+i*21}" y="56" width="12" height="9" fill="#3d6b55"/><rect x="${30+i*21}" y="72" width="12" height="9" fill="#3d6b55"/>`).join('')}<rect x="70" y="34" width="20" height="10" fill="#3d6b55"/><rect x="118" y="70" width="12" height="20" fill="#5b3a2a"/><path d="M14 92 C30 82 50 96 70 88 C90 82 110 96 146 90 L146 98 L14 98Z" fill="#2f6a4b"/></svg>`,
+    train:`<svg viewBox="0 0 120 50"><path d="M6 14 H96 Q112 14 114 30 V40 H6Z" fill="#c9343a"/><rect x="6" y="10" width="90" height="6" rx="2" fill="#8e8e8e"/><rect x="12" y="20" width="14" height="10" fill="#2b2b33"/><rect x="32" y="20" width="14" height="10" fill="#2b2b33"/><rect x="52" y="20" width="14" height="10" fill="#2b2b33"/><path d="M96 20 H106 Q110 22 110 30 H96Z" fill="#2b2b33"/><rect x="72" y="20" width="10" height="18" fill="#f2f0ea"/><rect x="6" y="32" width="108" height="3" fill="#f2f0ea"/><rect x="2" y="42" width="116" height="4" fill="#6c6c6c"/></svg>`,
+    station:`<svg viewBox="0 0 150 100"><rect x="62" y="6" width="22" height="40" fill="#d38c69"/><path d="M58 8 H88 V2 H58Z" fill="#5b3328"/><rect x="69" y="14" width="8" height="10" rx="4" fill="#5b3328"/><path d="M4 40 H146 V46 H4Z" fill="#5b3328"/><rect x="8" y="46" width="134" height="48" fill="#d38c69"/>${[0,1,2,3,4,5].map(i=>`<path d="M${16+i*21} 90 V68 Q${22+i*21} 58 ${28+i*21} 68 V90Z" fill="#5b3328"/>`).join('')}<rect x="8" y="58" width="134" height="2" fill="#f2d9c8"/></svg>`,
+    cheese:`<svg viewBox="0 0 90 70"><path d="M6 46 L60 8 L86 30 L86 60 L6 64Z" fill="#f2cf6b"/><path d="M60 8 L86 30 L6 46Z" fill="#f7df92"/><circle cx="34" cy="52" r="5" fill="#e3b54e"/><circle cx="64" cy="48" r="4" fill="#e3b54e"/><circle cx="74" cy="56" r="3" fill="#e3b54e"/><circle cx="50" cy="58" r="2.5" fill="#e3b54e"/></svg>`,
+    wine:`<svg viewBox="0 0 90 110"><rect x="18" y="4" width="8" height="18" fill="#1e3a2c"/><path d="M14 22 Q14 18 22 18 Q30 18 30 22 L32 34 Q36 40 36 50 V98 Q36 102 32 102 H12 Q8 102 8 98 V50 Q8 40 12 34Z" fill="#1f4a35"/><rect x="10" y="58" width="24" height="22" fill="#b22e36"/><path d="M50 40 H80 Q80 62 65 64 Q50 62 50 40Z" fill="#f2efe9" opacity=".9"/><path d="M52 48 H78 Q76 62 65 63 Q54 62 52 48Z" fill="#9e1f2c"/><rect x="63.5" y="63" width="3" height="20" fill="#d8d4cc"/><rect x="56" y="82" width="18" height="3" rx="1.5" fill="#d8d4cc"/>${[[46,94],[54,92],[62,95],[50,101],[58,100],[66,102],[54,107],[62,108]].map(([x,y])=>`<circle cx="${x}" cy="${y}" r="4" fill="#7e1d33"/>`).join('')}</svg>`,
+    watch:`<svg viewBox="0 0 70 90"><rect x="24" y="2" width="22" height="26" rx="3" fill="#b9bcc2"/><rect x="24" y="62" width="22" height="26" rx="3" fill="#b9bcc2"/>${[6,12,18,68,74,80].map(y=>`<path d="M24 ${y} H46" stroke="#9a9ea6" stroke-width="1"/>`).join('')}<circle cx="35" cy="45" r="22" fill="#dfe1e5"/><circle cx="35" cy="45" r="18" fill="#fbfbf8"/><path d="M35 45 V32 M35 45 L44 50" stroke="#2b2b33" stroke-width="2" stroke-linecap="round"/><rect x="57" y="42" width="5" height="6" rx="1" fill="#b9bcc2"/></svg>`,
+    plane:`<svg viewBox="0 0 80 80"><circle cx="40" cy="40" r="36" fill="#cfe3f3" opacity=".75"/><circle cx="40" cy="40" r="26" fill="#e2eef8" opacity=".9"/><path d="M14 40 L66 36 Q70 36 70 40 Q70 44 66 44 L14 40Z M40 38 L30 22 L36 22 L50 37Z M40 42 L30 58 L36 58 L50 43Z M18 39 L14 30 L18 30 L24 38Z" fill="#fff"/></svg>`,
+    hotel:`<svg viewBox="0 0 160 100"><path d="M6 28 L20 14 H140 L154 28Z" fill="#7a2b24"/>${[0,1,2,3,4,5,6].map(i=>`<path d="M${16+i*20} 14 V6 L${22+i*20} 2 L${28+i*20} 6 V14Z" fill="#7a2b24"/>`).join('')}<rect x="8" y="28" width="144" height="68" fill="#f3e2b8"/>${[0,1,2,3,4,5,6].map(i=>[0,1,2].map(r=>`<rect x="${16+i*20}" y="${36+r*20}" width="10" height="12" fill="#5b5a3e"/>`).join('')).join('')}<rect x="72" y="76" width="16" height="20" fill="#5b3a2a"/></svg>`,
+    boat:`<svg viewBox="0 0 120 60"><path d="M4 50 Q60 44 116 50 L116 58 L4 58Z" fill="#9fcbe0"/><path d="M10 34 H106 L96 48 H20Z" fill="#f2f0ea"/><rect x="10" y="40" width="96" height="4" fill="#e8b53e"/><rect x="30" y="24" width="56" height="10" fill="#f2f0ea"/>${[0,1,2,3,4].map(i=>`<rect x="${34+i*10}" y="26" width="6" height="5" fill="#2b4a6b"/>`).join('')}<rect x="54" y="12" width="4" height="12" fill="#c9343a"/></svg>`,
+    swirl:`<svg viewBox="0 0 70 50"><path d="M6 26 C12 6 26 8 22 22 C18 36 34 40 36 26 C38 12 52 14 48 28 C46 38 58 42 64 30" fill="none" stroke="#7fa7cf" stroke-width="3" stroke-linecap="round"/></svg>`
+  };
+  const SET={higley:['tree','chalet','watch','swirl','plane'],cushing:['hotel','tree2','wine','plane','swirl'],pcdd:['station','tree','cheese','plane'],
+    fermilab:['train','tree','tree2','plane','swirl'],msu:['chalet','tree2','cheese','plane'],stanford:['station','wine','tree','plane','swirl'],
+    sevilla:['hotel','wine','tree2','plane'],cambridge:['boat','train','tree','plane','swirl']};
+  // where stickers may sit on the page (percent of the page box), around the film and the note
+  const SPOTS=[[78,2,14],[64,0,10],[91,28,8],[92,84,8],[34,88,9],[52,0,8],[70,90,8],[2,90,8]];
     let prevPin=null;
     const rollBtn=document.getElementById('rollBtn'),roll=document.getElementById('roll');
     function showRollButton(id){const p=PINS[id];rollBtn.textContent='open the camera roll: '+p.name;rollBtn.hidden=false;rollBtn.dataset.pin=id;}
@@ -576,6 +596,12 @@
       const n=Math.max(4,photos.length);
       for(let i=0;i<n;i++){const ph=photos[i],f=document.createElement('figure');f.className='roll-frame'+(ph?'':' empty');
         f.innerHTML=ph?`<img src="${ph.src}" alt="${ph.caption||''}"><figcaption>${ph.caption||''}</figcaption>`:'<span>developing…</span>';strip.appendChild(f);}
+      // stickers in the reference's flat map style, plus a little route label with the city name
+      const st=document.getElementById('rollStickers');st.innerHTML='';
+      (SET[id]||[]).forEach((k,n)=>{const [x,y,w]=SPOTS[n%SPOTS.length];const d=document.createElement('div');d.innerHTML=ICON[k];const svg=d.firstChild;
+        svg.style.left=x+'%';svg.style.top=y+'%';svg.style.width=w+'%';svg.style.transform=`rotate(${(n%2?1:-1)*(3+n*2)}deg)`;st.appendChild(svg);});
+      const city=p.sub.split(',')[0].toUpperCase();
+      st.insertAdjacentHTML('beforeend',`<svg class="roll-route" viewBox="0 0 260 80" style="left:44%;top:6%;width:26%"><path d="M8 60 C60 40 90 70 140 44 S220 20 250 30" fill="none" stroke="#3c8a63" stroke-width="3"/><circle cx="8" cy="60" r="5" fill="#2f6a4b"/><circle cx="140" cy="44" r="5" fill="#2f6a4b"/><circle cx="250" cy="30" r="5" fill="#2f6a4b"/><text x="120" y="30" font-size="26" fill="#2b2b2b" text-anchor="middle">${city}</text></svg>`);
       roll.hidden=false;document.getElementById('rollClose').focus();
     }
     rollBtn.addEventListener('click',()=>openRoll(rollBtn.dataset.pin));
@@ -703,15 +729,10 @@
     <button class="roll-close" id="rollClose" type="button" aria-label="Close camera roll">close</button>
     <h2 class="roll-title"><span>Camera roll:</span><em id="rollPlace"></em></h2>
     <div class="roll-film">
-      <svg class="roll-can" viewBox="0 0 120 190" aria-hidden="true">
-        <rect x="34" y="2" width="52" height="16" rx="5" fill="#2b2b2b"/><rect x="8" y="16" width="104" height="168" rx="12" fill="#2b2b2b"/>
-        <rect x="14" y="30" width="92" height="140" rx="6" fill="#7c8f3a"/><rect x="14" y="30" width="18" height="140" fill="#5f6f2a"/>
-        <text x="72" y="100" font-family="Courier New,monospace" font-size="15" font-weight="700" fill="#f3efe1" transform="rotate(-90 72 100)" text-anchor="middle">35mm · SG 200</text>
-        <text x="96" y="100" font-family="Courier New,monospace" font-size="9" fill="#f3efe1" transform="rotate(-90 96 100)" text-anchor="middle">for color prints</text>
-        <rect x="48" y="178" width="24" height="10" rx="2" fill="#1d1d1d"/>
-      </svg>
+      <img class="roll-can" src="img/roll/film-canister.png" alt="" width="172" height="302">
       <div class="roll-strip" id="rollStrip"></div>
     </div>
+    <div class="roll-stickers" id="rollStickers" aria-hidden="true"></div>
     <div class="roll-bottom">
       <div class="roll-note"><p class="roll-label" id="rollLabel"></p><p id="rollText"></p></div>
       <div class="roll-ticket" aria-hidden="true">
@@ -723,11 +744,17 @@
   </div>
 </div>
 <style>
+  .roll-page{isolation:isolate}
+  .roll-stickers{position:absolute;inset:0;pointer-events:none;z-index:2}
+  .roll-stickers svg{position:absolute;filter:drop-shadow(0 2px 2px rgba(60,40,20,.18))}
+  .roll-title,.roll-film,.roll-bottom{position:relative;z-index:1}
+  .roll-route{position:absolute;pointer-events:none}
+  .roll-route text{font-family:'Nanum Pen Script',cursive;letter-spacing:.06em}
   .roll-btn{position:fixed;left:50%;bottom:28px;transform:translateX(-50%);z-index:40;font:15px 'Courier Prime',monospace;color:#24306b;background:#fbf6ee;border:0;border-radius:999px;padding:10px 20px;box-shadow:0 10px 24px rgba(0,0,0,.45);cursor:pointer}
   .roll-btn:hover,.roll-btn:focus-visible{background:#fff;outline:2px solid #9cc0ff;outline-offset:3px}
   .roll-overlay{position:fixed;inset:0;z-index:60;display:flex;align-items:center;justify-content:center;padding:18px;background:rgba(4,8,22,.7);backdrop-filter:blur(4px)}
   .roll-overlay[hidden]{display:none}
-  .roll-page{position:relative;width:min(980px,100%);max-height:92vh;overflow:auto;background:#fbf6ee;border-radius:6px;padding:clamp(18px,3vw,34px);box-shadow:0 30px 70px rgba(0,0,0,.6);color:#2b2620;
+  .roll-page{position:relative;width:min(980px,100%);padding-bottom:70px !important;max-height:92vh;overflow:auto;background:#fbf6ee;border-radius:6px;padding:clamp(18px,3vw,34px);box-shadow:0 30px 70px rgba(0,0,0,.6);color:#2b2620;
     animation:rollIn .45s cubic-bezier(.2,.8,.2,1)}
   @keyframes rollIn{from{opacity:0;transform:translateY(18px) scale(.98)}to{opacity:1;transform:none}}
   .roll-close{position:absolute;right:16px;top:14px;font:13px 'Courier Prime',monospace;background:none;border:1px solid #cfc6b3;border-radius:6px;padding:4px 10px;cursor:pointer;color:#2b2620}
