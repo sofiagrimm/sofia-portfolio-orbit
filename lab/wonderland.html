@@ -99,6 +99,8 @@
   .thing img{display:block;width:100%;height:auto;filter:drop-shadow(0 10px 14px rgba(0,0,0,.45))}
   .medal{padding:9px;border-radius:50%;background:linear-gradient(135deg,#f3dc8e,#b8862e 35%,#f0d07c 55%,#8e6420 80%,#d9b25a);box-shadow:0 18px 30px rgba(0,0,0,.5)}
   .medal img{border-radius:50%;filter:none!important}
+  .pic{padding:12px;border-radius:5px;background:linear-gradient(135deg,#f3dc8e,#b8862e 35%,#f0d07c 55%,#8e6420 80%,#d9b25a);box-shadow:0 18px 30px rgba(0,0,0,.5),inset 0 0 0 3px rgba(90,60,14,.6)}
+  .pic img{border:2px solid #5a3c0e;filter:none!important}
 
   /* at the bottom: the Queen, and an invitation */
   #queen{position:fixed;left:calc(clamp(14px,3vw,36px) + 130px);bottom:2vh;z-index:34;width:min(250px,30vw);background:none;border:0;padding:0;cursor:pointer;
@@ -268,6 +270,11 @@
   add(svgEl('<div class="medal"><img src="img/wonderland/rabbit-watch.webp" alt=""></div><span class="hint" style="color:#f4ecd8">"Oh dear! I shall be late!"</span>'),.32,.18,700,170,8);
   // the same burst of cards from the door keeps tumbling past on the way down
   [[-.2,-.15,4600],[.25,.1,10400],[-.15,.05,16800],[.2,-.12,21800]].forEach(([x,y,d],i)=>{add(svgEl('<img src="img/wonderland/flying-cards.webp" alt="">'),x,y,d,560,(i%2?14:-14));});
+  // pictures hung on the walls of the hole: the hedge keyhole, and the keyhole full of everything
+  add(svgEl('<div class="pic"><img src="img/wonderland/book-cover.webp" alt=""></div>'),.36,.06,7300,250,0);things[things.length-1].rot=5;
+  add(svgEl('<div class="pic"><img src="img/wonderland/keyhole-collage.webp" alt=""></div>'),-.36,-.04,18900,230,0);things[things.length-1].rot=-5;
+  // the herald, announcing the Queen just before the bottom
+  add(svgEl('<img src="img/wonderland/herald.webp" alt=""><span class="hint" style="color:#f4ecd8">make way for the Queen!</span>'),.3,.14,23400,170,6);
   // a ticket to the rose garden, drifting by
   add(svgEl('<img src="img/wonderland/roses-ticket.webp" alt="">'),-.36,-.04,12600,230,10);
   // DRINK ME and EAT ME: things you can actually take
