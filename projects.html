@@ -292,7 +292,7 @@
       {rank:"6", suit:"club",    label:"ASEAN expansion", scene:"islands", img:"img/cards/card-6-clubs.jpg"},
       {rank:"7", suit:"spade",   label:"Fermilab lenses", scene:"telescope", img:"img/cards/card-7-spades.jpg"},
       {rank:"8", suit:"diamond", label:"green routing", scene:"bus", img:"img/cards/card-8-diamonds.jpg"},
-      {rank:"JOKER", suit:null,  label:"this website", scene:"joker"},
+      {rank:"JOKER", suit:null,  label:"this website", scene:"joker", img:"img/cards/card-joker.jpg"},
       {rank:"9", suit:"heart",   label:"NeuroPrint", scene:"stretch"}
     ];
     const SUIT_PATH = {
@@ -424,7 +424,8 @@
       const label=`<text x="125" y="324" font-family="'Nanum Pen Script',cursive" font-size="22" fill="#6a6560" text-anchor="middle">${h.label}</text>`;
       // drawn illustration if we have one; otherwise the code-drawn scene
       const art=h.img?`<image href="${h.img}" x="4" y="4" width="242" height="342" preserveAspectRatio="xMidYMid slice" clip-path="url(#clip${f})"/>`:SCENES[h.scene]();
-      return `<svg viewBox="0 0 250 350" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">${defs}${paper}${art}${corners}${label}</svg>`;
+      const jokerSide=(h.img&&h.rank==='JOKER')?['J','O','K','E','R'].map((c,i)=>`<text x="30" y="${66+i*32}" font-family="'DM Serif Display',Georgia,serif" font-size="28" fill="${INK}" text-anchor="middle">${c}</text>`).join(''):'';
+      return `<svg viewBox="0 0 250 350" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">${defs}${paper}${art}${jokerSide}${corners}${label}</svg>`;
     }
 
     // Winding road with little cars, for the back of the Red Cross card.
