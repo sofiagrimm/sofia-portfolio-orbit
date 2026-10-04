@@ -7,7 +7,7 @@
 <meta name="robots" content="noindex">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@1,300&family=Cherry+Bomb+One&family=Inter:wght@300;400;500;600&family=Reenie+Beanie&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@1,300&family=Cherry+Bomb+One&family=Inter:wght@300;400;500;600;700;800&family=Reenie+Beanie&display=swap">
 <style>
   :root{--desk:#efe3e1;--desk2:#dfe5d2;--paper:#fbf7f1;--ink:#3a2e2c;--pink:#d9939f;--sage:#8f9f74;--edge:#e7ddd0}
   *{box-sizing:border-box;margin:0;padding:0}
@@ -66,9 +66,54 @@
   .count .from{display:block;font:500 10px 'Inter';font-style:normal;letter-spacing:.2em;text-transform:uppercase;color:var(--sage);margin-top:2px}
 
   @media (max-width:760px){main{padding-top:120px}header nav{gap:4px 10px}header a{font-size:11px}}
+
+  /* template pages: each one is drawn as an SVG at the size of the image it was copied from */
+  .tplface{background:#fff}
+  .tplface svg.tpl{position:absolute;inset:0;width:100%;height:100%;display:block}
+  .tpl text{white-space:pre}
+  .para{white-space:pre-wrap;word-break:break-word}
+
+  /* the editor */
+  #panel{display:none}
+  body.editing main{right:min(380px,42vw)}
+  body.editing header{right:min(380px,42vw)}
+  body.editing .bar{right:min(380px,42vw)}
+  body.editing #book{cursor:default}
+  body.editing #panel{display:flex;flex-direction:column;position:fixed;top:0;right:0;bottom:0;width:min(380px,42vw);z-index:60;background:#fffdf9;border-left:1px solid rgba(58,46,44,.15);
+    overflow-y:auto;padding:22px 20px 0;font-size:13px;box-shadow:-20px 0 40px rgba(70,40,40,.08)}
+  #panel .ph b{display:block;font-family:'Cherry Bomb One',cursive;font-weight:400;font-size:24px}
+  #panel .ph span{display:block;color:#7a6d68;margin-top:4px;line-height:1.4}
+  #panel h3{font:600 11px 'Inter';letter-spacing:.18em;text-transform:uppercase;color:var(--sage);margin:22px 0 8px}
+  #panel .fld{margin:0 0 12px}
+  #panel .fld label{display:block;font-weight:500;margin-bottom:4px}
+  #panel .fld label em{font-style:normal;font:600 9px 'Inter';letter-spacing:.14em;text-transform:uppercase;color:#fff;background:var(--pink);border-radius:999px;padding:2px 7px;margin-left:6px;vertical-align:2px}
+  #panel input:not([type]),#panel textarea{width:100%;font:14px 'Inter';color:var(--ink);background:#fff;border:1px solid rgba(58,46,44,.22);border-radius:8px;padding:8px 10px}
+  #panel input:focus,#panel textarea:focus{outline:2px solid var(--sage);outline-offset:1px}
+  #panel .img{display:grid;grid-template-columns:64px 1fr;gap:12px;align-items:start;padding:10px;border:1px solid rgba(58,46,44,.12);border-radius:10px}
+  #panel .img img{width:64px;height:64px;object-fit:cover;border-radius:6px;background:#f3ede6}
+  #panel .img small{display:block;color:#8a7d78;margin-top:6px;line-height:1.35}
+  #panel input[type=range]{width:100%;margin-top:8px;accent-color:var(--pink)}
+  #panel .row{display:flex;gap:8px;flex-wrap:wrap}
+  #panel .btn{display:inline-block;font:500 11px 'Inter';letter-spacing:.12em;text-transform:uppercase;color:var(--ink);background:#fff;border:1px solid rgba(58,46,44,.3);border-radius:999px;padding:7px 12px;cursor:pointer}
+  #panel .btn:hover,#panel .btn:focus-within,#panel .btn:focus-visible{border-color:var(--ink);outline:none}
+  #panel .btn.main{width:100%;background:var(--ink);color:#fff;padding:11px;border-color:var(--ink)}
+  #panel .btn.main:disabled{opacity:.5}
+  #panel .btn.quiet{border-color:transparent;text-decoration:underline;text-underline-offset:3px;padding-left:0}
+  #panel .pf{position:sticky;bottom:0;margin-top:auto;background:linear-gradient(transparent,#fffdf9 18px);padding:22px 0 18px}
+  #panel #pstatus{min-height:1.2em;color:#7a6d68;margin-bottom:8px;line-height:1.35}
+  .tpl .hot{fill:transparent;stroke:rgba(217,147,159,.0);stroke-width:2;cursor:grab}
+  .tpl .slot:hover .hot{stroke:rgba(217,147,159,.9)}
+  body.editing .tpl .tx{cursor:text}
+  @media (max-width:760px){
+    body.editing main{right:0;bottom:46vh;padding-bottom:70px}
+    body.editing .bar{right:0;bottom:calc(46vh + 10px)}
+    body.editing #panel{top:auto;left:0;width:auto;height:46vh;border-left:0;border-top:1px solid rgba(58,46,44,.15)}
+    body.editing #book{height:min(calc(54vh - 190px),calc((100vw - 32px) * 1.25))}
+  }
   /* the logo keeps its original look: light, spaced, italic Cormorant Garamond */
   .nav-name,header .brand,.site>a:first-child{font-family:'Cormorant Garamond',Georgia,serif !important;font-weight:300 !important;font-style:italic !important;letter-spacing:.06em !important}
 </style>
+
 </head>
 <body>
 <header>
@@ -88,31 +133,133 @@
   <button id="next" type="button">turn &rarr;</button>
 </div>
 
+<aside id="panel" aria-label="Edit the flip book"></aside>
+
+<!-- each page is a template copied from a mood board: where every word and picture sits, measured from the original -->
+<script type="application/json" id="fb-spec">[{"key":"friendship","title":"friendship application","w":735,"h":919,"bg":"img/flipbook/t/friendship-bg.webp","items":[{"type":"slot","key":"photo","label":"Top photo","box":[124,104,280,311],"kind":"rect","people":true,"radius":0,"fit":"cover","fill":null,"sticker":false,"mask":null,"src":"img/flipbook/t/friendship-photo.webp"},{"type":"star","key":"star1","cx":129,"cy":114,"r":31,"rot":-20,"color":"#6f713a","ratio":0.45},{"type":"star","key":"star2","cx":281,"cy":305,"r":44,"rot":18,"color":"#cfc6bd","ratio":0.45},{"type":"rect","key":"pantone","box":[503,53,668,201],"color":"#7b7643"},{"type":"circle","key":"dot","cx":529,"cy":196,"r":37,"color":"#ecd8d8"},{"type":"slot","key":"poster1","label":"Pick 1","box":[423,539,513,661],"kind":"rect","people":false,"radius":0,"fit":"cover","fill":null,"sticker":false,"mask":null,"src":"img/flipbook/t/friendship-poster1.webp"},{"type":"slot","key":"poster2","label":"Pick 2","box":[525,539,614,661],"kind":"rect","people":false,"radius":0,"fit":"cover","fill":null,"sticker":false,"mask":null,"src":"img/flipbook/t/friendship-poster2.webp"},{"type":"slot","key":"poster3","label":"Pick 3","box":[423,679,524,822],"kind":"rect","people":false,"radius":0,"fit":"cover","fill":null,"sticker":false,"mask":null,"src":"img/flipbook/t/friendship-poster3.webp"},{"type":"star","key":"star3","cx":525,"cy":543,"r":60,"rot":-14,"color":"#d9b2ac","ratio":0.45},{"type":"slot","key":"person","label":"Full-length cut-out","box":[92,484,246,892],"kind":"cutout","people":true,"radius":0,"fit":"cover","fill":null,"sticker":true,"mask":null,"src":"img/flipbook/t/friendship-person.webp"},{"type":"slot","key":"lily","label":"Flower","box":[178,494,280,590],"kind":"cutout","people":false,"radius":0,"fit":"cover","fill":null,"sticker":false,"mask":"pink","src":"img/flipbook/t/friendship-lily.webp"},{"type":"slot","key":"bowl","label":"Matcha bowl","box":[498,644,688,818],"kind":"cutout","people":false,"radius":0,"fit":"cover","fill":null,"sticker":false,"mask":"diff","src":"img/flipbook/t/friendship-bowl.webp"},{"type":"text","key":"title","label":"Top line","text":"friendship application","box":[289,14,471,29],"weight":500,"style":"normal","rot":0,"anchor":"middle","ls":0.14,"color":"#3f3a3a","size":15.46,"sx":0.8842,"base":4.33,"start":-91.0,"w":182,"h":15,"family":"'Inter',Helvetica,Arial,sans-serif"},{"type":"text","key":"mbti","label":"Type","text":"INTJ","box":[37,43,84,67],"weight":500,"style":"normal","rot":0,"anchor":"start","ls":0.0,"color":"#2f2f2f","size":32.43,"sx":0.6694,"base":11.68,"start":-23.5,"w":47,"h":24,"family":"'Inter',Helvetica,Arial,sans-serif"},{"type":"text","key":"sign","label":"Sign","text":"Virgo","box":[36,82,86,103],"weight":500,"style":"normal","rot":0,"anchor":"start","ls":0.0,"color":"#2f2f2f","size":21.54,"sx":0.9104,"base":5.87,"start":-25.0,"w":50,"h":21,"family":"'Inter',Helvetica,Arial,sans-serif"},{"type":"text","key":"l1","label":"Note, line 1","text":"I'm on","box":[29,118,74,135],"weight":500,"style":"normal","rot":0,"anchor":"start","ls":0.0,"color":"#2f2f2f","size":22.97,"sx":0.6651,"base":8.27,"start":-22.5,"w":45,"h":17,"family":"'Inter',Helvetica,Arial,sans-serif"},{"type":"text","key":"l2","label":"Note, line 2","text":"legal age","box":[29,141,93,160],"weight":500,"style":"normal","rot":0,"anchor":"start","ls":0.0,"color":"#8a4b55","size":22.35,"sx":0.9032,"base":3.91,"start":-32.0,"w":64,"h":19,"family":"'Reenie Beanie',cursive"},{"type":"text","key":"l3","label":"Note, line 3","text":"already!","box":[29,164,85,180],"weight":500,"style":"normal","rot":0,"anchor":"start","ls":0.0,"color":"#2f2f2f","size":17.02,"sx":0.8534,"base":4.43,"start":-28.0,"w":56,"h":16,"family":"'Inter',Helvetica,Arial,sans-serif"},{"type":"text","key":"pls","label":"Under the photo","text":"pls be my friend all !!!","box":[86,331,207,345],"weight":500,"style":"normal","rot":0,"anchor":"start","ls":0.0,"color":"#2f2f2f","size":14.36,"sx":0.8249,"base":3.98,"start":-60.5,"w":121,"h":14,"family":"'Inter',Helvetica,Arial,sans-serif"},{"type":"text","key":"pant1","label":"Swatch label","text":"PANTONE","box":[512,65,571,77],"weight":700,"style":"normal","rot":0,"anchor":"start","ls":0.0,"color":"#ffffff","size":16.0,"sx":0.7603,"base":5.84,"start":-29.5,"w":59,"h":12,"family":"'Inter',Helvetica,Arial,sans-serif"},{"type":"text","key":"pant2","label":"Swatch code","text":"#707025","box":[514,80,577,96],"weight":700,"style":"normal","rot":0,"anchor":"start","ls":0.0,"color":"#ffffff","size":21.33,"sx":0.6773,"base":7.79,"start":-31.5,"w":63,"h":16,"family":"'Inter',Helvetica,Arial,sans-serif"},{"type":"text","key":"first","label":"Name","text":"Maisy","box":[482,236,722,322],"weight":500,"style":"normal","rot":0,"anchor":"start","ls":0.0,"color":"#7a7646","size":108.18,"sx":1.2678,"base":22.99,"start":-120.0,"w":240,"h":86,"family":"'Reenie Beanie',cursive"},{"type":"text","key":"last","label":"Surname","text":"Zeliniea","box":[546,318,724,402],"weight":500,"style":"normal","rot":0,"anchor":"start","ls":0.0,"color":"#7a7646","size":137.7,"sx":0.4878,"base":40.62,"start":-89.0,"w":178,"h":84,"family":"'Reenie Beanie',cursive"},{"type":"text","key":"m1","label":"Favourites 1","text":"IVE","box":[228,544,267,565],"weight":600,"style":"normal","rot":0,"anchor":"start","ls":0.0,"color":"#2a2020","size":28.77,"sx":0.8421,"base":10.5,"start":-19.5,"w":39,"h":21,"family":"'Inter',Helvetica,Arial,sans-serif"},{"type":"text","key":"m2","label":"Favourites 2","text":"TREASURE","box":[286,544,415,565],"weight":600,"style":"normal","rot":0,"anchor":"start","ls":0.0,"color":"#727146","size":28.0,"sx":0.8726,"base":10.22,"start":-64.5,"w":129,"h":21,"family":"'Inter',Helvetica,Arial,sans-serif"},{"type":"text","key":"m3","label":"Favourites 3","text":"ENHYPEN","box":[228,574,344,597],"weight":600,"style":"normal","rot":0,"anchor":"start","ls":0.0,"color":"#6e3b40","size":31.29,"sx":0.7667,"base":11.34,"start":-58.0,"w":116,"h":23,"family":"'Inter',Helvetica,Arial,sans-serif"},{"type":"text","key":"m4","label":"Favourites 4","text":"Cortis","box":[228,607,304,632],"weight":600,"style":"normal","rot":0,"anchor":"start","ls":0.0,"color":"#727146","size":32.26,"sx":0.8055,"base":12.18,"start":-38.0,"w":76,"h":25,"family":"'Inter',Helvetica,Arial,sans-serif"},{"type":"text","key":"m5","label":"Favourites 5","text":"TWICE","box":[331,609,415,630],"weight":600,"style":"normal","rot":0,"anchor":"start","ls":0.0,"color":"#d9c3c4","size":28.0,"sx":0.9091,"base":10.22,"start":-42.0,"w":84,"h":21,"family":"'Inter',Helvetica,Arial,sans-serif"},{"type":"text","key":"m6","label":"Favourites 6","text":"Olivia Rodrigo","box":[230,640,357,660],"weight":600,"style":"normal","rot":0,"anchor":"start","ls":0.0,"color":"#6e3b40","size":20.41,"sx":0.9233,"base":5.61,"start":-63.5,"w":127,"h":20,"family":"'Inter',Helvetica,Arial,sans-serif"},{"type":"text","key":"m7","label":"Favourites 7","text":"No Na","box":[362,641,415,658],"weight":600,"style":"normal","rot":0,"anchor":"start","ls":0.0,"color":"#2a2626","size":22.97,"sx":0.7807,"base":8.27,"start":-26.5,"w":53,"h":17,"family":"'Inter',Helvetica,Arial,sans-serif"},{"type":"text","key":"m8","label":"Favourites 8","text":"My Chemical Romance","box":[230,668,397,686],"weight":600,"style":"normal","rot":0,"anchor":"start","ls":0.0,"color":"#d6c3c5","size":18.46,"sx":0.8179,"base":5.12,"start":-83.5,"w":167,"h":18,"family":"'Inter',Helvetica,Arial,sans-serif"},{"type":"text","key":"m9","label":"Favourites 9","text":"and many Indo legend songs!","box":[233,697,415,714],"weight":500,"style":"normal","rot":0,"anchor":"start","ls":0.0,"color":"#2f2c2c","size":17.99,"sx":0.7206,"base":4.63,"start":-91.0,"w":182,"h":17,"family":"'Inter',Helvetica,Arial,sans-serif"},{"type":"text","key":"free","label":"List heading","text":"FREEPASS:","box":[254,724,381,748],"weight":600,"style":"normal","rot":0,"anchor":"start","ls":0.0,"color":"#727146","size":32.0,"sx":0.7411,"base":11.68,"start":-63.5,"w":127,"h":24,"family":"'Inter',Helvetica,Arial,sans-serif"},{"type":"text","key":"f1","label":"List 1","text":"small account","box":[267,759,355,772],"weight":500,"style":"normal","rot":0,"anchor":"start","ls":0.0,"color":"#2f2c2c","size":17.57,"sx":0.755,"base":6.32,"start":-44.0,"w":88,"h":13,"family":"'Inter',Helvetica,Arial,sans-serif"},{"type":"text","key":"f2","label":"List 2","text":"also into my favs!","box":[267,777,374,793],"weight":500,"style":"normal","rot":0,"anchor":"start","ls":0.0,"color":"#2f2c2c","size":16.41,"sx":0.7828,"base":4.55,"start":-53.5,"w":107,"h":16,"family":"'Inter',Helvetica,Arial,sans-serif"},{"type":"text","key":"f3","label":"List 3","text":"movie/k-drama enjoyer","box":[267,797,417,811],"weight":500,"style":"normal","rot":0,"anchor":"start","ls":0.0,"color":"#2f2c2c","size":14.36,"sx":0.9432,"base":3.98,"start":-75.0,"w":150,"h":14,"family":"'Inter',Helvetica,Arial,sans-serif"},{"type":"text","key":"dni","label":"Second heading","text":"DNI:","box":[209,819,259,843],"weight":600,"style":"normal","rot":0,"anchor":"start","ls":0.0,"color":"#6e3b40","size":32.88,"sx":0.7329,"base":12.0,"start":-25.0,"w":50,"h":24,"family":"'Inter',Helvetica,Arial,sans-serif"},{"type":"text","key":"dni2","label":"Last line","text":"if you're not so active account, minor, and like to engage yourself in drama.","box":[214,848,683,865],"weight":500,"style":"normal","rot":0,"anchor":"start","ls":0.0,"color":"#2f2c2c","size":17.35,"sx":0.7543,"base":4.77,"start":-234.5,"w":469,"h":17,"family":"'Inter',Helvetica,Arial,sans-serif"},{"type":"text","key":"picks1","label":"Star, line 1","text":"personal","box":[493,532,554,554],"weight":600,"style":"normal","rot":9,"anchor":"start","ls":0.0,"color":"#4a3533","size":23.53,"sx":0.6143,"base":6.18,"start":-30.5,"w":61,"h":22,"family":"'Inter',Helvetica,Arial,sans-serif"},{"type":"text","key":"picks2","label":"Star, line 2","text":"picks!","box":[503,552,541,569],"weight":600,"style":"normal","rot":9,"anchor":"start","ls":0.0,"color":"#4a3533","size":17.53,"sx":0.7451,"base":4.91,"start":-19.0,"w":38,"h":17,"family":"'Inter',Helvetica,Arial,sans-serif"},{"type":"text","key":"matcha","label":"Caption 1","text":"matcha","box":[545,822,616,842],"weight":600,"style":"normal","rot":0,"anchor":"start","ls":0.0,"color":"#7d7f55","size":26.85,"sx":0.7377,"base":9.73,"start":-35.5,"w":71,"h":20,"family":"'Inter',Helvetica,Arial,sans-serif"},{"type":"text","key":"lovers","label":"Caption 2","text":"lovers!","box":[620,822,683,842],"weight":600,"style":"normal","rot":0,"anchor":"start","ls":0.0,"color":"#dccbcb","size":27.03,"sx":0.7107,"base":9.73,"start":-31.5,"w":63,"h":20,"family":"'Inter',Helvetica,Arial,sans-serif"},{"type":"text","key":"prop","label":"Side note","text":"Property of Maisy","box":[29,618,42,740],"weight":500,"style":"normal","rot":-90,"anchor":"middle","ls":0.16,"color":"#8a8585","size":13.33,"sx":0.8258,"base":3.7,"start":-61.0,"w":122,"h":13,"family":"'Inter',Helvetica,Arial,sans-serif"}]},{"key":"magazine","title":"magazine spread","w":735,"h":500,"bg":"img/flipbook/t/magazine-bg.webp","items":[{"type":"slot","key":"left","label":"Left photo","box":[75,85,228,254],"kind":"rect","people":true,"radius":8,"fit":"cover","fill":null,"sticker":false,"mask":null,"src":"img/flipbook/t/magazine-left.webp"},{"type":"slot","key":"mid","label":"Middle photo","box":[237,145,357,320],"kind":"rect","people":true,"radius":8,"fit":"cover","fill":null,"sticker":false,"mask":null,"src":"img/flipbook/t/magazine-mid.webp"},{"type":"slot","key":"right","label":"Right page photo","box":[393,28,685,450],"kind":"rect","people":true,"radius":0,"fit":"cover","fill":null,"sticker":false,"mask":null,"src":"img/flipbook/t/magazine-right.webp"},{"type":"text","key":"brand","label":"Masthead","text":"miu miu","box":[78,43,320,77],"weight":800,"style":"normal","rot":0,"anchor":"start","ls":0.0,"color":"#1e1e1e","size":43.59,"sx":1.4199,"base":16.78,"start":-121.0,"w":242,"h":34,"family":"'Inter',Helvetica,Arial,sans-serif"},{"type":"text","key":"sub","label":"Over the masthead","text":"pink essentials","box":[166,74,334,99],"weight":500,"style":"normal","rot":-7,"anchor":"start","ls":0.0,"color":"#f2d6dc","size":30,"sx":1.1464,"base":5.78,"start":-82.8,"w":168,"h":25,"family":"'Reenie Beanie',cursive"},{"type":"para","key":"p1","label":"Intro paragraph","text":"Miu Miu is a high-fashion women's clothing and accessories brand and a subsidiary of Prada, known for its playful, youthful, and provocative designs. It was founded in 1992 by Miuccia Prada, using her childhood nickname as the brand's name, and it serves as a space for her to explore more experimental and unconventional ideas than her main Prada line.","box":[236,94,380,142],"size":5.1,"lh":1.2,"weight":600,"color":"#2a2a2a","family":"'Inter',Helvetica,Arial,sans-serif"},{"type":"para","key":"p2","label":"Paragraph 2","text":"Branding and Concept: Miu Miu was established by Miuccia Prada as a more playful and experimental outlet, named after her childhood nickname.","box":[166,283,232,330],"size":4.8,"lh":1.22,"weight":600,"color":"#2a2a2a","family":"'Inter',Helvetica,Arial,sans-serif"},{"type":"para","key":"p3","label":"Paragraph 3","text":"Design Philosophy: It offers a distinct contrast to Prada's polished image, embracing a more eclectic and unconventional style. Miu Miu's designs often feature clashing prints, unexpected silhouettes, and a sense of playful irreverence.","box":[150,337,232,390],"size":4.8,"lh":1.22,"weight":600,"color":"#2a2a2a","family":"'Inter',Helvetica,Arial,sans-serif"},{"type":"para","key":"p4","label":"Paragraph 4","text":"Miu Miu has timeless and trendy pieces overall. Making their designs unforgettable.","box":[150,393,228,416],"size":4.8,"lh":1.22,"weight":600,"color":"#2a2a2a","family":"'Inter',Helvetica,Arial,sans-serif"},{"type":"text","key":"vert","label":"Down the gutter","text":"Always new, always miu.","box":[360,142,382,450],"weight":500,"style":"normal","rot":90,"anchor":"middle","ls":0.0,"color":"#d9c4c8","size":26.04,"sx":1.489,"base":6.18,"start":-154.0,"w":308,"h":22,"family":"'Reenie Beanie',cursive"},{"type":"text","key":"ning","label":"Over the photo","text":"ningning","box":[414,234,501,252],"weight":500,"style":"normal","rot":0,"anchor":"start","ls":0.0,"color":"#f3dfe4","size":24.32,"sx":1.5028,"base":2.92,"start":-43.5,"w":87,"h":18,"family":"'Reenie Beanie',cursive"},{"type":"text","key":"hot1","label":"Headline 1","text":"HOT","box":[398,310,486,374],"weight":600,"style":"normal","rot":0,"anchor":"start","ls":0.0,"color":"#1a1a1a","size":85.33,"sx":0.4808,"base":31.15,"start":-44.0,"w":88,"h":64,"family":"'Inter',Helvetica,Arial,sans-serif"},{"type":"text","key":"hot2","label":"Headline 2","text":"MESS","box":[398,397,516,447],"weight":600,"style":"normal","rot":0,"anchor":"start","ls":0.0,"color":"#1a1a1a","size":66.67,"sx":0.6254,"base":24.33,"start":-59.0,"w":118,"h":50,"family":"'Inter',Helvetica,Arial,sans-serif"},{"type":"text","key":"cred1","label":"Credit left","text":"@tubaztuu","box":[74,438,92,445],"weight":700,"style":"normal","rot":0,"anchor":"start","ls":0.0,"color":"#3a3a3a","size":7.45,"sx":0.45,"base":1.94,"start":-9.0,"w":18,"h":7,"family":"'Inter',Helvetica,Arial,sans-serif"},{"type":"text","key":"cred2","label":"Credit right","text":"@tubaztuu","box":[652,438,685,445],"weight":700,"style":"normal","rot":0,"anchor":"start","ls":0.0,"color":"#3a3a3a","size":7.45,"sx":0.8191,"base":1.94,"start":-16.5,"w":33,"h":7,"family":"'Inter',Helvetica,Arial,sans-serif"}]},{"key":"paint","title":"outfit in paint","w":735,"h":923,"bg":"img/flipbook/t/paint-bg.webp","items":[{"type":"slot","key":"person","label":"Outfit photo","box":[153,117,403,757],"kind":"rect","people":true,"radius":0,"fit":"contain","fill":"#ffffff","sticker":false,"mask":null,"src":"img/flipbook/t/paint-person.webp"},{"type":"slot","key":"i1","label":"Piece 1","box":[412,191,547,326],"kind":"rect","people":false,"radius":0,"fit":"contain","fill":"#efeeff","sticker":false,"mask":null,"src":"img/flipbook/t/paint-i1.webp"},{"type":"slot","key":"i2","label":"Piece 2","box":[568,191,703,326],"kind":"rect","people":false,"radius":0,"fit":"contain","fill":"#edeffe","sticker":false,"mask":null,"src":"img/flipbook/t/paint-i2.webp"},{"type":"slot","key":"i3","label":"Piece 3","box":[412,351,547,486],"kind":"rect","people":false,"radius":0,"fit":"contain","fill":"#efeffe","sticker":false,"mask":null,"src":"img/flipbook/t/paint-i3.webp"},{"type":"slot","key":"i4","label":"Piece 4","box":[568,351,703,486],"kind":"rect","people":false,"radius":0,"fit":"contain","fill":"#edeffe","sticker":false,"mask":null,"src":"img/flipbook/t/paint-i4.webp"},{"type":"slot","key":"i5","label":"Piece 5","box":[412,511,547,645],"kind":"rect","people":false,"radius":0,"fit":"contain","fill":"#edeffe","sticker":false,"mask":null,"src":"img/flipbook/t/paint-i5.webp"},{"type":"slot","key":"i6","label":"Piece 6","box":[568,511,703,645],"kind":"rect","people":false,"radius":0,"fit":"contain","fill":"#edeffb","sticker":false,"mask":null,"src":"img/flipbook/t/paint-i6.webp"},{"type":"text","key":"title","label":"Window title","text":"untitled - Paint","box":[16,19,276,40],"weight":400,"style":"normal","rot":0,"anchor":"start","ls":0.06,"color":"#fdf8d8","size":27.27,"sx":1.2222,"base":10.09,"start":-130.0,"w":260,"h":21,"family":"'Inter',Helvetica,Arial,sans-serif"}]},{"key":"moodboard","title":"mood board","w":736,"h":920,"bg":"img/flipbook/t/moodboard-bg.webp","items":[{"type":"slot","key":"face","label":"Close-up photo","box":[290,151,445,354],"kind":"rect","people":true,"radius":0,"fit":"cover","fill":null,"sticker":false,"mask":null,"src":"img/flipbook/t/moodboard-face.webp"},{"type":"slot","key":"matcha","label":"Top square","box":[411,63,591,236],"kind":"rect","people":false,"radius":0,"fit":"cover","fill":null,"sticker":false,"mask":null,"src":"img/flipbook/t/moodboard-matcha.webp"},{"type":"slot","key":"marble","label":"Texture square","box":[368,481,556,659],"kind":"rect","people":false,"radius":0,"fit":"cover","fill":null,"sticker":false,"mask":null,"src":"img/flipbook/t/moodboard-marble.webp"},{"type":"slot","key":"blouse","label":"Outfit photo","box":[315,614,488,846],"kind":"rect","people":true,"radius":0,"fit":"cover","fill":null,"sticker":false,"mask":null,"src":"img/flipbook/t/moodboard-blouse.webp"},{"type":"slot","key":"lily","label":"Flower","box":[240,466,408,610],"kind":"cutout","people":false,"radius":0,"fit":"cover","fill":null,"sticker":false,"mask":null,"src":"img/flipbook/t/moodboard-lily.webp"},{"type":"slot","key":"chair","label":"Object","box":[513,676,680,820],"kind":"cutout","people":false,"radius":0,"fit":"cover","fill":null,"sticker":false,"mask":null,"src":"img/flipbook/t/moodboard-chair.webp"},{"type":"text","key":"credt","label":"Credit, top","text":"SINCERELY.JEHN","box":[315,29,416,42],"weight":700,"style":"normal","rot":0,"anchor":"middle","ls":0.0,"color":"#ffffff","size":17.33,"sx":0.6863,"base":6.33,"start":-50.5,"w":101,"h":13,"family":"'Inter',Helvetica,Arial,sans-serif"},{"type":"text","key":"sl1","label":"Side words, top 1","text":"LATER","box":[56,103,69,139],"weight":700,"style":"normal","rot":-90,"anchor":"middle","ls":0.0,"color":"#ffffff","size":17.69,"sx":0.6451,"base":6.41,"start":-18.0,"w":36,"h":13,"family":"'Inter',Helvetica,Arial,sans-serif"},{"type":"text","key":"sl2","label":"Side words, top 2","text":"FOR","box":[56,175,69,197],"weight":700,"style":"normal","rot":-90,"anchor":"middle","ls":0.0,"color":"#ffffff","size":17.33,"sx":0.6299,"base":6.33,"start":-11.0,"w":22,"h":13,"family":"'Inter',Helvetica,Arial,sans-serif"},{"type":"text","key":"sl3","label":"Side words, top 3","text":"SAVE","box":[56,233,69,263],"weight":700,"style":"normal","rot":-90,"anchor":"middle","ls":0.0,"color":"#ffffff","size":17.33,"sx":0.6507,"base":6.33,"start":-15.0,"w":30,"h":13,"family":"'Inter',Helvetica,Arial,sans-serif"},{"type":"text","key":"pk1","label":"Corner label, top 1","text":"PICK YOUR","box":[660,42,671,106],"weight":700,"style":"normal","rot":90,"anchor":"start","ls":0.0,"color":"#ffffff","size":14.67,"sx":0.7977,"base":5.35,"start":-32.0,"w":64,"h":11,"family":"'Inter',Helvetica,Arial,sans-serif"},{"type":"text","key":"pk2","label":"Corner label, top 2","text":"MOOD","box":[647,42,658,70],"weight":700,"style":"normal","rot":90,"anchor":"start","ls":0.0,"color":"#ffffff","size":14.67,"sx":0.5975,"base":5.35,"start":-14.0,"w":28,"h":11,"family":"'Inter',Helvetica,Arial,sans-serif"},{"type":"text","key":"pk3","label":"Corner label, top 3","text":"BOARD","box":[633,42,645,85],"weight":700,"style":"normal","rot":90,"anchor":"start","ls":0.0,"color":"#ffffff","size":16.0,"sx":0.7646,"base":5.84,"start":-21.5,"w":43,"h":12,"family":"'Inter',Helvetica,Arial,sans-serif"},{"type":"text","key":"pt1","label":"Part, top","text":"PART 1","box":[660,252,672,292],"weight":700,"style":"normal","rot":90,"anchor":"middle","ls":0.0,"color":"#ffffff","size":16.33,"sx":0.7413,"base":5.92,"start":-20.0,"w":40,"h":12,"family":"'Inter',Helvetica,Arial,sans-serif"},{"type":"text","key":"pan1","label":"Swatch label","text":"PANTONE","box":[117,197,157,206],"weight":700,"style":"normal","rot":0,"anchor":"start","ls":0.0,"color":"#ffffff","size":12.0,"sx":0.6873,"base":4.38,"start":-20.0,"w":40,"h":9,"family":"'Inter',Helvetica,Arial,sans-serif"},{"type":"text","key":"pan2","label":"Swatch code","text":"15-6313 TCX","box":[117,208,167,216],"weight":400,"style":"normal","rot":0,"anchor":"start","ls":0.0,"color":"#f3f6ec","size":10.67,"sx":0.778,"base":3.89,"start":-25.0,"w":50,"h":8,"family":"'Inter',Helvetica,Arial,sans-serif"},{"type":"text","key":"pan3","label":"Swatch name","text":"Laurel Green","box":[117,217,162,226],"weight":400,"style":"normal","rot":0,"anchor":"start","ls":0.0,"color":"#f3f6ec","size":11.92,"sx":0.624,"base":4.32,"start":-22.5,"w":45,"h":9,"family":"'Inter',Helvetica,Arial,sans-serif"},{"type":"text","key":"num","label":"Number","text":"(01)","box":[570,484,591,497],"weight":700,"style":"normal","rot":0,"anchor":"start","ls":0.0,"color":"#2b2622","size":14.29,"sx":0.7903,"base":5.21,"start":-10.5,"w":21,"h":13,"family":"'Inter',Helvetica,Arial,sans-serif"},{"type":"text","key":"pb1","label":"Corner label 1","text":"PICK YOUR","box":[660,510,673,574],"weight":700,"style":"normal","rot":90,"anchor":"start","ls":0.0,"color":"#2b2622","size":17.33,"sx":0.675,"base":6.33,"start":-32.0,"w":64,"h":13,"family":"'Inter',Helvetica,Arial,sans-serif"},{"type":"text","key":"pb2","label":"Corner label 2","text":"MOOD","box":[647,510,659,545],"weight":700,"style":"normal","rot":90,"anchor":"start","ls":0.0,"color":"#2b2622","size":16.0,"sx":0.6847,"base":5.84,"start":-17.5,"w":35,"h":12,"family":"'Inter',Helvetica,Arial,sans-serif"},{"type":"text","key":"pb3","label":"Corner label 3","text":"BOARD","box":[633,510,645,553],"weight":700,"style":"normal","rot":90,"anchor":"start","ls":0.0,"color":"#2b2622","size":16.0,"sx":0.7646,"base":5.84,"start":-21.5,"w":43,"h":12,"family":"'Inter',Helvetica,Arial,sans-serif"},{"type":"text","key":"pt2","label":"Part","text":"PART 1","box":[660,823,672,863],"weight":700,"style":"normal","rot":90,"anchor":"middle","ls":0.0,"color":"#2b2622","size":16.33,"sx":0.7413,"base":5.92,"start":-20.0,"w":40,"h":12,"family":"'Inter',Helvetica,Arial,sans-serif"},{"type":"text","key":"sb1","label":"Side words 1","text":"LATER","box":[56,598,66,635],"weight":700,"style":"normal","rot":-90,"anchor":"middle","ls":0.0,"color":"#2b2622","size":13.61,"sx":0.862,"base":4.93,"start":-18.5,"w":37,"h":10,"family":"'Inter',Helvetica,Arial,sans-serif"},{"type":"text","key":"sb2","label":"Side words 2","text":"FOR","box":[56,672,66,696],"weight":700,"style":"normal","rot":-90,"anchor":"middle","ls":0.0,"color":"#2b2622","size":13.33,"sx":0.8933,"base":4.87,"start":-12.0,"w":24,"h":10,"family":"'Inter',Helvetica,Arial,sans-serif"},{"type":"text","key":"sb3","label":"Side words 3","text":"SAVE","box":[56,730,66,760],"weight":700,"style":"normal","rot":-90,"anchor":"middle","ls":0.0,"color":"#2b2622","size":13.33,"sx":0.8459,"base":4.87,"start":-15.0,"w":30,"h":10,"family":"'Inter',Helvetica,Arial,sans-serif"},{"type":"text","key":"pg1","label":"Palette 1","text":"PINK","box":[278,754,289,783],"weight":700,"style":"normal","rot":90,"anchor":"start","ls":0.0,"color":"#2b2622","size":15.07,"sx":0.7986,"base":5.5,"start":-14.5,"w":29,"h":11,"family":"'Inter',Helvetica,Arial,sans-serif"},{"type":"text","key":"pg2","label":"Palette 2","text":"+ GREEN","box":[265,754,276,805],"weight":700,"style":"normal","rot":90,"anchor":"start","ls":0.0,"color":"#2b2622","size":14.67,"sx":0.8087,"base":5.35,"start":-25.5,"w":51,"h":11,"family":"'Inter',Helvetica,Arial,sans-serif"},{"type":"text","key":"credb","label":"Credit","text":"SINCERELY.JEHN","box":[315,873,416,885],"weight":700,"style":"normal","rot":0,"anchor":"middle","ls":0.0,"color":"#3d3833","size":16.0,"sx":0.7435,"base":5.84,"start":-50.5,"w":101,"h":12,"family":"'Inter',Helvetica,Arial,sans-serif"}]}]</script>
 <script>
 (() => {
   const still = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const EDIT = new URLSearchParams(location.search).has('edit');
+  const TEMPLATES = JSON.parse(document.getElementById('fb-spec').textContent);
+  const REPO = 'sofiagrimm/sofia-portfolio-orbit', BRANCH = 'main', CONTENT = 'lab/flipbook-content.json';
+  const NS = 'http://www.w3.org/2000/svg';
   const book = document.getElementById('book');
 
-  // the pages, front to back
-  const PAGES = [
-    {cover:true},
-    {src:'img/flipbook/friendship.webp', alt:'Friendship application collage: a pink lily, a spiral notebook, favourite bands and films, and matcha'},
-    {src:'img/flipbook/pink-essentials.webp', alt:'Magazine spread: Miu Miu pink essentials on the left, a Hot Mess editorial on the right', fit:true},
-    {src:'img/flipbook/paint-outfit.webp', alt:'An outfit laid out inside an old Paint window: yellow jacket, pink bubble skirt, white sunglasses, platform sandals, a brown bag'},
-    {src:'img/flipbook/pink-green.webp', alt:'Pink and green mood board on a spiral notebook: lilies, matcha, a sheer green blouse, a green armchair'},
-    {end:true},
-  ];
+  // ── content: the template's own words and pictures, then whatever has been published, then (when editing) the draft ──
+  let published = {}, draft = {};
+  try { draft = EDIT ? JSON.parse(localStorage.getItem('flipbook-draft') || '{}') : {}; } catch (e) { draft = {}; }
+  const merged = () => {
+    const out = JSON.parse(JSON.stringify(published));
+    for (const [pk, pv] of Object.entries(draft)) {
+      out[pk] = out[pk] || {t: {}, i: {}};
+      Object.assign(out[pk].t = out[pk].t || {}, pv.t || {});
+      Object.assign(out[pk].i = out[pk].i || {}, pv.i || {});
+    }
+    return out;
+  };
+  let content = {};
+  const textOf = (pk, it) => (content[pk] && content[pk].t && content[pk].t[it.key] != null) ? content[pk].t[it.key] : it.text;
+  const imgOf = (pk, it) => (content[pk] && content[pk].i && content[pk].i[it.key]) || null;
 
-  // every turn leaves from a new side: the four edges, then the four corners
+  // ── the pages, front to back ──
+  const PAGES = [{cover: true}, ...TEMPLATES.map(t => ({tpl: t})), {end: true}];
   const DIRS = [
     {x:1,y:0,name:'the right'},{x:0,y:1,name:'the bottom'},{x:-1,y:0,name:'the left'},{x:0,y:-1,name:'the top'},
     {x:1,y:1,name:'the bottom right corner'},{x:-1,y:-1,name:'the top left corner'},{x:-1,y:1,name:'the bottom left corner'},{x:1,y:-1,name:'the top right corner'},
   ];
   const dirFor = i => DIRS[i % DIRS.length];
-
   const compass = `<svg class="compass" viewBox="0 0 80 80" aria-hidden="true"><g fill="none" stroke="#8f9f74" stroke-width="1.4">
     <circle cx="40" cy="40" r="30"/><path d="M40 4V76M4 40H76M14 14L66 66M66 14L14 66" stroke-dasharray="2 4"/></g>
     <path d="M40 10L45 40L40 70L35 40Z" fill="#d9939f" opacity=".85"/><circle cx="40" cy="40" r="3" fill="#3a2e2c"/></svg>`;
+
+  const el = (tag, attrs = {}, parent) => { const e = document.createElementNS(NS, tag); for (const k in attrs) e.setAttribute(k, attrs[k]); if (parent) parent.appendChild(e); return e; };
+  const natural = {};
+  const sizeOf = src => natural[src] ? Promise.resolve(natural[src]) : new Promise(res => { const im = new Image(); im.onload = () => res(natural[src] = [im.naturalWidth, im.naturalHeight]); im.onerror = () => res([1, 1]); im.src = src; });
+
+  function starPoints(cx, cy, r, rot, ratio) {
+    const p = [];
+    for (let k = 0; k < 10; k++) {
+      const a = (rot - 90 + k * 36) * Math.PI / 180, rr = k % 2 ? r * ratio : r;
+      p.push((cx + rr * Math.cos(a)).toFixed(1) + ',' + (cy + rr * Math.sin(a)).toFixed(1));
+    }
+    return p.join(' ');
+  }
+
+  // place a picture inside its box: cover crops to fill, contain fits; zoom and pan are kept per picture
+  async function placeImage(img, it, pic) {
+    const [x0, y0, x1, y1] = it.box, bw = x1 - x0, bh = y1 - y0;
+    const src = pic ? pic.src : it.src;
+    img.setAttribute('href', src);
+    if (it.kind === 'cutout' || it.fit === 'contain') {
+      img.setAttribute('x', x0); img.setAttribute('y', y0); img.setAttribute('width', bw); img.setAttribute('height', bh);
+      img.setAttribute('preserveAspectRatio', it.kind === 'cutout' && it.people ? 'xMidYMax meet' : 'xMidYMid meet');
+      return;
+    }
+    const [nw, nh] = await sizeOf(src);
+    const z = pic && pic.z ? pic.z : 1;
+    const s = Math.max(bw / nw, bh / nh) * z, w = nw * s, h = nh * s;
+    const px = pic && pic.x != null ? pic.x : 0, py = pic && pic.y != null ? pic.y : 0;
+    img.setAttribute('x', (x0 + (bw - w) / 2 + px * (w - bw) / 2).toFixed(2));
+    img.setAttribute('y', (y0 + (bh - h) / 2 + py * (h - bh) / 2).toFixed(2));
+    img.setAttribute('width', w.toFixed(2)); img.setAttribute('height', h.toFixed(2));
+    img.setAttribute('preserveAspectRatio', 'none');
+  }
+
+  function renderTemplate(face, t) {
+    face.innerHTML = '';
+    const svg = el('svg', {viewBox: `0 0 ${t.w} ${t.h}`, preserveAspectRatio: 'xMidYMid meet', class: 'tpl', role: 'img', 'aria-label': t.title});
+    face.appendChild(svg);
+    const defs = el('defs', {}, svg);
+    const f = el('filter', {id: `stk-${t.key}`, x: '-10%', y: '-10%', width: '120%', height: '120%'}, defs);
+    el('feMorphology', {in: 'SourceAlpha', operator: 'dilate', radius: '4', result: 'd'}, f);
+    el('feFlood', {'flood-color': '#fbf8f2', result: 'w'}, f);
+    el('feComposite', {in: 'w', in2: 'd', operator: 'in', result: 'o'}, f);
+    el('feDropShadow', {in: 'o', dx: '1', dy: '2', stdDeviation: '2', 'flood-opacity': '.25', result: 'os'}, f);
+    const m = el('feMerge', {}, f); el('feMergeNode', {in: 'os'}, m); el('feMergeNode', {in: 'SourceGraphic'}, m);
+    el('image', {href: t.bg, x: 0, y: 0, width: t.w, height: t.h, preserveAspectRatio: 'none'}, svg);
+    for (const it of t.items) {
+      if (it.type === 'slot') {
+        const [x0, y0, x1, y1] = it.box, pic = imgOf(t.key, it);
+        const g = el('g', {class: 'slot', 'data-key': it.key}, svg);
+        if (it.kind !== 'cutout') {
+          const cp = el('clipPath', {id: `c-${t.key}-${it.key}`}, defs);
+          el('rect', {x: x0, y: y0, width: x1 - x0, height: y1 - y0, rx: it.radius || 0}, cp);
+          g.setAttribute('clip-path', `url(#c-${t.key}-${it.key})`);
+          if (it.fill) el('rect', {x: x0, y: y0, width: x1 - x0, height: y1 - y0, fill: it.fill}, g);
+        }
+        const img = el('image', {}, g);
+        if (it.sticker && pic) img.setAttribute('filter', `url(#stk-${t.key})`);
+        placeImage(img, it, pic);
+        if (EDIT) { el('rect', {x: x0, y: y0, width: x1 - x0, height: y1 - y0, class: 'hot'}, g); }
+      } else if (it.type === 'star') {
+        el('polygon', {points: starPoints(it.cx, it.cy, it.r, it.rot, it.ratio), fill: it.color}, svg);
+      } else if (it.type === 'rect') {
+        const [x0, y0, x1, y1] = it.box; el('rect', {x: x0, y: y0, width: x1 - x0, height: y1 - y0, fill: it.color}, svg);
+      } else if (it.type === 'circle') {
+        el('circle', {cx: it.cx, cy: it.cy, r: it.r, fill: it.color}, svg);
+      } else if (it.type === 'text') {
+        const [x0, y0, x1, y1] = it.box, cx = (x0 + x1) / 2, cy = (y0 + y1) / 2;
+        const mid = it.anchor === 'middle';
+        const tx = el('text', {
+          transform: `translate(${cx} ${cy}) rotate(${it.rot}) translate(${mid ? 0 : it.start} ${it.base}) scale(${it.sx} 1)`,
+          'font-size': it.size, 'font-weight': it.weight, 'font-style': it.style, fill: it.color,
+          'text-anchor': mid ? 'middle' : 'start', 'letter-spacing': (it.ls * it.size).toFixed(2), class: 'tx', 'data-key': it.key,
+        }, svg);
+        tx.style.fontFamily = it.family;
+        tx.textContent = textOf(t.key, it);
+      } else if (it.type === 'para') {
+        const [x0, y0, x1, y1] = it.box;
+        const fo = el('foreignObject', {x: x0, y: y0, width: x1 - x0, height: y1 - y0 + 30}, svg);
+        const d = document.createElement('div');
+        d.className = 'para'; d.dataset.key = it.key;
+        Object.assign(d.style, {fontFamily: it.family, fontSize: it.size + 'px', lineHeight: it.lh, fontWeight: it.weight, color: it.color});
+        d.textContent = textOf(t.key, it);
+        fo.appendChild(d);
+      }
+    }
+    if (EDIT) wireEditing(svg, t);
+  }
 
   const els = PAGES.map((p, i) => {
     const page = document.createElement('div');
@@ -122,113 +269,259 @@
         <h1>turn it<br><em>any</em><br>which way</h1>
         <div style="display:flex;justify-content:space-between;align-items:flex-end;gap:12px"><p>Every page leaves from a different side. Top, bottom, left, right, and all four corners.</p>${compass}</div></div>`;
     else if (p.end) front = `<div class="face front cover end"><small>the last page</small><h1>that's the<br><em>whole</em> book</h1><p>Turn once more to start over.</p>${compass}</div>`;
-    else front = `<div class="face front${p.fit ? ' fit' : ''}"><img src="${p.src}" alt="${p.alt}" draggable="false"></div>`;
+    else front = `<div class="face front tplface"></div>`;
     page.innerHTML = front + '<div class="face back"></div><div class="shade"></div>';
     page.querySelector('.front').insertAdjacentHTML('beforeend', '<div class="shine"></div>');
     book.appendChild(page);
     return page;
   });
+  function renderAll() {
+    content = merged();
+    PAGES.forEach((p, k) => { if (p.tpl) { const f = els[k].querySelector('.front'); const sh = f.querySelector('.shine'); renderTemplate(f, p.tpl); f.appendChild(sh); } });
+  }
+  function renderOne(k) {
+    content = merged();
+    const f = els[k].querySelector('.front'), sh = f.querySelector('.shine');
+    renderTemplate(f, PAGES[k].tpl); f.appendChild(sh);
+  }
 
-  // place the dog-ear on the side this page will leave from
+  // ── turning ──
   function ear(page, d) {
     page.querySelectorAll('.ear').forEach(e => e.remove());
     const e = document.createElement('div');
     if (d.x && d.y) {
       e.className = 'ear corner';
       e.style[d.x > 0 ? 'right' : 'left'] = '0'; e.style[d.y > 0 ? 'bottom' : 'top'] = '0';
-      // turn the triangle so its fold faces the page
-      const rot = d.x > 0 ? (d.y > 0 ? 0 : 90) : (d.y > 0 ? 270 : 180);
-      e.style.transform = `rotate(${rot}deg)`;
+      e.style.transform = `rotate(${d.x > 0 ? (d.y > 0 ? 0 : 90) : (d.y > 0 ? 270 : 180)}deg)`;
     } else {
       e.className = 'ear edge';
-      const horiz = !!d.x;
-      Object.assign(e.style, horiz ? {top:0, bottom:0, width:'22px'} : {left:0, right:0, height:'22px'});
+      Object.assign(e.style, d.x ? {top: 0, bottom: 0, width: '22px'} : {left: 0, right: 0, height: '22px'});
       e.style[d.x > 0 ? 'right' : d.x < 0 ? 'left' : d.y > 0 ? 'bottom' : 'top'] = '0';
       e.style.setProperty('--g', d.x > 0 ? 'to left' : d.x < 0 ? 'to right' : d.y > 0 ? 'to top' : 'to bottom');
     }
     page.appendChild(e);
   }
-
-  // the hinge sits on the opposite side; the page swings up toward you and over it
   const hinge = d => `${50 - d.x * 50}% ${50 - d.y * 50}%`;
   const axis = d => `${-d.y},${d.x},0`;
-
   let i = 0, busy = false;
   const num = document.getElementById('num'), from = document.getElementById('from');
   const prevBtn = document.getElementById('prev'), nextBtn = document.getElementById('next');
-
   function layout() {
-    els.forEach((el, k) => {
-      el.hidden = k < i;
-      el.style.zIndex = String(100 - k);
-      el.style.transform = '';
-      el.querySelector('.back').style.transform = `rotate3d(${axis(dirFor(k))},180deg)`; // the back always faces away until the page turns
+    els.forEach((e, k) => {
+      e.hidden = k < i; e.style.zIndex = String(100 - k); e.style.transform = '';
+      e.querySelector('.back').style.transform = `rotate3d(${axis(dirFor(k))},180deg)`;
     });
     ear(els[i], dirFor(i));
     num.textContent = `${i + 1} / ${els.length}`;
     from.textContent = i === els.length - 1 ? 'back to the start' : `from ${dirFor(i).name}`;
     prevBtn.disabled = i === 0;
+    if (EDIT) panelFor(i);
   }
-
-  function animate(el, d, out) {
-    const ax = axis(d), a0 = out ? 0 : -180, a1 = out ? -180 : 0;
-    el.style.transformOrigin = hinge(d);
-    el.querySelector('.back').style.transform = `rotate3d(${ax},180deg)`;
-    el.classList.add('going');
-    el.style.zIndex = '200';
-    const ease = 'cubic-bezier(.45,.05,.25,1)';
-    const dur = still ? 1 : 950;
-    const turn = el.animate([
-      {transform:`rotate3d(${ax},${a0}deg)`},
-      {transform:`rotate3d(${ax},${(a0 + a1) / 2}deg) translateZ(40px)`},
-      {transform:`rotate3d(${ax},${a1}deg)`},
-    ], {duration:dur, easing:ease, fill:'forwards'});
-    // light catches the page as it lifts; the page beneath sits in its shadow
-    el.querySelector('.shine').style.background = `linear-gradient(${Math.atan2(d.y, d.x) * 180 / Math.PI + 90}deg,rgba(255,255,255,0),rgba(255,255,255,.35),rgba(60,30,30,.25))`;
-    el.querySelector('.shine').animate([{opacity:0},{opacity:1},{opacity:0}], {duration:dur, easing:ease});
+  function animate(e, d, out) {
+    const ax = axis(d), a0 = out ? 0 : -180, a1 = out ? -180 : 0, dur = still ? 1 : 950, ease = 'cubic-bezier(.45,.05,.25,1)';
+    e.style.transformOrigin = hinge(d);
+    e.querySelector('.back').style.transform = `rotate3d(${ax},180deg)`;
+    e.classList.add('going'); e.style.zIndex = '200';
+    const turn = e.animate([{transform: `rotate3d(${ax},${a0}deg)`}, {transform: `rotate3d(${ax},${(a0 + a1) / 2}deg) translateZ(40px)`}, {transform: `rotate3d(${ax},${a1}deg)`}], {duration: dur, easing: ease, fill: 'forwards'});
+    const sh = e.querySelector('.shine');
+    sh.style.background = `linear-gradient(${Math.atan2(d.y, d.x) * 180 / Math.PI + 90}deg,rgba(255,255,255,0),rgba(255,255,255,.35),rgba(60,30,30,.25))`;
+    sh.animate([{opacity: 0}, {opacity: 1}, {opacity: 0}], {duration: dur, easing: ease});
     const below = out ? els[i + 1] : els[i];
-    if (below && !still) below.querySelector('.shade').animate(out ? [{opacity:.55},{opacity:0}] : [{opacity:0},{opacity:.55}], {duration:dur, easing:ease});
-    return turn.finished.then(() => { turn.cancel(); el.classList.remove('going'); });
+    if (below && !still) below.querySelector('.shade').animate(out ? [{opacity: .55}, {opacity: 0}] : [{opacity: 0}, {opacity: .55}], {duration: dur, easing: ease});
+    return turn.finished.then(() => { turn.cancel(); e.classList.remove('going'); });
   }
-
   async function next() {
     if (busy) return;
-    if (i === els.length - 1) { // last page: shuffle back to the cover
-      busy = true; i = 0; layout();
-      if (!still) els[0].animate([{opacity:0, transform:'translateY(14px)'},{opacity:1, transform:'none'}], {duration:500, easing:'ease-out'});
-      busy = false; return;
-    }
-    busy = true;
-    const el = els[i];
-    await animate(el, dirFor(i), true);
-    i++; layout(); busy = false;
+    if (i === els.length - 1) { busy = true; i = 0; layout(); if (!still) els[0].animate([{opacity: 0, transform: 'translateY(14px)'}, {opacity: 1, transform: 'none'}], {duration: 500, easing: 'ease-out'}); busy = false; return; }
+    busy = true; await animate(els[i], dirFor(i), true); i++; layout(); busy = false;
   }
-
   async function prev() {
     if (busy || i === 0) return;
-    busy = true;
-    i--;
-    const el = els[i];
-    el.hidden = false;
-    els[i + 1].querySelectorAll('.ear').forEach(e => e.remove());
-    await animate(el, dirFor(i), false);
-    layout(); busy = false;
+    busy = true; i--; els[i].hidden = false; els[i + 1].querySelectorAll('.ear').forEach(e => e.remove());
+    await animate(els[i], dirFor(i), false); layout(); busy = false;
   }
-
-  book.addEventListener('click', next);
+  book.addEventListener('click', () => { if (!EDIT) next(); });
   nextBtn.addEventListener('click', next);
   prevBtn.addEventListener('click', prev);
   book.addEventListener('keydown', e => {
-    if (['ArrowRight','ArrowDown',' ','Enter'].includes(e.key)) { e.preventDefault(); next(); }
-    if (['ArrowLeft','ArrowUp'].includes(e.key)) { e.preventDefault(); prev(); }
+    if (e.target !== book) return;
+    if (['ArrowRight', 'ArrowDown', ' ', 'Enter'].includes(e.key)) { e.preventDefault(); next(); }
+    if (['ArrowLeft', 'ArrowUp'].includes(e.key)) { e.preventDefault(); prev(); }
   });
   addEventListener('keydown', e => {
-    if (e.target === book || e.target.tagName === 'BUTTON') return;
+    if (e.target === book || /^(BUTTON|INPUT|TEXTAREA|SELECT)$/.test(e.target.tagName)) return;
     if (e.key === 'ArrowRight') next(); if (e.key === 'ArrowLeft') prev();
   });
 
-  layout();
+  // ── editing (flipbook.html?edit) ──
+  const panel = document.getElementById('panel');
+  const saveDraft = () => { try { localStorage.setItem('flipbook-draft', JSON.stringify(draft)); status(''); } catch (e) { status('This browser is out of room for drafts. Publish, or use smaller pictures.'); } };
+  const status = msg => { const s = document.getElementById('pstatus'); if (s) s.textContent = msg; };
+  const dslot = pk => (draft[pk] = draft[pk] || {t: {}, i: {}});
+
+  function shrink(file, keepAlpha) {
+    return new Promise((res, rej) => {
+      const url = URL.createObjectURL(file), im = new Image();
+      im.onload = () => {
+        const max = 1400, k = Math.min(1, max / Math.max(im.naturalWidth, im.naturalHeight));
+        const c = document.createElement('canvas'); c.width = Math.round(im.naturalWidth * k); c.height = Math.round(im.naturalHeight * k);
+        c.getContext('2d').drawImage(im, 0, 0, c.width, c.height); URL.revokeObjectURL(url);
+        let d = c.toDataURL('image/webp', .88);
+        if (!d.startsWith('data:image/webp')) d = keepAlpha ? c.toDataURL('image/png') : c.toDataURL('image/jpeg', .88);
+        res(d);
+      };
+      im.onerror = () => rej(new Error('That file could not be read as a picture.'));
+      im.src = url;
+    });
+  }
+
+  function panelFor(k) {
+    if (!panel) return;
+    const p = PAGES[k];
+    if (!p.tpl) {
+      panel.innerHTML = `<div class="ph"><b>Editing</b><span>Turn to a page to change its words and pictures.</span></div>${footer()}`;
+      wireFooter(); return;
+    }
+    const t = p.tpl, pk = t.key;
+    let h = `<div class="ph"><b>${t.title}</b><span>Changes save as a draft in this browser. Publish to put them on the site.</span></div>`;
+    h += '<h3>Pictures</h3>';
+    for (const it of t.items.filter(x => x.type === 'slot')) {
+      const pic = imgOf(pk, it), src = pic ? pic.src : it.src;
+      h += `<div class="fld img" data-key="${it.key}"><img src="${src}" alt=""><div><label>${it.label}${it.people ? ' <em>person</em>' : ''}</label>
+        <div class="row"><label class="btn">replace<input type="file" accept="image/*" data-up="${it.key}" hidden></label>${pic ? `<button type="button" class="btn" data-reset="${it.key}">reset</button>` : ''}</div>
+        ${it.kind === 'cutout' ? '<small>Use a picture with a see-through background (on iPhone, press and hold a photo, then copy the subject).</small>' : (it.fit === 'contain' ? '' : `<input type="range" min="1" max="3" step=".01" value="${pic && pic.z || 1}" data-zoom="${it.key}" aria-label="Zoom ${it.label}"><small>Drag the picture on the page to move it.</small>`)}
+        </div></div>`;
+    }
+    h += '<h3>Words</h3>';
+    for (const it of t.items.filter(x => x.type === 'text' || x.type === 'para')) {
+      const v = textOf(pk, it).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/"/g, '&quot;');
+      h += `<div class="fld"><label for="f-${pk}-${it.key}">${it.label}</label>${it.type === 'para'
+        ? `<textarea id="f-${pk}-${it.key}" data-text="${it.key}" rows="4">${v}</textarea>`
+        : `<input id="f-${pk}-${it.key}" data-text="${it.key}" value="${v}">`}</div>`;
+    }
+    h += `<button type="button" class="btn quiet" data-resetpage>put this page back the way it was</button>`;
+    panel.innerHTML = h + footer();
+    panel.querySelectorAll('[data-text]').forEach(inp => inp.addEventListener('input', () => {
+      const it = t.items.find(x => x.key === inp.dataset.text);
+      dslot(pk).t[it.key] = inp.value; saveDraft(); content = merged();
+      const node = els[k].querySelector(`[data-key="${it.key}"].tx, .para[data-key="${it.key}"]`);
+      if (node) node.textContent = inp.value;
+    }));
+    panel.querySelectorAll('[data-up]').forEach(inp => inp.addEventListener('change', async () => {
+      const f = inp.files[0]; if (!f) return;
+      const it = t.items.find(x => x.key === inp.dataset.up);
+      status('Reading the picture…');
+      try { dslot(pk).i[it.key] = {src: await shrink(f, it.kind === 'cutout'), z: 1, x: 0, y: 0}; saveDraft(); renderOne(k); panelFor(k); }
+      catch (e) { status(e.message); }
+    }));
+    panel.querySelectorAll('[data-reset]').forEach(b => b.addEventListener('click', () => {
+      dslot(pk).i[b.dataset.reset] = null; saveDraft(); renderOne(k); panelFor(k);
+    }));
+    panel.querySelectorAll('[data-zoom]').forEach(r => r.addEventListener('input', () => {
+      const it = t.items.find(x => x.key === r.dataset.zoom);
+      const cur = imgOf(pk, it) || {src: it.src};
+      dslot(pk).i[it.key] = Object.assign({}, cur, {z: +r.value}); saveDraft(); content = merged();
+      placeImage(els[k].querySelector(`.slot[data-key="${it.key}"] image`), it, dslot(pk).i[it.key]);
+    }));
+    panel.querySelector('[data-resetpage]').addEventListener('click', () => {
+      if (!confirm('Put this page back to the original words and pictures? (Published changes stay until you publish again.)')) return;
+      draft[pk] = {t: {}, i: {}};
+      t.items.forEach(it => { if (it.type === 'slot') draft[pk].i[it.key] = null; else if (it.type === 'text' || it.type === 'para') draft[pk].t[it.key] = it.text; });
+      saveDraft(); renderOne(k); panelFor(k);
+    });
+    wireFooter();
+  }
+  function footer() {
+    return `<div class="pf"><p id="pstatus" role="status"></p>
+      <button type="button" class="btn main" id="publish">publish to the site</button>
+      <div class="row"><button type="button" class="btn quiet" id="backup">download a backup</button><button type="button" class="btn quiet" id="discard">discard draft</button></div></div>`;
+  }
+  function wireFooter() {
+    document.getElementById('publish').onclick = publish;
+    document.getElementById('discard').onclick = () => { if (confirm('Throw away the unpublished changes in this browser?')) { draft = {}; saveDraft(); renderAll(); layout(); } };
+    document.getElementById('backup').onclick = () => {
+      const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([JSON.stringify(merged(), null, 1)], {type: 'application/json'}));
+      a.download = 'flipbook-content.json'; a.click();
+    };
+  }
+
+  // drag a picture inside its frame to choose what shows; click words on the page to jump to their box
+  function wireEditing(svg, t) {
+    const k = PAGES.findIndex(p => p.tpl === t);
+    svg.querySelectorAll('.tx').forEach(n => n.addEventListener('click', () => { const f = document.getElementById(`f-${t.key}-${n.dataset.key}`); if (f) { f.focus(); f.select(); } }));
+    svg.querySelectorAll('.slot').forEach(g => {
+      const it = t.items.find(x => x.key === g.dataset.key);
+      if (it.kind === 'cutout' || it.fit === 'contain') return;
+      g.addEventListener('pointerdown', e => {
+        const pic = imgOf(t.key, it); if (!pic && !it.src) return;
+        e.preventDefault(); g.setPointerCapture(e.pointerId);
+        const r = svg.getBoundingClientRect(), scale = t.w / r.width;
+        const img = g.querySelector('image'), start = {x: e.clientX, y: e.clientY}, base = Object.assign({src: it.src, z: 1, x: 0, y: 0}, pic || {});
+        const w = +img.getAttribute('width'), h = +img.getAttribute('height'), [x0, y0, x1, y1] = it.box;
+        const mv = ev => {
+          const dx = (ev.clientX - start.x) * scale, dy = (ev.clientY - start.y) * scale;
+          const nx = w > x1 - x0 ? Math.max(-1, Math.min(1, base.x + dx * 2 / (w - (x1 - x0)))) : 0;
+          const ny = h > y1 - y0 ? Math.max(-1, Math.min(1, base.y + dy * 2 / (h - (y1 - y0)))) : 0;
+          dslot(t.key).i[it.key] = Object.assign({}, base, {x: nx, y: ny}); content = merged();
+          placeImage(img, it, dslot(t.key).i[it.key]);
+        };
+        const up = () => { g.removeEventListener('pointermove', mv); g.removeEventListener('pointerup', up); saveDraft(); };
+        g.addEventListener('pointermove', mv); g.addEventListener('pointerup', up);
+      });
+    });
+  }
+
+  // ── publishing: commit the pictures and the words to GitHub; the site redeploys from there ──
+  async function gh(path, opts = {}) {
+    const tok = localStorage.getItem('flipbook-gh');
+    return fetch(`https://api.github.com/repos/${REPO}/contents/${path}`, Object.assign({headers: {Authorization: `Bearer ${tok}`, Accept: 'application/vnd.github+json'}}, opts));
+  }
+  async function sha8(s) { const b = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(s)); return [...new Uint8Array(b)].slice(0, 4).map(x => x.toString(16).padStart(2, '0')).join(''); }
+  async function publish() {
+    let tok = localStorage.getItem('flipbook-gh');
+    if (!tok) {
+      tok = prompt('Paste a GitHub token that can write to sofia-portfolio-orbit (fine-grained, Contents: read and write). It stays in this browser only.');
+      if (!tok) return; localStorage.setItem('flipbook-gh', tok.trim());
+    }
+    const btn = document.getElementById('publish'); btn.disabled = true;
+    try {
+      const out = merged();
+      for (const [pk, pv] of Object.entries(out)) {
+        for (const [key, pic] of Object.entries(pv.i || {})) {
+          if (!pic) { delete pv.i[key]; continue; }
+          if (!pic.src.startsWith('data:')) continue;
+          const [meta, b64] = pic.src.split(','), ext = meta.includes('webp') ? 'webp' : meta.includes('png') ? 'png' : 'jpg';
+          const path = `lab/img/flipbook/u/${pk}-${key}-${await sha8(b64)}.${ext}`;
+          status(`Uploading ${pk} / ${key}…`);
+          const exists = await gh(path);
+          if (exists.status === 404) {
+            const r = await gh(path, {method: 'PUT', body: JSON.stringify({message: `Flip book: picture for ${pk} / ${key}`, content: b64, branch: BRANCH})});
+            if (!r.ok) throw new Error(`GitHub said ${r.status} while uploading a picture.`);
+          }
+          pic.src = path.replace(/^lab\//, '');
+        }
+      }
+      status('Saving the words…');
+      const cur = await gh(CONTENT), body = {message: 'Flip book: update pages', branch: BRANCH,
+        content: btoa(unescape(encodeURIComponent(JSON.stringify(out, null, 1))))};
+      if (cur.ok) body.sha = (await cur.json()).sha;
+      const r = await gh(CONTENT, {method: 'PUT', body: JSON.stringify(body)});
+      if (r.status === 401 || r.status === 403) { localStorage.removeItem('flipbook-gh'); throw new Error('GitHub turned the token down. Try publishing again with a new one.'); }
+      if (!r.ok) throw new Error(`GitHub said ${r.status}.`);
+      published = out; draft = {}; saveDraft(); renderAll(); layout();
+      status('Published. The site picks it up in a minute or two, once it redeploys.');
+    } catch (e) { status(e.message || 'Publishing did not work.'); }
+    btn.disabled = false;
+  }
+
+  // ── start ──
+  if (EDIT) document.body.classList.add('editing');
+  fetch('flipbook-content.json', {cache: 'no-store'}).then(r => r.ok ? r.json() : {}).catch(() => ({})).then(j => {
+    published = j || {}; renderAll(); layout();
+  });
+  renderAll(); layout();
 })();
+
 </script>
 </body>
 </html>
