@@ -334,14 +334,14 @@
     import * as THREE from 'three';
 
     const PINS = {
-      higley:   { lat:41.3028, lng:-72.9399, label:'Neuroscience · Yale SOM',                    name:'Higley Lab',              sub:'New Haven, CT',    color:0x44ccff, glowColor:'rgba(68,204,255,'  },
-      fermilab: { lat:41.8420, lng:-88.2568, label:'Astrophysics · Fermilab',                    name:'Gravitational Lens CNN',  sub:'Batavia, IL',      color:0xffcc44, glowColor:'rgba(255,204,68,' },
-      msu:      { lat:42.7018, lng:-84.4822, label:'Proteomics · Michigan State',                 name:'Sun Lab',                sub:'East Lansing, MI', color:0xff6699, glowColor:'rgba(255,102,153,'},
-      stanford: { lat:37.4275, lng:-122.1697,label:'Genetics · Stanford',                        name:'Stan-X',                 sub:'Palo Alto, CA',    color:0x5588ff, glowColor:'rgba(85,136,255,' },
-      sevilla:  { lat:37.3891, lng:-5.9845,  label:'Medical Shadowing · Clínica Santa Isabel',   name:'Clínica Santa Isabel',   sub:'Sevilla, Spain',   color:0xff9944, glowColor:'rgba(255,153,68,' },
-      cushing:  { lat:41.3026, lng:-72.9346, label:'History of Medicine · Yale',                name:'Cushing Brain Tumor Registry', sub:'New Haven, CT', color:0x8c6eff, glowColor:'rgba(140,110,255,' },
-      pcdd:     { lat:41.3162, lng:-72.9226, label:'Biomedical Engineering · Yale SEAS',        name:'PCDD',                    sub:'New Haven, CT',    color:0x44eeaa, glowColor:'rgba(68,238,170,' },
-      cambridge:{ lat:52.2053, lng:0.1218,   label:'STEM Research · CCIR',                       name:'Cambridge Centre',        sub:'Cambridge, UK',    color:0xcc88ff, glowColor:'rgba(204,136,255,' },
+      higley:   { lat:41.3028, lng:-72.9399, label:'Neuroscience · Yale SOM',                    name:'Higley Lab',              sub:'New Haven, CT',    color:0x8fc8ff, glowColor:'rgba(68,204,255,'  },
+      fermilab: { lat:41.8420, lng:-88.2568, label:'Astrophysics · Fermilab',                    name:'Gravitational Lens CNN',  sub:'Batavia, IL',      color:0xffd88a, glowColor:'rgba(255,204,68,' },
+      msu:      { lat:42.7018, lng:-84.4822, label:'Proteomics · Michigan State',                 name:'Sun Lab',                sub:'East Lansing, MI', color:0xff9fbf, glowColor:'rgba(255,102,153,'},
+      stanford: { lat:37.4275, lng:-122.1697,label:'Genetics · Stanford',                        name:'Stan-X',                 sub:'Palo Alto, CA',    color:0xb7a6ff, glowColor:'rgba(85,136,255,' },
+      sevilla:  { lat:37.3891, lng:-5.9845,  label:'Medical Shadowing · Clínica Santa Isabel',   name:'Clínica Santa Isabel',   sub:'Sevilla, Spain',   color:0xffb98f, glowColor:'rgba(255,153,68,' },
+      cushing:  { lat:41.3026, lng:-72.9346, label:'History of Medicine · Yale',                name:'Cushing Brain Tumor Registry', sub:'New Haven, CT', color:0xd7a6f5, glowColor:'rgba(140,110,255,' },
+      pcdd:     { lat:41.3162, lng:-72.9226, label:'Biomedical Engineering · Yale SEAS',        name:'PCDD',                    sub:'New Haven, CT',    color:0x8fe3c4, glowColor:'rgba(68,238,170,' },
+      cambridge:{ lat:52.2053, lng:0.1218,   label:'STEM Research · CCIR',                       name:'Cambridge Centre',        sub:'Cambridge, UK',    color:0xf7a8d8, glowColor:'rgba(204,136,255,' },
     };
 
     const canvas = document.getElementById('globeCanvas');
@@ -396,10 +396,10 @@
       const ctx = c.getContext('2d');
       ctx.filter = 'blur(6px)'; ctx.imageSmoothingEnabled = true; ctx.drawImage(m, 0, 0, W, H); ctx.filter = 'none';
       const img = ctx.getImageData(0, 0, W, H), d = img.data;
-      const ocean = [70, 110, 150], land = [158, 182, 138];
+      const ocean = [128, 182, 230], land = [184, 226, 158];
       for (let i = 0; i < d.length; i += 4) {
         const a = d[i+3] / 255, isLand = a > 0.5;
-        const base = isLand ? land : ocean, n = (Math.random() - 0.5) * 14;
+        const base = isLand ? land : ocean, n = (Math.random() - 0.5) * 16;
         d[i] = Math.max(0, Math.min(255, base[0] + n)); d[i+1] = Math.max(0, Math.min(255, base[1] + n)); d[i+2] = Math.max(0, Math.min(255, base[2] + n)); d[i+3] = 255;
       }
       ctx.putImageData(img, 0, 0);
@@ -407,7 +407,7 @@
     }
 
     const earthGeo = new THREE.SphereGeometry(GLOBE_R, 128, 64);
-    const earthMat = new THREE.MeshBasicMaterial({ color:0x466e96 });
+    const earthMat = new THREE.MeshBasicMaterial({ color:0x80b6e6 });
     const earthMesh = new THREE.Mesh(earthGeo, earthMat);
     scene.add(earthMesh);
     buildEarthTexture().then(ec => {
