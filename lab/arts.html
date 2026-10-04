@@ -169,6 +169,7 @@
 </section>
 <p class="credit">Paintings: public domain, via Wikimedia Commons.</p>
 
+<script src="living.js"></script>
 <script>
 // ── the paintings and what each one would love, or hate, to be offered.
 //    To show your own work, add entries here: img (any image path), title, blurb, signature,
@@ -447,14 +448,14 @@ const PAINTINGS = [
       Object.assign(pic.style,{left:(wl*100)+'%',top:(wt*100)+'%',width:(ww*100)+'%',height:(wh*100)+'%'});
       b.style.maxWidth=(boxAR<1?560:660)+'px';
       requestAnimationFrame(()=>{const r=pic.getBoundingClientRect();addEyes(pic,img.src,{x:0,y:0,w:r.width,h:r.height},k);
-        const cv=document.createElement('canvas');cv.className='live';pic.appendChild(cv);const L=Living(cv,LM[k],false);
-        if(L){b.__live=L;L.load(img.src,LM[k]);}});};
+        const cv=document.createElement('canvas');cv.className='live';pic.appendChild(cv);const L=window.LivingMesh?LivingMesh(cv,img.src,k===2?null:('p'+k+'-'+img.src.split('/').pop().slice(0,40)),LM[k].fig):null;
+        if(L){b.__live=L;}});};
     if(img.complete&&img.naturalWidth)build();else img.addEventListener('load',build,{once:true});
     // two offers under each painting: point at one and the sitter reacts in the frame
     const row=document.createElement('div');row.className='offers2';const mood=document.createElement('span');mood.className='mood2';mood.setAttribute('aria-live','polite');
     [p.good,p.bad].sort(()=>k%2?-1:1).forEach(o=>{const btn=document.createElement('button');btn.type='button';btn.innerHTML=ICON[o.icon]+`<span>${o.name}</span>`;
-      const good=o===p.good,on=()=>{mood.textContent=o.mood;b.classList.toggle('happy',good);b.classList.toggle('sad',!good);const L=b.__live;if(L){L.moodT=good?1:-1;kick();}},
-        off=()=>{mood.textContent='';b.classList.remove('happy','sad');const L=b.__live;if(L){L.moodT=0;kick();}};
+      const good=o===p.good,on=()=>{mood.textContent=o.mood;b.classList.toggle('happy',good);b.classList.toggle('sad',!good);const L=b.__live;if(L)L.setMood(good?1:-1);},
+        off=()=>{mood.textContent='';b.classList.remove('happy','sad');const L=b.__live;if(L)L.setMood(0);};
       btn.addEventListener('pointerenter',on);btn.addEventListener('pointerleave',off);btn.addEventListener('focus',on);btn.addEventListener('blur',off);btn.addEventListener('click',on);row.appendChild(btn);});
     const wrap=document.createElement('div');wrap.appendChild(row);wrap.appendChild(mood);b.after(wrap);
   });
