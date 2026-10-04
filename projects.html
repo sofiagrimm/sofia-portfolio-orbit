@@ -101,7 +101,7 @@
     .deck.shuffling .b3,.deck.shuffling .b5{animation:cutRight .7s ease-in-out}
     @keyframes cutLeft{0%,100%{transform:none}40%{transform:translateX(-62%) rotate(-10deg)}60%{transform:translateX(-62%) rotate(-10deg)}}
     @keyframes cutRight{0%,100%{transform:none}40%{transform:translateX(62%) rotate(10deg)}60%{transform:translateX(62%) rotate(10deg)}}
-    .deck-label{font-family:'Nanum Pen Script',cursive;font-size:26px;line-height:1;color:#f1ecdc;transform:rotate(-3deg)}
+    .deck-label{font-family:'Nanum Pen Script',cursive;font-size:34px;line-height:1;color:#f1ecdc;transform:rotate(-3deg)}
     .card-scene.drawn .card-back{box-shadow:0 0 0 3px #f3b6c8,0 22px 40px rgba(0,0,0,.55)}
     @media (prefers-reduced-motion:reduce){.deck.shuffling .back{animation:none}}
     /* ── HAND-PAINTED PLAYING CARDS ── */
@@ -177,7 +177,7 @@
       <button class="deck" id="deck" aria-label="Shuffle the deck and draw a random project">
         <span class="back b1"><svg viewBox="0 0 250 350" aria-hidden="true"><use href="#deckBack"/></svg></span><span class="back b2"><svg viewBox="0 0 250 350" aria-hidden="true"><use href="#deckBack"/></svg></span><span class="back b3"><svg viewBox="0 0 250 350" aria-hidden="true"><use href="#deckBack"/></svg></span><span class="back b4"><svg viewBox="0 0 250 350" aria-hidden="true"><use href="#deckBack"/></svg></span><span class="back b5"><svg viewBox="0 0 250 350" aria-hidden="true"><use href="#deckBack"/></svg></span>
       </button>
-      <p class="deck-label">can't decide?<br>shuffle &amp; draw one</p>
+      <p class="deck-label">shuffle?</p>
     </div>
     <div class="rule"></div>
     <div class="memory-grid" id="memoryGrid"></div>
