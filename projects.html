@@ -195,7 +195,7 @@
 
     /* chips you can pick up: the page box lets clicks through to the table except on its own controls */
     .page{pointer-events:none}
-    .page .card-scene,.page .deck,.page a,.page button,.page .deck-wrap{pointer-events:auto}
+    .page .card-scene,.page .deck,.page a,.page button{pointer-events:auto}
     #table .stack{pointer-events:auto;cursor:grab}
     #table .chip{transform-box:view-box}
     #table .dice{pointer-events:auto;cursor:pointer}
@@ -226,6 +226,11 @@
     .chipset .stack{position:absolute;will-change:transform;contain:layout style}
     .chipset .chip{position:absolute;display:block;height:auto;-webkit-user-drag:none;user-select:none}
     .chipset .cshadow{position:absolute;border-radius:50%;background:radial-gradient(closest-side,rgba(0,0,0,.42),rgba(0,0,0,0))}
+    #table .tuckbox{pointer-events:auto;cursor:grab;touch-action:none}
+    #table .tuckbox.held{cursor:grabbing}
+    #table .tuckbox:focus-visible{outline:2px solid #f3d38a;outline-offset:6px}
+    #table .tuckbox svg{position:relative;z-index:1}
+    #table .tuckpop{position:absolute;left:12%;top:4%;width:76%;z-index:0;pointer-events:none}
   </style>
 </head>
 <body>
@@ -1241,13 +1246,46 @@
     document.body.appendChild(el);
   }
   function shadeC(hex,k){const n=parseInt(hex.slice(1),16),f=c=>Math.round(k>0?c+(255-c)*k:c*(1+k));return '#'+((1<<24)+(f(n>>16)<<16)+(f(n>>8&255)<<8)+f(n&255)).toString(16).slice(1);}
+
+  // ── The card box: click it, or grab it and shake it, and it rattles. Shake hard enough and a
+  //    card hops up out of the top and drops back in.
+  function wireBox(){
+    const box=[...document.querySelectorAll('#table .pc')].find(e=>e.dataset.spec&&JSON.parse(e.dataset.spec).prop==='box');
+    if(!box||box.dataset.wired)return;box.dataset.wired='1';
+    box.classList.add('tuckbox');box.setAttribute('role','button');box.tabIndex=0;box.setAttribute('aria-label','Shake the card box');
+    const base=box.style.transform;let busy=false,drag=null,energy=0,lastX=0,lastY=0,lastHop=0;
+    // the hidden card that pops out of the top
+    const pop=document.createElement('div');pop.className='tuckpop';pop.appendChild(art('back',back));box.insertBefore(pop,box.firstChild);
+    const rattle=(v)=>{for(let k=0;k<Math.round(3+v*6);k++)setTimeout(()=>chipAudio.paper(.02,1800+Math.random()*1800,.06+v*.12),k*28+Math.random()*12);};
+    const hop=()=>{const t=performance.now();if(t-lastHop<700)return;lastHop=t;chipAudio.slide();
+      pop.animate([{transform:'translateY(0)'},{transform:'translateY(-42%) rotate(-4deg)',offset:.4},{transform:'translateY(-38%) rotate(3deg)',offset:.6},{transform:'translateY(0)'}],{duration:700,easing:'cubic-bezier(.3,.7,.3,1)'});};
+    function shake(){
+      if(busy)return;busy=true;chipAudio.init();rattle(.8);
+      box.animate([0,1,2,3,4,5,6,7,8].map(i=>({transform:`${base} translate(${i===8?0:(i%2?7:-7)*(1-i/9)}px,${i===8?0:(i%2?-3:3)*(1-i/9)}px) rotate(${i===8?0:(i%2?4:-4)*(1-i/9)}deg)`})),{duration:620,easing:'ease-out'}).finished.then(()=>{busy=false;});
+      setTimeout(hop,180);
+    }
+    box.addEventListener('click',e=>{if(drag&&drag.moved)return;shake();});
+    box.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();shake();}});
+    // grab and shake: the box follows your hand a little and rattles with how hard you shake
+    box.addEventListener('pointerdown',e=>{chipAudio.init();drag={x:e.clientX,y:e.clientY,moved:false};lastX=e.clientX;lastY=e.clientY;energy=0;box.setPointerCapture(e.pointerId);box.classList.add('held');});
+    box.addEventListener('pointermove',e=>{if(!drag)return;const dx=e.clientX-drag.x,dy=e.clientY-drag.y;if(Math.hypot(dx,dy)>4)drag.moved=true;
+      const v=Math.hypot(e.clientX-lastX,e.clientY-lastY);lastX=e.clientX;lastY=e.clientY;energy=energy*.85+v*.15;
+      const cx=Math.max(-40,Math.min(40,dx*.35)),cy=Math.max(-30,Math.min(30,dy*.35));
+      box.style.transform=`${base} translate(${cx}px,${cy}px) rotate(${Math.max(-12,Math.min(12,dx*.06))}deg)`;
+      if(v>6&&Math.random()<Math.min(.9,v/40))rattle(Math.min(1,v/40));
+      if(energy>14)hop();});
+    const release=()=>{if(!drag)return;box.classList.remove('held');
+      box.animate([{transform:box.style.transform},{transform:base}],{duration:420,easing:'cubic-bezier(.3,1.5,.5,1)'});box.style.transform=base;
+      if(drag.moved){chipAudio.thumpSoft&&chipAudio.thumpSoft();rattle(.4);}setTimeout(()=>{drag=null;},0);};
+    box.addEventListener('pointerup',release);box.addEventListener('pointercancel',release);
+  }
   function layoutTable(){
     if(window.__arranging&&layoutTable.done)return;layoutTable.done=true;
     // measure the table where it really sits, even while the opening is sliding it into view
     const de=document.documentElement,pm=de.classList.contains('pool-moving');
     const kids=[...document.body.children],saved=kids.map(k=>k.style.transform);
     if(pm){de.classList.remove('pool-moving');kids.forEach(k=>{if(k.id!=='pool')k.style.transform='';});}
-    cornerSpill();lay();buildFrame();fitArch();clearArch();fillEmpty();wireChips();wireDice();
+    cornerSpill();lay();buildFrame();fitArch();clearArch();fillEmpty();wireChips();wireDice();wireBox();
     if(pm){de.classList.add('pool-moving');kids.forEach((k,i)=>{if(k.id!=='pool')k.style.transform=saved[i];});}
   }
   window.__lt=layoutTable;addEventListener('load',layoutTable);layoutTable();
