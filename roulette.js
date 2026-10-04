@@ -5,7 +5,7 @@
   if (/[?&]arrange\b/.test(location.search)) return;
   var ROOT = (document.currentScript && document.currentScript.src || location.href).replace(/[^/]*$/, '');
   var ALL = [
-    ['home', 'index.html'], ['about', 'about.html'], ['research', 'research.html'], ['the card table', 'projects.html'], ['skills & works', 'lab/skills.html'], ['the card catalog', 'lab/cards.html'],
+    ['home', 'index.html'], ['about', 'about.html'], ['research', 'research.html'], ['the card table', 'projects.html'], ['languages', 'lab/skills.html'], ['wonderland', 'lab/wonderland.html'], ['the card catalog', 'lab/cards.html'],
     ['notes', 'lab/notes.html'], ['sofia is', 'lab/sofia-is.html'], ['arts', 'lab/arts.html'], ['the globe', 'lab/globe.html'], ['tilt', 'lab/lace.html'], ['a letter', 'contact.html']
   ];
   var here = location.pathname.replace(/\/$/, '/index.html');

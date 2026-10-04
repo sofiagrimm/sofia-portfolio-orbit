@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>skills &amp; works | Sofia Grimm</title>
+<title>programming &amp; real languages | Sofia Grimm</title>
 <meta name="robots" content="noindex">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -35,7 +35,7 @@
   .cover .hi{position:absolute;left:clamp(24px,4vw,56px);top:clamp(24px,4vw,46px)}
   .cover .guide{position:absolute;right:clamp(24px,5vw,90px);top:clamp(70px,9vw,100px);font-size:clamp(22px,2.4vw,32px);transform:rotate(-3deg)}
   .cover .this{position:absolute;left:clamp(60px,12vw,190px);top:clamp(110px,14vw,170px);font-size:clamp(26px,3vw,40px);transform:rotate(-6deg);z-index:4}
-  .cover h1{position:relative;text-align:center;font-size:clamp(120px,20vw,290px);margin-top:4%}
+  .cover h1{position:relative;text-align:center;font-size:clamp(64px,10.5vw,150px);margin-top:6%}
   .cover h1 span{display:block;position:relative;z-index:1}
   .cover h1 .amp{font-size:.5em;color:var(--pink2);vertical-align:.35em}
   .cover .me{position:absolute;z-index:2;left:56%;bottom:0;height:70%;transform:translateX(-50%);filter:drop-shadow(0 10px 18px rgba(0,0,0,.25));pointer-events:none}
@@ -65,6 +65,11 @@
   .chart i b{position:absolute;top:-20px;left:50%;transform:translateX(-50%);font:600 11px 'Inter';color:var(--ink);white-space:nowrap}
   .chart-labels{display:flex;gap:12px;padding-left:10px;font-size:10px;color:#5b5550}
   .chart-labels span{width:34px;text-align:center}
+  .hellos{list-style:none;margin-top:14px;display:grid;gap:10px}
+  .hellos li{display:flex;align-items:baseline;gap:14px;border-bottom:1px dashed rgba(43,39,36,.25);padding-bottom:8px}
+  .hellos b{font-family:'Cherry Bomb One',cursive;font-weight:400;font-size:34px;color:var(--pink2)}
+  .hellos code{font:15px 'Courier Prime',monospace;background:#fbf8f2;padding:4px 8px;border-radius:4px;box-shadow:0 2px 4px rgba(0,0,0,.08)}
+  .hellos small{margin-left:auto;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:#7d7772}
   .photos{display:grid;grid-template-columns:1fr 1fr;gap:10px}
   .photos img{width:100%;aspect-ratio:4/3;object-fit:cover;display:block;box-shadow:0 6px 12px rgba(0,0,0,.18)}
 
@@ -120,7 +125,7 @@
 <body>
 <header>
   <a class="brand" href="../index.html">Sofia Grimm</a>
-  <nav aria-label="Site"><a href="../index.html">Home</a><a href="../about.html">About</a><a href="../research.html">Research</a><a href="../projects.html">Projects</a><a href="skills.html" aria-current="page">Skills &amp; works</a><a href="cards.html">Cards</a><a href="notes.html">Notes</a><a href="sofia-is.html">Sofia is</a><a href="arts.html">Arts</a><a href="globe.html">Globe</a><a href="lace.html">Tilt</a><a href="../contact.html">Contact</a></nav>
+  <nav aria-label="Site"><a href="../index.html">Home</a><a href="../about.html">About</a><a href="../research.html">Research</a><a href="../projects.html">Projects</a><a href="skills.html" aria-current="page">Languages</a><a href="wonderland.html">Wonderland</a><a href="cards.html">Cards</a><a href="notes.html">Notes</a><a href="sofia-is.html">Sofia is</a><a href="arts.html">Arts</a><a href="globe.html">Globe</a><a href="lace.html">Tilt</a><a href="../contact.html">Contact</a></nav>
 </header>
 
 <main>
@@ -128,8 +133,8 @@
   <section class="sheet cover" aria-labelledby="t1">
     <p class="pen hi">Hi. since you're new here,</p>
     <p class="pen guide">let me be ya tour guide</p>
-    <p class="pen this">this is</p>
-    <h1 class="bubble" id="t1"><span>skills</span><span class="front"><span class="amp" style="display:inline">&amp; </span>works</span></h1>
+    <p class="pen this">I speak</p>
+    <h1 class="bubble" id="t1"><span>programming</span><span class="front"><span class="amp" style="display:inline">&amp; </span>real languages</span></h1>
     <img class="me" src="img/sw/sofia-cutout.webp" alt="Sofia pipetting at a lab bench">
     <p class="small role">Molecular Biophysics &amp; Biochemistry · Ethics, Politics &amp; Economics</p>
     <p class="small by">by Sofia Grimm</p>
@@ -138,35 +143,40 @@
   <!-- story -->
   <section class="sheet two" aria-label="How it started">
     <div class="story">
-      <p>Grew up in Hong Kong, moved to the Chicago suburbs, and picked up Spanish and Chinese along the way.</p>
+      <p>Grew up in Hong Kong, moved to the Chicago suburbs, and picked up Spanish and Chinese along the way. Lately, a few languages computers understand too.</p>
       <div class="doodle" aria-hidden="true">
         <div class="pol"><img src="img/chalkboard.jpg" alt=""></div>
         <svg viewBox="0 0 200 60"><path d="M4 40 C30 10 50 55 80 30 S120 5 140 30 S170 50 196 20" fill="none" stroke="#2b2724" stroke-width="1.6" stroke-dasharray="5 5"/><path d="M188 14 L196 20 L187 26" fill="none" stroke="#2b2724" stroke-width="1.6"/></svg>
         <div class="pol"><img src="img/bench.jpg" alt=""></div>
       </div>
-      <p>Now at Yale, mostly at a bench, in an archive, or somewhere in between. Somewhere along the way it clicked: <b>the best science is also the best-told story.</b></p>
+      <p>A language is just a way of being understood, whether it's a grandmother in Spanish, a friend in Chinese, or a browser in JavaScript. <b>Every one of them rewards the same thing: paying attention.</b></p>
     </div>
     <div>
       <span class="oval">Yale College<br>Class of 2029</span>
-      <div class="tags">
-        <span>wet-lab research</span><span>image-analysis pipelines</span><span>archival research</span><span>healthcare consulting</span>
-        <span>editing</span><span>science writing</span><span>web design</span><span>LEGO set design</span><span>Spanish</span><span>Chinese</span>
+      <div class="tags" aria-label="Languages I speak">
+        <span>English</span><span>Español</span><span>中文</span>
+      </div>
+      <div class="tags" aria-label="Languages I write code in" style="margin-top:10px">
+        <span>HTML</span><span>CSS</span><span>JavaScript</span><span>GLSL shaders</span>
       </div>
     </div>
   </section>
 
   <!-- not just -->
   <section class="sheet" aria-label="What I bring">
-    <p class="big l1">it's not just pipetting,</p>
-    <p class="big l2">it's telling the story of the data.</p>
+    <p class="big l1">it's not just syntax,</p>
+    <p class="big l2">it's being understood.</p>
     <div class="two" style="margin-top:30px">
       <div>
-        <p class="pen" style="font-size:30px">where the hours go</p>
-        <div class="chart" role="img" aria-label="A rough sketch of how my week splits between lab, editing, consulting and making things">
-          <i style="height:88%"><b>lab</b></i><i style="height:56%"><b>edit</b></i><i style="height:48%"><b>consult</b></i><i style="height:66%"><b>make</b></i><i style="height:30%"><b>sleep?</b></i>
-        </div>
-        <p class="small" style="margin-top:8px">a very scientific estimate</p>
-        <p style="font-size:13px;line-height:1.6;margin-top:16px;max-width:44ch">How do you turn a microscope image, a hundred-year-old case file, or a client's spreadsheet into something people want to read? Clean data, a clear question, and a little bit of design.</p>
+        <p class="pen" style="font-size:30px">how I say hello</p>
+        <ul class="hellos">
+          <li><b>hello</b><small>English</small></li>
+          <li><b>hola</b><small>Español</small></li>
+          <li><b>你好</b><small>中文</small></li>
+          <li><code>&lt;h1&gt;hello&lt;/h1&gt;</code><small>HTML</small></li>
+          <li><code>h1 { color: #f3a1c4 }</code><small>CSS</small></li>
+          <li><code>console.log("hello")</code><small>JavaScript</small></li>
+        </ul>
       </div>
       <div class="photos"><img src="img/instrument.jpg" alt="Lab instrument"><img src="img/chalkboard.jpg" alt="Chalkboard after a lecture"><img src="img/atrium.jpg" alt="Looking up in an atrium"><img src="img/bench.jpg" alt="At the bench"></div>
     </div>
@@ -182,38 +192,22 @@
       <b style="font-family:'DM Serif Display',serif;font-style:italic">Aa</b><b style="font-family:'Courier Prime',monospace">Aa</b><b style="font-family:'Reenie Beanie',cursive">Aa</b><b style="font-family:'Inter',sans-serif;font-weight:800">Aa</b>
       <small>DM Serif</small><small>Courier</small><small>handwriting</small><small>Inter</small>
     </div>
-    <h2 class="bubble" id="t2">skills<br>&amp; works</h2>
+    <h2 class="bubble" id="t2">code<br>&amp; words</h2>
     <div class="phone"><img src="img/sw/phone-projects.jpg" alt="This website's card table on a phone"></div>
     <div class="phone two"><img src="img/sw/phone-notes.jpg" alt="This website's notes page on a phone"></div>
     <div class="tools">
-      <div><b>in the lab</b>neurodegeneration imaging pipelines, activated-carbon screening</div>
-      <div><b>in the archive</b>case-file research on the Harvey Cushing Brain Tumor Registry</div>
-      <div><b>on the page</b>print managing editor, short-take editor, staff science writer</div>
-      <div><b>on the screen</b>HTML, CSS, JavaScript, WebGL, and this whole site</div>
+      <div><b>HTML</b>the bones of every page here</div>
+      <div><b>CSS</b>the felt, the night sky, the paper, the lamp light</div>
+      <div><b>JavaScript</b>the pool break, the chips, the roulette, the paper airplane</div>
+      <div><b>GLSL</b>the shaders that let old masters' eyes follow you</div>
     </div>
     <div class="film" aria-hidden="true"><img src="img/bench.jpg" alt=""><img src="img/chalkboard.jpg" alt=""><img src="img/instrument.jpg" alt=""><img src="img/atrium.jpg" alt=""></div>
   </section>
 
-  <!-- works -->
+  <!-- where the works went -->
   <section class="sheet works" aria-labelledby="t3">
-    <h2 class="bubble" id="t3">works</h2>
-    <p class="pen" style="font-size:30px">a few things I've made (click to look closer)</p>
-    <div class="wgrid">
-      <a class="work" href="../projects.html"><span class="tape"></span><span class="kind">web</span><div class="art"><img src="img/sw/desk-projects.jpg" alt="The card table page of this site"></div>
-        <h3>this website</h3><p>A card table, a night sky, a pool hall and a paper airplane, hand-built from scratch.</p></a>
-      <a class="work" href="arts.html"><span class="tape"></span><span class="kind">design</span><div class="art"><svg viewBox="140 180 320 260"><rect x="140" y="180" width="320" height="260" fill="#f2ddd6"/><path d="M160 270 L300 190 L440 270Z" fill="#6d7378"/><rect x="175" y="268" width="250" height="150" fill="#7b2a22"/>
-          <rect x="283" y="350" width="34" height="68" fill="#6b3f22"/><rect x="236" y="336" width="128" height="8" fill="#f6f3ec"/><path d="M228 336 L300 312 L372 336Z" fill="#f6f3ec"/>
-          <rect x="200" y="290" width="22" height="34" fill="#cfe1ea" stroke="#f6f3ec" stroke-width="3"/><rect x="378" y="290" width="22" height="34" fill="#cfe1ea" stroke="#f6f3ec" stroke-width="3"/><rect x="140" y="418" width="320" height="22" fill="#4f8a3c"/></svg></div>
-        <h3>A House Like Yours</h3><p>A 724-piece custom LEGO Architecture set. Creative and Performing Arts Award.</p></a>
-      <a class="work" href="../projects.html"><span class="tape"></span><span class="kind">code</span><div class="art"><img src="../img/cards/card-9-hearts.jpg" alt="The NeuroPrint card"></div>
-        <h3>NeuroPrint</h3><p>A hackathon tool using computer vision to follow Parkinson's motor symptoms at home.</p></a>
-      <a class="work" href="../research.html"><span class="tape"></span><span class="kind">lab</span><div class="art"><img src="img/instrument.jpg" alt="Lab instrument"></div>
-        <h3>the research</h3><p>Imaging pipelines for neurodegeneration, drug-deactivation screening, and archival work.</p></a>
-      <a class="work" href="../about.html"><span class="tape"></span><span class="kind">words</span><div class="art"><img src="img/chalkboard.jpg" alt="Chalkboard"></div>
-        <h3>the writing</h3><p>Editing a law journal's print issue and a global-health review, and writing science stories.</p></a>
-      <a class="work" href="arts.html"><span class="tape"></span><span class="kind">art</span><div class="art"><img src="img/frames/heart.webp" alt="A carved heart frame" style="object-fit:contain;background:#f3c7d0"></div>
-        <h3>learning from the greats</h3><p>Old masters re-imagined in 3D: their eyes follow you, and they react to what you offer.</p></a>
-    </div>
+    <h2 class="bubble" id="t3">the works?</h2>
+    <p class="pen" style="font-size:32px">they fell down the rabbit hole. <a href="wonderland.html" style="color:var(--pink2)">follow them &rarr;</a></p>
   </section>
 
   <!-- wrap -->
@@ -225,6 +219,5 @@
   </section>
 </main>
 <script src="../gh.js"></script>
-<script src="../roulette.js"></script>
 </body>
 </html>

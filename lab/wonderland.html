@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>down the rabbit hole | Sofia Grimm</title>
+<meta name="robots" content="noindex">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IM+Fell+English+SC&family=IM+Fell+English:ital@0;1&family=Inter:wght@300;500&display=swap">
+<style>
+  :root{--night:#0c1726;--lime:#e7f07a;--cream:#f4ecd8;--gold:#c9a45a;--red:#b8242c}
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{overflow-x:clip}
+  body{background:var(--night);color:var(--cream);font-family:'Inter',Helvetica,Arial,sans-serif;height:1100vh}
+  header{position:fixed;top:0;left:0;right:0;z-index:50;display:flex;justify-content:space-between;align-items:baseline;flex-wrap:wrap;gap:8px;padding:18px clamp(16px,4vw,44px);background:linear-gradient(rgba(12,23,38,.9),transparent)}
+  header a{color:var(--cream);text-decoration:none;font-size:12px;letter-spacing:.14em;text-transform:uppercase;opacity:.7}
+  header a:hover,header a:focus-visible,header a[aria-current]{opacity:1;text-decoration:underline;text-underline-offset:4px}
+  header .brand{font-family:'IM Fell English',serif;font-style:italic;font-size:24px;letter-spacing:0;text-transform:none;opacity:1}
+  header nav{display:flex;flex-wrap:wrap;gap:4px 14px}
+
+  /* the hole: a fixed stage everything falls past */
+  #hole{position:fixed;inset:0;overflow:hidden;
+    background:radial-gradient(ellipse 34% 30% at 50% 50%,#050b14 0%,#0c1726 45%,#1a2433 70%,#2c2418 100%)}
+  #hole .ring{position:absolute;left:50%;top:50%;border-radius:50%;pointer-events:none;
+    border:solid rgba(70,52,32,.55);box-shadow:inset 0 0 60px rgba(0,0,0,.6),0 0 40px rgba(0,0,0,.5)}
+  .thing{position:absolute;left:0;top:0;will-change:transform,opacity;transform-origin:50% 50%}
+  .thing svg{display:block;width:100%;height:auto;filter:drop-shadow(0 10px 14px rgba(0,0,0,.45))}
+  .quote{font-family:'IM Fell English',serif;font-style:italic;color:var(--lime);font-size:30px;line-height:1.2;text-align:center;width:520px;text-shadow:0 2px 12px rgba(0,0,0,.6)}
+  .quote small{display:block;font-family:'Inter';font-style:normal;font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--cream);opacity:.6;margin-top:8px}
+
+  /* works hang in gilded frames as you pass them */
+  .work{width:340px;text-decoration:none;color:inherit;display:block}
+  .work .frame{padding:18px;background:linear-gradient(135deg,#f3dc8e,#b8862e 35%,#f0d07c 55%,#8e6420 80%,#d9b25a);border-radius:6px;box-shadow:0 18px 30px rgba(0,0,0,.5),inset 0 0 0 3px rgba(90,60,14,.6)}
+  .work .inner{background:#f6f0e2;color:#2a2219;padding:16px 18px;border:2px solid #5a3c0e;min-height:150px}
+  .work .inner img{display:block;width:100%;aspect-ratio:16/10;object-fit:cover;margin-bottom:10px}
+  .work h3{font-family:'IM Fell English SC',serif;font-weight:400;font-size:24px;line-height:1.05}
+  .work p{font-size:12.5px;line-height:1.5;margin-top:6px;color:#4a4036}
+  .work .go{display:inline-block;margin-top:8px;font:500 11px 'Inter';letter-spacing:.14em;text-transform:uppercase;color:var(--red)}
+  .work:hover .frame,.work:focus-visible .frame{box-shadow:0 0 0 3px var(--lime),0 18px 30px rgba(0,0,0,.5)}
+  .work:focus-visible{outline:none}
+
+  /* the things you can do something with */
+  .eat,.drink{cursor:pointer;background:none;border:0;padding:0}
+  .eat:focus-visible,.drink:focus-visible{outline:3px solid var(--lime);outline-offset:6px;border-radius:12px}
+  .hint{display:block;margin-top:6px;font:500 11px 'Inter';letter-spacing:.18em;text-transform:uppercase;color:var(--lime);text-align:center}
+
+  /* Alice, falling in the middle of it all */
+  #alice{position:fixed;left:50%;top:52%;width:clamp(120px,15vw,190px);z-index:20;pointer-events:none;transform:translate(-50%,-50%);transition:width .9s cubic-bezier(.3,1.4,.4,1)}
+  #alice svg{width:100%;height:auto;display:block;filter:drop-shadow(0 16px 24px rgba(0,0,0,.55))}
+  body.small #alice{width:clamp(56px,7vw,86px)}
+  body.big #alice{width:clamp(200px,24vw,300px)}
+
+  /* titles and the fall counter */
+  .title{position:fixed;left:0;right:0;top:12vh;z-index:30;text-align:center;pointer-events:none;transition:opacity .6s}
+  .title h1{font-family:'IM Fell English SC',serif;font-weight:400;color:var(--lime);font-size:clamp(46px,8vw,110px);line-height:.95;text-shadow:0 4px 30px rgba(0,0,0,.6)}
+  .title p{font-family:'IM Fell English',serif;font-style:italic;font-size:clamp(16px,1.6vw,20px);margin-top:12px;color:var(--cream)}
+  .title .scroll{display:block;margin-top:18px;font:500 11px 'Inter';letter-spacing:.24em;text-transform:uppercase;opacity:.7}
+  .meter{position:fixed;left:clamp(14px,3vw,36px);bottom:clamp(14px,3vw,30px);z-index:30;font-family:'IM Fell English',serif;font-size:15px;color:var(--cream);opacity:.85}
+  .meter b{font-family:'IM Fell English SC',serif;font-size:30px;font-weight:400;color:var(--lime);display:block;line-height:1}
+  .toast{position:fixed;left:50%;top:22vh;z-index:40;transform:translate(-50%,0);font-family:'IM Fell English',serif;font-style:italic;font-size:clamp(28px,4vw,48px);color:var(--lime);
+    text-shadow:0 4px 20px rgba(0,0,0,.7);opacity:0;pointer-events:none;transition:opacity .4s,transform .6s;white-space:nowrap}
+  .toast.on{opacity:1;transform:translate(-50%,-10px)}
+
+  /* the bottom: a checkered floor, a signpost, and a grin */
+  #floor{position:fixed;left:-20%;right:-20%;bottom:-6vh;height:46vh;z-index:5;opacity:0;pointer-events:none;
+    transform:perspective(600px) rotateX(62deg);transform-origin:50% 100%;
+    background:conic-gradient(from 45deg,#b8242c 0 25%,#f4ecd8 0 50%,#b8242c 0 75%,#f4ecd8 0) 0 0/90px 90px;box-shadow:inset 0 80px 80px rgba(12,23,38,.95)}
+  #signpost{position:fixed;right:clamp(16px,8vw,140px);bottom:4vh;z-index:35;width:min(330px,62vw);opacity:0;transform:translateY(40px);transition:opacity .6s,transform .6s;pointer-events:none}
+  body.landed #signpost{opacity:1;transform:none;pointer-events:auto}
+  #signpost .post{position:absolute;left:46%;top:0;bottom:0;width:22px;background:linear-gradient(90deg,#5a3a20,#7a5230,#5a3a20)}
+  #signpost a{position:relative;display:block;width:max-content;margin:0 0 10px;padding:8px 30px;font-family:'IM Fell English',serif;font-size:22px;color:#3a2614;text-decoration:none;
+    background:linear-gradient(180deg,#d9c29a,#c4a678);box-shadow:0 6px 10px rgba(0,0,0,.4)}
+  #signpost a.r{clip-path:polygon(0 0,88% 0,100% 50%,88% 100%,0 100%);margin-left:12%;transform:rotate(-2deg)}
+  #signpost a.l{clip-path:polygon(12% 0,100% 0,100% 100%,12% 100%,0 50%);transform:rotate(2deg)}
+  #signpost a:hover,#signpost a:focus-visible{background:linear-gradient(180deg,#efe0bd,#d6ba8a);outline:none}
+  #signpost .smallcaps{font-family:'IM Fell English SC',serif}
+  #grin{position:fixed;left:12vw;top:22vh;z-index:6;width:min(320px,40vw);opacity:0;transition:opacity 2s;pointer-events:none}
+  body.landed #grin{opacity:.9;animation:grin 7s ease-in-out infinite}
+  @keyframes grin{0%,100%{opacity:.9}50%{opacity:.15}}
+
+  @media (max-width:760px){.work{width:250px}.quote{width:300px;font-size:22px}#signpost{right:4vw}}
+  @media (prefers-reduced-motion:reduce){#alice{transition:none}}
+  .sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+</style>
+</head>
+<body>
+<header>
+  <a class="brand" href="../index.html">Sofia Grimm</a>
+  <nav aria-label="Site"><a href="../index.html">Home</a><a href="../about.html">About</a><a href="../research.html">Research</a><a href="../projects.html">Projects</a><a href="skills.html">Languages</a><a href="wonderland.html" aria-current="page">Wonderland</a><a href="cards.html">Cards</a><a href="notes.html">Notes</a><a href="sofia-is.html">Sofia is</a><a href="arts.html">Arts</a><a href="globe.html">Globe</a><a href="lace.html">Tilt</a><a href="../contact.html">Contact</a></nav>
+</header>
+
+<div id="hole" aria-hidden="false"></div>
+<div id="floor" aria-hidden="true"></div>
+<svg id="grin" viewBox="0 0 320 160" aria-hidden="true">
+  <ellipse cx="96" cy="26" rx="26" ry="16" fill="#e7f07a" opacity=".9"/><ellipse cx="96" cy="26" rx="5" ry="14" fill="#0c1726"/>
+  <ellipse cx="224" cy="26" rx="26" ry="16" fill="#e7f07a" opacity=".9"/><ellipse cx="224" cy="26" rx="5" ry="14" fill="#0c1726"/>
+  <path d="M24 70 Q160 190 296 70 Q160 120 24 70Z" fill="#f4ecd8"/>
+  <path d="M24 70 Q160 190 296 70" fill="none" stroke="#b05aa8" stroke-width="5"/><path d="M24 70 Q160 120 296 70" fill="none" stroke="#b05aa8" stroke-width="3"/>
+  <path d="M60 80 L62 110" stroke="#7a6a8a" stroke-width="2"/><path d="M85 86 L87 118" stroke="#7a6a8a" stroke-width="2"/><path d="M110 92 L112 126" stroke="#7a6a8a" stroke-width="2"/><path d="M135 98 L137 134" stroke="#7a6a8a" stroke-width="2"/><path d="M160 104 L162 142" stroke="#7a6a8a" stroke-width="2"/><path d="M185 98 L187 134" stroke="#7a6a8a" stroke-width="2"/><path d="M210 92 L212 126" stroke="#7a6a8a" stroke-width="2"/><path d="M235 86 L237 118" stroke="#7a6a8a" stroke-width="2"/><path d="M260 80 L262 110" stroke="#7a6a8a" stroke-width="2"/>
+</svg>
+
+<div class="title" id="title"><h1>Down the<br>Rabbit Hole</h1><p>where the works ended up</p><span class="scroll">scroll to fall</span></div>
+<div id="alice" aria-hidden="true"></div>
+<div class="meter" aria-live="off"><b id="miles">0</b>miles fallen</div>
+<div class="toast" id="toast" role="status"></div>
+
+<nav id="signpost" aria-label="Where to next"><div class="post"></div>
+  <a class="r" href="../projects.html">This Way</a>
+  <a class="l smallcaps" href="../index.html">Nowhere</a>
+  <a class="r" href="arts.html">Over There</a>
+  <a class="l" href="notes.html">That Way</a>
+  <a class="r" href="#" id="anywhere">Anywhere</a>
+  <a class="l smallcaps" href="../contact.html">Somewhere</a>
+</nav>
+
+<!-- the works, listed plainly for screen readers and anyone without motion -->
+<ul class="sr-only" id="plain"></ul>
+
+<script>
+(function(){
+  const still=matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const hole=document.getElementById('hole'),toast=document.getElementById('toast');
+  const W=()=>innerWidth,H=()=>innerHeight;
+
+  // ── drawings ─────────────────────────────────────────────────────────────
+  const SUITS={heart:'M50 80 C10 52 4 30 20 18 C33 9 45 14 50 26 C55 14 67 9 80 18 C96 30 90 52 50 80Z',diamond:'M50 10 L82 50 L50 90 L18 50Z',
+    spade:'M50 10 C70 34 92 48 84 66 C78 78 62 78 54 68 C56 80 60 86 66 92 H34 C40 86 44 80 46 68 C38 78 22 78 16 66 C8 48 30 34 50 10Z',
+    club:'M50 12 A16 16 0 1 1 49.9 12Z M28 40 A16 16 0 1 1 27.9 40Z M72 40 A16 16 0 1 1 71.9 40Z M44 54 H56 L62 90 H38Z'};
+  const ART={
+    card:(r,s)=>{const red=s==='heart'||s==='diamond',c=red?'#b8242c':'#1c1a1c';return `<svg viewBox="0 0 100 140"><rect x="2" y="2" width="96" height="136" rx="8" fill="#f8f3e6" stroke="#cdbf9f" stroke-width="2"/>
+      <text x="12" y="26" font-family="IM Fell English,serif" font-size="20" fill="${c}">${r}</text><g transform="translate(26 40) scale(.48)"><path d="${SUITS[s]}" fill="${c}"/></g>
+      <g transform="translate(88 114) rotate(180) scale(.2)"><path d="${SUITS[s]}" fill="${c}"/></g></svg>`;},
+    cup:()=>`<svg viewBox="0 0 120 90"><ellipse cx="60" cy="78" rx="52" ry="9" fill="#e9e3d6"/><path d="M18 22 H100 C98 58 84 74 59 74 C34 74 20 58 18 22Z" fill="#fbf8f2"/>
+      <path d="M100 30 C120 30 120 54 96 56" fill="none" stroke="#fbf8f2" stroke-width="8"/><ellipse cx="59" cy="22" rx="41" ry="9" fill="#8a4a1e"/><ellipse cx="66" cy="21" rx="12" ry="4" fill="#f2d24c"/>
+      ${[0,1,2,3,4].map(i=>`<path d="M${26+i*15} 30 V68" stroke="#c9a45a" stroke-width="1.6" opacity=".7"/>`).join('')}<path d="M24 46 H96" stroke="#c9a45a" stroke-width="1.6" opacity=".7"/></svg>`,
+    pot:()=>`<svg viewBox="0 0 160 130"><path d="M40 40 C30 110 130 110 120 40Z" fill="#fbf8f2"/><path d="M40 40 C60 30 100 30 120 40" fill="#efe8da"/><circle cx="80" cy="28" r="8" fill="#c9a45a"/>
+      <path d="M120 54 C150 50 150 90 120 92" fill="none" stroke="#fbf8f2" stroke-width="9"/><path d="M42 60 C20 56 12 40 4 26 L14 24 C22 38 30 46 44 50Z" fill="#fbf8f2"/>
+      ${[0,1,2,3].map(i=>`<path d="M${52+i*18} 46 C${50+i*18} 70 ${52+i*18} 90 ${56+i*16} 100" stroke="#c9a45a" stroke-width="1.6" fill="none" opacity=".8"/>`).join('')}</svg>`,
+    watch:()=>`<svg viewBox="0 0 100 120"><path d="M50 4 C38 4 38 18 50 18 C62 18 62 4 50 4Z" fill="none" stroke="#c9a45a" stroke-width="4"/><rect x="44" y="16" width="12" height="10" rx="2" fill="#b8913f"/>
+      <circle cx="50" cy="70" r="44" fill="#c9a45a"/><circle cx="50" cy="70" r="37" fill="#f7f2e4"/>${[...Array(12)].map((_,i)=>`<path d="M50 37 V43" stroke="#2a2219" stroke-width="2" transform="rotate(${i*30} 50 70)"/>`).join('')}
+      <path d="M50 70 L50 48 M50 70 L66 76" stroke="#2a2219" stroke-width="3" stroke-linecap="round"/><circle cx="50" cy="70" r="3" fill="#b8242c"/></svg>`,
+    key:()=>`<svg viewBox="0 0 140 60"><circle cx="24" cy="30" r="18" fill="none" stroke="#c9a45a" stroke-width="7"/><path d="M42 30 H130 M110 30 V46 M122 30 V44" stroke="#c9a45a" stroke-width="7" stroke-linecap="round"/></svg>`,
+    book:()=>`<svg viewBox="0 0 160 110"><path d="M80 20 C60 6 22 6 6 14 V100 C22 92 60 92 80 104Z" fill="#f4ecd8" stroke="#8a6a3a" stroke-width="2"/><path d="M80 20 C100 6 138 6 154 14 V100 C138 92 100 92 80 104Z" fill="#efe6cf" stroke="#8a6a3a" stroke-width="2"/>
+      ${[0,1,2,3,4,5].map(i=>`<path d="M18 ${30+i*11} C40 ${26+i*11} 58 ${26+i*11} 72 ${32+i*11} M88 ${32+i*11} C102 ${26+i*11} 120 ${26+i*11} 142 ${30+i*11}" stroke="#9c8c70" stroke-width="1.4" fill="none"/>`).join('')}<path d="M4 102 C24 94 62 94 80 108 C98 94 136 94 156 102" fill="none" stroke="#7a2a22" stroke-width="5"/></svg>`,
+    chair:()=>`<svg viewBox="0 0 160 170"><path d="M34 20 C30 0 130 0 126 20 L122 96 H38Z" fill="#a8623a"/><path d="M44 22 C44 10 116 10 116 22 L112 90 H48Z" fill="#c9884a"/>${[0,1,2].map(i=>`<circle cx="${62+i*18}" cy="${40+i%2*20}" r="3" fill="#7a4220"/>`).join('')}
+      <path d="M18 70 C10 60 34 50 40 66 L40 116 H24Z M142 70 C150 60 126 50 120 66 L120 116 H136Z" fill="#a8623a"/><rect x="22" y="96" width="116" height="30" rx="10" fill="#c9884a"/>
+      <path d="M32 126 L26 166 M128 126 L134 166 M52 126 L50 156 M108 126 L110 156" stroke="#6a3a1e" stroke-width="7" stroke-linecap="round"/></svg>`,
+    jar:()=>`<svg viewBox="0 0 110 130"><rect x="20" y="10" width="70" height="16" rx="4" fill="#b8913f"/><path d="M16 28 H94 C98 40 98 110 90 120 H20 C12 110 12 40 16 28Z" fill="#dfe9ec" opacity=".75" stroke="#b9c8cc" stroke-width="2"/>
+      <rect x="22" y="58" width="66" height="34" fill="#f4ecd8" stroke="#8a6a3a"/><text x="55" y="72" text-anchor="middle" font-family="IM Fell English SC,serif" font-size="9" fill="#7a2a22">ORANGE</text><text x="55" y="85" text-anchor="middle" font-family="IM Fell English SC,serif" font-size="9" fill="#7a2a22">MARMALADE</text></svg>`,
+    bottle:()=>`<svg viewBox="0 0 120 190"><rect x="48" y="4" width="24" height="16" rx="3" fill="#9a6a3a"/><path d="M50 20 H70 V48 C96 60 102 82 102 120 C102 168 84 182 60 182 C36 182 18 168 18 120 C18 82 24 60 50 48Z" fill="#7fc3d4" opacity=".75" stroke="#cfeaf0" stroke-width="3"/>
+      <path d="M22 118 C30 132 90 132 98 118 C98 166 82 178 60 178 C38 178 22 166 22 118Z" fill="#c34a7a" opacity=".85"/><path d="M34 66 C30 86 30 110 34 130" stroke="#fff" stroke-width="5" opacity=".5" fill="none"/>
+      <path d="M70 34 C96 30 108 54 98 70" fill="none" stroke="#d8c49a" stroke-width="2"/><g transform="translate(76 66) rotate(14)"><rect width="64" height="34" rx="4" fill="#f4ecd8" stroke="#8a6a3a"/><text x="32" y="14" text-anchor="middle" font-family="IM Fell English SC,serif" font-size="11" fill="#2a2219">DRINK</text><text x="32" y="28" text-anchor="middle" font-family="IM Fell English SC,serif" font-size="11" fill="#2a2219">ME</text></g></svg>`,
+    cake:()=>`<svg viewBox="0 0 160 120"><ellipse cx="80" cy="102" rx="74" ry="14" fill="#fbf8f2"/><path d="M22 54 H138 V92 C138 102 22 102 22 92Z" fill="#e8c27a"/><ellipse cx="80" cy="54" rx="58" ry="16" fill="#f6e0ae"/>
+      <path d="M22 70 C40 80 60 70 80 78 C100 70 120 80 138 70" stroke="#fbf3e2" stroke-width="7" fill="none"/>
+      <text x="80" y="60" text-anchor="middle" font-family="IM Fell English SC,serif" font-size="17" fill="#5a2a1a" letter-spacing="3">EAT ME</text>${[[46,52],[112,50],[60,60],[100,62]].map(([x,y])=>`<circle cx="${x}" cy="${y}" r="2.4" fill="#4a1e14"/>`).join('')}</svg>`,
+    map:()=>`<svg viewBox="0 0 140 110"><path d="M8 14 L50 6 L92 14 L132 6 V96 L92 104 L50 96 L8 104Z" fill="#e9dcb8" stroke="#8a6a3a" stroke-width="2"/><path d="M50 6 V96 M92 14 V104" stroke="#b8a074" stroke-width="1.4"/>
+      <path d="M20 70 C40 40 60 60 76 40 S110 30 122 54" stroke="#b8242c" stroke-width="2.4" stroke-dasharray="5 5" fill="none"/><path d="M116 50 l6 6 m0 -6 l-6 6" stroke="#b8242c" stroke-width="2.6"/></svg>`,
+    rabbit:()=>`<svg viewBox="0 0 140 170"><path d="M52 60 C40 10 50 0 58 8 C66 18 64 44 62 62Z M80 62 C84 20 96 6 102 14 C108 24 96 50 88 64Z" fill="#fbf8f2" stroke="#d9d0bf" stroke-width="2"/>
+      <ellipse cx="72" cy="84" rx="32" ry="28" fill="#fbf8f2"/><circle cx="62" cy="80" r="4" fill="#b8242c"/><circle cx="84" cy="80" r="4" fill="#b8242c"/><path d="M48 112 C40 140 46 160 72 162 C98 160 104 140 96 112Z" fill="#b8242c"/>
+      <path d="M48 112 C58 120 86 120 96 112 L92 102 C80 110 64 110 52 102Z" fill="#fbf8f2" stroke="#c9a45a" stroke-width="2"/><circle cx="104" cy="140" r="12" fill="#c9a45a"/><circle cx="104" cy="140" r="9" fill="#f7f2e4"/></svg>`
+  };
+  // Alice, mid-fall: hair streaming up, skirt billowing, arms flung wide
+  document.getElementById('alice').innerHTML=`<svg viewBox="0 0 200 260">
+    <g id="aliceBody">
+      <path d="M100 150 C60 150 30 120 28 70 C60 92 76 96 100 96 C124 96 140 92 172 70 C170 120 140 150 100 150Z" fill="#3f6fb4"/>
+      <path d="M100 148 C80 148 66 132 64 96 C80 100 120 100 136 96 C134 132 120 148 100 148Z" fill="#fbf8f2"/>
+      <path d="M64 96 C80 102 120 102 136 96" fill="none" stroke="#e5ddcc" stroke-width="3"/>
+      <path d="M86 150 C78 190 72 214 64 236 M114 150 C122 188 130 210 140 230" stroke="#fbf8f2" stroke-width="12" stroke-linecap="round"/>
+      <path d="M58 236 C56 248 74 250 72 238Z M138 228 C144 240 160 236 150 224Z" fill="#1c1a1c"/>
+      <rect x="84" y="140" width="32" height="34" rx="12" fill="#3f6fb4"/>
+      <path d="M86 150 C60 140 36 132 14 100 M114 150 C140 140 164 130 186 100" stroke="#f3d6c4" stroke-width="10" stroke-linecap="round" fill="none"/>
+      <path d="M84 146 C70 140 60 138 52 130 M116 146 C130 140 140 138 148 130" stroke="#3f6fb4" stroke-width="16" stroke-linecap="round"/>
+      <circle cx="100" cy="186" r="22" fill="#f3d6c4"/>
+      <path d="M78 186 C76 150 88 120 100 112 C112 120 124 150 122 186 C112 168 88 168 78 186Z" fill="#f2cf63"/>
+      <path d="M82 170 C70 140 76 110 86 92 M118 170 C130 140 124 110 114 92 M100 168 C96 140 98 116 100 100" stroke="#e3b84a" stroke-width="5" fill="none" stroke-linecap="round"/>
+      <path d="M86 176 C94 172 106 172 114 176" stroke="#1c1a1c" stroke-width="5" fill="none"/>
+    </g></svg>`;
+
+  // ── the fall: everything lives at a depth along the hole ─────────────────
+  const WORKS=[
+    ['this website','A card table, a night sky, a pool hall and a paper airplane, hand-built from scratch.','../projects.html','img/sw/desk-projects.jpg'],
+    ['A House Like Yours','A 724-piece custom LEGO Architecture set. Creative and Performing Arts Award.','arts.html',null],
+    ['NeuroPrint','A hackathon tool using computer vision to follow Parkinson\'s motor symptoms at home.','../projects.html','../img/cards/card-9-hearts.jpg'],
+    ['the research','Imaging pipelines for neurodegeneration, drug-deactivation screening, and archival work.','../research.html','img/instrument.jpg'],
+    ['the writing','Editing a law journal\'s print issue and a global-health review, and writing science stories.','../about.html','img/chalkboard.jpg'],
+    ['learning from the greats','Old masters re-imagined in 3D: their eyes follow you, and they react to what you offer.','arts.html','img/frames/heart.webp']
+  ];
+  const QUOTES=[
+    ['Down, down, down. Would the fall <em>never</em> come to an end?','Lewis Carroll, 1865'],
+    ['I wonder how many miles I\'ve fallen by this time?',''],
+    ['Who in the world am I? Ah, <em>that\'s</em> the great puzzle!',''],
+    ['Why, sometimes I\'ve believed as many as six impossible things before breakfast.','Through the Looking-Glass']
+  ];
+  const DEPTH=26000;   // total distance of the fall, in the drawing's own units
+  const things=[];let seed=7;const rnd=()=>{seed=(seed*16807)%2147483647;return seed/2147483647;};
+  function add(el,x,y,d,size,spin){const t=document.createElement('div');t.className='thing';t.appendChild(el);t.style.width=size+'px';hole.appendChild(t);
+    things.push({t,x,y,d,size,rot:(rnd()-.5)*60,spin:spin??(rnd()-.5)*40});}
+  const svgEl=html=>{const d=document.createElement('div');d.innerHTML=html;return d;};
+  // scattered objects all the way down, kept out of the very centre where Alice falls
+  const KINDS=['cup','pot','watch','key','book','chair','jar','map','card','card','card','card'];
+  const RS=['A','2','5','7','9','10','J','Q','K'],SS=['heart','spade','diamond','club'];
+  for(let i=0;i<70;i++){
+    const k=KINDS[Math.floor(rnd()*KINDS.length)],ang=rnd()*Math.PI*2,rad=.28+rnd()*.42;
+    add(svgEl(k==='card'?ART.card(RS[Math.floor(rnd()*RS.length)],SS[Math.floor(rnd()*4)]):ART[k]()),Math.cos(ang)*rad,Math.sin(ang)*rad*.8,300+rnd()*(DEPTH-1600),k==='card'?110:k==='chair'||k==='pot'?170:120);
+  }
+  // the works, one after another, alternating sides
+  const plain=document.getElementById('plain');
+  WORKS.forEach(([t,p,href,img],i)=>{
+    const a=document.createElement('a');a.className='work';a.href=href;
+    a.innerHTML=`<div class="frame"><div class="inner">${img?`<img src="${img}" alt="">`:''}<h3>${t}</h3><p>${p}</p><span class="go">take a closer look</span></div></div>`;
+    add(a,(i%2?.34:-.34),(i%3-1)*.08,2600+i*3300,340,0);things[things.length-1].rot=(i%2?4:-4);
+    plain.insertAdjacentHTML('beforeend',`<li><a href="${href}">${t}</a>: ${p}</li>`);
+  });
+  QUOTES.forEach(([q,src],i)=>{const d=document.createElement('div');d.className='quote';d.innerHTML=q+(src?`<small>${src}</small>`:'');add(d,0,-.2,1300+i*6500,520,0);things[things.length-1].rot=0;});
+  // the white rabbit, hurrying past near the top
+  add(svgEl(ART.rabbit()+'<span class="hint" style="color:#f4ecd8">"Oh dear! I shall be late!"</span>'),.32,.18,900,150,8);
+  // DRINK ME and EAT ME: things you can actually take
+  const drink=document.createElement('button');drink.className='drink';drink.type='button';drink.setAttribute('aria-label','Drink me: shrink');drink.innerHTML=ART.bottle()+'<span class="hint">drink me</span>';
+  add(drink,-.3,.12,8200,150,0);
+  const eat=document.createElement('button');eat.className='eat';eat.type='button';eat.setAttribute('aria-label','Eat me: grow');eat.innerHTML=ART.cake()+'<span class="hint">eat me</span>';
+  add(eat,.3,.1,15800,190,0);
+  const say=(t)=>{toast.textContent=t;toast.classList.add('on');clearTimeout(say.t);say.t=setTimeout(()=>toast.classList.remove('on'),2200);};
+  drink.addEventListener('click',()=>{document.body.classList.remove('big');document.body.classList.add('small');scale=1.5;say('Curiouser and curiouser!');});
+  eat.addEventListener('click',()=>{document.body.classList.remove('small');document.body.classList.add('big');scale=.8;say('Opening out like the largest telescope!');});
+
+  // tunnel rings that rush past to give the sense of falling
+  const RINGS=14,ringEls=[];for(let i=0;i<RINGS;i++){const r=document.createElement('div');r.className='ring';hole.appendChild(r);ringEls.push(r);}
+
+  // ── draw a frame of the fall ────────────────────────────────────────────
+  let fall=0,target=0,scale=1,curScale=1,vel=0,tilt=0,raf=0,last=0;
+  const FOCAL=700;
+  function frame(now){
+    raf=0;const dt=Math.min(.05,(now-(last||now))/1000)||.016;last=now;
+    const prev=fall;fall+=(target-fall)*Math.min(1,dt*6);vel=(fall-prev)/dt;curScale+=(scale-curScale)*Math.min(1,dt*3);
+    const w=W(),h=H(),cx=w/2,cy=h*.52;
+    things.forEach(o=>{const z=o.d-fall;
+      if(z<-140||z>5200){if(o.vis!==false){o.t.style.visibility='hidden';o.vis=false;}return;}
+      if(o.vis===false){o.t.style.visibility='';o.vis=true;}
+      const s=FOCAL/(FOCAL+Math.max(-120,z))*curScale,x=cx+o.x*w*1.6*s/curScale*.62,y=cy+o.y*h*1.6*s/curScale*.62;
+      const op=Math.min(1,(5200-z)/900)*Math.min(1,(z+140)/220),r=o.rot+o.spin*fall/900;
+      o.t.style.opacity=op.toFixed(3);o.t.style.zIndex=Math.round(10000-z);
+      o.t.style.transform=`translate(${(x-o.size/2).toFixed(1)}px,${(y-o.size/2).toFixed(1)}px) scale(${s.toFixed(4)}) rotate(${r.toFixed(1)}deg)`;});
+    ringEls.forEach((r,i)=>{const gap=700,z=((i*gap-fall)%(RINGS*gap)+RINGS*gap)%(RINGS*gap),s=FOCAL/(FOCAL+z),size=Math.max(w,h)*1.25*s;
+      r.style.width=r.style.height=size+'px';r.style.marginLeft=r.style.marginTop=(-size/2)+'px';r.style.borderWidth=Math.max(1,60*s)+'px';r.style.opacity=Math.min(.9,z/1400);});
+    // Alice tumbles with how fast you're falling
+    tilt+=((Math.max(-1,Math.min(1,vel/4000)))*35-tilt)*Math.min(1,dt*4);
+    const al=document.getElementById('aliceBody');if(al)al.setAttribute('transform',`rotate(${(tilt+Math.sin(now/900)*6).toFixed(1)} 100 140)`);
+    document.getElementById('miles').textContent=Math.round(fall/DEPTH*4000).toLocaleString();
+    document.getElementById('title').style.opacity=Math.max(0,1-fall/900);
+    const end=Math.max(0,Math.min(1,(fall-(DEPTH-1800))/1400));document.getElementById('floor').style.opacity=end;document.body.classList.toggle('landed',end>.6);
+    if(Math.abs(target-fall)>.5||vel>1)raf=requestAnimationFrame(frame);
+  }
+  const maxScroll=()=>document.documentElement.scrollHeight-innerHeight;
+  function onScroll(){target=scrollY/Math.max(1,maxScroll())*DEPTH;if(still){fall=target;}if(!raf)raf=requestAnimationFrame(frame);}
+  addEventListener('scroll',onScroll,{passive:true});addEventListener('resize',onScroll);
+  document.getElementById('anywhere').addEventListener('click',e=>{e.preventDefault();const p=['../index.html','../about.html','../research.html','../projects.html','skills.html','cards.html','notes.html','sofia-is.html','arts.html','globe.html','lace.html','../contact.html'];location.href=p[Math.floor(Math.random()*p.length)];});
+  onScroll();
+})();
+</script>
+<script src="../gh.js"></script>
+</body>
+</html>
