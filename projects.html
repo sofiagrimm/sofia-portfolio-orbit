@@ -169,7 +169,7 @@
     const PINS = [
       {short:"PCDD", note:"14 carbons", tone:"#d5ddcc", ar:"3/4", art:"carbon"},
       {short:"Vantage", note:"best solo hack", tone:"#efe2b8", ar:"4/5", art:"chart"},
-      {short:"Red Cross fleet model", note:"how many bloodmobiles?", tone:"#f0d4d8", ar:"2/3", art:"fleet"},
+      {short:"Red Cross fleet model", note:"how many bloodmobiles?", tone:"#f6ecc9", ar:"4/5", art:"fleet"},
       {short:"ASEAN expansion", note:"Singapore first", tone:"#c9d3e6", ar:"1/1", art:"islands"},
       {short:"Gravitational lens CNN", note:"Fermilab, 2023", tone:"#dcd3e8", ar:"3/4", art:"lens"},
       {short:"Green vehicle routing", note:"spotlight scholar", tone:"#d5ddcc", ar:"4/5", art:"routes"},
@@ -184,7 +184,21 @@
         return h+`<circle cx="138" cy="122" r="7" fill="${ACC}"/><circle cx="60" cy="68" r="5" fill="${ACC}"/>`;},
       chart:()=>{let h='';const v=[60,80,70,105,95,120,112,140,130,155];v.forEach((y,i)=>{const x=24+i*16,up=i%3!==1;h+=`<line x1="${x}" y1="${200-y-22}" x2="${x}" y2="${200-y+18}" stroke="${INK}" stroke-width="1.6"/><rect x="${x-5}" y="${200-y-10}" width="10" height="${up?24:16}" fill="${up?INK:ACC}"/>`;});
         return h+`<path d="M20 160 C60 150 90 120 120 100 S170 60 184 52" fill="none" stroke="${ACC}" stroke-width="2" stroke-dasharray="4 4"/>`;},
-      fleet:()=>{let h='';for(let r=0;r<4;r++)for(let c=0;c<3;c++){const x=26+c*54,y=34+r*40,on=(r*3+c)%4!==2;h+=`<g transform="translate(${x} ${y})"><rect width="40" height="20" rx="4" fill="${on?INK:'none'}" stroke="${INK}" stroke-width="2"/><rect x="28" y="4" width="9" height="7" rx="1.5" fill="${on?'#f0d4d8':INK}"/><circle cx="9" cy="23" r="4" fill="${ACC}"/><circle cx="31" cy="23" r="4" fill="${ACC}"/></g>`;}return h;},
+      fleet:()=>{const id='wb'+Math.random().toString(36).slice(2,7);
+        return `<defs><filter id="${id}"><feTurbulence type="fractalNoise" baseFrequency=".045" numOctaves="2" seed="4"/><feDisplacementMap in="SourceGraphic" scale="3.2"/></filter></defs>
+        <g transform="translate(0 6)">
+        <!-- fill, printed slightly off the outline like a crayon drawing -->
+        <path d="M24 122 L24 98 Q24 90 32 89 L56 86 L68 62 Q71 56 78 56 L136 56 Q146 56 150 64 L162 88 Q168 90 168 98 L168 124 Q168 130 162 130 L30 130 Q24 130 24 124Z" fill="#ef6461"/>
+        <g filter="url(#${id})" stroke="#2b2620" stroke-width="5" stroke-linejoin="round" stroke-linecap="round">
+          <path d="M30 126 L30 100 Q30 92 38 91 L62 88 L74 64 Q77 58 84 58 L142 58 Q152 58 156 66 L168 90 Q174 92 174 100 L174 126 Q174 132 168 132 L36 132 Q30 132 30 126Z" fill="none"/>
+          <rect x="84" y="66" width="28" height="22" rx="4" fill="#a9dbe8"/>
+          <rect x="120" y="66" width="30" height="22" rx="4" fill="#a9dbe8"/>
+          <circle cx="40" cy="106" r="5.5" fill="#f6d65c" stroke-width="3.5"/>
+          <circle cx="64" cy="134" r="14" fill="#5b5753"/><circle cx="148" cy="134" r="14" fill="#5b5753"/>
+          <path d="M184 116 q-2 -9 7 -10 q3 -8 11 -4 q8 -3 9 6 q7 3 2 10 q1 8 -8 7 q-5 6 -11 1 q-9 1 -10 -6z" fill="#fffaf2" stroke-width="3.5" transform="translate(-12 0)"/>
+        </g>
+        <path d="M102 104 C96 99 95 94 99 92 C102 90 104 92 105 94 C106 92 108 90 111 92 C115 94 114 99 108 104 L105 107Z" fill="#fff4f2"/>
+        </g>`;},
       islands:()=>`<path d="M30 70 q14 -16 30 -4 q10 10 -4 18 q-18 8 -26 -14z" fill="${INK}"/><path d="M110 50 q18 -8 26 6 q4 14 -14 14 q-18 -2 -12 -20z" fill="${INK}"/><path d="M60 130 q20 -12 46 0 q22 12 6 22 q-30 14 -52 -22z" fill="${INK}"/><path d="M140 120 q16 -4 22 8 q2 14 -16 10 q-12 -6 -6 -18z" fill="${INK}"/>
         <circle cx="100" cy="98" r="8" fill="${ACC}"/><g fill="none" stroke="${ACC}" stroke-width="1.8" stroke-dasharray="3 4"><path d="M100 98 Q70 70 46 74"/><path d="M100 98 Q115 70 124 60"/><path d="M100 98 Q90 125 82 140"/><path d="M100 98 Q130 110 150 130"/></g>`,
       lens:()=>{let h='';for(let i=0;i<26;i++){h+=`<circle cx="${(i*37)%190+5}" cy="${(i*53)%190+5}" r="${1+(i%3)*.6}" fill="${INK}" opacity=".5"/>`;}
