@@ -1011,34 +1011,51 @@
     if(y>A.base)return false;const dx=x-A.cx,dy=A.base-y;
     return (dx/A.aOut)**2+(dy/A.bOut)**2<=1&&(dx/A.aIn)**2+(dy/A.bIn)**2>=1;
   }
-  function touchesBand(el,pad=8){
-    const b=docBox(el);for(let i=0;i<=8;i++)for(let j=0;j<=8;j++){
-      const x=b.l-pad+(b.r-b.l+2*pad)*i/8,y=b.t-pad+(b.b-b.t+2*pad)*j/8;if(inBand(x,y))return true;}return false;
-  }
   // anything loose on the table that would sit on the arch is pushed outward clear of it, or left off;
   // anything that would end up under the hand is left off too
-  function overlapsHand(el){
-    const b=docBox(el);return [...document.querySelectorAll('#memoryGrid .card-scene')].some(sc=>{const c=docBox(sc);
-      return !(b.r<c.l+16||b.l>c.r-16||b.b<c.t+16||b.t>c.b-16);});
+  // Overlap checks work on plain rectangles worked out with arithmetic. Everything on the table
+  // is measured once up front, then decisions are made, then the page is changed in one go.
+  // (Measuring after every change forced the browser to re-lay the page hundreds of times,
+  // which is what made zooming in and out so slow.)
+  const hit=(b,c,pad)=>!(b.r<c.l+pad||b.l>c.r-pad||b.b<c.t+pad||b.t>c.b-pad);
+  const shift=(b,dx,dy)=>({l:b.l+dx,r:b.r+dx,t:b.t+dy,b:b.b+dy});
+  function bandHitBox(b,pad=8){
+    if(!A)return false;
+    for(let i=0;i<=8;i++)for(let j=0;j<=8;j++){if(inBand(b.l-pad+(b.r-b.l+2*pad)*i/8,b.t-pad+(b.b-b.t+2*pad)*j/8))return true;}
+    return false;
+  }
+  function touchesBand(el,pad=8){return bandHitBox(docBox(el),pad);}
+  let HAND=[];
+  const measureHand=()=>{HAND=[...document.querySelectorAll('#memoryGrid .card-scene')].map(docBox);};
+  const handHit=b=>HAND.some(c=>hit(b,c,16));
+  function overlapsHand(el){return handHit(docBox(el));}
+  function propBoxes(){ // chip groups have lots of empty space around them, so use their actual stacks
+    const out=[];document.querySelectorAll('#table .pc').forEach(o=>{if(o.style.display==='none')return;
+      const parts=o.querySelectorAll('.stack');(parts.length?[...parts]:[o]).forEach(p=>out.push(docBox(p)));});return out;
   }
   function overlapsAny(el,sel,pad=10){
-    // chip groups have lots of empty space around them, so measure their actual stacks
     const b=docBox(el);return [...document.querySelectorAll(sel)].some(o=>{if(o===el||o.style.display==='none')return false;
       const parts=o.querySelectorAll('.stack').length?[...o.querySelectorAll('.stack')]:[o];
-      return parts.some(p=>{const c=docBox(p);return !(b.r<c.l+pad||b.l>c.r-pad||b.b<c.t+pad||b.t>c.b-pad);});});
+      return parts.some(p=>hit(b,docBox(p),pad));});
   }
   function clearArch(){
     if(!A)return;
-    document.querySelectorAll('#table .pc, #cardframe .fc').forEach(el=>{
-      el.style.translate='';
-      if(el.closest('#table')&&overlapsHand(el)){el.style.display='none';return;}
-      if(!touchesBand(el))return;
-      const b=docBox(el),mx=(b.l+b.r)/2-A.cx,my=A.base-(b.t+b.b)/2,len=Math.hypot(mx,my)||1,ux=mx/len,uy=-my/len;
-      let ok=false;
-      for(let k=1;k<=8&&!ok;k++){el.style.translate=`${ux*k*26}px ${uy*k*26}px`;ok=!touchesBand(el);}
-      const nb=docBox(el);
-      if(!ok||nb.r>document.documentElement.clientWidth+40||nb.l<-60||nb.t<60||(el.closest('#table')&&overlapsHand(el)))el.style.display='none';
+    measureHand();
+    const W=document.documentElement.clientWidth;
+    const items=[...document.querySelectorAll('#table .pc, #cardframe .fc')];
+    items.forEach(el=>{el.style.translate='';});
+    const boxes=items.map(docBox);             // one measurement pass
+    const plan=items.map((el,i)=>{            // decide with arithmetic only
+      const b=boxes[i];
+      if(el.closest('#table')&&handHit(b))return {hide:true};
+      if(!bandHitBox(b))return null;
+      const mx=(b.l+b.r)/2-A.cx,my=A.base-(b.t+b.b)/2,len=Math.hypot(mx,my)||1,ux=mx/len,uy=-my/len;
+      for(let k=1;k<=8;k++){const nb=shift(b,ux*k*26,uy*k*26);if(!bandHitBox(nb)){
+        if(nb.r>W+40||nb.l<-60||nb.t<60||(el.closest('#table')&&handHit(nb)))return {hide:true};
+        return {dx:ux*k*26,dy:uy*k*26};}}
+      return {hide:true};
     });
+    plan.forEach((p,i)=>{if(!p)return;if(p.hide)items[i].style.display='none';else items[i].style.translate=`${p.dx}px ${p.dy}px`;});  // one write pass
   }
 
   // ── Counting chips: hover lifts a stack up off the felt, fanned out between your fingers;
@@ -1122,21 +1139,26 @@
     document.querySelectorAll('#cardframe .fc.extra').forEach(e=>e.remove());
     const vw=document.documentElement.clientWidth;if(vw<760)return;
     const w=138,h=w*1.4,frameEl=document.getElementById('cardframe');
-    const fan=[...document.querySelectorAll('#memoryGrid .card-scene')].map(docBox),fanBottom=Math.max(...fan.map(b=>b.b));
+    measureHand();
+    const fanBottom=Math.max(...HAND.map(b=>b.b));
     const docH=document.documentElement.scrollHeight,bottomRow=[...frameEl.querySelectorAll('.fc:not(.extra)')].map(docBox).filter(b=>b.t>docH-h*1.4);
-    const floor=bottomRow.length?Math.min(...bottomRow.map(b=>b.t)):document.documentElement.scrollHeight-40;
-    // try lots of spots across the open felt and keep every card that lands clear of everything else
-    let n=0,placed=0;
-    const top=fanBottom-h*.3,span=floor-top-h;
+    const floor=bottomRow.length?Math.min(...bottomRow.map(b=>b.t)):docH-40;
+    const props=propBoxes();
+    let placed=0;const top=fanBottom-h*.3,span=floor-top-h;
     if(span<h*.3)return;
+    // try lots of spots, working out each card's tilted footprint with arithmetic, and only add the keepers
+    const frag=document.createDocumentFragment();
     for(let k=0;k<700&&placed<34;k++){
       const x=w*.1+rnd(k+101)*(vw-w*1.2),y=top+rnd(k+211)*span;if(x>vw*.6)continue;
+      const rot=(rnd(k+37)-.5)*80,rad=rot*Math.PI/180,c=Math.abs(Math.cos(rad)),sn=Math.abs(Math.sin(rad));
+      const hw=(w*c+h*sn)/2,hh=(w*sn+h*c)/2,cx=x+w/2,cy=y+h/2,b={l:cx-hw,r:cx+hw,t:cy-hh,b:cy+hh};
+      if(handHit(b)||bandHitBox(b)||props.some(p=>hit(b,p,4))||b.b>floor+h*.4)continue;
       const [r,s]=BORDER_CARDS[(k*7+3)%BORDER_CARDS.length];
       const el=document.createElement('div');el.className='fc extra';el.dataset.card=r+'|'+s;el.style.width=w+'px';
-      el.style.left=x+'px';el.style.top=y+'px';el.style.transform=`rotate(${(rnd(k+37)-.5)*80}deg)`;
-      setArt(el,'c'+r+s,()=>card(r,s));frameEl.appendChild(el);
-      if(overlapsHand(el)||touchesBand(el)||overlapsAny(el,'#table .pc',4)||docBox(el).b>floor+h*.4)el.remove();else placed++;
+      el.style.left=x+'px';el.style.top=y+'px';el.style.transform=`rotate(${rot}deg)`;
+      setArt(el,'c'+r+s,()=>card(r,s));frag.appendChild(el);placed++;
     }
+    frameEl.appendChild(frag);
   }
 
   // ── Dice: click (or tap) a pair to roll it. They hop, tumble and skid, faces flickering,
@@ -1212,8 +1234,9 @@
     cornerSpill();lay();buildFrame();fitArch();clearArch();fillEmpty();wireChips();wireDice();
     if(pm){de.classList.add('pool-moving');kids.forEach((k,i)=>{if(k.id!=='pool')k.style.transform=saved[i];});}
   }
-  addEventListener('load',layoutTable);layoutTable();
-  addEventListener('resize',()=>{clearTimeout(layoutTable.t);layoutTable.t=setTimeout(layoutTable,150);});
+  window.__lt=layoutTable;addEventListener('load',layoutTable);layoutTable();
+  let laidW=innerWidth;
+  addEventListener('resize',()=>{clearTimeout(layoutTable.t);layoutTable.t=setTimeout(()=>{if(Math.abs(innerWidth-laidW)<2)return;laidW=innerWidth;layoutTable();},300);});
 
 })();
 </script>
