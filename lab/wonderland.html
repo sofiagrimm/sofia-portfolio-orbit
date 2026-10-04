@@ -63,9 +63,12 @@
   .toast.on{opacity:1;transform:translate(-50%,-10px)}
 
   /* the bottom: a checkered floor, a signpost, and a grin */
-  #floor{position:fixed;left:-20%;right:-20%;bottom:-6vh;height:46vh;z-index:5;opacity:0;pointer-events:none;
-    transform:perspective(600px) rotateX(62deg);transform-origin:50% 100%;
-    background:conic-gradient(from 45deg,#b8242c 0 25%,#f4ecd8 0 50%,#b8242c 0 75%,#f4ecd8 0) 0 0/90px 90px;box-shadow:inset 0 80px 80px rgba(12,23,38,.95)}
+  #floor{position:fixed;left:50%;bottom:-3vh;width:max(118vw,1000px);aspect-ratio:735/279;z-index:5;opacity:0;pointer-events:none;transform:translateX(-50%);
+    background:url(img/wonderland/checker-path.webp) center bottom/100% 100% no-repeat;filter:drop-shadow(0 -10px 30px rgba(0,0,0,.5))}
+  #teastack{position:fixed;left:calc(30vw - 40px);bottom:9vh;z-index:33;width:clamp(70px,7vw,110px);opacity:0;transform:translateY(30px);transition:opacity .7s .1s,transform .7s .1s;pointer-events:none}
+  #teastack img{display:block;width:100%;height:auto;filter:drop-shadow(0 12px 14px rgba(0,0,0,.5))}
+  body.landed #teastack{opacity:1;transform:none}
+  @media (max-width:760px){#teastack{display:none}}
   #signpost{position:fixed;right:clamp(16px,8vw,140px);bottom:4vh;z-index:35;width:min(330px,62vw);opacity:0;transform:translateY(40px);transition:opacity .6s,transform .6s;pointer-events:none}
   body.landed #signpost{opacity:1;transform:none;pointer-events:auto}
   #signpost .post{position:absolute;left:46%;top:0;bottom:0;width:22px;background:linear-gradient(90deg,#5a3a20,#7a5230,#5a3a20)}
@@ -167,6 +170,7 @@
 <div class="meter" aria-live="off"><b id="miles">0</b>miles fallen</div>
 <div class="toast" id="toast" role="status"></div>
 
+<div id="teastack" aria-hidden="true"><img src="img/wonderland/teacups-2.webp" alt=""></div>
 <button id="queen" type="button" aria-label="The Queen of Hearts"><img src="img/wonderland/queen.webp" alt=""></button>
 <a id="backup" href="#top"><div class="pic"><img src="img/wonderland/keyhole-cards.webp" alt=""></div><span>back up to the door</span></a>
 <a id="invite" href="../contact.html"><img src="img/wonderland/invited-stub.webp" alt=""><span>write to me</span></a>
@@ -193,13 +197,12 @@
   const SUITS={heart:'M50 80 C10 52 4 30 20 18 C33 9 45 14 50 26 C55 14 67 9 80 18 C96 30 90 52 50 80Z',diamond:'M50 10 L82 50 L50 90 L18 50Z',
     spade:'M50 10 C70 34 92 48 84 66 C78 78 62 78 54 68 C56 80 60 86 66 92 H34 C40 86 44 80 46 68 C38 78 22 78 16 66 C8 48 30 34 50 10Z',
     club:'M50 12 A16 16 0 1 1 49.9 12Z M28 40 A16 16 0 1 1 27.9 40Z M72 40 A16 16 0 1 1 71.9 40Z M44 54 H56 L62 90 H38Z'};
+  let cupN=0;
   const ART={
     card:(r,s)=>{const red=s==='heart'||s==='diamond',c=red?'#b8242c':'#1c1a1c';return `<svg viewBox="0 0 100 140"><rect x="2" y="2" width="96" height="136" rx="8" fill="#f8f3e6" stroke="#cdbf9f" stroke-width="2"/>
       <text x="12" y="26" font-family="IM Fell English,serif" font-size="20" fill="${c}">${r}</text><g transform="translate(26 40) scale(.48)"><path d="${SUITS[s]}" fill="${c}"/></g>
       <g transform="translate(88 114) rotate(180) scale(.2)"><path d="${SUITS[s]}" fill="${c}"/></g></svg>`;},
-    cup:()=>`<svg viewBox="0 0 120 90"><ellipse cx="60" cy="78" rx="52" ry="9" fill="#e9e3d6"/><path d="M18 22 H100 C98 58 84 74 59 74 C34 74 20 58 18 22Z" fill="#fbf8f2"/>
-      <path d="M100 30 C120 30 120 54 96 56" fill="none" stroke="#fbf8f2" stroke-width="8"/><ellipse cx="59" cy="22" rx="41" ry="9" fill="#8a4a1e"/><ellipse cx="66" cy="21" rx="12" ry="4" fill="#f2d24c"/>
-      ${[0,1,2,3,4].map(i=>`<path d="M${26+i*15} 30 V68" stroke="#c9a45a" stroke-width="1.6" opacity=".7"/>`).join('')}<path d="M24 46 H96" stroke="#c9a45a" stroke-width="1.6" opacity=".7"/></svg>`,
+    cup:()=>`<img src="img/wonderland/teacups-${(cupN++%2)+1}.webp" alt="">`,
     pot:()=>`<svg viewBox="0 0 160 130"><path d="M40 40 C30 110 130 110 120 40Z" fill="#fbf8f2"/><path d="M40 40 C60 30 100 30 120 40" fill="#efe8da"/><circle cx="80" cy="28" r="8" fill="#c9a45a"/>
       <path d="M120 54 C150 50 150 90 120 92" fill="none" stroke="#fbf8f2" stroke-width="9"/><path d="M42 60 C20 56 12 40 4 26 L14 24 C22 38 30 46 44 50Z" fill="#fbf8f2"/>
       ${[0,1,2,3].map(i=>`<path d="M${52+i*18} 46 C${50+i*18} 70 ${52+i*18} 90 ${56+i*16} 100" stroke="#c9a45a" stroke-width="1.6" fill="none" opacity=".8"/>`).join('')}</svg>`,
@@ -265,11 +268,11 @@
     things.push({t,x,y,d:d+ENTRY,size,rot:(rnd()-.5)*60,spin:spin??(rnd()-.5)*40});}
   const svgEl=html=>{const d=document.createElement('div');d.innerHTML=html;return d;};
   // scattered objects all the way down, kept out of the very centre where Alice falls
-  const KINDS=['cup','pot','watch','key','book','chair','jar','map','card','card'];
+  const KINDS=['cup','cup','pot','watch','key','book','chair','jar','map','card','card'];
   const RS=['A','2','5','7','9','10','J','Q','K'],SS=['heart','spade','diamond','club'];
   for(let i=0;i<70;i++){
     const k=KINDS[Math.floor(rnd()*KINDS.length)],ang=rnd()*Math.PI*2,rad=.28+rnd()*.42;
-    add(svgEl(k==='card'?ART.card(RS[Math.floor(rnd()*RS.length)],SS[Math.floor(rnd()*4)]):ART[k]()),Math.cos(ang)*rad,Math.sin(ang)*rad*.8,300+rnd()*(DEPTH-1600),k==='card'?110:k==='chair'||k==='pot'?170:120);
+    add(svgEl(k==='card'?ART.card(RS[Math.floor(rnd()*RS.length)],SS[Math.floor(rnd()*4)]):ART[k]()),Math.cos(ang)*rad,Math.sin(ang)*rad*.8,300+rnd()*(DEPTH-1600),k==='card'?110:k==='cup'?72:k==='chair'||k==='pot'?170:120);
   }
   // the works, one after another, alternating sides
   const plain=document.getElementById('plain');
