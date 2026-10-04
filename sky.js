@@ -127,6 +127,18 @@
     ctx.font = '11px "Courier Prime", Courier, monospace';
     C.forEach(function (k) {
       var pts = k.stars.map(function (s) { return project(s[1], s[2], L); });
+      // keep the figures out of the middle column where the page's text sits: any constellation
+      // that would cross it slides out to whichever side it's already leaning toward
+      if (W < 760) { pts = pts.map(function () { return null; }); }
+      else {
+        var cfg = (document.body.dataset.skyClear || '.3,460').split(',').map(Number), half = Math.min(W * cfg[0], cfg[1]), zl = W / 2 - half, zr = W / 2 + half, vis = pts.filter(Boolean);
+        if (vis.length) {
+          var minX = Math.min.apply(null, vis.map(function (p) { return p.x; })), maxX = Math.max.apply(null, vis.map(function (p) { return p.x; }));
+          var mid = (minX + maxX) / 2, lbl = 90, shift = 0;
+          if (maxX + lbl > zl && minX < zr) shift = mid < W / 2 ? zl - maxX - lbl : zr - minX + 12;
+          if (shift) pts = pts.map(function (p) { return p ? { x: p.x + shift, y: p.y, alt: p.alt } : p; });
+        }
+      }
       ctx.globalAlpha = 0.28; ctx.strokeStyle = '#cfe0ff'; ctx.lineWidth = 1;
       k.lines.forEach(function (l) { var a = pts[l[0]], b = pts[l[1]]; if (!a || !b || Math.abs(a.x - b.x) > W / 2) return; ctx.beginPath(); ctx.moveTo(a.x, a.y); ctx.lineTo(b.x, b.y); ctx.stroke(); });
       var sx = 0, sy = 0, n = 0;
