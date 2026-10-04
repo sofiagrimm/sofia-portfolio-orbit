@@ -216,6 +216,9 @@
     #cardframe,#table,#arch{contain:layout paint}
     .card-scene{will-change:transform}
     .rast{display:block;width:100%;height:auto;aspect-ratio:250/350;-webkit-user-drag:none;user-select:none}
+    #cornerSpill{position:absolute;top:70px;right:0;width:clamp(260px,26vw,430px);z-index:3;pointer-events:none;filter:drop-shadow(-10px 14px 18px rgba(0,0,0,.45))}
+    #cornerSpill svg{display:block;width:100%;height:auto}
+    html,body{overflow-x:clip}
   </style>
 </head>
 <body>
@@ -820,7 +823,6 @@
   // piles of green-backed cards, chip stacks, dice and a few face-up cards
   const LAYOUT=[
     {prop:'box', x:42, y:3, w:176, rot:-8},
-    {chips:[[30,40,4],[78,30,3,1],[104,72,5,2]], x:80, y:4, w:300, rot:0, wide:1},
     {chips:[[24,30,1,3]], x:35, y:21, w:240, rot:0},
     {prop:'dealer', x:28, y:66, w:124, rot:0},
     {prop:'tray', x:6, y:70, w:330, rot:-24, wide:1},
@@ -898,9 +900,12 @@
     // left edge, top to bottom
     // a messy spill down each side: two loose layers, overlapping, every card at its own angle
     if(vw>=1100){
-      for(let y=70;y<vh-h*.9;y+=h*.5){place(-w*.55+rnd(i+1)*w*.35,y+rnd(i+2)*h*.2,(rnd(i+7)-.5)*60);}
-      for(let y=100;y<vh-h*.9;y+=h*.62){place(-w*.2+rnd(i+3)*w*.3,y+rnd(i+4)*h*.2,(rnd(i+8)-.5)*70);}
-      for(let y=90;y<vh-h*.9;y+=h*.58){place(vw-w*.45-rnd(i+5)*w*.3,y+rnd(i+6)*h*.2,(rnd(i+9)-.5)*60);}
+      // top-left heap: thick at the corner, thinning out down and to the right
+      // (kept to the left of the shuffle deck so its label stays readable)
+      const dk=document.querySelector('.deck'),lim=dk?dk.getBoundingClientRect().left+scrollX-w*.75:w*1.3;
+      for(let k=0;k<14;k++){const a=rnd(k+41),b=rnd(k+43);place(Math.min(-w*.6+a*a*w*1.9,lim),84+b*b*h*2.3,(rnd(k+47)-.5)*80);}
+      // bottom-left heap, mirrored up from the bottom of the page
+      for(let k=0;k<14;k++){const a=rnd(k+61),b=rnd(k+63);place(-w*.6+a*a*w*1.9,vh-h*.7-b*b*h*2.3,(rnd(k+67)-.5)*80);}
     }
     // bottom edge, left to right
     // bottom row sits below the hand; if there isn't room under it, leave the row out
@@ -908,8 +913,9 @@
     const fanBottom=document.getElementById('memoryGrid').getBoundingClientRect().bottom+scrollY+12;
     const rowTop=Math.max(vh-h*.5,fanBottom);
     if(vh-rowTop>=h*.28){
-      for(let x=-w*.3;x<vw;x+=w*.62){place(x,rowTop+rnd(i+3)*h*.12,(rnd(i+11)-.5)*50);}
-      for(let x=-w*.05;x<vw;x+=w*.75){place(x,rowTop-h*.38+rnd(i+4)*h*.18,(rnd(i+12)-.5)*60);}
+      // the bottom row trails off toward the right instead of running the whole way across
+      for(let x=-w*.3;x<vw*.62;x+=w*.62){place(x,rowTop+rnd(i+3)*h*.12+Math.max(0,x/vw)*h*.5,(rnd(i+11)-.5)*50);}
+      for(let x=-w*.05;x<vw*.4;x+=w*.75){place(x,rowTop-h*.38+rnd(i+4)*h*.18+Math.max(0,x/vw)*h*.5,(rnd(i+12)-.5)*60);}
     }
   }
   const pb=document.querySelector('.poster-base');if(pb)setArt(pb,'cAclub',()=>card('A','club'));
@@ -1091,7 +1097,7 @@
     const top=fanBottom-h*.3,span=floor-top-h;
     if(span<h*.3)return;
     for(let k=0;k<700&&placed<34;k++){
-      const x=w*.1+rnd(k+101)*(vw-w*1.2),y=top+rnd(k+211)*span;
+      const x=w*.1+rnd(k+101)*(vw-w*1.2),y=top+rnd(k+211)*span;if(x>vw*.6)continue;
       const [r,s]=BORDER_CARDS[(k*7+3)%BORDER_CARDS.length];
       const el=document.createElement('div');el.className='fc extra';el.dataset.card=r+'|'+s;el.style.width=w+'px';
       el.style.left=x+'px';el.style.top=y+'px';el.style.transform=`rotate(${(rnd(k+37)-.5)*80}deg)`;
@@ -1129,11 +1135,46 @@
       g.setAttribute('role','button');g.setAttribute('aria-label','Roll the dice');g.setAttribute('tabindex','0');
       g.addEventListener('click',()=>rollPair(g));g.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();rollPair(g);}});});
   }
+
+  function cornerSpill(){
+    let old=document.getElementById('cornerSpill');if(old)old.remove();
+    if(innerWidth<760)return;
+    const chip=(x,y,r,col,rot,tilt,n)=>{ // a dice-pattern casino chip, optionally a short stack seen at an angle
+      const edge=col==='#151517'?'#ecebe6':'#f3efe8',sy=tilt||1;let g='';
+      for(let k=(n||1)-1;k>=0;k--){const yy=y+k*r*.16;
+        g+=`<g transform="translate(${x} ${yy}) rotate(${rot}) scale(1 ${sy})">
+          <circle r="${r}" fill="${k?shadeC(col,-.35):col}"/>${k?'':`
+          ${[...Array(8)].map((_,i)=>`<rect x="${-r*.13}" y="${-r}" width="${r*.26}" height="${r*.24}" rx="${r*.03}" fill="${edge}" transform="rotate(${i*45})"/>`).join('')}
+          ${[...Array(8)].map((_,i)=>`<g transform="rotate(${i*45+22.5}) translate(0 ${-r*.86})">${[[-1,-1],[1,1],[1,-1],[-1,1]].map(([a,b])=>`<circle cx="${a*r*.045}" cy="${b*r*.045}" r="${r*.022}" fill="${edge}" opacity=".8"/>`).join('')}</g>`).join('')}
+          <circle r="${r*.7}" fill="none" stroke="${edge}" stroke-width="${r*.02}" opacity=".5"/>
+          <circle r="${r*.62}" fill="${shadeC(col,.06)}"/>
+          <circle r="${r}" fill="url(#csSheen)"/>`}</g>`;}
+      return g;};
+    const die=(x,y,s,rot,pips)=>`<g transform="translate(${x} ${y}) rotate(${rot})">
+      <rect x="${-s/2+s*.12}" y="${-s/2+s*.16}" width="${s}" height="${s}" rx="${s*.2}" fill="#000" opacity=".35"/>
+      <rect x="${-s/2}" y="${-s/2}" width="${s}" height="${s}" rx="${s*.2}" fill="url(#csDie)" opacity=".93"/>
+      <rect x="${-s/2+s*.06}" y="${-s/2+s*.06}" width="${s*.88}" height="${s*.88}" rx="${s*.16}" fill="none" stroke="#ff8a8a" stroke-width="${s*.03}" opacity=".45"/>
+      ${pips.map(([a,b])=>`<circle cx="${a*s*.25}" cy="${b*s*.25}" r="${s*.075}" fill="#fff8f4"/>`).join('')}
+      <path d="M${-s*.38} ${-s*.3} Q${-s*.1} ${-s*.46} ${s*.3} ${-s*.4}" stroke="#fff" stroke-width="${s*.05}" fill="none" opacity=".55" stroke-linecap="round"/></g>`;
+    const P={1:[[0,0]],2:[[-1,-1],[1,1]],3:[[-1,-1],[0,0],[1,1]],4:[[-1,-1],[1,-1],[-1,1],[1,1]],5:[[-1,-1],[1,-1],[0,0],[-1,1],[1,1]],6:[[-1,-1],[1,-1],[-1,0],[1,0],[-1,1],[1,1]]};
+    const B='#151517',Rd='#c3161f';
+    const svg=`<svg viewBox="0 0 620 520" xmlns="http://www.w3.org/2000/svg" style="overflow:hidden">
+      <defs><radialGradient id="csSheen" cx="35%" cy="28%" r="70%"><stop offset="0" stop-color="#fff" stop-opacity=".28"/><stop offset=".5" stop-color="#fff" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".25"/></radialGradient>
+        <linearGradient id="csDie" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ff4a4f"/><stop offset=".45" stop-color="#c3161f"/><stop offset="1" stop-color="#6e070c"/></linearGradient></defs>
+      ${chip(560,96,92,B,8,1,1)}${chip(410,84,80,B,-14,1,1)}${chip(600,290,96,B,-6,1,4)}
+      ${chip(480,220,84,Rd,-24,.62,5)}${chip(350,260,74,Rd,12,.7,4)}${chip(580,440,80,Rd,30,1,2)}${chip(450,380,66,Rd,-10,.55,6)}
+      ${chip(290,140,58,Rd,0,1,1)}
+      ${die(180,110,68,-14,P[5])}${die(250,370,74,10,P[6])}${die(360,470,64,-8,P[3])}
+    </svg>`;
+    const el=document.createElement('div');el.id='cornerSpill';el.setAttribute('aria-hidden','true');el.innerHTML=svg;
+    document.body.appendChild(el);
+  }
+  function shadeC(hex,k){const n=parseInt(hex.slice(1),16),f=c=>Math.round(k>0?c+(255-c)*k:c*(1+k));return '#'+((1<<24)+(f(n>>16)<<16)+(f(n>>8&255)<<8)+f(n&255)).toString(16).slice(1);}
   function layoutTable(){
     if(window.__arranging&&layoutTable.done)return;layoutTable.done=true;
     // measure the table where it really sits, even while the opening is sliding it into view
     const de=document.documentElement,pm=de.classList.contains('pool-moving');if(pm)de.classList.remove('pool-moving');
-    lay();buildFrame();fitArch();clearArch();fillEmpty();wireChips();wireDice();
+    cornerSpill();lay();buildFrame();fitArch();clearArch();fillEmpty();wireChips();wireDice();
     if(pm)de.classList.add('pool-moving');
   }
   addEventListener('load',layoutTable);layoutTable();
