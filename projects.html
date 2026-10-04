@@ -784,7 +784,9 @@
     if(mobile) return;
     const fanBottom=document.getElementById('memoryGrid').getBoundingClientRect().bottom+scrollY+12;
     const rowTop=Math.max(vh-h*.5,fanBottom);
-    if(vh-rowTop>=h*.28) for(let x=w*.15;x<vw;x+=w*1.32){place(x,rowTop+rnd(i+3)*h*.05,(rnd(i+11)-.5)*12);}
+    if(vh-rowTop>=h*.28){
+      for(let x=w*.15;x<vw;x+=w*1.32){place(x,rowTop+rnd(i+3)*h*.05,(rnd(i+11)-.5)*12);}
+    }
   }
   const pb=document.querySelector('.poster-base');if(pb)pb.innerHTML=card('A','club');
   // ── the printed arch: fitted around the hand, and nothing else on the table may touch it
@@ -844,6 +846,12 @@
   function overlapsHand(el){
     const b=docBox(el);return [...document.querySelectorAll('#memoryGrid .card-scene')].some(sc=>{const c=docBox(sc);
       return !(b.r<c.l+16||b.l>c.r-16||b.b<c.t+16||b.t>c.b-16);});
+  }
+  function overlapsAny(el,sel,pad=10){
+    // chip groups have lots of empty space around them, so measure their actual stacks
+    const b=docBox(el);return [...document.querySelectorAll(sel)].some(o=>{if(o===el||o.style.display==='none')return false;
+      const parts=o.querySelectorAll('.stack').length?[...o.querySelectorAll('.stack')]:[o];
+      return parts.some(p=>{const c=docBox(p);return !(b.r<c.l+pad||b.l>c.r-pad||b.b<c.t+pad||b.t>c.b-pad);});});
   }
   function clearArch(){
     if(!A)return;
@@ -909,7 +917,28 @@
       st.addEventListener('pointerdown',e=>{chipAudio.init();if(e.pointerType!=='mouse'){raise();timers.push(setTimeout(drop,650));}});
     });
   }
-  function layoutTable(){lay();buildFrame();fitArch();clearArch();wireChips();}
+  // fill open felt between the hand and the bottom row with more loose cards, wherever nothing else is
+  function fillEmpty(){
+    document.querySelectorAll('#cardframe .fc.extra').forEach(e=>e.remove());
+    const vw=document.documentElement.clientWidth;if(vw<760)return;
+    const w=138,h=w*1.4,frameEl=document.getElementById('cardframe');
+    const fan=[...document.querySelectorAll('#memoryGrid .card-scene')].map(docBox),fanBottom=Math.max(...fan.map(b=>b.b));
+    const docH=document.documentElement.scrollHeight,bottomRow=[...frameEl.querySelectorAll('.fc:not(.extra)')].map(docBox).filter(b=>b.t>docH-h*1.4);
+    const floor=bottomRow.length?Math.min(...bottomRow.map(b=>b.t)):document.documentElement.scrollHeight-40;
+    // try lots of spots across the open felt and keep every card that lands clear of everything else
+    let n=0,placed=0;
+    const top=fanBottom-h*.3,span=floor-top-h;
+    if(span<h*.3)return;
+    for(let k=0;k<420&&placed<14;k++){
+      const x=w*.1+rnd(k+101)*(vw-w*1.2),y=top+rnd(k+211)*span;
+      const [r,s]=BORDER_CARDS[(k*7+3)%BORDER_CARDS.length];
+      const el=document.createElement('div');el.className='fc extra';el.style.width=w+'px';
+      el.style.left=x+'px';el.style.top=y+'px';el.style.transform=`rotate(${(rnd(k+37)-.5)*30}deg)`;
+      el.innerHTML=card(r,s);frameEl.appendChild(el);
+      if(overlapsHand(el)||touchesBand(el)||overlapsAny(el,'#table .pc',4)||overlapsAny(el,'#cardframe .fc',6)||docBox(el).b>floor+6)el.remove();else placed++;
+    }
+  }
+  function layoutTable(){lay();buildFrame();fitArch();clearArch();fillEmpty();wireChips();}
   addEventListener('load',layoutTable);layoutTable();
   addEventListener('resize',()=>{clearTimeout(layoutTable.t);layoutTable.t=setTimeout(layoutTable,150);});
 
