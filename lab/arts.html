@@ -14,7 +14,7 @@
   html,body{overflow-x:clip}
   body{min-height:100vh;background:var(--sun);font-family:'Inter',Helvetica,Arial,sans-serif;color:#fff;display:flex;flex-direction:column;align-items:center}
   /* the Vitruvian sketch, faint behind everything */
-  .sketch{position:fixed;inset:0;background:url('https://commons.wikimedia.org/wiki/Special:FilePath/Da_Vinci_Vitruve_Luc_Viatour.jpg?width=1400') center/min(95vh,1000px) no-repeat;
+  .sketch{position:fixed;inset:0;background:url('art/vitruve.jpg') center/min(95vh,1000px) no-repeat;
     opacity:.16;mix-blend-mode:multiply;pointer-events:none;filter:sepia(.6) contrast(1.2)}
   .site{position:relative;z-index:2;width:100%;display:flex;justify-content:space-between;align-items:baseline;padding:22px clamp(18px,4vw,48px) 0;color:var(--ink);font-size:13px;letter-spacing:.12em;text-transform:uppercase}
   .site a{color:var(--ink);text-decoration:none;opacity:.7}.site a:hover,.site a:focus-visible{opacity:1}
@@ -174,7 +174,11 @@
 // ── the paintings and what each one would love, or hate, to be offered.
 //    To show your own work, add entries here: img (any image path), title, blurb, signature,
 //    and two offers (good = makes them happy, bad = upsets them) with a little drawing each.
-const W = f => 'https://commons.wikimedia.org/wiki/Special:FilePath/' + f + '?width=1600';
+// the paintings are served from this site (the server fetches them from Wikimedia once), which
+// lets the browser work with their pixels for the eye-tracking and expressions
+const ART_SLUG = {'Mona_Lisa,_by_Leonardo_da_Vinci,_from_C2RMF_retouched.jpg':'mona','Johannes_Vermeer_(1632-1675)_-_The_Girl_With_The_Pearl_Earring_(1665).jpg':'pearl',
+  'Van_Gogh_-_Starry_Night_-_Google_Art_Project.jpg':'starry','John_William_Waterhouse_-_The_Lady_of_Shalott_-_Google_Art_Project_edit.jpg':'shalott'};
+const W = f => (location.protocol.startsWith('http') ? 'art/' + ART_SLUG[f] + '.jpg' : 'https://commons.wikimedia.org/wiki/Special:FilePath/' + f + '?width=1600');
 const ICON = {
   pasta:`<svg viewBox="0 0 120 80"><g transform="rotate(-24 60 40)"><rect x="8" y="30" width="48" height="18" rx="4" fill="#e8b14d"/><rect x="66" y="28" width="46" height="18" rx="4" fill="#e8b14d"/>${[0,1,2,3,4].map(i=>`<path d="M${14+i*8} 30 v18 M${72+i*8} 28 v18" stroke="#c98a2a" stroke-width="2"/>`).join('')}<path d="M56 30 l4 6 l-3 4 l5 8 M66 28 l-3 7 l4 4 l-4 7" stroke="#fff3c9" stroke-width="2" fill="none"/></g><circle cx="62" cy="62" r="2" fill="#f2d28a"/><circle cx="70" cy="66" r="1.5" fill="#f2d28a"/><circle cx="56" cy="68" r="1.4" fill="#f2d28a"/></svg>`,
   tiramisu:`<svg viewBox="0 0 120 90"><ellipse cx="60" cy="74" rx="52" ry="10" fill="#f4f0e8"/><path d="M22 34 L60 22 L98 34 L98 66 L60 76 L22 66Z" fill="#f3e6cc"/><path d="M22 44 L60 54 L98 44 L98 50 L60 60 L22 50Z" fill="#7a4a26"/><path d="M22 58 L60 68 L98 58 L98 64 L60 74 L22 64Z" fill="#7a4a26"/><path d="M22 34 L60 46 L98 34 L60 22Z" fill="#5a331a"/>${[0,1,2,3,4,5,6].map(i=>`<circle cx="${34+i*8}" cy="${30+((i*7)%5)}" r="1.4" fill="#3a2010"/>`).join('')}</svg>`,

@@ -77,6 +77,32 @@ function send(res, code, body, headers = {}) {
   res.end(body);
 }
 
+const ART = {
+  mona: 'Mona_Lisa,_by_Leonardo_da_Vinci,_from_C2RMF_retouched.jpg',
+  pearl: 'Johannes_Vermeer_(1632-1675)_-_The_Girl_With_The_Pearl_Earring_(1665).jpg',
+  starry: 'Van_Gogh_-_Starry_Night_-_Google_Art_Project.jpg',
+  shalott: 'John_William_Waterhouse_-_The_Lady_of_Shalott_-_Google_Art_Project_edit.jpg',
+  vitruve: 'Da_Vinci_Vitruve_Luc_Viatour.jpg'
+};
+const ART_CACHE = new Map(), ART_DIR = path.join(require('os').tmpdir(), 'sg-art');
+try { fs.mkdirSync(ART_DIR, { recursive: true }); } catch (e) {}
+async function getArt(key) {
+  if (ART_CACHE.has(key)) return ART_CACHE.get(key);
+  const file = path.join(ART_DIR, key + '.jpg');
+  if (fs.existsSync(file)) { const b = fs.readFileSync(file); ART_CACHE.set(key, b); return b; }
+  const u = 'https://commons.wikimedia.org/wiki/Special:FilePath/' + encodeURIComponent(ART[key]) + '?width=1600';
+  const r = await fetch(u, { redirect: 'follow', headers: { 'User-Agent': 'sofiagrimm.com gallery (sofia.grimm@yale.edu)' } });
+  if (!r.ok) throw new Error('wikimedia ' + r.status);
+  const b = Buffer.from(await r.arrayBuffer());
+  ART_CACHE.set(key, b); try { fs.writeFileSync(file, b); } catch (e) {}
+  return b;
+}
+function serveArt(key, res) {
+  if (!ART[key]) return send(res, 404, 'not found');
+  getArt(key).then(b => { res.writeHead(200, { 'Content-Type': 'image/jpeg', 'Content-Length': b.length, 'Cache-Control': 'private, max-age=604800', 'X-Robots-Tag': 'noindex' }); res.end(b); },
+    () => send(res, 502, 'could not fetch the painting', { 'Content-Type': 'text/plain' }));
+}
+
 http.createServer((req, res) => {
   const url = new URL(req.url, 'http://x');
 
@@ -94,6 +120,12 @@ http.createServer((req, res) => {
 
   const ok = safeEqual(cookies(req)[COOKIE] || '', TOKEN);
   if (!ok) return send(res, 401, gatePage(false), { 'Content-Type': 'text/html; charset=utf-8' });
+
+  // the gallery's public-domain paintings, fetched from Wikimedia once and then served from here.
+  // Serving them from our own address is what lets the browser read their pixels (for the 3D face
+  // effects); straight from Wikimedia the browser refuses.
+  const art = /^\/lab\/art\/([a-z]+)\.jpg$/.exec(url.pathname);
+  if (art) return serveArt(art[1], res);
 
   // serve the site
   let p = decodeURIComponent(url.pathname);

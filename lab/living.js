@@ -28,18 +28,27 @@
     });
     return fmReady;
   }
+  // one detector, one painting at a time; the very first call can come back empty while the model
+  // is still warming up, so each painting gets a few tries
+  var pending = null;
+  function detectOnce(fm, cv) {
+    return new Promise(function (res) {
+      pending = res;
+      fm.send({ image: cv }).catch(function () { if (pending === res) { pending = null; res(null); } });
+      setTimeout(function () { if (pending === res) { pending = null; res(null); } }, 20000);
+    });
+  }
   function findFace(img, key) {
-    var ck = 'sg-mesh-v1-' + key;
+    var ck = 'sg-mesh-v2-' + key;
     try { var c = JSON.parse(localStorage.getItem(ck) || 'null'); if (c) return Promise.resolve(c); } catch (e) {}
     var job = queue.then(function () {
       return loadFM().then(function (fm) {
-        return new Promise(function (res) {
-          var W = img.naturalWidth, H = img.naturalHeight, s = Math.min(1, 1024 / Math.max(W, H));
-          var cv = document.createElement('canvas'); cv.width = Math.round(W * s); cv.height = Math.round(H * s); cv.getContext('2d').drawImage(img, 0, 0, cv.width, cv.height);
-          fm.onResults(function (r) { var L = (r.multiFaceLandmarks || [])[0]; res(L ? L.map(function (p) { return [+p.x.toFixed(5), +p.y.toFixed(5)]; }) : null); });
-          fm.send({ image: cv }).catch(function () { res(null); });
-          setTimeout(function () { res(null); }, 20000);
-        });
+        if (!fm.__wired) { fm.__wired = true; fm.onResults(function (r) { var L = (r.multiFaceLandmarks || [])[0], p = pending; pending = null;
+          if (p) p(L ? L.map(function (q) { return [+q.x.toFixed(5), +q.y.toFixed(5)]; }) : null); }); }
+        var W = img.naturalWidth, H = img.naturalHeight, s = Math.min(1, 1024 / Math.max(W, H));
+        var cv = document.createElement('canvas'); cv.width = Math.round(W * s); cv.height = Math.round(H * s); cv.getContext('2d').drawImage(img, 0, 0, cv.width, cv.height);
+        var attempt = function (n) { return detectOnce(fm, cv).then(function (L) { if (L || n <= 1) return L; return new Promise(function (r) { setTimeout(r, 600); }).then(function () { return attempt(n - 1); }); }); };
+        return attempt(3);
       });
     }).then(function (L) { if (L) try { localStorage.setItem(ck, JSON.stringify(L)); } catch (e) {} return L; }, function () { return null; });
     queue = job.catch(function () {});
