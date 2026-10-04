@@ -27,8 +27,20 @@
   #pool .meter b{position:absolute;left:0;right:0;bottom:0;height:0;background:linear-gradient(0deg,#f3d38a,#cf4a3c)}
   #pool .meter small{position:absolute;top:100%;left:50%;transform:translateX(-50%);margin-top:6px;font:12px 'Nanum Pen Script',cursive;color:#f1e6cf;white-space:nowrap}
   #pool .tag{position:absolute;font-family:'Nanum Pen Script',cursive;color:#f6ecd6;font-size:clamp(26px,3vw,40px);pointer-events:none;text-shadow:2px 2px 0 rgba(18,48,32,.6)}
-  #pool .skip{position:absolute;right:clamp(18px,3vw,36px);bottom:clamp(18px,3vw,36px);font:13px 'Courier Prime',Courier,monospace;color:#f6ecd6;background:rgba(20,40,25,.45);border:1px solid rgba(246,236,214,.5);border-radius:999px;padding:6px 14px;cursor:pointer;z-index:2}
+  #pool .skip{position:absolute;right:clamp(18px,3vw,36px);bottom:clamp(18px,3vw,36px);font:13px 'Courier Prime',Courier,monospace;color:#f6ecd6;background:rgba(20,40,25,.45);border:1px solid rgba(246,236,214,.5);border-radius:999px;padding:6px 14px;cursor:pointer;z-index:5}
   #pool .skip:hover,#pool .skip:focus-visible{background:rgba(20,40,25,.7);outline:none}
+  #pool .snd{position:absolute;right:clamp(18px,3vw,36px);bottom:calc(clamp(18px,3vw,36px) + 38px);font:13px 'Courier Prime',Courier,monospace;color:#f6ecd6;background:rgba(20,40,25,.45);border:1px solid rgba(246,236,214,.5);border-radius:999px;padding:6px 14px;cursor:pointer;z-index:5}
+  #pool .shade{position:absolute;left:50%;top:0;width:min(46vw,560px);transform:translate(-50%,-42%);pointer-events:none;z-index:1;transform-origin:50% -200px;animation:sway 6s ease-in-out infinite alternate;transition:top 1.4s cubic-bezier(.6,0,.3,1),opacity 1s}
+  #pool .shade.gone{top:-40vh;opacity:0}
+  @keyframes sway{from{rotate:-1.6deg}to{rotate:1.6deg}}
+  #pool .lamp{animation:glow 6s ease-in-out infinite alternate}
+  @keyframes glow{from{background-position:-2vw 0,0 0}to{background-position:2vw 0,0 0}}
+  #pool .bar{position:absolute;left:0;right:0;height:0;background:#0b0b0c;z-index:3;transition:height .35s cubic-bezier(.3,0,.2,1)}
+  #pool .bar.t{top:0}#pool .bar.b{bottom:0}
+  #pool.cine .bar{height:9vh}
+  #pool .stamp{position:absolute;left:50%;top:44%;z-index:4;pointer-events:none;font:400 clamp(70px,12vw,170px)/1 'DM Serif Display',Georgia,serif;font-style:italic;color:#f3d38a;
+    letter-spacing:.02em;text-shadow:6px 7px 0 rgba(18,48,32,.75);opacity:0;transform:translate(-50%,-50%) rotate(-8deg) scale(1.6)}
+  #pool .pdie{cursor:pointer}
   html.pool-moving body > *:not(#pool){translate:var(--pool-dx,0px) var(--pool-dy,0px)}
   `;
   var st = document.createElement('style'); st.textContent = css; document.head.appendChild(st);
@@ -37,9 +49,13 @@
   var pool = document.createElement('div'); pool.id = 'pool'; pool.tabIndex = 0;
   pool.setAttribute('role', 'dialog'); pool.setAttribute('aria-label', 'Opening: break the rack to get to the card table');
   pool.innerHTML = '<div class="world"><svg></svg></div><div class="lamp"></div><div class="grain"></div><div class="flash"></div>' +
-    '<p class="prompt"><b>break the rack.</b>pull the cue back,<br>then let go</p><div class="banner">sofia grimm\u2019s <span>pool hall</span> &amp; card room</div>' +
+    '<p class="prompt"><b>break the rack.</b>drag back to aim and pull,<br>then let go</p><div class="banner">sofia grimm\u2019s <span>pool hall</span> &amp; card room</div>' +
     '<div class="motes">' + Array.from({ length: 16 }, function (_, i) { return '<i style="left:' + (20 + Math.random() * 60) + '%;top:' + (15 + Math.random() * 60) + '%;--d:' + (8 + Math.random() * 8) + 's;--dl:-' + (Math.random() * 10) + 's;--mx:' + ((Math.random() - .5) * 120) + 'px;--my:' + (-40 - Math.random() * 80) + 'px"></i>'; }).join('') + '</div>' +
-    '<div class="meter"><b></b><small>power</small></div><button class="skip" type="button">skip</button>';
+    '<div class="meter"><b></b><small>power</small></div><button class="skip" type="button">skip</button><button class="snd" type="button" aria-pressed="true">sound: on</button>' +
+    '<div class="bar t"></div><div class="bar b"></div><div class="stamp" aria-hidden="true">break!</div>' +
+    '<svg class="shade" viewBox="0 0 560 260" aria-hidden="true"><path d="M280 0 V60" stroke="#1a1a1a" stroke-width="5"/><path d="M40 230 Q60 90 280 70 Q500 90 520 230Z" fill="#1f5a3c"/>' +
+    '<path d="M40 230 Q60 90 280 70 Q500 90 520 230Z" fill="url(#shadeHi)"/><rect x="30" y="222" width="500" height="18" rx="9" fill="#c9a45a"/><ellipse cx="280" cy="240" rx="230" ry="16" fill="#fff4d0" opacity=".85"/>' +
+    '<defs><linearGradient id="shadeHi" x1="0" x2="1"><stop offset="0" stop-color="#fff" stop-opacity=".0"/><stop offset=".3" stop-color="#fff" stop-opacity=".25"/><stop offset=".5" stop-color="#fff" stop-opacity="0"/></linearGradient></defs></svg>';
   document.body.appendChild(pool);
   document.documentElement.style.overflow = 'hidden';
   var meter = pool.querySelector('.meter'), banner = pool.querySelector('.banner'), world = pool.querySelector('.world'), svg = world.querySelector('svg'), prompt = pool.querySelector('.prompt'), flash = pool.querySelector('.flash');
@@ -52,28 +68,44 @@
   var el = function (tag, a, parent) { var e = document.createElementNS(NS, tag); for (var k in a) e.setAttribute(k, a[k]); (parent || svg).appendChild(e); return e; };
 
   // ── sound: made in the browser, only after the player has clicked
-  var audio = { c: null,
+  var audio = { c: null, m: null, muted: false,
+    out: function () { var c = this.c; if (!this.m) { this.m = c.createGain(); this.m.gain.value = this.muted ? 0 : 1; this.m.connect(c.destination); } return this.m; },
+    mute: function (on) { this.muted = on; if (this.m) this.m.gain.setTargetAtTime(on ? 0 : 1, this.c.currentTime, .05); },
+    // an upright-bass walk under the chase: quiet, plucky, a few bars of E minor
+    bassT: null,
+    bass: function (on) { var self = this, c = this.c; if (!c) return; clearInterval(this.bassT); if (!on) return;
+      var notes = [82.4, 98, 110, 123.5, 146.8, 123.5, 110, 98, 82.4, 87.3, 98, 110, 130.8, 123.5, 110, 92.5], i = 0;
+      var pluck = function (f) { var t = c.currentTime, o = c.createOscillator(), o2 = c.createOscillator(), g = c.createGain(), lp = c.createBiquadFilter();
+        o.type = 'triangle'; o2.type = 'sine'; o.frequency.value = f; o2.frequency.value = f * 2; lp.type = 'lowpass'; lp.frequency.setValueAtTime(900, t); lp.frequency.exponentialRampToValueAtTime(220, t + .3);
+        g.gain.setValueAtTime(.0001, t); g.gain.exponentialRampToValueAtTime(.16, t + .012); g.gain.exponentialRampToValueAtTime(.0005, t + .48);
+        o.connect(lp); o2.connect(lp); lp.connect(g).connect(self.out()); o.start(t); o2.start(t); o.stop(t + .5); o2.stop(t + .5); };
+      var brush = function () { self.noise(.09, 5200, .6, .035); };
+      pluck(notes[0]); this.bassT = setInterval(function () { i++; pluck(notes[i % notes.length]); if (i % 2) brush(); }, 545); },
     init: function () { try { this.c = this.c || new (window.AudioContext || window.webkitAudioContext)(); if (this.c.state === 'suspended') this.c.resume(); } catch (e) {} },
     noise: function (dur, f, q, gain, type) { var c = this.c; if (!c) return; var n = Math.ceil(c.sampleRate * dur), b = c.createBuffer(1, n, c.sampleRate), d = b.getChannelData(0);
       for (var i = 0; i < n; i++) d[i] = (Math.random() * 2 - 1) * Math.exp(-i / (c.sampleRate * dur * .25));
       var s = c.createBufferSource(); s.buffer = b; var fl = c.createBiquadFilter(); fl.type = type || 'bandpass'; fl.frequency.value = f; fl.Q.value = q; var g = c.createGain(); g.gain.value = gain;
-      s.connect(fl).connect(g).connect(c.destination); s.start(); },
+      s.connect(fl).connect(g).connect(audio.out()); s.start(); },
     tone: function (f, dur, gain, type) { var c = this.c; if (!c) return; var o = c.createOscillator(), g = c.createGain(), t = c.currentTime; o.type = type || 'sine'; o.frequency.setValueAtTime(f, t); o.frequency.exponentialRampToValueAtTime(f * .7, t + dur);
-      g.gain.setValueAtTime(gain, t); g.gain.exponentialRampToValueAtTime(.0005, t + dur); o.connect(g).connect(c.destination); o.start(); o.stop(t + dur + .02); },
+      g.gain.setValueAtTime(gain, t); g.gain.exponentialRampToValueAtTime(.0005, t + dur); o.connect(g).connect(audio.out()); o.start(); o.stop(t + dur + .02); },
     clack: function (v) { v = Math.max(.15, Math.min(1, v)); this.noise(.04, 3000 + Math.random() * 900, 1.3, .5 * v); this.tone(1700 + Math.random() * 400, .06, .08 * v); this.tone(380, .05, .1 * v, 'triangle'); },
     cue: function () { this.noise(.05, 1400, 1, .5); this.tone(220, .08, .2, 'triangle'); },
     thump: function () { this.tone(110, .25, .35, 'sine'); this.noise(.08, 400, .7, .3, 'lowpass'); },
     rumble: null,
     roll: function (on) { var c = this.c; if (!c) return; if (on && !this.rumble) { var n = c.sampleRate * 2, b = c.createBuffer(1, n, c.sampleRate), d = b.getChannelData(0);
         for (var i = 0; i < n; i++) d[i] = Math.random() * 2 - 1; var s = c.createBufferSource(); s.buffer = b; s.loop = true; var f = c.createBiquadFilter(); f.type = 'lowpass'; f.frequency.value = 260;
-        var g = c.createGain(); g.gain.value = 0; s.connect(f).connect(g).connect(c.destination); s.start(); this.rumble = { s: s, g: g }; }
+        var g = c.createGain(); g.gain.value = 0; s.connect(f).connect(g).connect(audio.out()); s.start(); this.rumble = { s: s, g: g }; }
       if (!on && this.rumble) { var r = this.rumble; r.g.gain.setTargetAtTime(0, c.currentTime, .15); setTimeout(function () { try { r.s.stop(); } catch (e) {} }, 800); this.rumble = null; } },
     level: function (v) { if (this.rumble) this.rumble.g.gain.setTargetAtTime(Math.min(.22, v), this.c.currentTime, .05); }
   };
 
+  // speckle texture drawn once to a tiny canvas; far cheaper than a live SVG noise filter
+  var SPECK = (function () { var c = document.createElement('canvas'); c.width = c.height = 96; var x = c.getContext('2d');
+    for (var i = 0; i < 900; i++) { x.fillStyle = 'rgba(255,255,255,' + (Math.random() * .9) + ')'; x.fillRect(Math.random() * 96, Math.random() * 96, Math.random() < .2 ? 2 : 1, 1); }
+    return c.toDataURL(); })();
   function defs() {
     var d = el('defs', {});
-    d.innerHTML = '<filter id="pSpeck" x="0" y="0" width="100%" height="100%"><feTurbulence type="fractalNoise" baseFrequency="1.4" numOctaves="1" seed="3"/>' +
+    d.innerHTML = '<pattern id="pSpeckPat" width="96" height="96" patternUnits="userSpaceOnUse"><image href="' + SPECK + '" width="96" height="96"/></pattern>' + '<filter id="pSpeck" x="0" y="0" width="100%" height="100%"><feTurbulence type="fractalNoise" baseFrequency="1.4" numOctaves="1" seed="3"/>' +
       '<feColorMatrix values="0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 -2.6 1.5"/><feComposite in2="SourceGraphic" operator="in"/></filter>' +
       '<linearGradient id="pWood" x1="0" y1="0" x2="' + (land ? 0 : 1) + '" y2="' + (land ? 1 : 0) + '"><stop offset="0" stop-color="#7d4a28"/><stop offset=".5" stop-color="' + WOOD + '"/><stop offset="1" stop-color="' + WOOD2 + '"/></linearGradient>' +
       '<radialGradient id="pShine" cx="35%" cy="30%" r="60%"><stop offset="0" stop-color="#fff" stop-opacity=".55"/><stop offset=".4" stop-color="#fff" stop-opacity="0"/></radialGradient>';
@@ -87,7 +119,7 @@
     if (kind === 'eight') el('circle', { r: R, fill: INK }, spin);
     else if (kind.indexOf('Stripe') > 0) { el('circle', { r: R, fill: CREAM }, spin); el('rect', { x: -R, y: -R * .52, width: R * 2, height: R * 1.04, fill: col, 'clip-path': 'url(#pc' + i + ')' }, spin); }
     else el('circle', { r: R, fill: col }, spin);
-    el('circle', { r: R, fill: '#fff', filter: 'url(#pSpeck)', opacity: '.33' }, spin);
+    el('circle', { r: R, fill: 'url(#pSpeckPat)', opacity: '.45' }, spin);
     var lab = el('g', {}, spin), lc = el('g', {}, lab);
     el('circle', { r: R * .48, fill: CREAM }, lc);
     var t = el('text', { 'text-anchor': 'middle', y: R * .21, 'font-family': "'DM Serif Display',Georgia,serif", 'font-size': R * .64, fill: INK }, lc); t.textContent = kind === 'eight' ? '8' : letter;
@@ -126,15 +158,15 @@
   function props() {
     var s = Math.min(SU, SV) / 900, g = el('g', {});
     var put = function (u, v, rot, html) { var p = P(u, v), e = el('g', { transform: 'translate(' + p.x + ' ' + p.y + ') rotate(' + rot + ') scale(' + s + ')' }, g); e.innerHTML = html; };
-    var spk = function (w, h, r) { return '<rect width="' + w + '" height="' + h + '" rx="' + (r || 0) + '" fill="#fff" filter="url(#pSpeck)" opacity=".38"/>'; };
+    var spk = function (w, h, r) { return '<rect width="' + w + '" height="' + h + '" rx="' + (r || 0) + '" fill="url(#pSpeckPat)" opacity=".38"/>'; };
     put(SU * .1, SV * .16, -12, '<rect x="6" y="8" width="150" height="190" fill="#123020" opacity=".55"/><rect width="150" height="190" fill="' + CREAM + '"/><rect y="150" width="150" height="40" fill="' + INK + '"/>' +
       '<text x="75" y="70" text-anchor="middle" font-family="\'DM Serif Display\',Georgia,serif" font-size="54" fill="#2f7a4a">sg</text><text x="75" y="98" text-anchor="middle" font-family="Courier New,monospace" font-size="12" font-weight="700" fill="#2f7a4a">CARD TABLE &amp;</text>' +
       '<text x="75" y="114" text-anchor="middle" font-family="Courier New,monospace" font-size="12" font-weight="700" fill="#2f7a4a">POOL LOUNGE</text><text x="75" y="140" text-anchor="middle" font-family="Courier New,monospace" font-size="9" fill="#2f7a4a">OPEN LATE · NEW HAVEN</text>' + spk(150, 190));
     put(SU * .9, SV * .14, 7, '<rect x="8" y="10" width="220" height="200" fill="#123020" opacity=".55"/><rect width="220" height="200" fill="' + CREAM + '"/><path d="M70 40 q20 -14 40 0 q20 -14 40 0 q-20 18 -40 10 q-20 8 -40 -10z" fill="' + RED + '" opacity=".85"/>' +
       '<text x="110" y="92" text-anchor="middle" font-family="\'Nanum Pen Script\',cursive" font-size="30" fill="' + INK + '">the card table</text><text x="110" y="126" text-anchor="middle" font-family="\'Nanum Pen Script\',cursive" font-size="26" fill="' + INK + '">new haven, ct</text>' +
       '<text x="110" y="158" text-anchor="middle" font-family="\'Nanum Pen Script\',cursive" font-size="26" fill="' + INK + '">sofiagrimm.com</text>' + spk(220, 200));
-    var die = function (u, v, rot, pips) { var h = '<rect x="5" y="6" width="56" height="56" rx="8" fill="#123020" opacity=".55"/><rect width="56" height="56" rx="8" fill="' + CREAM + '"/>'; pips.forEach(function (q) { h += '<circle cx="' + q[0] + '" cy="' + q[1] + '" r="5.5" fill="' + INK + '"/>'; }); put(u, v, rot, h + spk(56, 56, 8)); };
-    die(SU * 1.05, SV * .84, 14, [[28, 28]]); die(SU * 1.12, SV * .76, -10, [[16, 14], [40, 14], [16, 28], [40, 28], [16, 42], [40, 42]]);
+    var die = function (u, v, rot, pips) { var h = '<g class="pdie"><rect x="5" y="6" width="56" height="56" rx="8" fill="#123020" opacity=".55"/><rect width="56" height="56" rx="8" fill="' + CREAM + '"/>' + spk(56, 56, 8); pips.forEach(function (q) { h += '<circle class="pp" cx="' + q[0] + '" cy="' + q[1] + '" r="5.5" fill="' + INK + '"/>'; }); put(u, v, rot, h + '</g>'); };
+    die(SU * .64, SV * .84, 14, [[28, 28]]); die(SU * .71, SV * .77, -10, [[16, 14], [40, 14], [16, 28], [40, 28], [16, 42], [40, 42]]);
     put(SU * .2, SV * .78, 18, '<rect x="5" y="6" width="54" height="54" fill="#123020" opacity=".55"/><rect width="54" height="54" fill="' + BLUE + '"/><rect x="10" y="10" width="34" height="34" fill="#4c86b8"/>' + spk(54, 54));
     put(SU * 1.95, SV * .82, 0, '<circle cx="8" cy="10" r="66" fill="#123020" opacity=".55"/><circle r="66" fill="' + CREAM + '"/><text y="14" text-anchor="middle" font-family="\'DM Serif Display\',Georgia,serif" font-size="40" fill="' + RED + '">cards</text>');
     var c0 = P(SU * 1.75, SV * .18), c1 = P(SU * 2.55, SV * .24);
@@ -158,8 +190,8 @@
     el('path', { d: tri, fill: 'none', stroke: '#123020', 'stroke-width': R * .9, 'stroke-linejoin': 'round', opacity: '.55', transform: 'translate(' + R * .25 + ' ' + R * .3 + ')' }, rack);
     el('path', { d: tri, fill: 'none', stroke: INK, 'stroke-width': R * .75, 'stroke-linejoin': 'round' }, rack);
     el('path', { d: tri, fill: 'none', stroke: CREAM, 'stroke-width': R * .16, 'stroke-linejoin': 'round', opacity: '.75', 'stroke-dasharray': R * .9 + ' ' + R * .25 }, rack);
-    var a0 = P(SU * .25 + R * 1.4, midV), a1 = P(apexU - R * 1.2, midV);
-    aimLine = el('line', { x1: a0.x, y1: a0.y, x2: a1.x, y2: a1.y, stroke: CREAM, 'stroke-width': 2, 'stroke-dasharray': '2 9', 'stroke-linecap': 'round', opacity: .25 });
+    var a0 = P(SU * .25 + R * 1.4, midV), a1 = P(apexU - R * 1.2, midV), aimLen = (apexU - R * 2.05) - SU * .25;
+    aimLine = el('line', { x1: a0.x, y1: a0.y, x2: a1.x, y2: a1.y, stroke: CREAM, 'stroke-width': 2, 'stroke-dasharray': '2 9', 'stroke-linecap': 'round', opacity: .25 }); aimLine.dataset.len = aimLen;
     var gh = P(apexU - R * 2.05, midV); ghost = el('circle', { cx: gh.x, cy: gh.y, r: R, fill: 'none', stroke: CREAM, 'stroke-width': 1.5, 'stroke-dasharray': '4 5', opacity: .4 });
     trailEls = []; for (var t = 0; t < 10; t++) trailEls.push(el('circle', { r: R * (1 - t * .06), fill: INK, opacity: 0 }));
     balls = LETTERS.map(function (l, i) { var b = makeBall(i, l); b.x = pos[i].x; b.y = pos[i].y; return b; });
@@ -204,16 +236,33 @@
       t.setAttribute('cx', p.x); t.setAttribute('cy', p.y); t.setAttribute('opacity', Math.max(0, .22 - i * .022) * Math.min(1, p.s / (R * .5))); });
     var back = R + 6 + pull;
     if (aimLine && state === 'aim') { var k = pull / (Math.min(W, H) * .2); aimLine.setAttribute('opacity', .25 + k * .5); meter.querySelector('b').style.height = (k * 100) + '%'; }
-    if (cue) cue.setAttribute('transform', 'translate(' + (eight.x - dir.x * back) + ' ' + (eight.y - dir.y * back) + ') rotate(' + (land ? 0 : 90) + ')');
+    if (cue) cue.setAttribute('transform', 'translate(' + (eight.x - dir.x * back) + ' ' + (eight.y - dir.y * back) + ') rotate(' + (Math.atan2(dir.y, dir.x) * 180 / Math.PI) + ')');
+    if (aimLine && state === 'aim') { var reach = Math.hypot(+aimLine.dataset.len || 0, 0); aimLine.setAttribute('x1', eight.x + dir.x * R * 1.4); aimLine.setAttribute('y1', eight.y + dir.y * R * 1.4);
+      aimLine.setAttribute('x2', eight.x + dir.x * reach); aimLine.setAttribute('y2', eight.y + dir.y * reach);
+      ghost.setAttribute('cx', eight.x + dir.x * (reach + R * .85)); ghost.setAttribute('cy', eight.y + dir.y * (reach + R * .85)); }
   }
 
   var dragFrom = null, maxPull;
+  pool.querySelector('.snd').addEventListener('click', function (e) { audio.init(); var on = audio.muted; audio.mute(!on); e.currentTarget.textContent = 'sound: ' + (on ? 'on' : 'off'); e.currentTarget.setAttribute('aria-pressed', on); });
+  // the dice on the pool table roll too
+  var PIP = { 1: [[28, 28]], 2: [[16, 16], [40, 40]], 3: [[16, 16], [28, 28], [40, 40]], 4: [[16, 16], [40, 16], [16, 40], [40, 40]], 5: [[16, 16], [40, 16], [28, 28], [16, 40], [40, 40]], 6: [[16, 14], [40, 14], [16, 28], [40, 28], [16, 42], [40, 42]] };
+  function rollDie(g) { if (g.__rolling) return; g.__rolling = true; var t0 = performance.now(), base = g.getAttribute('transform') || '', sp = (Math.random() < .5 ? -1 : 1) * (540 + Math.random() * 360);
+    (function f(now) { var k = Math.min(1, (now - t0) / 900), e = 1 - Math.pow(1 - k, 3), hop = Math.abs(Math.sin(k * Math.PI * 2.5)) * (1 - k) * 30;
+      g.setAttribute('transform', base + ' translate(28 28) rotate(' + (sp * e) + ') translate(' + (-28) + ' ' + (-28 - hop) + ')');
+      if (k < .85 && Math.random() < .3) { var v = 1 + Math.floor(Math.random() * 6), pips = g.querySelectorAll('.pp'); pips.forEach(function (p) { p.remove(); }); PIP[v].forEach(function (q) { el('circle', { cx: q[0], cy: q[1], r: 5.5, fill: INK, class: 'pp' }, g); }); }
+      if (Math.abs(Math.sin(k * Math.PI * 2.5)) < .08 && k > .1) audio.clack(.3 * (1 - k) + .1);
+      if (k < 1) requestAnimationFrame(f); else { g.setAttribute('transform', base); g.__rolling = false; } })(t0); }
+  pool.addEventListener('click', function (e) { var d = e.target.closest && e.target.closest('.pdie'); if (d) { audio.init(); rollDie(d); } });
   pool.addEventListener('pointerdown', function (e) {
     audio.init();
-    if (state !== 'aim' || e.target.classList.contains('skip')) return;
+    if (state !== 'aim' || e.target.classList.contains('skip') || e.target.classList.contains('snd') || (e.target.closest && e.target.closest('.pdie'))) return;
     dragFrom = { x: e.clientX, y: e.clientY }; maxPull = Math.min(W, H) * .2; pool.classList.add('aiming'); meter.style.opacity = 1; pool.setPointerCapture(e.pointerId);
   });
-  pool.addEventListener('pointermove', function (e) { if (!dragFrom) return; var dx = e.clientX - dragFrom.x, dy = e.clientY - dragFrom.y; pull = Math.max(0, Math.min(maxPull, -(dx * dir.x + dy * dir.y) + Math.hypot(dx, dy) * .35)); draw(); });
+  pool.addEventListener('pointermove', function (e) { if (!dragFrom) return; var dx = e.clientX - dragFrom.x, dy = e.clientY - dragFrom.y, len = Math.hypot(dx, dy);
+    pull = Math.max(0, Math.min(maxPull, len));
+    // pulling back points the cue the other way; it can swing a little either side of the rack
+    if (len > 14) { var base = land ? 0 : Math.PI / 2, ang = Math.atan2(-dy, -dx) - base; ang = Math.atan2(Math.sin(ang), Math.cos(ang)); ang = Math.max(-.09, Math.min(.09, ang)) + base; dir = { x: Math.cos(ang), y: Math.sin(ang) }; }
+    draw(); });
   pool.addEventListener('pointerup', function () { if (!dragFrom) return; dragFrom = null; pool.classList.remove('aiming'); shoot(Math.max(.5, pull / maxPull)); });
   pool.addEventListener('keydown', function (e) { if ((e.key === 'Enter' || e.key === ' ') && state === 'aim') { e.preventDefault(); audio.init(); shoot(.8); } });
 
@@ -265,10 +314,13 @@
             var rel = (A.vx - B.vx) * nx + (A.vy - B.vy) * ny;
             if (rel > 0) { A.vx -= rel * nx * .96; A.vy -= rel * ny * .96; B.vx += rel * nx * .96; B.vy += rel * ny * .96;
               audio.clack(rel / (R * .8));
-              if (!impactAt) { impactAt = now; burst((A.x + B.x) / 2, (A.y + B.y) / 2); cam.shake = R * .7; slow = .25; var ip = { x: (A.x + B.x) / 2, y: (A.y + B.y) / 2 }; cam.f = { x: ip.x, y: ip.y }; } }
+              if (!impactAt) { impactAt = now; burst((A.x + B.x) / 2, (A.y + B.y) / 2); cam.shake = R * .7; slow = .25; pool.classList.add('cine');
+                pool.querySelector('.stamp').animate([{ opacity: 0, transform: 'translate(-50%,-50%) rotate(-8deg) scale(1.7)' }, { opacity: 1, transform: 'translate(-50%,-50%) rotate(-8deg) scale(1)', offset: .18 },
+                  { opacity: 1, transform: 'translate(-50%,-50%) rotate(-8deg) scale(1.02)', offset: .7 }, { opacity: 0, transform: 'translate(-50%,-50%) rotate(-8deg) scale(1.1)' }], { duration: 1100, easing: 'cubic-bezier(.2,.8,.2,1)', fill: 'forwards' }); var ip = { x: (A.x + B.x) / 2, y: (A.y + B.y) / 2 }; cam.f = { x: ip.x, y: ip.y }; } }
           }
         }
       }
+      if (!impactAt && state === 'break' && now - (physics.t0 || (physics.t0 = now)) > 2600) { impactAt = now; }
       if (impactAt) { var since = now - impactAt; cam.z = 1 + .22 * Math.max(0, Math.sin(Math.min(1, since / 1100) * Math.PI)); if (since > 550) slow = Math.min(1, slow + .03); cam.shake *= .9; if (since > 1200 && state === 'break') cruise(now); }
       trail.push({ x: eight.x, y: eight.y, s: Math.hypot(eight.vx, eight.vy) || trailSpeed }); if (trail.length > 30) trail.shift();
       if (state === 'cruise') { cruiseStep(now); pocketStep(now); }
@@ -281,7 +333,7 @@
   // the table, over the foot rail and onto the card table, then the ball rolls away
   var path, legs, legIdx = 0, legT0 = 0, bounced = false, landed = false, trailSpeed = 0;
   function cruise(now) {
-    state = 'cruise'; audio.roll(true);
+    state = 'cruise'; audio.roll(true); audio.bass(true); pool.classList.remove('cine'); pool.querySelector('.shade').classList.add('gone');
     var wall = R * 2.1 + R * .45 + R, b0 = land ? { u: eight.x, v: eight.y } : { u: eight.y, v: eight.x };
     path = [b0, { u: SU * 1.6, v: wall }, { u: END - R * 2.8, v: SV * .6 }, { u: END + SU * .32, v: SV * .64 }, { u: END + SU * 1.5, v: SV * .7 }];
     legs = [{ d: 3000, e: 'out' }, { d: 4300, e: 'lin' }, { d: 1400, e: 'hop' }, { d: 2600, e: 'lin' }];
@@ -327,11 +379,13 @@
     dispatchEvent(new Event('resize'));
   }
   function finish() {
+    audio.bass(false);
     if (state === 'gone') return; state = 'gone'; audio.roll(false); sessionStorage.setItem('sg-pool-done', '1');
     cam.u = END; setCamera();
     pool.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 350, fill: 'forwards' }).finished.then(cleanup);
   }
   pool.querySelector('.skip').addEventListener('click', function () {
+    audio.bass(false);
     state = 'gone'; audio.roll(false); sessionStorage.setItem('sg-pool-done', '1');
     pool.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 300, fill: 'forwards' }).finished.then(cleanup);
   });
