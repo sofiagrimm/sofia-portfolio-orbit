@@ -281,7 +281,7 @@
   });
   QUOTES.forEach(([q,src],i)=>{const d=document.createElement('div');d.className='quote';d.innerHTML=q+(src?`<small>${src}</small>`:'');add(d,0,-.2,1300+i*6500,520,0);things[things.length-1].rot=0;});
   // the white rabbit, hurrying past near the top
-  add(svgEl('<div class="medal"><img src="img/wonderland/rabbit-watch.webp" alt=""></div><span class="hint" style="color:#f4ecd8">"Oh dear! I shall be late!"</span>'),.32,.18,700,170,8);
+  add(svgEl('<img src="img/wonderland/white-rabbit.webp" alt=""><span class="hint" style="color:#f4ecd8">"Oh dear! I shall be late!"</span>'),.32,.16,700,170,8);
   // the same burst of cards from the door keeps tumbling past on the way down
   [[-.2,-.15,4600],[.25,.1,10400],[-.15,.05,16800],[.2,-.12,21800]].forEach(([x,y,d],i)=>{add(svgEl('<img src="img/wonderland/flying-cards.webp" alt="">'),x,y,d,560,(i%2?14:-14));});
   // pictures hung on the walls of the hole: the hedge keyhole, and the keyhole full of everything
