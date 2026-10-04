@@ -73,7 +73,9 @@
   .framed:focus-visible{outline:3px solid #2a2219;outline-offset:8px}
   .framed .pic{position:absolute;overflow:hidden;background:#222}
   .framed .pic img{display:block;width:100%;height:100%;object-fit:fill}
-  .framed svg.frame{position:relative;display:block;width:100%;height:auto;pointer-events:none}
+  .framed .fbox{position:relative;width:100%}
+  .framed .fimg{position:absolute;inset:0;width:100%;height:100%;object-fit:fill;pointer-events:none;z-index:2;-webkit-user-drag:none}
+  .framed .pic{z-index:1}
   .framed .cap{display:block;margin-top:14px;font-family:'Cormorant Garamond',serif;font-style:italic;font-size:19px;color:var(--ink)}
   .eye{position:absolute;background-repeat:no-repeat;pointer-events:none;-webkit-mask:radial-gradient(ellipse 50% 50% at 50% 50%,#000 45%,transparent 100%);mask:radial-gradient(ellipse 50% 50% at 50% 50%,#000 45%,transparent 100%)}
   .skyglow{position:absolute;inset:0;pointer-events:none;mix-blend-mode:screen;opacity:.9;background:radial-gradient(circle at var(--gx,50%) var(--gy,30%),rgba(255,236,150,.5),rgba(255,220,120,.12) 12%,transparent 26%)}
@@ -203,7 +205,9 @@ const PAINTINGS = [
     if(Math.abs(tx-fx)+Math.abs(ty-fy)>.5||Math.abs(gx-px)+Math.abs(gy-py)>.002)raf=requestAnimationFrame(loop);}
 
   // ── frames, drawn to fit each painting: gilded baroque, pink enamel, painted blue, red lace
-  const FRAMES=['gold','pink','blue','lace'];
+  // the real frames: each picture's window (left, top, width, height as fractions of the frame image)
+  const FRAME_IMG={"gold": {"ar": 0.8497, "win": [0.1703, 0.1503, 0.6662, 0.7079]}, "pink": {"ar": 0.8187, "win": [0.1982, 0.1477, 0.6054, 0.6944]}, "blue": {"ar": 1.2961, "win": [0.1536, 0.1991, 0.6929, 0.5996]}, "lace": {"ar": 0.8217, "win": [0.1006, 0.1021, 0.8003, 0.7984]}};
+  const FRAMES=['gold','lace','blue','pink'];   // Mona Lisa, Pearl Earring, Starry Night, Venus
   function frameSVG(kind,pw,ph){
     const t=Math.round(Math.min(pw,ph)*.2),W=pw+2*t,H=ph+2*t,id=kind+Math.random().toString(36).slice(2,7);
     const hole=`M${t} ${t}h${pw}v${ph}h${-pw}z`,outer=`M0 0h${W}v${H}h${-W}z`;
@@ -280,10 +284,14 @@ const PAINTINGS = [
     b.innerHTML=`<div class="pic"><img alt="${p.label}" src="${p.img.replace('width=1600','width=900')}"></div><span class="cap">${p.label}</span>`;
     grid.appendChild(b);
     const img=b.querySelector('img');
-    const build=()=>{const a=img.naturalWidth/img.naturalHeight||.7,pw=1000,ph=Math.round(1000/a),f=frameSVG(FRAMES[k],pw,ph);
-      b.insertAdjacentHTML('afterbegin',f.svg);const pic=b.querySelector('.pic');
-      Object.assign(pic.style,{left:(f.t/f.W*100)+'%',top:(f.t/f.H*100)+'%',width:(pw/f.W*100)+'%',height:(ph/f.H*100)+'%'});
-      b.style.maxWidth=(a<1?420:520)+'px';
+    const build=()=>{
+      // stretch the frame just enough that its window fits this painting exactly
+      const a=img.naturalWidth/img.naturalHeight||.7,F=FRAME_IMG[FRAMES[k]],[wl,wt,ww,wh]=F.win;
+      const boxAR=wh*a/ww;
+      b.insertAdjacentHTML('afterbegin',`<div class="fbox" style="aspect-ratio:${boxAR}"><img class="fimg" src="img/frames/${FRAMES[k]}.webp" alt="" draggable="false"></div>`);
+      const box=b.querySelector('.fbox'),pic=b.querySelector('.pic');box.insertBefore(pic,box.firstChild);
+      Object.assign(pic.style,{left:(wl*100)+'%',top:(wt*100)+'%',width:(ww*100)+'%',height:(wh*100)+'%'});
+      b.style.maxWidth=(boxAR<1?420:540)+'px';
       requestAnimationFrame(()=>{const r=pic.getBoundingClientRect();addEyes(pic,img.src,{x:0,y:0,w:r.width,h:r.height},k);});};
     if(img.complete&&img.naturalWidth)build();else img.addEventListener('load',build,{once:true});
     b.addEventListener('click',()=>{show(k);hero.scrollIntoView({behavior:'smooth',block:'start'});});
