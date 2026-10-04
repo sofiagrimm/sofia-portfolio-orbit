@@ -156,11 +156,12 @@
 
     /* red felt card table */
     html,body{background:#6e1f22}
-    body{background:
+    body{background:transparent !important}
+    html::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;will-change:transform;background:
       radial-gradient(ellipse 80% 70% at 50% 45%, rgba(255,140,120,.10) 0%, transparent 60%),
       radial-gradient(ellipse 120% 100% at 50% 50%, transparent 55%, rgba(30,0,4,.55) 100%),
       url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 .5 0'/%3E%3C/filter%3E%3Crect width='220' height='220' filter='url(%23n)' opacity='.35'/%3E%3C/svg%3E"),
-      linear-gradient(160deg,#842a2c,#6e1f22 55%,#5a1719);background-attachment:fixed}
+      linear-gradient(160deg,#842a2c,#6e1f22 55%,#5a1719)}
     .page-eyebrow{color:rgba(255,226,214,.6)}
     .page-title{color:#fff6ee}.page-title em{color:#f6c9cf}
     .page-subtitle{color:rgba(255,226,214,.65)}
@@ -211,6 +212,10 @@
     /* low, warm casino light: dark corners over the felt */
     body::after{content:"";position:fixed;inset:0;pointer-events:none;z-index:4;
       background:radial-gradient(ellipse 75% 70% at 50% 45%,transparent 45%,rgba(20,4,4,.55) 100%),linear-gradient(180deg,rgba(10,2,2,.25),transparent 30%)}
+    body::after{will-change:transform}
+    #cardframe,#table,#arch{contain:layout paint}
+    .card-scene{will-change:transform}
+    .rast{display:block;width:100%;height:auto;aspect-ratio:250/350;-webkit-user-drag:none;user-select:none}
   </style>
 </head>
 <body>
@@ -422,7 +427,7 @@
         <clipPath id="win"><path d="M140 176 L140 202 L188 202 L178 180 Q176 176 170 176Z"/></clipPath>
         <clipPath id="busw"><rect x="120" y="214" width="26" height="20" rx="3"/></clipPath>
       </defs>`;
-      const paper=`<g clip-path="url(#clip${f})"><rect x="4" y="4" width="242" height="342" fill="#f6f2e8"/><rect x="4" y="4" width="242" height="342" fill="#fff" filter="url(#tex${f})" opacity=".22"/></g>
+      const paper=`<g clip-path="url(#clip${f})"><rect x="4" y="4" width="242" height="342" fill="#f6f2e8"/>${h.img?'':`<rect x="4" y="4" width="242" height="342" fill="#fff" filter="url(#tex${f})" opacity=".22"/>`}</g>
         <rect x="4.5" y="4.5" width="241" height="341" rx="10" fill="none" stroke="#d6cdb9" stroke-width="1"/>`;
       let corners='';
       if(h.suit){
@@ -651,6 +656,30 @@
       ${corner}<g transform="rotate(180 125 175)">${corner}</g>${mid}</svg>`;
   }
 
+
+  // Hand-inked cards use several texture filters each, and there are dozens of them on the
+  // table. Drawing them live made the page heavy, so each design is turned into an image once
+  // (with the corner font tucked inside) and reused.
+  const ART={},ARTSRC={};let FELL='';
+  function artURL(key,svg){
+    const withFont=FELL?svg.replace(/<svg([^>]*)>/,`<svg$1><style>@font-face{font-family:'IM Fell English';src:url(${FELL}) format('woff2')}</style>`):svg;
+    return 'data:image/svg+xml;charset=utf-8,'+encodeURIComponent(withFont);
+  }
+  function art(key,make){
+    if(!ARTSRC[key])ARTSRC[key]=make();
+    if(!ART[key])ART[key]=artURL(key,ARTSRC[key]);
+    const im=new Image();im.decoding='async';im.alt='';im.className='rast';im.dataset.art=key;im.src=ART[key];im.draggable=false;return im;
+  }
+  function setArt(el,key,make){el.textContent='';el.appendChild(art(key,make));}
+  // fetch the corner font once and redraw the card images with it
+  (async()=>{try{
+    const css=await (await fetch('https://fonts.googleapis.com/css2?family=IM+Fell+English&display=swap')).text();
+    const urls=[...css.matchAll(/url\((https:[^)]+\.woff2)\)/g)].map(m=>m[1]);const u=urls[urls.length-1];if(!u)return;
+    const buf=await (await fetch(u)).arrayBuffer();let bin='';const b=new Uint8Array(buf);for(let i=0;i<b.length;i+=8192)bin+=String.fromCharCode.apply(null,b.subarray(i,i+8192));
+    FELL='data:font/woff2;base64,'+btoa(bin);
+    Object.keys(ART).forEach(k=>delete ART[k]);
+    document.querySelectorAll('img.rast').forEach(im=>{const k=im.dataset.art;if(!ART[k])ART[k]=artURL(k,ARTSRC[k]);im.src=ART[k];});
+  }catch(e){}})();
   const GREEN="#2e7656";
   function back(){
     const f='b'+(uid++);
@@ -824,7 +853,7 @@
         el.style.top=`calc(${g.y}% + ${g.pile?k*-3:Math.abs(spread)*8}px)`;
         el.style.transform=`rotate(${g.rot+tilt}deg)`;
         el.style.transformOrigin='50% 110%';
-        el.innerHTML=rs?card(rs[0],rs[1]):back();
+        if(rs)setArt(el,'c'+rs[0]+rs[1],()=>card(rs[0],rs[1]));else setArt(el,'back',back);
         table.appendChild(el);
       });
     });
@@ -865,7 +894,7 @@
     const vw=innerWidth,mobile=vw<760,w=mobile?72:138,h=w*1.4;frame.innerHTML='';let i=0;
     const vh=Math.max(document.documentElement.scrollHeight,innerHeight);frame.style.height=vh+'px';
     const place=(x,y,rot)=>{const [r,s]=BORDER_CARDS[i%BORDER_CARDS.length];const el=document.createElement('div');el.className='fc';el.dataset.card=r+'|'+s;el.style.width=w+'px';
-      el.style.left=x+'px';el.style.top=y+'px';el.style.transform=`rotate(${rot}deg)`;el.innerHTML=card(r,s);frame.appendChild(el);i++;};
+      el.style.left=x+'px';el.style.top=y+'px';el.style.transform=`rotate(${rot}deg)`;setArt(el,'c'+r+s,()=>card(r,s));frame.appendChild(el);i++;};
     // left edge, top to bottom
     // a messy spill down each side: two loose layers, overlapping, every card at its own angle
     if(vw>=1100){
@@ -883,7 +912,7 @@
       for(let x=-w*.05;x<vw;x+=w*.75){place(x,rowTop-h*.38+rnd(i+4)*h*.18,(rnd(i+12)-.5)*60);}
     }
   }
-  const pb=document.querySelector('.poster-base');if(pb)pb.innerHTML=card('A','club');
+  const pb=document.querySelector('.poster-base');if(pb)setArt(pb,'cAclub',()=>card('A','club'));
   // ── the printed arch: fitted around the hand, and nothing else on the table may touch it
   const NSA='http://www.w3.org/2000/svg';
   const arch=document.createElementNS(NSA,'svg');arch.id='arch';arch.setAttribute('aria-hidden','true');
@@ -1066,7 +1095,7 @@
       const [r,s]=BORDER_CARDS[(k*7+3)%BORDER_CARDS.length];
       const el=document.createElement('div');el.className='fc extra';el.dataset.card=r+'|'+s;el.style.width=w+'px';
       el.style.left=x+'px';el.style.top=y+'px';el.style.transform=`rotate(${(rnd(k+37)-.5)*80}deg)`;
-      el.innerHTML=card(r,s);frameEl.appendChild(el);
+      setArt(el,'c'+r+s,()=>card(r,s));frameEl.appendChild(el);
       if(overlapsHand(el)||touchesBand(el)||overlapsAny(el,'#table .pc',4)||docBox(el).b>floor+h*.4)el.remove();else placed++;
     }
   }
