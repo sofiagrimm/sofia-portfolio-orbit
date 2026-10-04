@@ -317,7 +317,7 @@ const PAINTINGS = [
 
   // ── frames, drawn to fit each painting: gilded baroque, pink enamel, painted blue, red lace
   // the real frames: each picture's window (left, top, width, height as fractions of the frame image)
-  const FRAME_IMG={"gold": {"ar": 0.8497, "win": [0.1703, 0.1503, 0.6662, 0.7079]}, "pink": {"ar": 0.8187, "win": [0.1982, 0.1477, 0.6054, 0.6944]}, "blue": {"ar": 1.2961, "win": [0.1536, 0.1991, 0.6929, 0.5996]}, "lace": {"ar": 0.8217, "win": [0.1006, 0.1021, 0.8003, 0.7984]}};
+  const FRAME_IMG={"gold": {"ar": 0.8497, "win": [0.1716, 0.1514, 0.6647, 0.7074]}, "pink": {"ar": 0.8187, "win": [0.1991, 0.1488, 0.6049, 0.693]}, "blue": {"ar": 1.2957, "win": [0.1546, 0.2004, 0.6912, 0.5981]}, "lace": {"ar": 0.8205, "win": [0.1015, 0.1026, 0.7994, 0.7979]}};
   const FRAMES=['gold','lace','blue','pink'];   // Mona Lisa, Pearl Earring, Starry Night, Venus
   function frameSVG(kind,pw,ph){
     const t=Math.round(Math.min(pw,ph)*.2),W=pw+2*t,H=ph+2*t,id=kind+Math.random().toString(36).slice(2,7);
