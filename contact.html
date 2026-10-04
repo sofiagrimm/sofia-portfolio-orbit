@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Contact | Sofia Grimm</title>
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Inter:wght@300;400;500&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Inter:wght@300;400;500&family=IM+Fell+English:ital@0;1&family=IM+Fell+English+SC&family=Pinyon+Script&family=Nanum+Pen+Script&display=swap');
     *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
     html,body{width:100%;min-height:100%;background:#060d18;font-family:'Inter',sans-serif;color:#e9f0ff;}
     canvas{display:block;position:fixed;inset:0;z-index:0}
@@ -30,84 +30,68 @@
     .nav-links a:hover,.nav-links a.active{color:rgba(220,235,255,0.9);background:rgba(100,140,255,0.08);}
     .nav-links .divider{color:rgba(100,130,200,0.2);font-size:13px;user-select:none;}
 
-    .page{position:relative;z-index:10;max-width:720px;margin:0 auto;padding:130px 32px 80px;}
-    .page-eyebrow{font-size:11px;letter-spacing:0.22em;text-transform:uppercase;color:rgba(160,185,255,0.45);margin-bottom:20px;}
-    .page-title{font-family:'Cormorant Garamond',serif;font-size:54px;font-weight:300;line-height:1.08;color:#eef3ff;margin-bottom:40px;}
-    .page-title em{font-style:italic;color:rgba(190,210,255,0.85);}
-    .rule{width:48px;height:1px;background:linear-gradient(90deg,rgba(140,170,255,0.4),transparent);margin-bottom:40px;}
+    .page{position:relative;z-index:10;max-width:640px;margin:0 auto;padding:118px 24px 90px;}
+    :root{
+      --paper:#efe7d6;--paper-2:#e6dcc6;--paper-shade:#d8ccb2;
+      --ink:#2b2620;--ink-soft:#6a6052;--blue:#6f93d6;--wax:#a3262c;--wax-dark:#741a1f;--postmark:#c2463d;
+    }
+    .lead{font-family:'Nanum Pen Script',cursive;font-size:34px;line-height:1;color:#f1ecdc;transform:rotate(-2deg);margin:0 0 22px 6px}
+    .stack{display:flex;flex-direction:column;align-items:center;gap:18px}
 
-    .contact-intro{
-      font-size:15px;font-weight:300;line-height:1.85;
-      color:rgba(210,225,255,0.72);
-      margin-bottom:52px;
-      max-width:56ch;
-    }
-    .contact-intro strong{font-weight:500;color:rgba(220,232,255,0.92);}
+    /* letter cards: hidden until the seal is broken */
+    .sheet{width:100%;background:radial-gradient(ellipse at 30% 20%,#f5efe2 0%,var(--paper) 60%,var(--paper-2) 100%);color:var(--ink);
+      box-shadow:0 18px 40px rgba(0,0,0,.5),0 2px 4px rgba(0,0,0,.35);border-radius:2px;position:relative;z-index:5}
+    .js .sheet{opacity:0;transform:translateY(140px) scale(.94);max-height:0;margin-bottom:-18px;overflow:hidden;
+      transition:opacity .6s ease,transform .8s cubic-bezier(.2,.8,.2,1),max-height .8s ease,margin .8s ease}
+    .js .open .sheet{opacity:1;transform:none;max-height:520px;margin-bottom:0}
+    .js .stack:not(.open) .sheet{padding-top:0;padding-bottom:0;outline:0;box-shadow:none}
+    .js .open .sheet.second{transition-delay:.25s}
+    .js .open .sheet.first{transition-delay:.55s}
 
-    /* Contact cards */
-    .contact-cards{
-      display:flex;flex-direction:column;gap:14px;
-      margin-bottom:60px;
-    }
-    .contact-card{
-      position:relative;overflow:hidden;
-      display:flex;align-items:center;gap:20px;
-      padding:22px 24px;
-      border-radius:16px;
-      background:rgba(8,14,46,0.62);
-      border:1px solid rgba(100,130,220,0.13);
-      backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
-      text-decoration:none;
-      transition:border-color .32s, transform .32s, box-shadow .32s, background .32s;
-    }
-    .contact-card::after{
-      content:'';
-      position:absolute;top:0;left:0;right:0;height:2px;
-      background:var(--card-stripe);
-      border-radius:16px 16px 0 0;
-    }
-    .contact-card::before{
-      content:'';
-      position:absolute;inset:0;
-      background:radial-gradient(ellipse 60% 50% at 20% 0%, var(--card-glow-color) 0%, transparent 70%);
-      opacity:0;transition:opacity .35s;
-      pointer-events:none;border-radius:16px;
-    }
-    .contact-card:hover::before{opacity:1;}
-    .contact-card:hover{
-      border-color:var(--card-border);
-      transform:translateY(-3px);
-      box-shadow:0 12px 48px rgba(0,0,0,0.5), 0 0 0 1px var(--card-border), 0 0 40px var(--card-outer-glow);
-    }
-    .card-icon-wrap{
-      width:44px;height:44px;border-radius:12px;flex-shrink:0;
-      background:var(--card-icon-bg);
-      border:1px solid var(--card-icon-border);
-      display:flex;align-items:center;justify-content:center;
-    }
-    .card-icon-wrap svg{width:20px;height:20px;stroke:var(--card-accent);fill:none;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round;}
-    .card-body{flex:1;min-width:0;}
-    .card-label{
-      font-size:9px;font-weight:500;letter-spacing:0.22em;text-transform:uppercase;
-      color:var(--card-accent);margin-bottom:5px;
-    }
-    .card-value{
-      font-size:15px;font-weight:300;
-      color:rgba(220,234,255,0.90);
-      letter-spacing:0.01em;
-    }
-    .card-arrow{
-      flex-shrink:0;color:var(--card-accent);opacity:0.45;
-      transition:opacity .25s, transform .25s;
-    }
-    .contact-card:hover .card-arrow{opacity:0.85;transform:translateX(4px);}
-    .card-arrow svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round;}
+    .member{padding:16px 22px 18px;text-align:center}
+    .member .row{display:flex;justify-content:space-between;font-family:'IM Fell English SC',Georgia,serif;font-size:13px;letter-spacing:.06em;color:var(--ink-soft)}
+    .mono{display:flex;align-items:center;justify-content:center;gap:4px;margin:6px 0 2px;color:var(--blue)}
+    .mono span{font-family:'Pinyon Script',cursive;font-size:clamp(64px,13vw,92px);line-height:1}
+    .mono svg{width:clamp(54px,10vw,74px);height:auto}
+    .member .no{font-family:'IM Fell English SC',Georgia,serif;font-size:13px;letter-spacing:.08em;color:var(--ink-soft)}
 
-    /* color themes */
-    .cc--blue   {--card-glow-color:rgba(80,140,255,0.12);--card-border:rgba(100,160,255,0.40);--card-outer-glow:rgba(80,140,255,0.08);--card-stripe:linear-gradient(90deg,rgba(80,140,255,0.8),rgba(120,180,255,0.5),rgba(80,140,255,0.1));--card-accent:rgba(140,190,255,0.88);--card-icon-bg:rgba(60,100,220,0.20);--card-icon-border:rgba(100,150,255,0.30);}
-    .cc--cyan   {--card-glow-color:rgba(40,210,255,0.10);--card-border:rgba(60,220,255,0.36);--card-outer-glow:rgba(40,200,255,0.07);--card-stripe:linear-gradient(90deg,rgba(40,210,255,0.8),rgba(80,230,255,0.5),rgba(40,210,255,0.1));--card-accent:rgba(100,225,255,0.88);--card-icon-bg:rgba(20,160,200,0.20);--card-icon-border:rgba(40,200,255,0.30);}
-    .cc--purple {--card-glow-color:rgba(180,100,255,0.12);--card-border:rgba(190,120,255,0.40);--card-outer-glow:rgba(160,80,255,0.08);--card-stripe:linear-gradient(90deg,rgba(180,100,255,0.8),rgba(210,150,255,0.5),rgba(180,100,255,0.1));--card-accent:rgba(210,165,255,0.88);--card-icon-bg:rgba(140,60,220,0.20);--card-icon-border:rgba(180,110,255,0.30);}
+    .invite{padding:clamp(28px,6vw,44px) clamp(26px,7vw,56px);text-align:center;outline:1px solid #2b262066;outline-offset:-12px}
+    .invite::before{content:"";position:absolute;inset:17px;border:1px solid #2b262033;pointer-events:none}
+    .corner{position:absolute;width:44px;height:44px;color:#2b2620}
+    .c1{top:8px;left:8px}.c2{top:8px;right:8px;transform:scaleX(-1)}.c3{bottom:8px;left:8px;transform:scaleY(-1)}.c4{bottom:8px;right:8px;transform:scale(-1)}
+    .invite h1{font-family:'IM Fell English',Georgia,serif;font-style:italic;font-weight:400;font-size:clamp(26px,5vw,34px);line-height:1.15;color:var(--ink)}
+    .invite p{font-family:'IM Fell English',Georgia,serif;font-size:17px;line-height:1.55;color:#3b342b;max-width:37ch;margin:14px auto 0}
+    .invite ul{list-style:none;margin:22px auto 0;display:grid;gap:6px;font-family:'IM Fell English',Georgia,serif;font-size:16px}
+    .invite a{color:var(--ink);text-decoration:underline;text-decoration-color:#2b262066;text-underline-offset:3px}
+    .invite a:hover,.invite a:focus-visible{text-decoration-color:var(--ink)}
+    .invite .sig{font-family:'Nanum Pen Script',cursive;font-size:36px;line-height:1;color:#24306b;margin-top:18px;transform:rotate(-3deg)}
 
+    /* envelope */
+    .envelope{position:relative;width:100%;aspect-ratio:16/10;perspective:1400px}
+    .env-body{position:absolute;inset:0;background:linear-gradient(170deg,#f2ebdc,var(--paper-2));box-shadow:0 22px 44px rgba(0,0,0,.55),0 2px 5px rgba(0,0,0,.35);border-radius:3px;overflow:hidden}
+    .env-body svg.folds{position:absolute;inset:0;width:100%;height:100%}
+    .flap{position:absolute;left:0;right:0;top:0;height:58%;transform-origin:top center;filter:drop-shadow(0 2px 2px rgba(80,60,30,.25));transition:transform .7s cubic-bezier(.4,.1,.2,1);z-index:3;transform-style:preserve-3d}
+    .flap .face{position:absolute;inset:0;clip-path:polygon(0 0,100% 0,50% 100%);backface-visibility:hidden}
+    .flap .out{background:linear-gradient(180deg,#f4eee0,#e9e0cc)}
+    .flap .in{background:#ddd1b8;transform:rotateX(180deg)}
+    .open .flap{transform:rotateX(178deg);z-index:1}
+    .seal{position:absolute;left:50%;top:58%;width:clamp(64px,13vw,86px);aspect-ratio:1;transform:translate(-50%,-50%);z-index:4;
+      border:0;background:none;cursor:pointer;padding:0;transition:transform .35s ease,opacity .45s ease}
+    .seal:hover{transform:translate(-50%,-50%) scale(1.06) rotate(-4deg)}
+    .seal:focus-visible{outline:3px solid #9cc0ff;outline-offset:4px;border-radius:50%}
+    .open .seal{opacity:0;transform:translate(-50%,-30%) scale(.7) rotate(20deg);pointer-events:none}
+    .postmark{position:absolute;color:var(--postmark);opacity:.85;z-index:4;pointer-events:none}
+    .pm1{right:6%;top:9%;width:30%;transform:rotate(-14deg)}
+    .pm2{right:4%;top:44%;width:34%;color:#6d6658;opacity:.7;transform:rotate(6deg)}
+    .pencil{position:absolute;left:44%;bottom:9%;font-family:'Nanum Pen Script',cursive;font-size:clamp(22px,4vw,30px);color:#6d6658;z-index:4}
+    .hint{font-family:'Nanum Pen Script',cursive;font-size:26px;color:#c9d6ff;margin-top:14px;text-align:center;transition:opacity .4s}
+    .open + .hint{opacity:0}
+    .fallback{margin-top:22px;text-align:center;font-size:13px;color:rgba(200,215,255,.6)}
+    .fallback a{color:#dfe7ff}
+
+    @media (prefers-reduced-motion:reduce){
+      .js .sheet,.flap,.seal{transition:none !important}
+    }
     .coords{position:fixed;bottom:32px;left:48px;z-index:20;font-size:10px;letter-spacing:0.18em;color:rgba(110,130,190,0.28);font-weight:300;pointer-events:none;}
 
     @media (max-width: 768px) {
@@ -135,6 +119,7 @@
       .nav-links a{flex-shrink:0}
     }
   </style>
+  <script>document.documentElement.classList.add('js');</script>
 </head>
 <body>
   <div class="nebula"></div>
@@ -151,50 +136,78 @@
     </div>
   </nav>
   <main class="page">
-    <div class="page-eyebrow">Get in touch</div>
-    <h1 class="page-title">Say <em>hello.</em></h1>
-    <div class="rule"></div>
-    <p class="contact-intro">
-      Email me about <strong>research</strong>, <strong>consulting</strong>, something you're building,
-      or just to say hi.
-    </p>
-    <div class="contact-cards">
+    <p class="lead">there's a letter here for you</p>
+    <div class="stack" id="stack">
+      <section class="sheet member first" aria-label="Card">
+        <div class="row"><span>Issued from New Haven</span><span>41.31° N 72.93° W</span></div>
+        <div class="mono" aria-label="S G monogram">
+          <span>S</span>
+          <svg viewBox="0 0 80 70" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M40 64 C40 48 38 38 30 26"/><path d="M39 46 C46 40 54 40 60 44"/><path d="M36 36 C30 34 22 36 18 42"/>
+            <g transform="translate(30 20)"><circle cx="0" cy="-7" r="6"/><circle cx="7" cy="1" r="6"/><circle cx="-7" cy="1" r="6"/><circle cx="0" cy="0" r="1.2" fill="currentColor"/></g>
+            <g transform="translate(60 44) scale(.7)"><circle cx="0" cy="-7" r="6"/><circle cx="7" cy="1" r="6"/><circle cx="-7" cy="1" r="6"/></g>
+            <path d="M18 42 c-4 -2 -6 2 -3 4 c3 2 6 -1 3 -4z"/>
+          </svg>
+          <span>G</span>
+        </div>
+        <div class="no">Member no. 2029</div>
+      </section>
 
-      <a class="contact-card cc--blue" href="mailto:sofia.grimm@yale.edu">
-        <div class="card-icon-wrap">
-          <svg viewBox="0 0 24 24"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
-        </div>
-        <div class="card-body">
-          <div class="card-label">Email</div>
-          <div class="card-value">sofia.grimm@yale.edu</div>
-        </div>
-        <div class="card-arrow"><svg viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg></div>
-      </a>
+      <section class="sheet invite second" aria-labelledby="invite-title">
+        <svg class="corner c1" viewBox="0 0 44 44" fill="none" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" aria-hidden="true"><path d="M3 3 C16 3 22 8 22 16 C22 22 17 24 14 21 C11 18 14 14 18 16"/><path d="M3 3 C3 16 8 22 16 22 C22 22 24 17 21 14 C18 11 14 14 16 18"/><path d="M3 3 L11 11"/><path d="M26 4 C30 2 34 4 36 3 M4 26 C2 30 4 34 3 36"/><circle cx="11" cy="11" r="1.4" fill="currentColor"/></svg><svg class="corner c2" viewBox="0 0 44 44" fill="none" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" aria-hidden="true"><path d="M3 3 C16 3 22 8 22 16 C22 22 17 24 14 21 C11 18 14 14 18 16"/><path d="M3 3 C3 16 8 22 16 22 C22 22 24 17 21 14 C18 11 14 14 16 18"/><path d="M3 3 L11 11"/><path d="M26 4 C30 2 34 4 36 3 M4 26 C2 30 4 34 3 36"/><circle cx="11" cy="11" r="1.4" fill="currentColor"/></svg><svg class="corner c3" viewBox="0 0 44 44" fill="none" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" aria-hidden="true"><path d="M3 3 C16 3 22 8 22 16 C22 22 17 24 14 21 C11 18 14 14 18 16"/><path d="M3 3 C3 16 8 22 16 22 C22 22 24 17 21 14 C18 11 14 14 16 18"/><path d="M3 3 L11 11"/><path d="M26 4 C30 2 34 4 36 3 M4 26 C2 30 4 34 3 36"/><circle cx="11" cy="11" r="1.4" fill="currentColor"/></svg><svg class="corner c4" viewBox="0 0 44 44" fill="none" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" aria-hidden="true"><path d="M3 3 C16 3 22 8 22 16 C22 22 17 24 14 21 C11 18 14 14 18 16"/><path d="M3 3 C3 16 8 22 16 22 C22 22 24 17 21 14 C18 11 14 14 16 18"/><path d="M3 3 L11 11"/><path d="M26 4 C30 2 34 4 36 3 M4 26 C2 30 4 34 3 36"/><circle cx="11" cy="11" r="1.4" fill="currentColor"/></svg>
+        <h1 id="invite-title">You're invited to write to me.</h1>
+        <p>About research, consulting, something you're building, or a book you think I'd like. I read everything that comes in.</p>
+        <ul>
+          <li><a href="mailto:sofia.grimm@yale.edu">sofia.grimm@yale.edu</a></li>
+          <li><a href="https://www.linkedin.com/in/sofia-grimm/" target="_blank" rel="noopener noreferrer">linkedin</a> &nbsp;&middot;&nbsp; <a href="https://github.com/sofiagrimm" target="_blank" rel="noopener noreferrer">github</a></li>
+        </ul>
+        <div class="sig">sofia</div>
+      </section>
 
-      <a class="contact-card cc--cyan" href="https://www.linkedin.com/in/sofia-grimm/" target="_blank" rel="noopener noreferrer">
-        <div class="card-icon-wrap">
-          <svg viewBox="0 0 24 24"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg>
+      <div class="envelope">
+        <div class="env-body">
+          <svg class="folds" viewBox="0 0 160 100" preserveAspectRatio="none" aria-hidden="true">
+            <path d="M0 100 L68 48 Q80 40 92 48 L160 100 Z" fill="#e8dec9" stroke="#cdbfa2" stroke-width=".35"/>
+            <path d="M0 0 L62 52" stroke="#d3c6aa" stroke-width=".35"/><path d="M160 0 L98 52" stroke="#d3c6aa" stroke-width=".35"/>
+          </svg>
         </div>
-        <div class="card-body">
-          <div class="card-label">LinkedIn</div>
-          <div class="card-value">linkedin.com/in/sofia-grimm</div>
-        </div>
-        <div class="card-arrow"><svg viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg></div>
-      </a>
-
-      <a class="contact-card cc--purple" href="https://github.com/sofiagrimm" target="_blank" rel="noopener noreferrer">
-        <div class="card-icon-wrap">
-          <svg viewBox="0 0 24 24"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg>
-        </div>
-        <div class="card-body">
-          <div class="card-label">GitHub</div>
-          <div class="card-value">github.com/sofiagrimm</div>
-        </div>
-        <div class="card-arrow"><svg viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg></div>
-      </a>
-
+        <div class="flap"><div class="face out"></div><div class="face in"></div></div>
+        <svg class="postmark pm1" viewBox="0 0 120 120" aria-hidden="true">
+          <defs><path id="pmArc" d="M60 60 m-42 0 a42 42 0 1 1 84 0"/></defs>
+          <circle cx="60" cy="60" r="54" fill="none" stroke="currentColor" stroke-width="3"/>
+          <circle cx="60" cy="60" r="30" fill="none" stroke="currentColor" stroke-width="2"/>
+          <text font-family="Courier New,monospace" font-size="14" font-weight="700" fill="currentColor" letter-spacing="3"><textPath href="#pmArc" startOffset="50%" text-anchor="middle">NEW HAVEN</textPath></text>
+          <text x="60" y="58" font-family="Courier New,monospace" font-size="13" font-weight="700" fill="currentColor" text-anchor="middle">OCT</text>
+          <text x="60" y="73" font-family="Courier New,monospace" font-size="13" font-weight="700" fill="currentColor" text-anchor="middle">2026</text>
+        </svg>
+        <svg class="postmark pm2" viewBox="0 0 160 90" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.2">
+          <circle cx="40" cy="45" r="32"/><circle cx="40" cy="45" r="22"/>
+          <path d="M78 22 q10 -6 20 0 t20 0 t20 0 t20 0"/><path d="M78 36 q10 -6 20 0 t20 0 t20 0 t20 0"/><path d="M78 50 q10 -6 20 0 t20 0 t20 0 t20 0"/><path d="M78 64 q10 -6 20 0 t20 0 t20 0 t20 0"/>
+        </svg>
+        <span class="pencil" aria-hidden="true">for you</span>
+        <button class="seal" id="seal" aria-controls="stack" aria-expanded="false" aria-label="Break the seal to open the letter">
+          <svg viewBox="0 0 100 100" aria-hidden="true">
+            <path d="M50 4 C62 3 66 10 76 12 C86 15 90 24 93 33 C97 42 94 50 97 60 C98 71 90 77 84 84 C77 92 68 93 58 96 C47 99 38 95 29 92 C19 88 12 82 7 72 C3 63 5 54 3 44 C3 33 9 25 16 17 C25 9 38 5 50 4Z" fill="var(--wax)"/>
+            <circle cx="50" cy="50" r="31" fill="none" stroke="var(--wax-dark)" stroke-width="3"/>
+            <circle cx="50" cy="50" r="27" fill="#b02f35"/>
+            <text x="50" y="62" text-anchor="middle" font-family="Pinyon Script,cursive" font-size="34" fill="var(--wax-dark)">sg</text>
+            <path d="M24 30 C30 22 40 18 48 18" fill="none" stroke="#d4545a" stroke-width="2.5" stroke-linecap="round" opacity=".7"/>
+          </svg>
+        </button>
+      </div>
     </div>
+    <p class="hint" id="hint">break the seal</p>
+    <noscript><p class="fallback">Email me at <a href="mailto:sofia.grimm@yale.edu">sofia.grimm@yale.edu</a>.</p></noscript>
   </main>
+  <script>
+    (function(){
+      var stack=document.getElementById('stack'),seal=document.getElementById('seal');
+      seal.addEventListener('click',function(){
+        stack.classList.add('open');seal.setAttribute('aria-expanded','true');
+        setTimeout(function(){var f=stack.querySelector('.invite a');if(f)f.focus({preventScroll:true});},1100);
+      });
+    })();
+  </script>
   <div class="coords">41.3083&deg; N &nbsp; 72.9279&deg; W</div>
 
   <script type="module">
