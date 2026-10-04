@@ -82,6 +82,28 @@
   .skyglow{position:absolute;inset:0;pointer-events:none;mix-blend-mode:screen;opacity:.9;background:radial-gradient(circle at var(--gx,50%) var(--gy,30%),rgba(255,236,150,.5),rgba(255,220,120,.12) 12%,transparent 26%)}
   .eyemark{position:absolute;width:14px;height:14px;margin:-7px 0 0 -7px;border-radius:50%;background:#ff3b6b;border:2px solid #fff;cursor:move;z-index:9}
   @media (max-width:760px){.grid{grid-template-columns:1fr}}
+
+  /* ── the heart: LEGO house inside a carved heart frame ── */
+  .heartbox{position:relative;z-index:2;width:min(1150px,92vw);display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,.9fr);gap:clamp(20px,4vw,60px);align-items:center;margin:clamp(18px,4vh,40px) 0 30px;color:var(--ink)}
+  .heart{position:relative;width:100%;aspect-ratio:601/543;filter:drop-shadow(0 24px 30px rgba(90,50,0,.35));transition:transform .5s cubic-bezier(.2,.8,.2,1)}
+  .heart-frame{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;-webkit-user-drag:none}
+  .heart-art{position:absolute;inset:0;-webkit-mask:url(img/frames/heart-mask.png) center/100% 100% no-repeat;mask:url(img/frames/heart-mask.png) center/100% 100% no-repeat;overflow:hidden}
+  .heart-art svg,.heart-art img{display:block;width:100%;height:100%;object-fit:cover;transition:transform .4s ease-out}
+  .heart-copy h1{font-family:'Pinyon Script',cursive;font-weight:400;font-size:clamp(48px,6vw,84px);line-height:1}
+  .heart-copy p{margin-top:14px;font-size:15px;line-height:1.6;max-width:46ch;color:rgba(42,34,25,.85)}
+  .heart-copy .note{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:19px}
+  @media (max-width:760px){.heartbox{grid-template-columns:1fr}}
+  /* ── the paintings, big ── */
+  .gallery{width:min(1360px,94vw) !important}
+  .grid{gap:clamp(40px,6vw,90px) clamp(30px,4vw,70px) !important}
+  .framed{cursor:default !important}
+  .framed{margin:0}.cell{width:100%;display:flex;flex-direction:column;align-items:center}
+  .framed.happy .pic{filter:saturate(1.15) brightness(1.06)}.framed.sad .pic{filter:saturate(.45) brightness(.82)}.framed .pic{transition:filter .5s}
+  .offers2{display:flex;justify-content:center;gap:12px;margin-top:12px;flex-wrap:wrap}
+  .offers2 button{display:flex;align-items:center;gap:8px;padding:6px 14px 6px 8px;border-radius:999px;border:1px solid rgba(42,34,25,.25);background:rgba(255,255,255,.45);font:13px 'Inter',sans-serif;color:var(--ink);cursor:pointer;transition:background .2s,transform .2s}
+  .offers2 button:hover,.offers2 button:focus-visible{background:rgba(255,255,255,.8);transform:translateY(-2px);outline:none}
+  .offers2 svg{width:30px;height:30px}
+  .mood2{display:block;min-height:1.4em;margin-top:8px;font-family:'Cormorant Garamond',serif;font-style:italic;font-size:18px;color:#6b3f1d}
   @media (max-width:760px){.links{display:none}.offer.a{left:6%;top:20%}.offer.b{right:6%;top:24%}.hero{cursor:auto}.follower{display:none}}
   @media (prefers-reduced-motion:reduce){.canvas,.offer{transition:none}.hero.sad.shake .canvas{animation:none}}
 </style>
@@ -93,7 +115,34 @@
   <nav aria-label="Site"><a href="../index.html">Home</a><a href="../about.html">About</a><a href="../research.html">Research</a><a href="../projects.html">Projects</a><a href="cards.html">Cards</a><a href="notes.html">Notes</a><a href="sofia-is.html">Sofia is</a><a href="arts.html" aria-current="page" style="opacity:1">Arts</a><a href="globe.html">Globe</a><a href="lace.html">Tilt</a><a href="../contact.html">Contact</a></nav>
 </header>
 
-<main class="hero" id="hero">
+<section class="heartbox" aria-labelledby="legoTitle">
+  <div class="heart">
+    <div class="heart-art" id="legoArt"><svg viewBox="-60 120 720 470" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="LEGO model of a red-brick colonial house">
+  <defs>
+    <pattern id="brick" width="24" height="12" patternUnits="userSpaceOnUse"><rect width="24" height="12" fill="#7b2a22"/><path d="M0 11.5H24M12 0V6M0 6H24M0 6V12M24 6V12" stroke="#5a1c16" stroke-width="1.2"/><rect x="1" y="1" width="10" height="4" fill="#8c3328" opacity=".7"/><rect x="13" y="7" width="10" height="4" fill="#9a3b2e" opacity=".5"/></pattern>
+    <pattern id="stud" width="16" height="16" patternUnits="userSpaceOnUse"><rect width="16" height="16" fill="#4f8a3c"/><circle cx="8" cy="8" r="5" fill="#5c9a47" stroke="#3f7030" stroke-width="1.2"/><circle cx="6.5" cy="6.5" r="1.6" fill="#8cc06f" opacity=".8"/></pattern>
+    <pattern id="roof" width="18" height="14" patternUnits="userSpaceOnUse"><rect width="18" height="14" fill="#6d7378"/><path d="M0 13.5H18" stroke="#4e5458" stroke-width="2"/><rect x="2" y="2" width="14" height="5" fill="#80878c"/></pattern>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f7ebe6"/><stop offset="1" stop-color="#efd3cb"/></linearGradient>
+  </defs>
+  <rect x="0" y="0" width="600" height="543" fill="url(#sky)"/>
+  <path d="M150 420 L450 420 L500 470 L100 470Z" fill="url(#stud)"/><path d="M100 470 L500 470 L500 482 L100 482Z" fill="#3a6a2c"/>
+  <rect x="170" y="268" width="260" height="152" fill="url(#brick)"/>
+  <path d="M152 270 L300 182 L448 270Z" fill="url(#roof)" stroke="#4e5458" stroke-width="3"/>
+  <rect x="356" y="196" width="22" height="46" fill="url(#brick)"/><rect x="352" y="190" width="30" height="8" fill="#5a1c16"/>
+  <g><rect x="188" y="288" width="9" height="34" fill="#2d4a35"/><path d="M189 292h7" stroke="#1e3325" stroke-width="1.2"/><path d="M189 297h7" stroke="#1e3325" stroke-width="1.2"/><path d="M189 302h7" stroke="#1e3325" stroke-width="1.2"/><path d="M189 307h7" stroke="#1e3325" stroke-width="1.2"/><path d="M189 312h7" stroke="#1e3325" stroke-width="1.2"/><path d="M189 317h7" stroke="#1e3325" stroke-width="1.2"/><rect x="221" y="288" width="9" height="34" fill="#2d4a35"/><path d="M222 292h7" stroke="#1e3325" stroke-width="1.2"/><path d="M222 297h7" stroke="#1e3325" stroke-width="1.2"/><path d="M222 302h7" stroke="#1e3325" stroke-width="1.2"/><path d="M222 307h7" stroke="#1e3325" stroke-width="1.2"/><path d="M222 312h7" stroke="#1e3325" stroke-width="1.2"/><path d="M222 317h7" stroke="#1e3325" stroke-width="1.2"/><rect x="198" y="288" width="22" height="34" fill="#cfe1ea" stroke="#f6f3ec" stroke-width="3"/><path d="M209 288v34M198 305h22" stroke="#f6f3ec" stroke-width="2"/><rect x="195" y="321" width="28" height="5" fill="#f6f3ec"/></g><g><rect x="252" y="288" width="9" height="34" fill="#2d4a35"/><path d="M253 292h7" stroke="#1e3325" stroke-width="1.2"/><path d="M253 297h7" stroke="#1e3325" stroke-width="1.2"/><path d="M253 302h7" stroke="#1e3325" stroke-width="1.2"/><path d="M253 307h7" stroke="#1e3325" stroke-width="1.2"/><path d="M253 312h7" stroke="#1e3325" stroke-width="1.2"/><path d="M253 317h7" stroke="#1e3325" stroke-width="1.2"/><rect x="285" y="288" width="9" height="34" fill="#2d4a35"/><path d="M286 292h7" stroke="#1e3325" stroke-width="1.2"/><path d="M286 297h7" stroke="#1e3325" stroke-width="1.2"/><path d="M286 302h7" stroke="#1e3325" stroke-width="1.2"/><path d="M286 307h7" stroke="#1e3325" stroke-width="1.2"/><path d="M286 312h7" stroke="#1e3325" stroke-width="1.2"/><path d="M286 317h7" stroke="#1e3325" stroke-width="1.2"/><rect x="262" y="288" width="22" height="34" fill="#cfe1ea" stroke="#f6f3ec" stroke-width="3"/><path d="M273 288v34M262 305h22" stroke="#f6f3ec" stroke-width="2"/><rect x="259" y="321" width="28" height="5" fill="#f6f3ec"/></g><g><rect x="306" y="288" width="9" height="34" fill="#2d4a35"/><path d="M307 292h7" stroke="#1e3325" stroke-width="1.2"/><path d="M307 297h7" stroke="#1e3325" stroke-width="1.2"/><path d="M307 302h7" stroke="#1e3325" stroke-width="1.2"/><path d="M307 307h7" stroke="#1e3325" stroke-width="1.2"/><path d="M307 312h7" stroke="#1e3325" stroke-width="1.2"/><path d="M307 317h7" stroke="#1e3325" stroke-width="1.2"/><rect x="339" y="288" width="9" height="34" fill="#2d4a35"/><path d="M340 292h7" stroke="#1e3325" stroke-width="1.2"/><path d="M340 297h7" stroke="#1e3325" stroke-width="1.2"/><path d="M340 302h7" stroke="#1e3325" stroke-width="1.2"/><path d="M340 307h7" stroke="#1e3325" stroke-width="1.2"/><path d="M340 312h7" stroke="#1e3325" stroke-width="1.2"/><path d="M340 317h7" stroke="#1e3325" stroke-width="1.2"/><rect x="316" y="288" width="22" height="34" fill="#cfe1ea" stroke="#f6f3ec" stroke-width="3"/><path d="M327 288v34M316 305h22" stroke="#f6f3ec" stroke-width="2"/><rect x="313" y="321" width="28" height="5" fill="#f6f3ec"/></g><g><rect x="370" y="288" width="9" height="34" fill="#2d4a35"/><path d="M371 292h7" stroke="#1e3325" stroke-width="1.2"/><path d="M371 297h7" stroke="#1e3325" stroke-width="1.2"/><path d="M371 302h7" stroke="#1e3325" stroke-width="1.2"/><path d="M371 307h7" stroke="#1e3325" stroke-width="1.2"/><path d="M371 312h7" stroke="#1e3325" stroke-width="1.2"/><path d="M371 317h7" stroke="#1e3325" stroke-width="1.2"/><rect x="403" y="288" width="9" height="34" fill="#2d4a35"/><path d="M404 292h7" stroke="#1e3325" stroke-width="1.2"/><path d="M404 297h7" stroke="#1e3325" stroke-width="1.2"/><path d="M404 302h7" stroke="#1e3325" stroke-width="1.2"/><path d="M404 307h7" stroke="#1e3325" stroke-width="1.2"/><path d="M404 312h7" stroke="#1e3325" stroke-width="1.2"/><path d="M404 317h7" stroke="#1e3325" stroke-width="1.2"/><rect x="380" y="288" width="22" height="34" fill="#cfe1ea" stroke="#f6f3ec" stroke-width="3"/><path d="M391 288v34M380 305h22" stroke="#f6f3ec" stroke-width="2"/><rect x="377" y="321" width="28" height="5" fill="#f6f3ec"/></g><g><rect x="188" y="346" width="9" height="34" fill="#2d4a35"/><path d="M189 350h7" stroke="#1e3325" stroke-width="1.2"/><path d="M189 355h7" stroke="#1e3325" stroke-width="1.2"/><path d="M189 360h7" stroke="#1e3325" stroke-width="1.2"/><path d="M189 365h7" stroke="#1e3325" stroke-width="1.2"/><path d="M189 370h7" stroke="#1e3325" stroke-width="1.2"/><path d="M189 375h7" stroke="#1e3325" stroke-width="1.2"/><rect x="221" y="346" width="9" height="34" fill="#2d4a35"/><path d="M222 350h7" stroke="#1e3325" stroke-width="1.2"/><path d="M222 355h7" stroke="#1e3325" stroke-width="1.2"/><path d="M222 360h7" stroke="#1e3325" stroke-width="1.2"/><path d="M222 365h7" stroke="#1e3325" stroke-width="1.2"/><path d="M222 370h7" stroke="#1e3325" stroke-width="1.2"/><path d="M222 375h7" stroke="#1e3325" stroke-width="1.2"/><rect x="198" y="346" width="22" height="34" fill="#cfe1ea" stroke="#f6f3ec" stroke-width="3"/><path d="M209 346v34M198 363h22" stroke="#f6f3ec" stroke-width="2"/><rect x="195" y="379" width="28" height="5" fill="#f6f3ec"/></g><g><rect x="370" y="346" width="9" height="34" fill="#2d4a35"/><path d="M371 350h7" stroke="#1e3325" stroke-width="1.2"/><path d="M371 355h7" stroke="#1e3325" stroke-width="1.2"/><path d="M371 360h7" stroke="#1e3325" stroke-width="1.2"/><path d="M371 365h7" stroke="#1e3325" stroke-width="1.2"/><path d="M371 370h7" stroke="#1e3325" stroke-width="1.2"/><path d="M371 375h7" stroke="#1e3325" stroke-width="1.2"/><rect x="403" y="346" width="9" height="34" fill="#2d4a35"/><path d="M404 350h7" stroke="#1e3325" stroke-width="1.2"/><path d="M404 355h7" stroke="#1e3325" stroke-width="1.2"/><path d="M404 360h7" stroke="#1e3325" stroke-width="1.2"/><path d="M404 365h7" stroke="#1e3325" stroke-width="1.2"/><path d="M404 370h7" stroke="#1e3325" stroke-width="1.2"/><path d="M404 375h7" stroke="#1e3325" stroke-width="1.2"/><rect x="380" y="346" width="22" height="34" fill="#cfe1ea" stroke="#f6f3ec" stroke-width="3"/><path d="M391 346v34M380 363h22" stroke="#f6f3ec" stroke-width="2"/><rect x="377" y="379" width="28" height="5" fill="#f6f3ec"/></g>
+  <rect x="236" y="336" width="128" height="8" fill="#f6f3ec"/><path d="M228 336 L300 312 L372 336Z" fill="#f6f3ec" stroke="#d9d4c8" stroke-width="2"/>
+  <rect x="283" y="350" width="34" height="70" fill="#6b3f22"/><rect x="287" y="356" width="12" height="26" fill="#7d4c2b"/><rect x="301" y="356" width="12" height="26" fill="#7d4c2b"/><circle cx="310" cy="390" r="2.6" fill="#d9b25a"/>
+  <rect x="239" y="344" width="6" height="76" fill="#f6f3ec" stroke="#d9d4c8"/><rect x="255" y="344" width="6" height="76" fill="#f6f3ec" stroke="#d9d4c8"/><rect x="271" y="344" width="6" height="76" fill="#f6f3ec" stroke="#d9d4c8"/><rect x="323" y="344" width="6" height="76" fill="#f6f3ec" stroke="#d9d4c8"/><rect x="339" y="344" width="6" height="76" fill="#f6f3ec" stroke="#d9d4c8"/><rect x="355" y="344" width="6" height="76" fill="#f6f3ec" stroke="#d9d4c8"/><rect x="232" y="416" width="136" height="6" fill="#e9e4d8"/><circle cx="186" cy="410" r="13" fill="#3d7a35"/><circle cx="182" cy="406" r="4" fill="#5a9a4a"/><circle cx="206" cy="414" r="13" fill="#3d7a35"/><circle cx="202" cy="410" r="4" fill="#5a9a4a"/><circle cx="394" cy="410" r="13" fill="#3d7a35"/><circle cx="390" cy="406" r="4" fill="#5a9a4a"/><circle cx="414" cy="414" r="13" fill="#3d7a35"/><circle cx="410" cy="410" r="4" fill="#5a9a4a"/>
+</svg></div>
+    <img class="heart-frame" src="img/frames/heart.webp" alt="" draggable="false">
+  </div>
+  <div class="heart-copy">
+    <h1 id="legoTitle">A House Like Yours</h1>
+    <p>A custom LEGO Architecture set of 408 Conway Avenue in Narberth, Pennsylvania: 724 pieces at 1:48, a red-brick colonial with a gray pitched roof, green louvered shutters and a six-column white porch, designed brick by brick in Stud.io.</p>
+    <p class="note">Creative and Performing Arts Award, Yale · Saybrook College gallery, Dec 5–12, 2026</p>
+  </div>
+</section>
+<main class="hero" id="hero" hidden>
   <div class="canvas" id="canvas" role="img" aria-label=""></div>
   <div class="glow"></div>
   <div class="bar"><span class="logo">s. Grimm</span><nav class="links" aria-label="Arts"><a href="#" id="nextLink">Gallery</a><a href="sofia-is.html">About me</a></nav><a class="pill" href="../contact.html">Contact me</a></div>
@@ -112,7 +161,7 @@
 </main>
 <section class="gallery" aria-labelledby="galTitle">
   <h2 id="galTitle">the gallery</h2>
-  <p class="gal-sub">they're watching you. click one to bring it up top.</p>
+  <p class="gal-sub">they're watching you. offer them something and see how they take it.</p>
   <div class="grid" id="grid"></div>
 </section>
 <p class="credit">Paintings: public domain, via Wikimedia Commons.</p>
@@ -341,9 +390,9 @@ const PAINTINGS = [
   // ── build the 2 × 2 gallery
   const grid=document.getElementById('grid');
   PAINTINGS.forEach((p,k)=>{
-    const b=document.createElement('button');b.className='framed';b.type='button';b.setAttribute('aria-label',`Show ${p.label} at the top`);
+    const cell=document.createElement('div');cell.className='cell';const b=document.createElement('figure');b.className='framed';cell.appendChild(b);
     b.innerHTML=`<div class="pic"><img alt="${p.label}" src="${p.img.replace('width=1600','width=900')}"></div><span class="cap">${p.label}</span>`;
-    grid.appendChild(b);
+    grid.appendChild(cell);
     const img=b.querySelector('img');
     const build=()=>{
       // stretch the frame just enough that its window fits this painting exactly
@@ -352,12 +401,18 @@ const PAINTINGS = [
       b.insertAdjacentHTML('afterbegin',`<div class="fbox" style="aspect-ratio:${boxAR}"><img class="fimg" src="img/frames/${FRAMES[k]}.webp" alt="" draggable="false"></div>`);
       const box=b.querySelector('.fbox'),pic=b.querySelector('.pic');box.insertBefore(pic,box.firstChild);
       Object.assign(pic.style,{left:(wl*100)+'%',top:(wt*100)+'%',width:(ww*100)+'%',height:(wh*100)+'%'});
-      b.style.maxWidth=(boxAR<1?420:540)+'px';
+      b.style.maxWidth=(boxAR<1?560:660)+'px';
       requestAnimationFrame(()=>{const r=pic.getBoundingClientRect();addEyes(pic,img.src,{x:0,y:0,w:r.width,h:r.height},k);
         const cv=document.createElement('canvas');cv.className='live';pic.appendChild(cv);const L=Living(cv,LM[k],false);
-        if(L){L.load(img.src,LM[k]);b.addEventListener('pointerenter',()=>{L.moodT=1;kick();});b.addEventListener('pointerleave',()=>{L.moodT=0;kick();});}});};
+        if(L){b.__live=L;L.load(img.src,LM[k]);}});};
     if(img.complete&&img.naturalWidth)build();else img.addEventListener('load',build,{once:true});
-    b.addEventListener('click',()=>{show(k);hero.scrollIntoView({behavior:'smooth',block:'start'});});
+    // two offers under each painting: point at one and the sitter reacts in the frame
+    const row=document.createElement('div');row.className='offers2';const mood=document.createElement('span');mood.className='mood2';mood.setAttribute('aria-live','polite');
+    [p.good,p.bad].sort(()=>k%2?-1:1).forEach(o=>{const btn=document.createElement('button');btn.type='button';btn.innerHTML=ICON[o.icon]+`<span>${o.name}</span>`;
+      const good=o===p.good,on=()=>{mood.textContent=o.mood;b.classList.toggle('happy',good);b.classList.toggle('sad',!good);const L=b.__live;if(L){L.moodT=good?1:-1;kick();}},
+        off=()=>{mood.textContent='';b.classList.remove('happy','sad');const L=b.__live;if(L){L.moodT=0;kick();}};
+      btn.addEventListener('pointerenter',on);btn.addEventListener('pointerleave',off);btn.addEventListener('focus',on);btn.addEventListener('blur',off);btn.addEventListener('click',on);row.appendChild(btn);});
+    const wrap=document.createElement('div');wrap.appendChild(row);wrap.appendChild(mood);b.after(wrap);
   });
   // the frames tilt very slightly toward you as you move
   addEventListener('pointermove',e=>{grid.querySelectorAll('.framed').forEach(f=>{const r=f.getBoundingClientRect(),dx=(e.clientX-(r.left+r.width/2))/innerWidth,dy=(e.clientY-(r.top+r.height/2))/innerHeight;
@@ -367,6 +422,7 @@ const PAINTINGS = [
   // ── the hero's eyes: work out where the painting actually sits under 'cover' cropping
   let heroLive=null;
   function heroEyes(){
+    if(hero.hidden)return;
     if(!heroLive){const cv=document.createElement('canvas');cv.className='live';canvas.appendChild(cv);heroLive=Living(cv,LM[i],true);}
     if(heroLive){heroLive.moodT=0;heroLive.load(PAINTINGS[i].img,LM[i]);return;}
     const p=PAINTINGS[i],im=new Image();im.onload=()=>{const c=canvas.getBoundingClientRect(),cs=getComputedStyle(canvas);
