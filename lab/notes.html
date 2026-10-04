@@ -351,11 +351,19 @@
     // at rest the nose eases back toward a level glide
     const restLean=(frac<.02||p>=segs.length)?.35:1, rest=-6*Math.PI/180;
     const lean=Math.min(1,p*6)*restLean,rot=(1-lean)*rest+lean*(q.ang-NOSE);
-    wrap.style.transform=`translate(${q.x}px,${q.y}px) rotate(${rot}rad)`;
+    // always keep the plane inside the part of the page you're looking at (except as it flies off at the very end)
+    const top=scrollY+80,bottom=scrollY+innerHeight-Hh-30,exiting=p>segs.length-.35;
+    let x=q.x,y=Math.max(top,Math.min(bottom,q.y));
+    if(!exiting)x=Math.max(8,Math.min(document.documentElement.clientWidth-W-8,x));
+    wrap.style.transform=`translate(${x}px,${y}px) rotate(${rot}rad)`;
   }
   let ticking=false;
-  function tick(){cur+=(target-cur)*.1;place(cur);if(Math.abs(target-cur)>.0005)requestAnimationFrame(tick);else ticking=false;}
-  function onScroll(){target=progress();if(still){cur=target;place(cur);return;}if(!ticking){ticking=true;requestAnimationFrame(tick);}}
+  let lastT=0;
+  function tick(now){const dt=Math.min(50,now-(lastT||now))/16.7;lastT=now;
+    const step=(target-cur)*(1-Math.pow(1-.045,dt)),cap=.011*dt;
+    cur+=Math.max(-cap,Math.min(cap,step));place(cur);
+    if(Math.abs(target-cur)>.0005)requestAnimationFrame(tick);else{ticking=false;lastT=0;}}
+  function onScroll(){target=progress();if(still){cur=target;place(cur);return;}place(cur);if(!ticking){ticking=true;requestAnimationFrame(tick);}}
   plan();cur=target=progress();place(cur);
   addEventListener('scroll',onScroll,{passive:true});
   addEventListener('resize',()=>{plan();onScroll();});
