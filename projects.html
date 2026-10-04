@@ -208,6 +208,9 @@
       .nav-links::-webkit-scrollbar{display:none}
       .nav-links a{flex-shrink:0}
     }
+    /* low, warm casino light: dark corners over the felt */
+    body::after{content:"";position:fixed;inset:0;pointer-events:none;z-index:4;
+      background:radial-gradient(ellipse 75% 70% at 50% 45%,transparent 45%,rgba(20,4,4,.55) 100%),linear-gradient(180deg,rgba(10,2,2,.25),transparent 30%)}
   </style>
 </head>
 <body>
@@ -919,14 +922,26 @@
     A={cx,base,aIn,bIn,aOut,bOut};
     arch.setAttribute('height',document.documentElement.scrollHeight);
     const tA=aIn+th*.3,tB=bIn+th*.3,fs=th*.56;
-    arch.innerHTML=`<defs><path id="arcText" d="M${cx-tA} ${base} A${tA} ${tB} 0 0 1 ${cx+tA} ${base}"/></defs>
-      <path d="M${cx-aOut} ${base} A${aOut} ${bOut} 0 0 1 ${cx+aOut} ${base} L${cx+aIn} ${base} A${aIn} ${bIn} 0 0 0 ${cx-aIn} ${base}Z" fill="#4f1316"/>
-      <path d="M${cx-aOut} ${base} A${aOut} ${bOut} 0 0 1 ${cx+aOut} ${base}" fill="none" stroke="#d6b36a" stroke-width="3"/>
-      <path d="M${cx-aIn} ${base} A${aIn} ${bIn} 0 0 1 ${cx+aIn} ${base}" fill="none" stroke="#d6b36a" stroke-width="2"/>
-      <text font-family="'DM Serif Display',Georgia,serif" font-size="${fs}" letter-spacing="${fs*.45}" fill="#e8c784"><textPath href="#arcText" startOffset="50%" text-anchor="middle">PICK A CARD, ANY CARD!</textPath></text>`;
+    // printed like a blackjack layout: two thin gold rules, big serif caps between them, a line
+    // of italic house rules tucked inside, and betting circles along the outside
+    const GOLDP='#d9a956',iA=aIn-th*.42,iB=bIn-th*.42,ifs=fs*.62;
+    const spots=[];
+    [.16,.3,.7,.84].forEach((f,k)=>{const ang=Math.PI*(1-f),ex=cx+Math.cos(ang)*(aOut+th*.95),ey=base-Math.sin(ang)*(bOut+th*.95);
+      spots.push({x:ex,y:ey,r:th*.42,label:k===1?'P':(k===2?'P':'')});});
+    A.spots=spots;
+    arch.innerHTML=`<defs><path id="arcText" d="M${cx-tA} ${base} A${tA} ${tB} 0 0 1 ${cx+tA} ${base}"/>
+        <path id="arcRule" d="M${cx-iA} ${base} A${iA} ${iB} 0 0 1 ${cx+iA} ${base}"/></defs>
+      <path d="M${cx-aOut} ${base} A${aOut} ${bOut} 0 0 1 ${cx+aOut} ${base} L${cx+aIn} ${base} A${aIn} ${bIn} 0 0 0 ${cx-aIn} ${base}Z" fill="#000" opacity=".06"/>
+      <path d="M${cx-aOut} ${base} A${aOut} ${bOut} 0 0 1 ${cx+aOut} ${base}" fill="none" stroke="${GOLDP}" stroke-width="2.4" opacity=".9"/>
+      <path d="M${cx-aIn} ${base} A${aIn} ${bIn} 0 0 1 ${cx+aIn} ${base}" fill="none" stroke="${GOLDP}" stroke-width="2.4" opacity=".9"/>
+      <text font-family="'Cormorant Garamond','DM Serif Display',Georgia,serif" font-weight="700" font-size="${fs*1.08}" letter-spacing="${fs*.32}" fill="${GOLDP}"><textPath href="#arcText" startOffset="50%" text-anchor="middle">PICK A CARD, ANY CARD!</textPath></text>
+      <text font-family="'Cormorant Garamond',Georgia,serif" font-style="italic" font-size="${ifs}" letter-spacing="${ifs*.08}" fill="${GOLDP}" opacity=".8"><textPath href="#arcRule" startOffset="50%" text-anchor="middle">Sofia must stand on eight projects, and draw to curiosity</textPath></text>
+      ${spots.map(p=>`<circle cx="${p.x}" cy="${p.y}" r="${p.r}" fill="none" stroke="${GOLDP}" stroke-width="2" opacity=".85"/>${p.label?`<text x="${p.x}" y="${p.y+p.r*.32}" text-anchor="middle" font-family="'Cormorant Garamond',Georgia,serif" font-weight="700" font-size="${p.r*.9}" fill="${GOLDP}">${p.label}</text>`:''}`).join('')}`;
   }
   function inBand(x,y){
-    if(!A||y>A.base)return false;const dx=x-A.cx,dy=A.base-y;
+    if(!A)return false;
+    if(A.spots&&A.spots.some(p=>Math.hypot(x-p.x,y-p.y)<p.r+6))return true;
+    if(y>A.base)return false;const dx=x-A.cx,dy=A.base-y;
     return (dx/A.aOut)**2+(dy/A.bOut)**2<=1&&(dx/A.aIn)**2+(dy/A.bIn)**2>=1;
   }
   function touchesBand(el,pad=8){
