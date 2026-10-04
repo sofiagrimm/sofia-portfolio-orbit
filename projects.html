@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Projects | Sofia Grimm</title>
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Inter:wght@300;400;500&family=DM+Serif+Display:ital@0;1&family=Courier+Prime:wght@400;700&family=Nanum+Pen+Script&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Inter:wght@300;400;500&family=DM+Serif+Display:ital@0;1&family=IM+Fell+English&family=Courier+Prime:wght@400;700&family=Nanum+Pen+Script&display=swap');
     *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
     html,body{width:100%;min-height:100%;background:#060d18;font-family:'Inter',sans-serif;color:#e9f0ff;overflow-x:hidden;}
     canvas{display:block;position:fixed;inset:0;z-index:0}
@@ -28,8 +28,8 @@
     .rule{width:48px;height:1px;background:linear-gradient(90deg,rgba(140,170,255,.4),transparent);margin-bottom:44px;}
 
     /* ── GRID — 4 col desktop, 2 col tablet, 1 col mobile ── */
-    .memory-grid{columns:4 200px;column-gap:20px;}
-    @media(max-width:640px){.memory-grid{columns:2;column-gap:14px;}}
+    .memory-grid{position:relative;height:clamp(380px,40vw,440px);margin-top:10px}
+    @media(max-width:760px){.memory-grid{height:auto;display:grid;grid-template-columns:1fr 1fr;gap:22px 16px}}
     
 
     /* ── MOBILE NAV ── */
@@ -87,33 +87,34 @@
     #cardPopupFlipper{width:100%;height:100%;transform-style:preserve-3d;transition:transform .65s cubic-bezier(.22,1,.36,1);border-radius:14px;will-change:transform;}
     #cardPopupFlipper.flipped{transform:rotateY(180deg);}
 
-    /* ── PINS (paper card backs) ── */
-    .card-scene{display:inline-block;width:100%;margin:0 0 22px;break-inside:avoid;aspect-ratio:var(--ar,3/4)}
-    .card-scene:hover .card-flipper{transform:translateY(-4px)}
-    .card-scene.flipped:hover .card-flipper{transform:rotateY(180deg) translateY(-4px)}
-    .card-face{border-radius:10px}
-    .card-back{background:#efe7d6;border:0;display:block;box-shadow:0 14px 34px rgba(0,0,0,.5),0 2px 4px rgba(0,0,0,.35)}
-    .card-scene:not(.flipped):hover .card-back,.card-scene.revealed:hover .card-back{box-shadow:0 20px 44px rgba(0,0,0,.6),0 2px 4px rgba(0,0,0,.35);border:0}
+    /* ── HAND-PAINTED PLAYING CARDS ── */
+    .card-scene{aspect-ratio:5/7;position:absolute;left:var(--x);top:var(--y);width:clamp(140px,17vw,180px);
+      rotate:var(--r);transform-origin:50% 120%;translate:0 0;transition:translate .3s cubic-bezier(.2,.8,.2,1);z-index:var(--z)}
+    .card-scene:hover,.card-scene:focus-visible{translate:0 -28px;z-index:20;outline:none}
+    .card-scene:focus-visible .card-back{box-shadow:0 0 0 3px #9cc0ff,0 16px 30px rgba(0,0,0,.5)}
+    @media(max-width:760px){
+      .card-scene{position:relative;left:auto;top:auto;width:100%;rotate:var(--rm);transform-origin:50% 50%}
+      .card-scene:hover,.card-scene:focus-visible{translate:0 -8px}
+    }
+    .card-face{border-radius:12px}
+    .card-flipper{border-radius:12px}
+    .card-back{background:transparent;border:0;box-shadow:0 14px 28px rgba(0,0,0,.45),0 2px 4px rgba(0,0,0,.35);display:block}
+    .card-scene:not(.flipped):hover .card-back,.card-scene.revealed:hover .card-back{box-shadow:0 22px 40px rgba(0,0,0,.55),0 2px 4px rgba(0,0,0,.35);border:0}
     .card-back .cb-aurora,.card-back .cb-shimmer,.card-back .cb-burst{display:none}
-    .pin{position:absolute;inset:0;display:flex;flex-direction:column;padding:10px 10px 12px}
-    .pin-art{flex:1;border-radius:6px;overflow:hidden;position:relative;background:var(--tone)}
-    .pin-art svg{position:absolute;inset:0;width:100%;height:100%}
-    .pin-title{font-family:'DM Serif Display',Georgia,serif;font-style:italic;font-size:clamp(17px,1.6vw,21px);line-height:1.1;color:#2b2620;margin:10px 4px 0}
-    .pin-note{font-family:'Nanum Pen Script',cursive;font-size:20px;line-height:1;color:#24306b;margin:3px 4px 0}
-    .pin-tape{position:absolute;top:-9px;left:50%;width:70px;height:20px;margin-left:-35px;background:rgba(236,226,198,.6);box-shadow:0 1px 2px rgba(0,0,0,.25);transform:rotate(var(--tilt,-3deg));z-index:3}
-    .card-flipper{border-radius:10px}
-    .card-front{background:radial-gradient(ellipse at 30% 20%,#f5efe2 0%,#efe7d6 60%,#e6dcc6 100%);border:0;backdrop-filter:none;-webkit-backdrop-filter:none;
-      padding:18px 18px 16px;gap:6px;box-shadow:0 14px 34px rgba(0,0,0,.5),0 2px 4px rgba(0,0,0,.35);border-radius:10px}
+    .card-back svg{position:absolute;inset:0;width:100%;height:100%}
+    #cardPopupInner{aspect-ratio:5/7}
+    .card-front{background:radial-gradient(ellipse at 30% 20%,#fbf7ee 0%,#f3ecdd 70%,#e9e0cc 100%);border:0;backdrop-filter:none;-webkit-backdrop-filter:none;
+      padding:20px 20px 16px;gap:6px;box-shadow:0 14px 34px rgba(0,0,0,.5),0 2px 4px rgba(0,0,0,.35);border-radius:12px}
     .fr-tag{font-family:'Courier Prime',monospace;font-size:11px;letter-spacing:.02em;text-transform:none;color:#6a6052;font-weight:400}
     .fr-date{font-family:'Courier Prime',monospace;font-size:11px;letter-spacing:0;color:#8a7f6e}
-    .fr-rule{width:36px;height:1.5px;background:#b3473b;margin:4px 0}
+    .fr-rule{width:36px;height:1.5px;background:#c8433c;margin:4px 0}
     .fr-title{font-family:'DM Serif Display',Georgia,serif;font-style:italic;font-weight:400;font-size:clamp(17px,1.7vw,21px);line-height:1.15;color:#2b2620}
     .fr-body{font-family:'Courier Prime',monospace;font-size:11.5px;line-height:1.55;color:#3b342b}
     .fr-link{font-family:'Nanum Pen Script',cursive;font-size:21px;letter-spacing:0;text-transform:none;color:#24306b;border-bottom:1px solid #24306b55}
     .fr-link:hover{color:#16204f}
-    #cardPopupClose{background:#efe7d6;color:#2b2620;border:0}
+    #cardPopupClose{background:#f3ecdd;color:#2b2620;border:0}
     #cardPopupClose:hover{background:#fff;color:#2b2620;box-shadow:0 6px 20px rgba(0,0,0,.4)}
-    @media (prefers-reduced-motion:reduce){.card-scene{animation:none;opacity:1}.card-flipper{transition:none}}
+    @media (prefers-reduced-motion:reduce){.card-scene{animation:none;opacity:1;transition:none}.card-flipper{transition:none}}
     .coords{position:fixed;bottom:32px;left:48px;z-index:20;font-size:10px;letter-spacing:.18em;color:rgba(110,130,190,.28);font-weight:300;pointer-events:none;}
     @media(max-width:600px){.coords{display:none;}}
   </style>
@@ -165,59 +166,54 @@
       { tag:"Hackathon · MedTech", date:"April 2026", title:"NeuroPrint", body:"A browser-based tool for tracking Parkinson's at home, built at HackDartmouth. Patients do movement tasks like sit-to-stand, standing balance, gait turns, and shoulder range of motion while MediaPipe tracks their joints in the browser, so raw video never leaves the device. A FastAPI and SQLite backend saves each session, and a React dashboard shows clinicians how a patient's movement changes over time against age-matched references. We placed 3rd overall, won AirPods, and got a fast-track interview with Adaptional, a YC-backed startup.", link:"https://devpost.com/software/neuroprint-cky41g?ref_content=my-projects-tab&ref_feature=my_projects", linkLabel:"View on Devpost →" }
     ];
 
-    // Each project gets a small printed illustration instead of a playing-card suit.
-    const PINS = [
-      {short:"PCDD", note:"14 carbons", tone:"#d5ddcc", ar:"3/4", art:"carbon"},
-      {short:"Vantage", note:"best solo hack", tone:"#efe2b8", ar:"4/5", art:"chart"},
-      {short:"Red Cross fleet model", note:"how many bloodmobiles?", tone:"#f6ecc9", ar:"4/5", art:"fleet"},
-      {short:"ASEAN expansion", note:"Singapore first", tone:"#c9d3e6", ar:"1/1", art:"islands"},
-      {short:"Gravitational lens CNN", note:"Fermilab, 2023", tone:"#dcd3e8", ar:"3/4", art:"lens"},
-      {short:"Green vehicle routing", note:"spotlight scholar", tone:"#d5ddcc", ar:"4/5", art:"routes"},
-      {short:"This website", note:"you are here", tone:"#c9d3e6", ar:"2/3", art:"planet"},
-      {short:"NeuroPrint", note:"3rd overall", tone:"#f0d4d8", ar:"3/4", art:"pose"}
+    // Hand-painted playing cards. Suits are drawn as SVG paths, not text characters,
+    // so phones never swap them for emoji.
+    const HAND = [
+      {rank:"A", suit:"heart",   label:"PCDD"},
+      {rank:"A", suit:"spade",   label:"Vantage"},
+      {rank:"A", suit:"diamond", label:"Red Cross fleet"},
+      {rank:"K", suit:"club",    label:"ASEAN expansion"},
+      {rank:"A", suit:"club",    label:"Fermilab lenses"},
+      {rank:"Q", suit:"diamond", label:"Green routing"},
+      {rank:"JOKER", suit:null,  label:"this website"},
+      {rank:"K", suit:"heart",   label:"NeuroPrint"}
     ];
-    const INK="#24306b", ACC="#c4566f";
-    function dots(id){return `<defs><pattern id="${id}" width="6" height="6" patternUnits="userSpaceOnUse"><circle cx="3" cy="3" r=".9" fill="${INK}" opacity=".13"/></pattern></defs><rect width="200" height="200" fill="url(#${id})"/>`;}
-    const ART = {
-      carbon:()=>{let h='';const hx=(x,y)=>{const p=[...Array(6)].map((_,k)=>{const a=Math.PI/3*k+Math.PI/6;return `${(x+18*Math.cos(a)).toFixed(1)},${(y+18*Math.sin(a)).toFixed(1)}`}).join(' ');return `<polygon points="${p}" fill="none" stroke="${INK}" stroke-width="2"/>`;};
-        for(let r=0;r<5;r++)for(let c=0;c<5;c++){h+=hx(30+c*31.2+(r%2)*15.6,40+r*27);}
-        return h+`<circle cx="138" cy="122" r="7" fill="${ACC}"/><circle cx="60" cy="68" r="5" fill="${ACC}"/>`;},
-      chart:()=>{let h='';const v=[60,80,70,105,95,120,112,140,130,155];v.forEach((y,i)=>{const x=24+i*16,up=i%3!==1;h+=`<line x1="${x}" y1="${200-y-22}" x2="${x}" y2="${200-y+18}" stroke="${INK}" stroke-width="1.6"/><rect x="${x-5}" y="${200-y-10}" width="10" height="${up?24:16}" fill="${up?INK:ACC}"/>`;});
-        return h+`<path d="M20 160 C60 150 90 120 120 100 S170 60 184 52" fill="none" stroke="${ACC}" stroke-width="2" stroke-dasharray="4 4"/>`;},
-      fleet:()=>{const id='wb'+Math.random().toString(36).slice(2,7);
-        return `<defs><filter id="${id}"><feTurbulence type="fractalNoise" baseFrequency=".045" numOctaves="2" seed="4"/><feDisplacementMap in="SourceGraphic" scale="3.2"/></filter></defs>
-        <g transform="translate(0 6)">
-        <!-- fill, printed slightly off the outline like a crayon drawing -->
-        <path d="M24 122 L24 98 Q24 90 32 89 L56 86 L68 62 Q71 56 78 56 L136 56 Q146 56 150 64 L162 88 Q168 90 168 98 L168 124 Q168 130 162 130 L30 130 Q24 130 24 124Z" fill="#ef6461"/>
-        <g filter="url(#${id})" stroke="#2b2620" stroke-width="5" stroke-linejoin="round" stroke-linecap="round">
-          <path d="M30 126 L30 100 Q30 92 38 91 L62 88 L74 64 Q77 58 84 58 L142 58 Q152 58 156 66 L168 90 Q174 92 174 100 L174 126 Q174 132 168 132 L36 132 Q30 132 30 126Z" fill="none"/>
-          <rect x="84" y="66" width="28" height="22" rx="4" fill="#a9dbe8"/>
-          <rect x="120" y="66" width="30" height="22" rx="4" fill="#a9dbe8"/>
-          <circle cx="40" cy="106" r="5.5" fill="#f6d65c" stroke-width="3.5"/>
-          <circle cx="64" cy="134" r="14" fill="#5b5753"/><circle cx="148" cy="134" r="14" fill="#5b5753"/>
-          <path d="M184 116 q-2 -9 7 -10 q3 -8 11 -4 q8 -3 9 6 q7 3 2 10 q1 8 -8 7 q-5 6 -11 1 q-9 1 -10 -6z" fill="#fffaf2" stroke-width="3.5" transform="translate(-12 0)"/>
-        </g>
-        <path d="M102 104 C96 99 95 94 99 92 C102 90 104 92 105 94 C106 92 108 90 111 92 C115 94 114 99 108 104 L105 107Z" fill="#fff4f2"/>
-        </g>`;},
-      islands:()=>`<path d="M30 70 q14 -16 30 -4 q10 10 -4 18 q-18 8 -26 -14z" fill="${INK}"/><path d="M110 50 q18 -8 26 6 q4 14 -14 14 q-18 -2 -12 -20z" fill="${INK}"/><path d="M60 130 q20 -12 46 0 q22 12 6 22 q-30 14 -52 -22z" fill="${INK}"/><path d="M140 120 q16 -4 22 8 q2 14 -16 10 q-12 -6 -6 -18z" fill="${INK}"/>
-        <circle cx="100" cy="98" r="8" fill="${ACC}"/><g fill="none" stroke="${ACC}" stroke-width="1.8" stroke-dasharray="3 4"><path d="M100 98 Q70 70 46 74"/><path d="M100 98 Q115 70 124 60"/><path d="M100 98 Q90 125 82 140"/><path d="M100 98 Q130 110 150 130"/></g>`,
-      lens:()=>{let h='';for(let i=0;i<26;i++){h+=`<circle cx="${(i*37)%190+5}" cy="${(i*53)%190+5}" r="${1+(i%3)*.6}" fill="${INK}" opacity=".5"/>`;}
-        return h+`<circle cx="100" cy="100" r="54" fill="none" stroke="${INK}" stroke-width="7" stroke-dasharray="70 18 40 22"/><circle cx="100" cy="100" r="34" fill="none" stroke="${ACC}" stroke-width="4" stroke-dasharray="40 14"/><circle cx="100" cy="100" r="10" fill="${INK}"/>`;},
-      routes:()=>{const n=[[30,40],[80,30],[150,45],[45,100],[110,90],[170,110],[60,160],[120,150],[165,170]];let h=`<path d="M30 40 L80 30 L110 90 L170 110 L165 170 L120 150 L60 160 L45 100 Z" fill="none" stroke="${ACC}" stroke-width="3" stroke-linejoin="round"/>`;
-        [[0,3],[1,4],[2,4],[2,5],[3,6],[4,7],[6,7],[7,8],[5,8],[0,1],[1,2]].forEach(([a,b])=>{h+=`<line x1="${n[a][0]}" y1="${n[a][1]}" x2="${n[b][0]}" y2="${n[b][1]}" stroke="${INK}" stroke-width="1" opacity=".35"/>`;});
-        n.forEach(([x,y])=>{h+=`<circle cx="${x}" cy="${y}" r="7" fill="${INK}"/>`;});return h;},
-      planet:()=>{let h='';for(let i=0;i<30;i++){h+=`<circle cx="${(i*41)%196+2}" cy="${(i*67)%196+2}" r="${.8+(i%3)*.5}" fill="${INK}" opacity=".55"/>`;}
-        return h+`<circle cx="100" cy="104" r="38" fill="${INK}"/><ellipse cx="100" cy="104" rx="70" ry="16" fill="none" stroke="${ACC}" stroke-width="4" transform="rotate(-18 100 104)"/><path d="M62 92 a38 38 0 0 1 76 0" fill="none" stroke="#c9d3e6" stroke-width="2" opacity=".5"/><circle cx="160" cy="44" r="7" fill="${ACC}"/>`;},
-      pose:()=>{const p={h:[100,38],n:[100,64],ls:[78,70],rs:[122,70],le:[66,98],re:[136,92],lw:[60,124],rw:[150,74],hp:[100,112],lh:[88,116],rh:[112,116],lk:[82,150],rk:[120,148],la:[78,184],ra:[128,182]};
-        const L=[['n','ls'],['n','rs'],['ls','le'],['le','lw'],['rs','re'],['re','rw'],['n','hp'],['hp','lh'],['hp','rh'],['lh','lk'],['lk','la'],['rh','rk'],['rk','ra']];
-        let h=`<circle cx="100" cy="38" r="14" fill="none" stroke="${INK}" stroke-width="2.4"/>`;L.forEach(([a,b])=>{h+=`<line x1="${p[a][0]}" y1="${p[a][1]}" x2="${p[b][0]}" y2="${p[b][1]}" stroke="${INK}" stroke-width="2.4" stroke-linecap="round"/>`;});
-        Object.entries(p).forEach(([k,[x,y]])=>{if(k!=='h')h+=`<circle cx="${x}" cy="${y}" r="4.5" fill="${ACC}"/>`;});return h+`<path d="M146 70 a16 16 0 0 1 18 22" fill="none" stroke="${ACC}" stroke-width="1.8" stroke-dasharray="3 3"/>`;}
+    const SUIT_PATH = {
+      heart:"M50 90 C20 68 5 52 5 33 C5 18 16 8 30 8 C40 8 46 14 50 23 C54 14 60 8 70 8 C84 8 95 18 95 33 C95 52 80 68 50 90Z",
+      diamond:"M50 3 L86 50 L50 97 L14 50Z",
+      spade:"M50 4 C64 25 93 40 93 61 C93 75 81 83 68 81 C62 80 57 77 54 72 C55 81 59 89 67 95 L33 95 C41 89 45 81 46 72 C43 77 38 80 32 81 C19 83 7 75 7 61 C7 40 36 25 50 4Z",
+      club:"M50 12 a17 17 0 1 1 -0.1 0Z M28 42 a17 17 0 1 1 -0.1 0Z M72 42 a17 17 0 1 1 -0.1 0Z M46 58 C46 76 42 86 33 95 L67 95 C58 86 54 76 54 58Z"
     };
+    const RED="#d0443e", INKC="#2c3048";
+    function suitColor(s){return (s==='heart'||s==='diamond')?RED:INKC;}
+    function paintSuit(s,x,y,size,fid,op){
+      const c=suitColor(s), k=size/100;
+      return `<g transform="translate(${x-size/2} ${y-size/2}) scale(${k})">
+        <path d="${SUIT_PATH[s]}" fill="${c}" opacity="${op||.82}" filter="url(#wc${fid})"/>
+        <path d="${SUIT_PATH[s]}" fill="none" stroke="${c}" stroke-width="${2.2/k*0.6}" opacity=".45" filter="url(#wc${fid})"/></g>`;
+    }
     function makeCardBackSVG(idx){
-      const p=PINS[idx]||PINS[0];
-      return `<div class="pin" style="--tone:${p.tone}"><span class="pin-tape" style="--tilt:${(idx%2?3:-3)}deg"></span>
-        <div class="pin-art"><svg viewBox="0 0 200 200" preserveAspectRatio="xMidYMid slice" aria-hidden="true">${dots('ht'+idx+Math.random().toString(36).slice(2,6))}${ART[p.art]()}</svg></div>
-        <div class="pin-title">${p.short}</div><div class="pin-note">${p.note}</div></div>`;
+      const h=HAND[idx]||HAND[0], fid=idx+Math.random().toString(36).slice(2,6);
+      const defs=`<defs>
+        <filter id="wc${fid}" x="-10%" y="-10%" width="120%" height="120%"><feTurbulence type="fractalNoise" baseFrequency=".035" numOctaves="3" seed="${idx+2}"/><feDisplacementMap in="SourceGraphic" scale="6"/><feGaussianBlur stdDeviation=".5"/></filter>
+        <filter id="ink${fid}"><feTurbulence type="fractalNoise" baseFrequency=".03" numOctaves="2" seed="${idx+9}"/><feDisplacementMap in="SourceGraphic" scale="3"/></filter>
+        <linearGradient id="pp${fid}" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fdfaf3"/><stop offset=".7" stop-color="#f6f0e3"/><stop offset="1" stop-color="#e8e0cf"/></linearGradient>
+      </defs>`;
+      const card=`<rect x="6" y="6" width="238" height="338" rx="16" fill="url(#pp${fid})"/>
+        <path d="M232 20 L238 330" stroke="#b9b2a4" stroke-width="10" opacity=".35" filter="url(#wc${fid})"/>
+        <rect x="6" y="6" width="238" height="338" rx="16" fill="none" stroke="#3a3632" stroke-width="3" filter="url(#ink${fid})"/>`;
+      let face='';
+      if(h.rank==='JOKER'){
+        face=`${'JOKER'.split('').map((ch,i)=>`<text x="30" y="${62+i*36}" font-family="'IM Fell English',Georgia,serif" font-size="34" fill="${INKC}" text-anchor="middle">${ch}</text>`).join('')}
+          <g transform="translate(140 150)" filter="url(#wc${fid})"><path d="M0 -46 L13 -14 L46 -12 L20 9 L29 42 L0 23 L-29 42 L-20 9 L-46 -12 L-13 -14Z" fill="${RED}" opacity=".8"/></g>
+          <circle cx="182" cy="96" r="5" fill="${INKC}" opacity=".7"/><circle cx="96" cy="214" r="4" fill="${RED}" opacity=".7"/>`;
+      } else {
+        const c=suitColor(h.suit);
+        const corner=`<text x="30" y="52" font-family="'IM Fell English',Georgia,serif" font-size="34" fill="${c}" text-anchor="middle" opacity=".92">${h.rank}</text>${paintSuit(h.suit,30,74,24,fid,.9)}`;
+        face=`${corner}<g transform="rotate(180 125 175)">${corner}</g>${paintSuit(h.suit,125,160,h.rank==='A'?118:96,fid)}`;
+      }
+      const label=`<text x="125" y="${h.rank==='JOKER'?300:282}" font-family="'Nanum Pen Script',cursive" font-size="30" fill="#24306b" text-anchor="middle">${h.label}</text>`;
+      return `<svg viewBox="0 0 250 350" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">${defs}${card}${face}${label}</svg>`;
     }
 
     function makeFrontHTML(p){
@@ -286,7 +282,7 @@
 
     const grid=document.getElementById('memoryGrid');
     PROJECTS.forEach((p,i)=>{
-      const scene=document.createElement('div');scene.className='card-scene';scene.style.animationDelay=(i*0.07)+'s';scene.style.setProperty('--ar',(PINS[i]||{}).ar||'3/4');scene.tabIndex=0;scene.setAttribute('role','button');scene.setAttribute('aria-label',p.title);
+      const scene=document.createElement('div');scene.className='card-scene';scene.style.animationDelay=(i*0.07)+'s';const n=PROJECTS.length,c=(n-1)/2,off=i-c;scene.style.setProperty('--r',(off*6.5)+'deg');scene.style.setProperty('--x',`calc(50% - clamp(70px,8.5vw,90px) + ${off}*clamp(74px,9vw,98px))`);scene.style.setProperty('--y',(Math.abs(off)*Math.abs(off)*3+20)+'px');scene.style.setProperty('--z',i+1);scene.style.setProperty('--rm',((i%2?1:-1)*(1.5+i%3))+'deg');scene.tabIndex=0;scene.setAttribute('role','button');scene.setAttribute('aria-label',p.title);
       const flipper=document.createElement('div');flipper.className='card-flipper';
       const back=document.createElement('div');back.className='card-face card-back';back.innerHTML=makeCardBackSVG(i);
       const aurora=document.createElement('div');aurora.className='cb-aurora';aurora.style.animationDelay=(i*0.55)+'s';back.appendChild(aurora);
