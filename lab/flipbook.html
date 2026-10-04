@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>flip book | Sofia Grimm</title>
+<meta name="robots" content="noindex">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;1,9..144,300;1,9..144,500&family=Inter:wght@400;500&display=swap">
+<style>
+  :root{--desk:#efe3e1;--desk2:#dfe5d2;--paper:#fbf7f1;--ink:#3a2e2c;--pink:#d9939f;--sage:#8f9f74;--edge:#e7ddd0}
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%;overflow:hidden}
+  body{font-family:'Inter',Helvetica,Arial,sans-serif;color:var(--ink);
+    background:radial-gradient(ellipse 70% 60% at 30% 20%,#f6e7e6 0%,transparent 70%),radial-gradient(ellipse 70% 60% at 80% 90%,var(--desk2) 0%,transparent 70%),var(--desk)}
+
+  header{position:fixed;top:0;left:0;right:0;z-index:50;display:flex;justify-content:space-between;align-items:baseline;flex-wrap:wrap;gap:8px;padding:18px clamp(16px,4vw,44px)}
+  header a{color:var(--ink);text-decoration:none;font-size:12px;letter-spacing:.14em;text-transform:uppercase;opacity:.65}
+  header a:hover,header a:focus-visible,header a[aria-current]{opacity:1;text-decoration:underline;text-underline-offset:4px}
+  header .brand{font-family:'Fraunces',serif;font-style:italic;font-size:24px;letter-spacing:0;text-transform:none;opacity:1}
+  header nav{display:flex;flex-wrap:wrap;gap:4px 14px}
+
+  main{position:fixed;inset:0;display:grid;place-items:center;padding:96px 16px 92px}
+  /* the book: a loose stack of pages; each one leaves from a different edge or corner */
+  #book{position:relative;height:min(calc(100vh - 200px),calc((100vw - 32px) * 1.25),860px);aspect-ratio:4/5;perspective:2200px;cursor:pointer;outline:none}
+  #book:focus-visible{box-shadow:0 0 0 3px var(--sage);border-radius:6px}
+  .under{position:absolute;inset:0;background:var(--paper);border-radius:4px;box-shadow:0 1px 0 var(--edge)}
+  .under.u1{transform:translate(5px,6px) rotate(.6deg);background:#f4eee5}
+  .under.u2{transform:translate(-4px,10px) rotate(-.8deg);background:#efe7dc;box-shadow:0 30px 60px rgba(70,40,40,.18)}
+  .page{position:absolute;inset:0;transform-style:preserve-3d;will-change:transform}
+  .page[hidden]{display:none}
+  .face{position:absolute;inset:0;border-radius:4px;overflow:hidden;backface-visibility:hidden;-webkit-backface-visibility:hidden;background:var(--paper);
+    box-shadow:0 1px 2px rgba(60,40,40,.15)}
+  .face img{display:block;width:100%;height:100%;object-fit:cover}
+  .face.fit img{object-fit:contain;background:#fff}
+  .back{background:#f3ece2 repeating-linear-gradient(0deg,transparent 0 27px,rgba(143,159,116,.18) 27px 28px)}
+  .shade{position:absolute;inset:0;pointer-events:none;opacity:0;background:rgba(40,25,25,.5)}
+  .face .shine{position:absolute;inset:0;pointer-events:none;opacity:0}
+
+  /* the corner or edge you'll turn next, lifted a little */
+  .ear{position:absolute;z-index:3;pointer-events:none;transition:opacity .3s}
+  .ear.corner{width:44px;height:44px;background:linear-gradient(135deg,#efe6d9 0 50%,transparent 50%);filter:drop-shadow(-2px -2px 3px rgba(60,40,40,.25))}
+  .ear.edge{background:linear-gradient(var(--g),rgba(60,40,40,.18),transparent)}
+  .page.going .ear{opacity:0}
+
+  /* cover and the last page */
+  .cover{display:flex;flex-direction:column;justify-content:space-between;padding:9% 9% 8%;background:
+      radial-gradient(circle at 78% 22%,rgba(217,147,159,.35) 0 18%,transparent 19%),
+      radial-gradient(circle at 18% 84%,rgba(143,159,116,.3) 0 14%,transparent 15%),var(--paper)}
+  .cover small{font-size:11px;letter-spacing:.24em;text-transform:uppercase;color:var(--sage)}
+  .cover h1{font-family:'Fraunces',serif;font-weight:300;font-size:clamp(46px,9vh,92px);line-height:.92;letter-spacing:-.02em}
+  .cover h1 em{font-style:italic;font-weight:500;color:var(--pink)}
+  .cover p{font-family:'Fraunces',serif;font-style:italic;font-size:clamp(15px,2.1vh,19px);max-width:22ch;line-height:1.35}
+  .compass{width:74px;height:74px;align-self:flex-end}
+  .end{justify-content:center;align-items:center;text-align:center;gap:18px}
+  .end h1{font-size:clamp(38px,7vh,70px)}
+
+  /* controls */
+  .bar{position:fixed;left:0;right:0;bottom:22px;z-index:40;display:flex;justify-content:center;align-items:center;gap:18px}
+  .bar button{font:500 11px 'Inter';letter-spacing:.18em;text-transform:uppercase;color:var(--ink);background:rgba(251,247,241,.85);border:1px solid rgba(58,46,44,.25);
+    border-radius:999px;padding:10px 16px;cursor:pointer}
+  .bar button:hover,.bar button:focus-visible{border-color:var(--ink);outline:none}
+  .bar button:disabled{opacity:.35;cursor:default}
+  .count{font-family:'Fraunces',serif;font-style:italic;font-size:17px;min-width:9ch;text-align:center}
+  .count .from{display:block;font:500 10px 'Inter';font-style:normal;letter-spacing:.2em;text-transform:uppercase;color:var(--sage);margin-top:2px}
+
+  @media (max-width:760px){main{padding-top:120px}header nav{gap:4px 10px}header a{font-size:11px}}
+</style>
+</head>
+<body>
+<header>
+  <a class="brand" href="../index.html">Sofia Grimm</a>
+  <nav aria-label="Site"><a href="../index.html">Home</a><a href="../about.html">About</a><a href="../research.html">Research</a><a href="../projects.html">Projects</a><a href="skills.html">Languages</a><a href="wonderland.html">Wonderland</a><a href="flipbook.html" aria-current="page">Flip Book</a><a href="cards.html">Cards</a><a href="notes.html">Notes</a><a href="sofia-is.html">Sofia is</a><a href="arts.html">Arts</a><a href="globe.html">Globe</a><a href="lace.html">Tilt</a><a href="../contact.html">Contact</a></nav>
+</header>
+
+<main>
+  <div id="book" tabindex="0" role="region" aria-roledescription="flip book" aria-label="Flip book. Click or press the right arrow to turn the page.">
+    <div class="under u2"></div><div class="under u1"></div>
+  </div>
+</main>
+
+<div class="bar">
+  <button id="prev" type="button">&larr; back</button>
+  <div class="count" aria-live="polite"><span id="num">1 / 6</span><span class="from" id="from">from the right</span></div>
+  <button id="next" type="button">turn &rarr;</button>
+</div>
+
+<script>
+(() => {
+  const still = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const book = document.getElementById('book');
+
+  // the pages, front to back
+  const PAGES = [
+    {cover:true},
+    {src:'img/flipbook/friendship.webp', alt:'Friendship application collage: a pink lily, a spiral notebook, favourite bands and films, and matcha'},
+    {src:'img/flipbook/pink-essentials.webp', alt:'Magazine spread: Miu Miu pink essentials on the left, a Hot Mess editorial on the right', fit:true},
+    {src:'img/flipbook/paint-outfit.webp', alt:'An outfit laid out inside an old Paint window: yellow jacket, pink bubble skirt, white sunglasses, platform sandals, a brown bag'},
+    {src:'img/flipbook/pink-green.webp', alt:'Pink and green mood board on a spiral notebook: lilies, matcha, a sheer green blouse, a green armchair'},
+    {end:true},
+  ];
+
+  // every turn leaves from a new side: the four edges, then the four corners
+  const DIRS = [
+    {x:1,y:0,name:'the right'},{x:0,y:1,name:'the bottom'},{x:-1,y:0,name:'the left'},{x:0,y:-1,name:'the top'},
+    {x:1,y:1,name:'the bottom right corner'},{x:-1,y:-1,name:'the top left corner'},{x:-1,y:1,name:'the bottom left corner'},{x:1,y:-1,name:'the top right corner'},
+  ];
+  const dirFor = i => DIRS[i % DIRS.length];
+
+  const compass = `<svg class="compass" viewBox="0 0 80 80" aria-hidden="true"><g fill="none" stroke="#8f9f74" stroke-width="1.4">
+    <circle cx="40" cy="40" r="30"/><path d="M40 4V76M4 40H76M14 14L66 66M66 14L14 66" stroke-dasharray="2 4"/></g>
+    <path d="M40 10L45 40L40 70L35 40Z" fill="#d9939f" opacity=".85"/><circle cx="40" cy="40" r="3" fill="#3a2e2c"/></svg>`;
+
+  const els = PAGES.map((p, i) => {
+    const page = document.createElement('div');
+    page.className = 'page';
+    let front;
+    if (p.cover) front = `<div class="face front cover"><small>a flip book</small>
+        <h1>turn it<br><em>any</em><br>which way</h1>
+        <div style="display:flex;justify-content:space-between;align-items:flex-end;gap:12px"><p>Every page leaves from a different side. Top, bottom, left, right, and all four corners.</p>${compass}</div></div>`;
+    else if (p.end) front = `<div class="face front cover end"><small>the last page</small><h1>that's the<br><em>whole</em> book</h1><p>Turn once more to start over.</p>${compass}</div>`;
+    else front = `<div class="face front${p.fit ? ' fit' : ''}"><img src="${p.src}" alt="${p.alt}" draggable="false"></div>`;
+    page.innerHTML = front + '<div class="face back"></div><div class="shade"></div>';
+    page.querySelector('.front').insertAdjacentHTML('beforeend', '<div class="shine"></div>');
+    book.appendChild(page);
+    return page;
+  });
+
+  // place the dog-ear on the side this page will leave from
+  function ear(page, d) {
+    page.querySelectorAll('.ear').forEach(e => e.remove());
+    const e = document.createElement('div');
+    if (d.x && d.y) {
+      e.className = 'ear corner';
+      e.style[d.x > 0 ? 'right' : 'left'] = '0'; e.style[d.y > 0 ? 'bottom' : 'top'] = '0';
+      // turn the triangle so its fold faces the page
+      const rot = d.x > 0 ? (d.y > 0 ? 0 : 90) : (d.y > 0 ? 270 : 180);
+      e.style.transform = `rotate(${rot}deg)`;
+    } else {
+      e.className = 'ear edge';
+      const horiz = !!d.x;
+      Object.assign(e.style, horiz ? {top:0, bottom:0, width:'22px'} : {left:0, right:0, height:'22px'});
+      e.style[d.x > 0 ? 'right' : d.x < 0 ? 'left' : d.y > 0 ? 'bottom' : 'top'] = '0';
+      e.style.setProperty('--g', d.x > 0 ? 'to left' : d.x < 0 ? 'to right' : d.y > 0 ? 'to top' : 'to bottom');
+    }
+    page.appendChild(e);
+  }
+
+  // the hinge sits on the opposite side; the page swings up toward you and over it
+  const hinge = d => `${50 - d.x * 50}% ${50 - d.y * 50}%`;
+  const axis = d => `${-d.y},${d.x},0`;
+
+  let i = 0, busy = false;
+  const num = document.getElementById('num'), from = document.getElementById('from');
+  const prevBtn = document.getElementById('prev'), nextBtn = document.getElementById('next');
+
+  function layout() {
+    els.forEach((el, k) => {
+      el.hidden = k < i;
+      el.style.zIndex = String(100 - k);
+      el.style.transform = '';
+      el.querySelector('.back').style.transform = `rotate3d(${axis(dirFor(k))},180deg)`; // the back always faces away until the page turns
+    });
+    ear(els[i], dirFor(i));
+    num.textContent = `${i + 1} / ${els.length}`;
+    from.textContent = i === els.length - 1 ? 'back to the start' : `from ${dirFor(i).name}`;
+    prevBtn.disabled = i === 0;
+  }
+
+  function animate(el, d, out) {
+    const ax = axis(d), a0 = out ? 0 : -180, a1 = out ? -180 : 0;
+    el.style.transformOrigin = hinge(d);
+    el.querySelector('.back').style.transform = `rotate3d(${ax},180deg)`;
+    el.classList.add('going');
+    el.style.zIndex = '200';
+    const ease = 'cubic-bezier(.45,.05,.25,1)';
+    const dur = still ? 1 : 950;
+    const turn = el.animate([
+      {transform:`rotate3d(${ax},${a0}deg)`},
+      {transform:`rotate3d(${ax},${(a0 + a1) / 2}deg) translateZ(40px)`},
+      {transform:`rotate3d(${ax},${a1}deg)`},
+    ], {duration:dur, easing:ease, fill:'forwards'});
+    // light catches the page as it lifts; the page beneath sits in its shadow
+    el.querySelector('.shine').style.background = `linear-gradient(${Math.atan2(d.y, d.x) * 180 / Math.PI + 90}deg,rgba(255,255,255,0),rgba(255,255,255,.35),rgba(60,30,30,.25))`;
+    el.querySelector('.shine').animate([{opacity:0},{opacity:1},{opacity:0}], {duration:dur, easing:ease});
+    const below = out ? els[i + 1] : els[i];
+    if (below && !still) below.querySelector('.shade').animate(out ? [{opacity:.55},{opacity:0}] : [{opacity:0},{opacity:.55}], {duration:dur, easing:ease});
+    return turn.finished.then(() => { turn.cancel(); el.classList.remove('going'); });
+  }
+
+  async function next() {
+    if (busy) return;
+    if (i === els.length - 1) { // last page: shuffle back to the cover
+      busy = true; i = 0; layout();
+      if (!still) els[0].animate([{opacity:0, transform:'translateY(14px)'},{opacity:1, transform:'none'}], {duration:500, easing:'ease-out'});
+      busy = false; return;
+    }
+    busy = true;
+    const el = els[i];
+    await animate(el, dirFor(i), true);
+    i++; layout(); busy = false;
+  }
+
+  async function prev() {
+    if (busy || i === 0) return;
+    busy = true;
+    i--;
+    const el = els[i];
+    el.hidden = false;
+    els[i + 1].querySelectorAll('.ear').forEach(e => e.remove());
+    await animate(el, dirFor(i), false);
+    layout(); busy = false;
+  }
+
+  book.addEventListener('click', next);
+  nextBtn.addEventListener('click', next);
+  prevBtn.addEventListener('click', prev);
+  book.addEventListener('keydown', e => {
+    if (['ArrowRight','ArrowDown',' ','Enter'].includes(e.key)) { e.preventDefault(); next(); }
+    if (['ArrowLeft','ArrowUp'].includes(e.key)) { e.preventDefault(); prev(); }
+  });
+  addEventListener('keydown', e => {
+    if (e.target === book || e.target.tagName === 'BUTTON') return;
+    if (e.key === 'ArrowRight') next(); if (e.key === 'ArrowLeft') prev();
+  });
+
+  layout();
+})();
+</script>
+</body>
+</html>
