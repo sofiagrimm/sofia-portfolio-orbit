@@ -242,11 +242,22 @@
     .movable.held .rast{box-shadow:0 22px 30px rgba(20,0,0,.5);scale:1.05;transition:scale .15s,box-shadow .15s}
     .movable .rast{transition:scale .2s,box-shadow .2s}
     @media (max-width:760px){#cardframe .fc.movable{touch-action:auto}}
-    #spot i{position:absolute;pointer-events:none;z-index:9}
-    #spot .pool{border-radius:50%;background:radial-gradient(ellipse at 50% 50%,rgba(255,228,180,.26),rgba(255,214,160,.12) 38%,transparent 68%)}
-    #spot .beam{clip-path:polygon(38% 0,62% 0,100% 100%,0 100%);background:linear-gradient(180deg,rgba(255,236,200,.13),rgba(255,236,200,.05) 70%,transparent);filter:blur(6px)}
+    #spot i,#spot b{position:absolute;pointer-events:none}
+    /* the dark of the room: everything away from the lamp dims, smoothly */
+    #spot .shade{z-index:8;background:radial-gradient(var(--rw) var(--rh) at var(--cx) var(--cy),transparent 0%,transparent 50%,rgba(14,2,3,.3) 78%,rgba(10,1,2,.58) 125%,rgba(8,0,1,.7) 200%)}
+    /* light falling on the cloth: lifts and warms what's under it */
+    #spot .pool{z-index:9;border-radius:50%;mix-blend-mode:soft-light;background:radial-gradient(closest-side,rgba(255,232,190,.95),rgba(255,214,160,.65) 45%,rgba(255,200,140,.22) 75%,rgba(255,190,130,0) 100%)}
+    #spot .hot{z-index:9;border-radius:50%;background:radial-gradient(closest-side,rgba(255,236,205,.10),rgba(255,236,205,0));filter:blur(8px)}
+    /* the cone of light in the air: very faint, soft-edged, brightest near the lamp */
+    #spot .cone{z-index:9;clip-path:polygon(41% 0,59% 0,100% 100%,0 100%);opacity:.55;
+      background:linear-gradient(180deg,rgba(255,238,205,.11),rgba(255,232,195,.045) 55%,rgba(255,230,190,0) 100%);
+      -webkit-mask:linear-gradient(90deg,transparent 0%,#000 30%,#000 70%,transparent 100%);mask:linear-gradient(90deg,transparent 0%,#000 30%,#000 70%,transparent 100%)}
+    /* dust drifting through the light */
+    #spot b{z-index:9;width:3px;height:3px;border-radius:50%;background:rgba(255,240,215,.55);filter:blur(.6px);animation:dust 16s linear infinite}
+    @keyframes dust{0%{transform:translate(0,0);opacity:0}15%{opacity:.7}85%{opacity:.5}100%{transform:translate(22px,70px);opacity:0}}
+    @media (prefers-reduced-motion:reduce){#spot b{animation:none;opacity:.35}}
     /* the cards in the light read a touch brighter and cast deeper shadows */
-    @media(min-width:760px){#memoryGrid .card-scene{filter:brightness(1.05) drop-shadow(0 18px 22px rgba(20,0,0,.45))}}
+    @media(min-width:760px){#memoryGrid .card-scene{filter:brightness(1.04) drop-shadow(0 22px 18px rgba(12,0,0,.5))}}
   </style>
 </head>
 <body>
@@ -998,13 +1009,24 @@
   document.body.insertBefore(arch,document.body.firstChild);
   let A=null;
   const docBox=el=>{const r=el.getBoundingClientRect();return{l:r.left+scrollX,t:r.top+scrollY,r:r.right+scrollX,b:r.bottom+scrollY};};
+  // A pendant lamp hanging above the hand: everything outside its light falls away into shadow,
+  // the felt under it warms and lifts (lighting the cloth rather than painting haze on top),
+  // a faint cone of light hangs in the air with a few specks of dust drifting through it.
   function spotlight(){
-    let sp=document.getElementById('spot');if(!sp){sp=document.createElement('div');sp.id='spot';sp.setAttribute('aria-hidden','true');sp.innerHTML='<i class="beam"></i><i class="pool"></i>';document.body.appendChild(sp);}
+    let sp=document.getElementById('spot');
+    if(!sp){sp=document.createElement('div');sp.id='spot';sp.setAttribute('aria-hidden','true');
+      sp.innerHTML='<i class="shade"></i><i class="cone"></i><i class="pool"></i><i class="hot"></i>'+'<b></b>'.repeat(9);document.body.appendChild(sp);}
     const sc=[...document.querySelectorAll('#memoryGrid .card-scene')].map(docBox);if(!sc.length||innerWidth<760){sp.style.display='none';return;}
-    sp.style.display='';const l=Math.min(...sc.map(b=>b.l)),r=Math.max(...sc.map(b=>b.r)),t=Math.min(...sc.map(b=>b.t)),bt=Math.max(...sc.map(b=>b.b));
-    const cx=(l+r)/2,cy=(t+bt)/2,w=(r-l)*1.25,h=(bt-t)*1.7;
-    Object.assign(sp.querySelector('.pool').style,{left:(cx-w/2)+'px',top:(cy-h/2)+'px',width:w+'px',height:h+'px'});
-    Object.assign(sp.querySelector('.beam').style,{left:(cx-w*.45)+'px',top:'0px',width:(w*.9)+'px',height:(cy+h*.35)+'px'});
+    sp.style.display='';
+    const l=Math.min(...sc.map(b=>b.l)),r=Math.max(...sc.map(b=>b.r)),t=Math.min(...sc.map(b=>b.t)),bt=Math.max(...sc.map(b=>b.b));
+    const cx=(l+r)/2,cy=(t+bt)/2+(bt-t)*.08,w=(r-l)*1.35,h=(bt-t)*1.55;
+    const set=(q,o)=>Object.assign(sp.querySelector(q).style,o);
+    const docH=document.documentElement.scrollHeight;
+    set('.shade',{left:'0px',top:'0px',width:'100%',height:docH+'px','--cx':cx+'px','--cy':cy+'px','--rw':(w*.62)+'px','--rh':(h*.62)+'px'});
+    set('.pool',{left:(cx-w/2)+'px',top:(cy-h/2)+'px',width:w+'px',height:h+'px'});
+    set('.hot',{left:(cx-w*.28)+'px',top:(cy-h*.3)+'px',width:(w*.56)+'px',height:(h*.5)+'px'});
+    set('.cone',{left:(cx-w*.5)+'px',top:'-40px',width:w+'px',height:(cy+40)+'px'});
+    sp.querySelectorAll('b').forEach((d,k)=>{const f=k/9;Object.assign(d.style,{left:(cx-w*.25+w*.5*((k*37%9)/9))+'px',top:(cy*(.15+.7*((k*53%9)/9)))+'px',animationDelay:(-k*1.7)+'s',animationDuration:(14+k%4*3)+'s'});});
   }
   function fitArch(){
     const scenes=[...document.querySelectorAll('#memoryGrid .card-scene')];
@@ -1109,42 +1131,44 @@
   // ── Counting chips: hover lifts a stack up off the felt, fanned out between your fingers;
   //    move away and they drop back one at a time, each with a little clack.
   const chipAudio={ctx:null,
+    // one master volume for the whole table, kept low: these should be felt more than heard
+    out(){const c=this.ctx;if(!this.m){this.m=c.createGain();this.m.gain.value=.32;const lp=c.createBiquadFilter();lp.type='lowpass';lp.frequency.value=6500;this.m.connect(lp).connect(c.destination);}return this.m;},
     init(){if(!this.ctx){try{this.ctx=new (window.AudioContext||window.webkitAudioContext)();}catch(e){}}if(this.ctx&&this.ctx.state==='suspended')this.ctx.resume();},
     // a tiny xylophone: notes from a pentatonic scale so anything played together sounds sweet
     note(f,dur=.35,gain=.06,type='triangle',delay=0,glide=0){const c=this.ctx;if(!c||c.state!=='running')return;const t=c.currentTime+delay;
       const o=c.createOscillator(),o2=c.createOscillator(),g=c.createGain();o.type=type;o2.type='sine';o.frequency.setValueAtTime(f,t);o2.frequency.setValueAtTime(f*4,t);
       if(glide){o.frequency.exponentialRampToValueAtTime(f*glide,t+dur*.6);o2.frequency.exponentialRampToValueAtTime(f*4*glide,t+dur*.6);}
       const g2=c.createGain();g2.gain.value=.18;g.gain.setValueAtTime(.0001,t);g.gain.exponentialRampToValueAtTime(gain,t+.008);g.gain.exponentialRampToValueAtTime(.0001,t+dur);
-      o.connect(g);o2.connect(g2).connect(g);g.connect(c.destination);o.start(t);o2.start(t);o.stop(t+dur+.05);o2.stop(t+dur+.05);},
+      o.connect(g);o2.connect(g2).connect(g);g.connect(this.out());o.start(t);o2.start(t);o.stop(t+dur+.05);o2.stop(t+dur+.05);},
     PENTA:[523.25,587.33,659.25,783.99,880,1046.5,1174.66,1318.51,1567.98,1760],
     // shared building blocks: a filtered burst of noise, and a tone with a quick attack and decay
     burst(dur,type,f,q,gain,delay=0){const c=this.ctx;if(!c||c.state!=='running')return;const t=c.currentTime+delay,len=Math.ceil(c.sampleRate*dur),buf=c.createBuffer(1,len,c.sampleRate),d=buf.getChannelData(0);
       for(let k=0;k<len;k++)d[k]=(Math.random()*2-1)*Math.exp(-k/(c.sampleRate*dur*.22));const s=c.createBufferSource();s.buffer=buf;const fl=c.createBiquadFilter();fl.type=type;fl.frequency.value=f;fl.Q.value=q;
-      const g=c.createGain();g.gain.value=gain;s.connect(fl).connect(g).connect(c.destination);s.start(t);},
+      const g=c.createGain();g.gain.value=gain;s.connect(fl).connect(g).connect(this.out());s.start(t);},
     tone(f,dur,gain,type='sine',delay=0,to=0){const c=this.ctx;if(!c||c.state!=='running')return;const t=c.currentTime+delay,o=c.createOscillator(),g=c.createGain();o.type=type;o.frequency.setValueAtTime(f,t);
       if(to)o.frequency.exponentialRampToValueAtTime(to,t+dur*.8);g.gain.setValueAtTime(.0001,t);g.gain.exponentialRampToValueAtTime(gain,t+.004);g.gain.exponentialRampToValueAtTime(.0001,t+dur);
-      o.connect(g).connect(c.destination);o.start(t);o.stop(t+dur+.03);},
+      o.connect(g).connect(this.out());o.start(t);o.stop(t+dur+.03);},
     // CHIPS: clay chips meeting clay chips. A bright, glassy click with a little ceramic ring,
     // and a tiny glockenspiel ping that climbs as the stack builds back up.
     clack(i,n,vol=1){const p=1+(Math.random()-.5)*.08;
       this.burst(.03,'bandpass',4200*p,6,.5*vol);this.burst(.02,'bandpass',6100*p,8,.25*vol,.004);
       this.tone(3400*p,.09,.05*vol,'sine',0,3100*p);
-      this.tone(this.PENTA[Math.min(9,5+(n-1-i))]*2,.35,.02*vol,'sine',.01);},
+      this.tone(this.PENTA[Math.min(9,5+(n-1-i))]*2,.25,.006*vol,'sine',.01);},
     // DICE: acrylic dice tumbling on felt. A hollow wooden "tok" (like a temple block) and a soft
     // muffled thud from the felt underneath, a different block note on every bounce.
     tok(vol=1,b=0){const blocks=[784,659.25,880,587.33,1046.5],f=blocks[(b+Math.floor(Math.random()*2))%blocks.length];
-      this.tone(f,.11,.11*vol,'triangle',0,f*.86);this.tone(f*2.7,.04,.03*vol,'sine');
+      this.tone(f,.09,.05*vol,'triangle',0,f*.86);
       this.burst(.04,'bandpass',1300,3,.18*vol);this.burst(.07,'lowpass',260,.7,.3*vol);},
     // cards: a soft paper slide, a crisp snap when one flips, a riffle for the shuffle
     paper(dur,f,gain){const c=this.ctx;if(!c||c.state!=='running')return;const t=c.currentTime,len=Math.ceil(c.sampleRate*dur),buf=c.createBuffer(1,len,c.sampleRate),d=buf.getChannelData(0);
       for(let k=0;k<len;k++)d[k]=(Math.random()*2-1)*Math.sin(Math.PI*k/len);const s=c.createBufferSource();s.buffer=buf;const fl=c.createBiquadFilter();fl.type='bandpass';fl.frequency.value=f;fl.Q.value=.8;
-      const g=c.createGain();g.gain.value=gain;s.connect(fl).connect(g).connect(c.destination);s.start(t);},
-    slide(){this.paper(.12,2400,.03);this.note(this.PENTA[6+Math.floor(Math.random()*4)],.4,.018,'sine');},
-    snap(){this.tone(1046.5,.6,.05,'sine');this.tone(1052,.6,.03,'sine');this.tone(1568,.35,.015,'sine',.02);const c=this.ctx;if(!c||c.state!=='running')return;this.paper(.05,3600,.22);const o=c.createOscillator(),g=c.createGain(),t=c.currentTime;o.type='triangle';o.frequency.setValueAtTime(900,t);o.frequency.exponentialRampToValueAtTime(300,t+.05);g.gain.setValueAtTime(.08,t);g.gain.exponentialRampToValueAtTime(.0005,t+.06);o.connect(g).connect(c.destination);o.start(t);o.stop(t+.07);},
-    riffle(){for(let j=0;j<10;j++)this.tone(1400+j*90,.05,.015,'sine',.24+j*.055);for(let k=0;k<26;k++)setTimeout(()=>this.paper(.018,3000+Math.random()*1500,.1),240+k*22+Math.random()*8);setTimeout(()=>this.paper(.08,1800,.12),240+26*22+60);},
-    lift(){this.tone(520,.18,.03,'sine',0,1040);const c=this.ctx;if(!c||c.state!=='running')return;const t=c.currentTime,len=Math.ceil(c.sampleRate*.18),buf=c.createBuffer(1,len,c.sampleRate),d=buf.getChannelData(0);
+      const g=c.createGain();g.gain.value=gain;s.connect(fl).connect(g).connect(this.out());s.start(t);},
+    slide(){this.paper(.12,2400,.02);},
+    snap(){this.tone(1046.5,.4,.012,'sine');const c=this.ctx;if(!c||c.state!=='running')return;this.paper(.05,3600,.22);const o=c.createOscillator(),g=c.createGain(),t=c.currentTime;o.type='triangle';o.frequency.setValueAtTime(900,t);o.frequency.exponentialRampToValueAtTime(300,t+.05);g.gain.setValueAtTime(.08,t);g.gain.exponentialRampToValueAtTime(.0005,t+.06);o.connect(g).connect(this.out());o.start(t);o.stop(t+.07);},
+    riffle(){for(let k=0;k<26;k++)setTimeout(()=>this.paper(.018,3000+Math.random()*1500,.1),240+k*22+Math.random()*8);setTimeout(()=>this.paper(.08,1800,.12),240+26*22+60);},
+    lift(){const c=this.ctx;if(!c||c.state!=='running')return;const t=c.currentTime,len=Math.ceil(c.sampleRate*.18),buf=c.createBuffer(1,len,c.sampleRate),d=buf.getChannelData(0);
       for(let k=0;k<len;k++)d[k]=(Math.random()*2-1)*.5*Math.sin(Math.PI*k/len);const s=c.createBufferSource();s.buffer=buf;const f=c.createBiquadFilter();f.type='highpass';f.frequency.value=2500;
-      const g=c.createGain();g.gain.value=.05;s.connect(f).connect(g).connect(c.destination);s.start(t);}
+      const g=c.createGain();g.gain.value=.05;s.connect(f).connect(g).connect(this.out());s.start(t);}
   };
   // card sounds: brush past a card, flip one, shuffle the deck
   let lastSlide=0;

@@ -85,15 +85,15 @@
 
   // ── sound: made in the browser, only after the player has clicked
   var audio = { c: null, m: null, muted: false,
-    out: function () { var c = this.c; if (!this.m) { this.m = c.createGain(); this.m.gain.value = this.muted ? 0 : 1; this.m.connect(c.destination); } return this.m; },
-    mute: function (on) { this.muted = on; if (this.m) this.m.gain.setTargetAtTime(on ? 0 : 1, this.c.currentTime, .05); },
+    out: function () { var c = this.c; if (!this.m) { this.m = c.createGain(); this.m.gain.value = this.muted ? 0 : .35; this.m.connect(c.destination); } return this.m; },
+    mute: function (on) { this.muted = on; if (this.m) this.m.gain.setTargetAtTime(on ? 0 : .35, this.c.currentTime, .05); },
     // an upright-bass walk under the chase: quiet, plucky, a few bars of E minor
     bassT: null,
     bass: function (on) { var self = this, c = this.c; if (!c) return; clearInterval(this.bassT); if (!on) return;
       var notes = [82.4, 98, 110, 123.5, 146.8, 123.5, 110, 98, 82.4, 87.3, 98, 110, 130.8, 123.5, 110, 92.5], i = 0;
       var pluck = function (f) { var t = c.currentTime, o = c.createOscillator(), o2 = c.createOscillator(), g = c.createGain(), lp = c.createBiquadFilter();
         o.type = 'triangle'; o2.type = 'sine'; o.frequency.value = f; o2.frequency.value = f * 2; lp.type = 'lowpass'; lp.frequency.setValueAtTime(900, t); lp.frequency.exponentialRampToValueAtTime(220, t + .3);
-        g.gain.setValueAtTime(.0001, t); g.gain.exponentialRampToValueAtTime(.16, t + .012); g.gain.exponentialRampToValueAtTime(.0005, t + .48);
+        g.gain.setValueAtTime(.0001, t); g.gain.exponentialRampToValueAtTime(.07, t + .012); g.gain.exponentialRampToValueAtTime(.0005, t + .48);
         o.connect(lp); o2.connect(lp); lp.connect(g).connect(self.out()); o.start(t); o2.start(t); o.stop(t + .5); o2.stop(t + .5); };
       var brush = function () { self.noise(.09, 5200, .6, .035); };
       pluck(notes[0]); this.bassT = setInterval(function () { i++; pluck(notes[i % notes.length]); if (i % 2) brush(); }, 545); },
@@ -109,7 +109,7 @@
       g.gain.setValueAtTime(.0001, t); g.gain.exponentialRampToValueAtTime(gain, t + .008); g.gain.exponentialRampToValueAtTime(.0001, t + dur); o.connect(g).connect(audio.out()); o.start(t); o.stop(t + dur + .05); },
     PENTA: [261.63, 293.66, 329.63, 392, 440, 523.25, 587.33, 659.25, 783.99, 880],
     clack: function (v) { v = Math.max(.15, Math.min(1, v)); this.noise(.025, 2100 + Math.random() * 300, 2.2, .55 * v); this.tone(980 + Math.random() * 80, .07, .07 * v, 'sine'); this.tone(170, .09, .12 * v, 'sine');
-      this.note(this.PENTA[Math.floor(Math.random() * 5)] * .5, .4, .05 * v, 'triangle'); return; v = Math.max(.15, Math.min(1, v)); this.noise(.04, 3000 + Math.random() * 900, 1.3, .5 * v); this.tone(1700 + Math.random() * 400, .06, .08 * v); this.tone(380, .05, .1 * v, 'triangle'); },
+      return; v = Math.max(.15, Math.min(1, v)); this.noise(.04, 3000 + Math.random() * 900, 1.3, .5 * v); this.tone(1700 + Math.random() * 400, .06, .08 * v); this.tone(380, .05, .1 * v, 'triangle'); },
     cue: function () { this.noise(.04, 700, .8, .45, 'lowpass'); this.tone(150, .14, .2, 'sine'); this.note(392, .12, .03, 'sine', .02); return; this.noise(.05, 1400, 1, .5); this.tone(220, .08, .2, 'triangle'); },
     cushion: function () { this.tone(95, .16, .22, 'sine'); this.noise(.05, 300, .7, .25, 'lowpass'); this.note(130.81, .3, .05, 'triangle', .01, 1.25); },
     gulp: function () { this.noise(.08, 500, 1.4, .3); this.note(620, .35, .07, 'sine', .05, .32); this.tone(90, .25, .15, 'sine', .12); },
