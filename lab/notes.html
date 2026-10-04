@@ -114,6 +114,19 @@
   .grid-wrap{position:relative;filter:drop-shadow(0 10px 18px rgba(0,0,0,.45))}
   .clips{position:absolute;display:flex;gap:2px;z-index:3}
   .clips svg{width:18px}
+
+  /* rotating "sofia is a ___" line */
+  .is-a{display:flex;align-items:baseline;gap:.35em;margin:34px 0 0 6px;font-family:'Nanum Pen Script',cursive;font-size:clamp(30px,4vw,44px);color:#f1ecdc;line-height:1}
+  .is-a .art{display:inline-block;transition:opacity .25s}
+  .is-a .window{position:relative;display:inline-block;height:1.25em;overflow:hidden;vertical-align:bottom;min-width:7em}
+  .is-a .word{position:absolute;left:0;top:0;white-space:nowrap;font-family:'DM Serif Display',Georgia,serif;font-style:italic;font-size:1.1em;color:#f3b6c8;
+    transition:transform .55s cubic-bezier(.2,.8,.2,1),opacity .55s}
+  .is-a .word.in{transform:translateX(0);opacity:1}
+  .is-a .word.out{transform:translateX(-60%);opacity:0}
+  .is-a .word.next{transform:translateX(60%);opacity:0;transition:none}
+  .is-a .word::after{content:"";position:absolute;left:0;right:0;bottom:.05em;height:.08em;background:#f3b6c8;opacity:.45;border-radius:2px}
+  .sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+  @media (prefers-reduced-motion:reduce){.is-a .word{transition:opacity .4s}.is-a .word.out,.is-a .word.next{transform:none}}
   footer{position:relative;z-index:10;padding-bottom:110px !important;}
   footer{text-align:center;padding:0 0 48px;color:#7f8fb8;font-size:13px}
   footer a{color:#c9d6ff}
@@ -149,6 +162,7 @@
   <p class="wow">wow! look at all those stars <span aria-hidden="true">✩</span></p>
   <span class="hi">hi! i'm</span><br>
   <h1>sofia grimm<span class="tape" aria-hidden="true">that's me</span></h1>
+  <p class="is-a"><span aria-hidden="true">sofia is</span><span class="art" aria-hidden="true">a</span><span class="window" aria-hidden="true"><span class="word in">researcher</span></span><span class="sr-only">Sofia is a researcher, artist, writer, builder, archivist, editor, and consultant.</span></p>
   <div class="notebook-wrap">
     <div class="scrap-pink" aria-hidden="true"><span>new haven, october
 the light in the reading room
@@ -177,6 +191,25 @@ more soon, s.</span></div>
 </main>
 
 <footer>sofia.grimm@yale.edu &nbsp; <a href="https://www.linkedin.com/in/sofia-grimm/">linkedin</a></footer>
+<script>
+  // "sofia is a ___": swipe through words. Edit this list freely.
+  (function(){
+    var words=["researcher","artist","writer","builder","archivist","editor","consultant"];
+    var box=document.querySelector('.is-a .window'),art=document.querySelector('.is-a .art');
+    if(!box)return;
+    var i=0,cur=box.querySelector('.word');
+    function article(w){return /^[aeiou]/i.test(w)?'an':'a';}
+    art.textContent=article(words[0]);
+    setInterval(function(){
+      if(document.hidden)return;
+      i=(i+1)%words.length;
+      var nx=document.createElement('span');nx.className='word next';nx.textContent=words[i];box.appendChild(nx);
+      nx.offsetWidth;
+      cur.className='word out';nx.className='word in';art.textContent=article(words[i]);
+      var old=cur;cur=nx;setTimeout(function(){old.remove();},600);
+    },1900);
+  })();
+</script>
 <script src="../sky.js"></script>
 </body>
 </html>
