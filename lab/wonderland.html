@@ -52,8 +52,8 @@
   body.big #alice{width:clamp(200px,24vw,300px)}
 
   /* titles and the fall counter */
-  .title{position:fixed;left:0;right:0;top:12vh;z-index:30;text-align:center;pointer-events:none;transition:opacity .6s}
-  .title h1{font-family:'IM Fell English SC',serif;font-weight:400;color:var(--lime);font-size:clamp(46px,8vw,110px);line-height:.95;text-shadow:0 4px 30px rgba(0,0,0,.6)}
+  .title{position:fixed;left:0;right:0;top:8vh;z-index:30;text-align:center;pointer-events:none;transition:opacity .6s}
+  .title h1{font-family:'IM Fell English SC',serif;font-weight:400;color:var(--lime);font-size:clamp(38px,6vw,84px);line-height:.95;text-shadow:0 4px 30px rgba(0,0,0,.6)}
   .title p{font-family:'IM Fell English',serif;font-style:italic;font-size:clamp(16px,1.6vw,20px);margin-top:12px;color:var(--cream)}
   .title .scroll{display:block;margin-top:18px;font:500 11px 'Inter';letter-spacing:.24em;text-transform:uppercase;opacity:.7}
   .meter{position:fixed;left:clamp(14px,3vw,36px);bottom:clamp(14px,3vw,30px);z-index:30;font-family:'IM Fell English',serif;font-size:15px;color:var(--cream);opacity:.85}
@@ -79,6 +79,46 @@
   body.landed #grin{opacity:.9;animation:grin 7s ease-in-out infinite}
   @keyframes grin{0%,100%{opacity:.9}50%{opacity:.15}}
 
+  /* the door: a wall, a keyhole, the heart key, and the cards bursting out */
+  #door{position:fixed;inset:0;z-index:25;pointer-events:none}
+  #wall{position:absolute;inset:0;background:
+      radial-gradient(ellipse 40% 50% at 50% 60%,rgba(201,164,90,.10),transparent 70%),
+      radial-gradient(ellipse 120% 90% at 50% 55%,#1b2638 0%,#0e1726 55%,#070d17 100%)}
+  #burst,#keyhole,#follow{position:absolute;left:50%;top:60%;will-change:transform,opacity}
+  #burst{width:min(880px,112vw);transform:translate(-50%,-50%)}
+  #keyhole{height:min(56vh,520px);width:auto;transform:translate(-50%,-50%);transform-origin:50% 36%;filter:drop-shadow(0 20px 30px rgba(0,0,0,.6))}
+  #follow{left:calc(50% - min(37vw,520px));top:30vh;width:clamp(120px,15vw,210px);transform:rotate(-6deg)}
+  #heartkey{position:fixed;left:calc(50% + min(22vw,300px));top:62%;z-index:27;width:clamp(130px,16vw,230px);background:none;border:0;padding:0;cursor:pointer;
+    transform:translate(-50%,-50%);will-change:transform,opacity}
+  #heartkey img{display:block;width:100%;height:auto;filter:drop-shadow(0 14px 18px rgba(0,0,0,.55));animation:bob 4.5s ease-in-out infinite}
+  #heartkey:focus-visible{outline:3px solid var(--lime);outline-offset:8px;border-radius:12px}
+  #heartkey .hint{margin-top:2px}
+  @keyframes bob{0%,100%{transform:translateY(0) rotate(-2deg)}50%{transform:translateY(-10px) rotate(3deg)}}
+  #hall{position:absolute;inset:-30%;pointer-events:none;background:url(img/wonderland/hall.webp) center/cover;opacity:0;filter:saturate(.75) brightness(.8);will-change:transform,opacity;
+    -webkit-mask:radial-gradient(closest-side,transparent 12%,rgba(0,0,0,.6) 45%,#000 80%);mask:radial-gradient(closest-side,transparent 12%,rgba(0,0,0,.6) 45%,#000 80%)}
+  .thing img{display:block;width:100%;height:auto;filter:drop-shadow(0 10px 14px rgba(0,0,0,.45))}
+  .medal{padding:9px;border-radius:50%;background:linear-gradient(135deg,#f3dc8e,#b8862e 35%,#f0d07c 55%,#8e6420 80%,#d9b25a);box-shadow:0 18px 30px rgba(0,0,0,.5)}
+  .medal img{border-radius:50%;filter:none!important}
+
+  /* at the bottom: the Queen, and an invitation */
+  #queen{position:fixed;left:calc(clamp(14px,3vw,36px) + 130px);bottom:2vh;z-index:34;width:min(250px,30vw);background:none;border:0;padding:0;cursor:pointer;
+    opacity:0;transform:translateY(40px);transition:opacity .7s,transform .7s;pointer-events:none}
+  #queen img{display:block;width:100%;height:auto;filter:drop-shadow(0 16px 22px rgba(0,0,0,.55));transition:transform .3s}
+  body.landed #queen{opacity:1;transform:none;pointer-events:auto}
+  #queen:hover img{transform:rotate(-2deg) scale(1.03)}
+  #queen:focus-visible{outline:3px solid var(--lime);outline-offset:6px;border-radius:12px}
+  #invite{position:fixed;left:50%;bottom:6vh;z-index:34;width:min(260px,40vw);text-decoration:none;opacity:0;transform:translate(-50%,40px) rotate(-5deg);transition:opacity .7s .2s,transform .7s .2s;pointer-events:none}
+  #invite img{display:block;width:100%;height:auto;filter:drop-shadow(0 12px 16px rgba(0,0,0,.5));transition:transform .3s}
+  #invite span{display:block;text-align:center;margin-top:6px;font-family:'IM Fell English',serif;font-style:italic;font-size:17px;color:var(--cream)}
+  body.landed #invite{opacity:1;transform:translate(-50%,0) rotate(-5deg);pointer-events:auto}
+  #invite:focus-visible{outline:none}
+  #invite:hover img,#invite:focus-visible img{transform:rotate(3deg) translateY(-6px)}
+  #invite:focus-visible span{text-decoration:underline}
+  .flung{position:fixed;z-index:60;pointer-events:none;width:min(700px,90vw);animation:fling 1.6s cubic-bezier(.2,.7,.3,1) forwards}
+  @keyframes fling{0%{opacity:1;transform:translate(-50%,-50%) scale(.2) rotate(-20deg)}70%{opacity:1}100%{opacity:0;transform:translate(-50%,-90%) scale(1.8) rotate(12deg)}}
+  @media (max-width:760px){.title{top:118px}#keyhole{height:min(44vh,400px)}#burst{width:160vw}#follow{left:3vw;top:30vh;width:110px}#heartkey{left:76%;top:82%;width:120px}#invite{bottom:auto;top:20vh}#queen{width:32vw;left:30vw}}
+  @media (prefers-reduced-motion:reduce){#heartkey img{animation:none}.flung{display:none}}
+
   @media (max-width:760px){.work{width:250px}.quote{width:300px;font-size:22px}#signpost{right:4vw}}
   @media (prefers-reduced-motion:reduce){#alice{transition:none}}
   .sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
@@ -90,7 +130,7 @@
   <nav aria-label="Site"><a href="../index.html">Home</a><a href="../about.html">About</a><a href="../research.html">Research</a><a href="../projects.html">Projects</a><a href="skills.html">Languages</a><a href="wonderland.html" aria-current="page">Wonderland</a><a href="cards.html">Cards</a><a href="notes.html">Notes</a><a href="sofia-is.html">Sofia is</a><a href="arts.html">Arts</a><a href="globe.html">Globe</a><a href="lace.html">Tilt</a><a href="../contact.html">Contact</a></nav>
 </header>
 
-<div id="hole" aria-hidden="false"></div>
+<div id="hole" aria-hidden="false"><div id="hall"></div></div>
 <div id="floor" aria-hidden="true"></div>
 <svg id="grin" viewBox="0 0 320 160" aria-hidden="true">
   <ellipse cx="96" cy="26" rx="26" ry="16" fill="#e7f07a" opacity=".9"/><ellipse cx="96" cy="26" rx="5" ry="14" fill="#0c1726"/>
@@ -100,10 +140,20 @@
   <path d="M60 80 L62 110" stroke="#7a6a8a" stroke-width="2"/><path d="M85 86 L87 118" stroke="#7a6a8a" stroke-width="2"/><path d="M110 92 L112 126" stroke="#7a6a8a" stroke-width="2"/><path d="M135 98 L137 134" stroke="#7a6a8a" stroke-width="2"/><path d="M160 104 L162 142" stroke="#7a6a8a" stroke-width="2"/><path d="M185 98 L187 134" stroke="#7a6a8a" stroke-width="2"/><path d="M210 92 L212 126" stroke="#7a6a8a" stroke-width="2"/><path d="M235 86 L237 118" stroke="#7a6a8a" stroke-width="2"/><path d="M260 80 L262 110" stroke="#7a6a8a" stroke-width="2"/>
 </svg>
 
-<div class="title" id="title"><h1>Down the<br>Rabbit Hole</h1><p>where the works ended up</p><span class="scroll">scroll to fall</span></div>
+<div id="door" aria-hidden="true">
+  <div id="wall"></div>
+  <img id="burst" src="img/wonderland/flying-cards.webp" alt="">
+  <img id="keyhole" src="img/wonderland/keyhole.webp" alt="">
+  <img id="follow" src="img/wonderland/follow.webp" alt="">
+</div>
+<button id="heartkey" type="button" aria-label="Turn the key and fall down the rabbit hole"><img src="img/wonderland/heart-key.webp" alt=""><span class="hint">turn the key</span></button>
+<div class="title" id="title"><h1>Down the Rabbit Hole</h1><p>where the works ended up</p><span class="scroll">scroll, or turn the key</span></div>
 <div id="alice" aria-hidden="true"></div>
 <div class="meter" aria-live="off"><b id="miles">0</b>miles fallen</div>
 <div class="toast" id="toast" role="status"></div>
+
+<button id="queen" type="button" aria-label="The Queen of Hearts"><img src="img/wonderland/queen.webp" alt=""></button>
+<a id="invite" href="../contact.html"><img src="img/wonderland/invited-stub.webp" alt=""><span>write to me</span></a>
 
 <nav id="signpost" aria-label="Where to next"><div class="post"></div>
   <a class="r" href="../projects.html">This Way</a>
@@ -140,7 +190,7 @@
     watch:()=>`<svg viewBox="0 0 100 120"><path d="M50 4 C38 4 38 18 50 18 C62 18 62 4 50 4Z" fill="none" stroke="#c9a45a" stroke-width="4"/><rect x="44" y="16" width="12" height="10" rx="2" fill="#b8913f"/>
       <circle cx="50" cy="70" r="44" fill="#c9a45a"/><circle cx="50" cy="70" r="37" fill="#f7f2e4"/>${[...Array(12)].map((_,i)=>`<path d="M50 37 V43" stroke="#2a2219" stroke-width="2" transform="rotate(${i*30} 50 70)"/>`).join('')}
       <path d="M50 70 L50 48 M50 70 L66 76" stroke="#2a2219" stroke-width="3" stroke-linecap="round"/><circle cx="50" cy="70" r="3" fill="#b8242c"/></svg>`,
-    key:()=>`<svg viewBox="0 0 140 60"><circle cx="24" cy="30" r="18" fill="none" stroke="#c9a45a" stroke-width="7"/><path d="M42 30 H130 M110 30 V46 M122 30 V44" stroke="#c9a45a" stroke-width="7" stroke-linecap="round"/></svg>`,
+    key:()=>`<img src="img/wonderland/heart-key.webp" alt="">`,
     book:()=>`<svg viewBox="0 0 160 110"><path d="M80 20 C60 6 22 6 6 14 V100 C22 92 60 92 80 104Z" fill="#f4ecd8" stroke="#8a6a3a" stroke-width="2"/><path d="M80 20 C100 6 138 6 154 14 V100 C138 92 100 92 80 104Z" fill="#efe6cf" stroke="#8a6a3a" stroke-width="2"/>
       ${[0,1,2,3,4,5].map(i=>`<path d="M18 ${30+i*11} C40 ${26+i*11} 58 ${26+i*11} 72 ${32+i*11} M88 ${32+i*11} C102 ${26+i*11} 120 ${26+i*11} 142 ${30+i*11}" stroke="#9c8c70" stroke-width="1.4" fill="none"/>`).join('')}<path d="M4 102 C24 94 62 94 80 108 C98 94 136 94 156 102" fill="none" stroke="#7a2a22" stroke-width="5"/></svg>`,
     chair:()=>`<svg viewBox="0 0 160 170"><path d="M34 20 C30 0 130 0 126 20 L122 96 H38Z" fill="#a8623a"/><path d="M44 22 C44 10 116 10 116 22 L112 90 H48Z" fill="#c9884a"/>${[0,1,2].map(i=>`<circle cx="${62+i*18}" cy="${40+i%2*20}" r="3" fill="#7a4220"/>`).join('')}
@@ -193,12 +243,13 @@
     ['Why, sometimes I\'ve believed as many as six impossible things before breakfast.','Through the Looking-Glass']
   ];
   const DEPTH=26000;   // total distance of the fall, in the drawing's own units
+  const ENTRY=1400;    // the first stretch is spent at the door: the key turns and you dive through the keyhole
   const things=[];let seed=7;const rnd=()=>{seed=(seed*16807)%2147483647;return seed/2147483647;};
   function add(el,x,y,d,size,spin){const t=document.createElement('div');t.className='thing';t.appendChild(el);t.style.width=size+'px';hole.appendChild(t);
-    things.push({t,x,y,d,size,rot:(rnd()-.5)*60,spin:spin??(rnd()-.5)*40});}
+    things.push({t,x,y,d:d+ENTRY,size,rot:(rnd()-.5)*60,spin:spin??(rnd()-.5)*40});}
   const svgEl=html=>{const d=document.createElement('div');d.innerHTML=html;return d;};
   // scattered objects all the way down, kept out of the very centre where Alice falls
-  const KINDS=['cup','pot','watch','key','book','chair','jar','map','card','card','card','card'];
+  const KINDS=['cup','pot','watch','key','book','chair','jar','map','card','card'];
   const RS=['A','2','5','7','9','10','J','Q','K'],SS=['heart','spade','diamond','club'];
   for(let i=0;i<70;i++){
     const k=KINDS[Math.floor(rnd()*KINDS.length)],ang=rnd()*Math.PI*2,rad=.28+rnd()*.42;
@@ -214,7 +265,11 @@
   });
   QUOTES.forEach(([q,src],i)=>{const d=document.createElement('div');d.className='quote';d.innerHTML=q+(src?`<small>${src}</small>`:'');add(d,0,-.2,1300+i*6500,520,0);things[things.length-1].rot=0;});
   // the white rabbit, hurrying past near the top
-  add(svgEl(ART.rabbit()+'<span class="hint" style="color:#f4ecd8">"Oh dear! I shall be late!"</span>'),.32,.18,900,150,8);
+  add(svgEl('<div class="medal"><img src="img/wonderland/rabbit-watch.webp" alt=""></div><span class="hint" style="color:#f4ecd8">"Oh dear! I shall be late!"</span>'),.32,.18,700,170,8);
+  // the same burst of cards from the door keeps tumbling past on the way down
+  [[-.2,-.15,4600],[.25,.1,10400],[-.15,.05,16800],[.2,-.12,21800]].forEach(([x,y,d],i)=>{add(svgEl('<img src="img/wonderland/flying-cards.webp" alt="">'),x,y,d,560,(i%2?14:-14));});
+  // a ticket to the rose garden, drifting by
+  add(svgEl('<img src="img/wonderland/roses-ticket.webp" alt="">'),-.36,-.04,12600,230,10);
   // DRINK ME and EAT ME: things you can actually take
   const drink=document.createElement('button');drink.className='drink';drink.type='button';drink.setAttribute('aria-label','Drink me: shrink');drink.innerHTML=ART.bottle()+'<span class="hint">drink me</span>';
   add(drink,-.3,.12,8200,150,0);
@@ -226,6 +281,39 @@
 
   // tunnel rings that rush past to give the sense of falling
   const RINGS=14,ringEls=[];for(let i=0;i<RINGS;i++){const r=document.createElement('div');r.className='ring';hole.appendChild(r);ringEls.push(r);}
+
+  // ── the door: the key slides over and turns, then you dive through the keyhole ──
+  const door=document.getElementById('door'),wall=document.getElementById('wall'),burst=document.getElementById('burst'),
+    keyhole=document.getElementById('keyhole'),follow=document.getElementById('follow'),hkey=document.getElementById('heartkey'),
+    hall=document.getElementById('hall'),aliceEl=document.getElementById('alice');
+  const cl=v=>Math.max(0,Math.min(1,v)),ease=v=>v<.5?2*v*v:1-Math.pow(-2*v+2,2)/2;
+  function doorFrame(f,w,h){
+    const p=cl(f/ENTRY),narrow=w<=760;
+    // the key: across to the lock (0 to .35), a quarter turn (.33 to .5), then it's gone
+    const k=ease(cl(p/.35)),turn=ease(cl((p-.33)/.17));
+    const hx=parseFloat(getComputedStyle(hkey).left),hy=parseFloat(getComputedStyle(hkey).top);
+    const dx=(w/2-hx)*k,dy=(h*(narrow?.66:.65)-hy)*k;
+    hkey.style.transform=`translate(-50%,-50%) translate(${dx.toFixed(1)}px,${dy.toFixed(1)}px) rotate(${(-38*k+90*turn).toFixed(1)}deg) scale(${(1-.5*k).toFixed(3)})`;
+    hkey.style.opacity=(1-cl((p-.45)/.1)).toFixed(3);hkey.style.pointerEvents=p<.3?'auto':'none';
+    // the dive
+    const d=ease(cl((p-.42)/.58));
+    keyhole.style.transform=`translate(-50%,-50%) scale(${(1+d*d*7).toFixed(3)})`;
+    keyhole.style.opacity=(1-cl((p-.6)/.22)).toFixed(3);
+    burst.style.transform=`translate(-50%,-56%) scale(${(1+d*3.2).toFixed(3)}) rotate(${(d*-8).toFixed(2)}deg)`;
+    burst.style.opacity=(1-cl((p-.5)/.3)).toFixed(3);
+    follow.style.opacity=(1-cl(p/.25)).toFixed(3);
+    wall.style.opacity=(1-cl((p-.5)/.32)).toFixed(3);
+    door.style.visibility=p>=1?'hidden':'';
+    aliceEl.style.opacity=cl((p-.7)/.2).toFixed(3);
+    // the twisting hall the hole is cut through, turning as you fall
+    hall.style.opacity=(.3*cl((p-.5)/.4)).toFixed(3);
+    hall.style.transform=`rotate(${(f/70).toFixed(2)}deg) scale(${(1.05+.08*Math.sin(f/2200)).toFixed(3)})`;
+  }
+  hkey.addEventListener('click',()=>{scrollTo({top:Math.ceil(ENTRY/DEPTH*maxScroll())+2,behavior:still?'auto':'smooth'});});
+  // the Queen: click her and the cards fly
+  document.getElementById('queen').addEventListener('click',e=>{say('Off with their heads!');if(still)return;
+    const r=e.currentTarget.getBoundingClientRect(),c=document.createElement('img');c.src='img/wonderland/flying-cards.webp';c.alt='';c.className='flung';
+    c.style.left=(r.left+r.width/2)+'px';c.style.top=(r.top+r.height*.3)+'px';document.body.appendChild(c);setTimeout(()=>c.remove(),1700);});
 
   // ── draw a frame of the fall ────────────────────────────────────────────
   let fall=0,target=0,scale=1,curScale=1,vel=0,tilt=0,raf=0,last=0;
@@ -247,7 +335,8 @@
     tilt+=((Math.max(-1,Math.min(1,vel/4000)))*35-tilt)*Math.min(1,dt*4);
     const al=document.getElementById('aliceBody');if(al)al.setAttribute('transform',`rotate(${(tilt+Math.sin(now/900)*6).toFixed(1)} 100 140)`);
     document.getElementById('miles').textContent=Math.round(fall/DEPTH*4000).toLocaleString();
-    document.getElementById('title').style.opacity=Math.max(0,1-fall/900);
+    document.getElementById('title').style.opacity=Math.max(0,1-fall/500);
+    doorFrame(fall,w,h);
     const end=Math.max(0,Math.min(1,(fall-(DEPTH-1800))/1400));document.getElementById('floor').style.opacity=end;document.body.classList.toggle('landed',end>.6);
     if(Math.abs(target-fall)>.5||vel>1)raf=requestAnimationFrame(frame);
   }
