@@ -178,6 +178,13 @@
     #cardPopupFlipper.flipped .card-front{visibility:visible}
     #cardPopupFlipper.flipped .card-back{visibility:hidden;transition:visibility 0s .32s}
     .card-back svg rect:first-of-type{fill-opacity:1}
+
+    /* cards in the hand are flat (no 3D), so overlapping cards can never poke through each other;
+       the turn-over is a quick squash-and-swap instead */
+    .memory-grid .card-flipper{transform-style:flat;transition:none;transform:none !important}
+    .memory-grid .card-face{-webkit-backface-visibility:visible;backface-visibility:visible}
+    .memory-grid .card-front{transform:none}
+    .memory-grid .card-scene,.memory-grid .card-flipper{isolation:isolate}
   </style>
   <style>
     /* six tabs: let the nav scroll sideways on small screens instead of spilling off */
@@ -543,7 +550,12 @@
       // face up: open it. Already turned over: flip it back to the picture side.
       const act=()=>{
         if(popupLocked)return;
-        if(scene.classList.contains('flipped')){scene.classList.remove('flipped','revealed');scene.setAttribute('aria-label',p.title);return;}
+        if(scene.classList.contains('flipped')){
+          const fl=scene.querySelector('.card-flipper'),still=matchMedia('(prefers-reduced-motion: reduce)').matches;
+          const swap=()=>{scene.classList.remove('flipped','revealed');scene.setAttribute('aria-label',p.title);};
+          if(still){swap();return;}
+          fl.animate([{transform:'scaleX(1)'},{transform:'scaleX(0)'}],{duration:160,easing:'ease-in'}).finished.then(()=>{swap();fl.animate([{transform:'scaleX(0)'},{transform:'scaleX(1)'}],{duration:180,easing:'ease-out'});});
+          return;}
         openPopup(scene,i);
       };
       scene.addEventListener('click',(e)=>{if(e.target.closest('.fr-link'))return;act();});
