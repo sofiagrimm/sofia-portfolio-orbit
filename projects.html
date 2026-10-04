@@ -151,9 +151,10 @@
   body{position:relative}
   #table{position:absolute;left:0;top:0;width:100%;z-index:2;pointer-events:none;overflow:hidden}
   #cardframe{position:absolute;left:0;top:0;width:100%;z-index:3;pointer-events:none;overflow:hidden}
-  #cardframe .fc{position:absolute;filter:drop-shadow(0 6px 10px rgba(30,0,0,.5))}
+  #cardframe .fc{position:absolute}
+  #cardframe .rast,#table .pc .rast,.poster-base .rast{border-radius:6.4%/4.6%;box-shadow:0 6px 12px rgba(30,0,0,.45)}
   #cardframe .fc svg{display:block;width:100%;height:auto}
-  #table .pc{position:absolute;opacity:1;filter:drop-shadow(0 8px 12px rgba(40,0,0,.55))}
+  #table .pc{position:absolute;opacity:1}
   #table .pc svg{display:block;width:100%;height:auto}
 
     /* red felt card table */
@@ -223,7 +224,7 @@
     html,body{overflow-x:clip}
     .chipset{position:relative;width:100%;aspect-ratio:140/120}
     .chipset .stack{position:absolute}
-    .chipset .chip{position:absolute;display:block;height:auto;will-change:transform;-webkit-user-drag:none;user-select:none}
+    .chipset .chip{position:absolute;display:block;height:auto;-webkit-user-drag:none;user-select:none}
     .chipset .cshadow{position:absolute;border-radius:50%;background:radial-gradient(closest-side,rgba(0,0,0,.42),rgba(0,0,0,0))}
   </style>
 </head>
@@ -997,7 +998,7 @@
     A.spots=spots;
     arch.innerHTML=`<defs><path id="arcText" d="M${cx-tA} ${base} A${tA} ${tB} 0 0 1 ${cx+tA} ${base}"/>
         <path id="arcRule" d="M${cx-iA} ${base} A${iA} ${iB} 0 0 1 ${cx+iA} ${base}"/></defs>
-      <path d="M${cx-aOut} ${base} A${aOut} ${bOut} 0 0 1 ${cx+aOut} ${base} L${cx+aIn} ${base} A${aIn} ${bIn} 0 0 0 ${cx-aIn} ${base}Z" fill="#000" opacity=".06"/>
+      <path d="M${cx-aOut} ${base} A${aOut} ${bOut} 0 0 1 ${cx+aOut} ${base} L${cx+aIn} ${base} A${aIn} ${bIn} 0 0 0 ${cx-aIn} ${base}Z" fill="none"/>
       <path d="M${cx-aOut} ${base} A${aOut} ${bOut} 0 0 1 ${cx+aOut} ${base}" fill="none" stroke="${GOLDP}" stroke-width="2.4" opacity=".9"/>
       <path d="M${cx-aIn} ${base} A${aIn} ${bIn} 0 0 1 ${cx+aIn} ${base}" fill="none" stroke="${GOLDP}" stroke-width="2.4" opacity=".9"/>
       <text font-family="'Cormorant Garamond','DM Serif Display',Georgia,serif" font-weight="700" font-size="${fs*1.08}" letter-spacing="${fs*.32}" fill="${GOLDP}"><textPath href="#arcText" startOffset="50%" text-anchor="middle">PICK A CARD, ANY CARD!</textPath></text>
@@ -1100,11 +1101,11 @@
           }
           render(c);
         });
-        if(busy)requestAnimationFrame(loop);else running=false;
+        if(busy)requestAnimationFrame(loop);else{running=false;if(chips.every(c=>c.mode==='rest'))els.forEach(e=>e.style.willChange='');}
       }
       const go=()=>{if(!running){running=true;requestAnimationFrame(loop);}};
       const clear=()=>{timers.forEach(clearTimeout);timers=[];};
-      const raise=()=>{clear();chipAudio.lift();k=st.clientWidth/sw;
+      const raise=()=>{clear();chipAudio.lift();k=st.clientWidth/sw;els.forEach(e=>e.style.willChange='transform');
         if(stillChips){chips.forEach(c=>{c.y=-(10+c.i*7.5);render(c);});return;}
         chips.forEach(c=>{c.mode='lift';c.v-=1.5+c.i*.3;});go();};
       const drop=()=>{clear();

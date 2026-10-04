@@ -14,7 +14,7 @@
 
   var css = `
   #roulette{position:fixed;right:clamp(-120px,-7vw,-60px);bottom:clamp(-120px,-7vw,-60px);width:clamp(220px,22vw,330px);aspect-ratio:1;z-index:40;cursor:pointer;border:0;padding:0;background:none;
-    filter:drop-shadow(-14px -6px 30px rgba(0,0,0,.6));transition:transform .3s cubic-bezier(.2,.8,.2,1)}
+    filter:drop-shadow(-14px -6px 30px rgba(0,0,0,.6));will-change:transform;transition:transform .3s cubic-bezier(.2,.8,.2,1)}
   #roulette:hover,#roulette:focus-visible{transform:translate(-6px,-6px) scale(1.02);outline:none}
   #roulette svg{width:100%;height:100%;display:block;overflow:visible;transform:perspective(900px) rotateX(28deg) rotateZ(-8deg);transform-origin:50% 60%}
   #roulette .hint{position:absolute;left:4%;top:-6%;font:300 12px/1.4 'Inter','Helvetica Neue',Arial,sans-serif;letter-spacing:.3em;text-transform:uppercase;color:rgba(255,236,214,.85);
