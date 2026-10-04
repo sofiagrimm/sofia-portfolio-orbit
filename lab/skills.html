@@ -7,7 +7,7 @@
 <meta name="robots" content="noindex">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@1,300&family=Cherry+Bomb+One&family=Inter:wght@300;400;500;600&family=Reenie+Beanie&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,300;1,400;1,500;1,600&family=Inter:wght@300;400;500;600&family=Reenie+Beanie&display=swap">
 <style>
   :root{--paper:#efe8dc;--ink:#2b2724;--pink:#f3a1c4;--pink2:#e97fae;--grey:#8b8580;--frame:#a69d93}
   *{box-sizing:border-box;margin:0;padding:0}
@@ -25,7 +25,7 @@
   .sheet::before{content:"";position:absolute;inset:0;pointer-events:none;opacity:.35;mix-blend-mode:multiply;
     background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='2'/%3E%3CfeColorMatrix values='0 0 0 0 .55  0 0 0 0 .5  0 0 0 0 .42  0 0 0 .5 0'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)'/%3E%3C/svg%3E")}
   .pen{font-family:'Reenie Beanie',cursive;font-size:clamp(26px,3vw,40px);line-height:1;color:var(--ink)}
-  .bubble{font-family:'Cherry Bomb One',cursive;color:var(--pink);line-height:.82;letter-spacing:-.01em;
+  .bubble{font-family:'Cormorant Garamond',Georgia,serif;font-style:italic;color:var(--pink);line-height:.82;letter-spacing:-.01em;
     text-shadow:0 2px 0 #f7c0d8,0 6px 14px rgba(233,127,174,.25)}
   .small{font-size:12px;color:#5b5550}
   .tape{position:absolute;width:86px;height:24px;background:rgba(240,226,190,.75);box-shadow:0 1px 2px rgba(0,0,0,.1)}
@@ -67,7 +67,7 @@
   .chart-labels span{width:34px;text-align:center}
   .hellos{list-style:none;margin-top:14px;display:grid;gap:10px}
   .hellos li{display:flex;align-items:baseline;gap:14px;border-bottom:1px dashed rgba(43,39,36,.25);padding-bottom:8px}
-  .hellos b{font-family:'Cherry Bomb One',cursive;font-weight:400;font-size:34px;color:var(--pink2)}
+  .hellos b{font-family:'Cormorant Garamond',Georgia,serif;font-style:italic;font-weight:400;font-size:34px;color:var(--pink2)}
   .hellos code{font:15px 'Inter',monospace;background:#fbf8f2;padding:4px 8px;border-radius:4px;box-shadow:0 2px 4px rgba(0,0,0,.08)}
   .hellos small{margin-left:auto;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:#7d7772}
   .photos{display:grid;grid-template-columns:1fr 1fr;gap:10px}
@@ -122,6 +122,7 @@
     .board h2{order:-1}.cover .this,.cover .guide{display:none}.big.l1,.big.l2{text-align:left}}
   /* the logo keeps its original look: light, spaced, italic Cormorant Garamond */
   .nav-name,header .brand,.site>a:first-child{font-family:'Cormorant Garamond',Georgia,serif !important;font-weight:300 !important;font-style:italic !important;letter-spacing:.06em !important}
+  .bubble{font-weight:600 !important}
 </style>
 </head>
 <body>
@@ -191,8 +192,8 @@
       <div><i style="background:#f3b6c8"></i><small>blush</small></div><div><i style="background:#24306b"></i><small>ink</small></div><div><i style="background:#e2c27e"></i><small>gilt</small></div>
     </div>
     <div class="type" aria-label="Typefaces I use">
-      <b style="font-family:'Cherry Bomb One',cursive;color:#f3a1c4">Aa</b><b style="font-family:'Inter',sans-serif;font-weight:800">Aa</b><b style="font-family:'Reenie Beanie',cursive">Aa</b>
-      <small>Cherry Bomb</small><small>Inter</small><small>Reenie Beanie</small>
+      <b style="font-family:'Cormorant Garamond',Georgia,serif;font-style:italic;color:#f3a1c4">Aa</b><b style="font-family:'Inter',sans-serif;font-weight:800">Aa</b><b style="font-family:'Reenie Beanie',cursive">Aa</b>
+      <small>Cormorant</small><small>Inter</small><small>Reenie Beanie</small>
     </div>
     <h2 class="bubble" id="t2">code<br>&amp; words</h2>
     <div class="phone"><img src="img/sw/phone-projects.jpg" alt="This website's card table on a phone"></div>
