@@ -134,6 +134,7 @@
       '<feColorMatrix values="0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 -2.6 1.5"/><feComposite in2="SourceGraphic" operator="in"/></filter>' +
       '<linearGradient id="pWood" x1="0" y1="0" x2="' + (land ? 0 : 1) + '" y2="' + (land ? 1 : 0) + '"><stop offset="0" stop-color="#7d4a28"/><stop offset=".5" stop-color="' + WOOD + '"/><stop offset="1" stop-color="' + WOOD2 + '"/></linearGradient>' +
       BALLS.concat(['#151515', '#efe9dc']).map(function (c, k) { return '<radialGradient id="bc' + k + '" cx="38%" cy="32%" r="75%"><stop offset="0" stop-color="' + shade(c, .45) + '"/><stop offset=".5" stop-color="' + c + '"/><stop offset="1" stop-color="' + shade(c, -.6) + '"/></radialGradient>'; }).join('') +
+      '<linearGradient id="poolDie" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ff4a4f"/><stop offset=".45" stop-color="#c3161f"/><stop offset="1" stop-color="#6e070c"/></linearGradient>' +
       '<linearGradient id="dieShade" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fff" stop-opacity=".5"/><stop offset=".55" stop-color="#fff" stop-opacity="0"/><stop offset="1" stop-color="#5a5248" stop-opacity=".35"/></linearGradient>' +
       '<radialGradient id="ballRim" cx="50%" cy="50%" r="50%"><stop offset=".62" stop-color="#000" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".45"/></radialGradient>' +
       '<radialGradient id="ballKey" cx="50%" cy="50%" r="50%"><stop offset="0" stop-color="#fff" stop-opacity=".95"/><stop offset=".45" stop-color="#fff" stop-opacity=".35"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></radialGradient>' +
@@ -198,7 +199,7 @@
     var s = Math.min(SU, SV) / 900, g = el('g', {});
     var put = function (u, v, rot, html) { var p = P(u, v), e = el('g', { transform: 'translate(' + p.x + ' ' + p.y + ') rotate(' + rot + ') scale(' + s + ')' }, g); e.innerHTML = html; };
     var spk = function (w, h, r) { return '<rect width="' + w + '" height="' + h + '" rx="' + (r || 0) + '" fill="url(#pSpeckPat)" opacity=".38"/>'; };
-    var die = function (u, v, rot, pips) { var h = '<g class="pdie"><rect x="5" y="6" width="56" height="56" rx="8" fill="#03262a" opacity=".55"/><rect width="56" height="56" rx="8" fill="#f1ece2"/><rect width="56" height="56" rx="8" fill="url(#dieShade)"/>'; pips.forEach(function (q) { h += '<circle class="pp" cx="' + q[0] + '" cy="' + q[1] + '" r="5.5" fill="' + INK + '"/>'; }); put(u, v, rot, h + '</g>'); };
+    var die = function (u, v, rot, pips) { var h = '<g class="pdie"><rect x="5" y="6" width="56" height="56" rx="8" fill="#03262a" opacity=".55"/><rect width="56" height="56" rx="10" fill="url(#poolDie)" opacity=".95"/><rect x="3" y="3" width="50" height="50" rx="8" fill="none" stroke="#ff8a8a" stroke-width="1.6" opacity=".5"/><path d="M8 12 Q22 3 44 7" stroke="#fff" stroke-width="2.6" fill="none" opacity=".5" stroke-linecap="round"/>'; pips.forEach(function (q) { h += '<circle class="pp" cx="' + q[0] + '" cy="' + q[1] + '" r="5.5" fill="#fff8f4"/>'; }); put(u, v, rot, h + '</g>'); };
     die(SU * .64, SV * .84, 14, [[28, 28]]); die(SU * .71, SV * .77, -10, [[16, 14], [40, 14], [16, 28], [40, 28], [16, 42], [40, 42]]);
     put(SU * .2, SV * .78, 18, '<rect x="8" y="10" width="54" height="54" rx="4" fill="#011417" opacity=".45"/><rect width="54" height="54" rx="4" fill="#2a6fb0"/><rect x="3" y="3" width="48" height="20" rx="3" fill="#fff" opacity=".12"/><rect x="12" y="12" width="30" height="30" rx="3" fill="#1d5a95"/>');
     var c0 = P(SU * 1.75, SV * .18), c1 = P(SU * 2.55, SV * .24);
@@ -284,7 +285,7 @@
   function rollDie(g) { if (g.__rolling) return; g.__rolling = true; var t0 = performance.now(), base = g.getAttribute('transform') || '', sp = (Math.random() < .5 ? -1 : 1) * (540 + Math.random() * 360);
     (function f(now) { var k = Math.min(1, (now - t0) / 900), e = 1 - Math.pow(1 - k, 3), hop = Math.abs(Math.sin(k * Math.PI * 2.5)) * (1 - k) * 30;
       g.setAttribute('transform', base + ' translate(28 28) rotate(' + (sp * e) + ') translate(' + (-28) + ' ' + (-28 - hop) + ')');
-      if (k < .85 && Math.random() < .3) { var v = 1 + Math.floor(Math.random() * 6), pips = g.querySelectorAll('.pp'); pips.forEach(function (p) { p.remove(); }); PIP[v].forEach(function (q) { el('circle', { cx: q[0], cy: q[1], r: 5.5, fill: INK, class: 'pp' }, g); }); }
+      if (k < .85 && Math.random() < .3) { var v = 1 + Math.floor(Math.random() * 6), pips = g.querySelectorAll('.pp'); pips.forEach(function (p) { p.remove(); }); PIP[v].forEach(function (q) { el('circle', { cx: q[0], cy: q[1], r: 5.5, fill: '#fff8f4', class: 'pp' }, g); }); }
       if (Math.abs(Math.sin(k * Math.PI * 2.5)) < .08 && k > .1) audio.clack(.3 * (1 - k) + .1);
       if (k < 1) requestAnimationFrame(f); else { g.setAttribute('transform', base); g.__rolling = false; } })(t0); }
   pool.addEventListener('click', function (e) { var d = e.target.closest && e.target.closest('.pdie'); if (d) { audio.init(); rollDie(d); } });

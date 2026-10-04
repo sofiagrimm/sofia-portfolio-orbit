@@ -221,6 +221,9 @@
     .rast{display:block;width:100%;height:auto;aspect-ratio:250/350;-webkit-user-drag:none;user-select:none}
     #cornerSpill{position:absolute;top:70px;right:0;width:clamp(260px,26vw,430px);z-index:3;pointer-events:none;filter:drop-shadow(-10px 14px 18px rgba(0,0,0,.45))}
     #cornerSpill svg{display:block;width:100%;height:auto}
+    #cornerSpill .spill-dice{position:absolute;left:14%;top:34%;width:36%;pointer-events:none}
+    #cornerSpill .spill-dice .dice{pointer-events:auto;cursor:pointer}
+    #cornerSpill .dice:focus{outline:none}#cornerSpill .dice:focus-visible{outline:2px solid #f3d38a}
     html,body{overflow-x:clip}
     .chipset{position:relative;width:100%;aspect-ratio:140/120}
     .chipset .stack{position:absolute;will-change:transform;contain:layout style}
@@ -750,11 +753,19 @@
     });
     return html+'</div>';
   }
-  function dice(){
+  // one dice design everywhere on the table: red translucent casino dice with white pips
+  function dice(list){
+    list=list||[[24,28,-14,5],[62,32,22,3]];
     const pipsAt={1:[[0,0]],2:[[-7,-7],[7,7]],3:[[-7,-7],[0,0],[7,7]],4:[[-7,-7],[7,-7],[-7,7],[7,7]],5:[[-7,-7],[7,-7],[0,0],[-7,7],[7,7]],6:[[-7,-7],[7,-7],[-7,0],[7,0],[-7,7],[7,7]]};
     // each die is its own group (shadow, body, pips) so it can be picked up and rolled
-    const die=(x,y,r,v)=>`<g class="die" data-x="${x}" data-y="${y}" data-r="${r}" data-v="${v}" transform="translate(${x} ${y}) rotate(${r})"><rect class="dshadow" x="-13" y="-10" width="28" height="28" rx="6" fill="#8e1c22"/><g class="dbody"><rect x="-15" y="-14" width="28" height="28" rx="6" fill="#d3383f"/><rect x="-12" y="-11" width="10" height="5" rx="2" fill="#fff" opacity=".25"/><g class="pips">${pipsAt[v].map(([a,b])=>`<circle cx="${a-1}" cy="${b}" r="2.6" fill="#fff"/>`).join('')}</g></g></g>`;
-    return `<svg viewBox="0 0 90 60" xmlns="http://www.w3.org/2000/svg" style="overflow:visible"><g class="dice"><rect x="4" y="6" width="82" height="50" rx="10" fill="#000" opacity="0"/>${die(24,28,-14,5)}${die(62,32,22,3)}</g></svg>`;
+    const die=(x,y,r,v)=>`<g class="die" data-x="${x}" data-y="${y}" data-r="${r}" data-v="${v}" transform="translate(${x} ${y}) rotate(${r})">`+
+      `<rect class="dshadow" x="-12" y="-9" width="28" height="28" rx="6" fill="#000" opacity=".35"/>`+
+      `<g class="dbody"><rect x="-15" y="-14" width="28" height="28" rx="6" fill="url(#dieGlass)" opacity=".94"/>`+
+      `<rect x="-13.3" y="-12.3" width="24.6" height="24.6" rx="4.8" fill="none" stroke="#ff8a8a" stroke-width=".9" opacity=".5"/>`+
+      `<g class="pips">${pipsAt[v].map(([a,b])=>`<circle cx="${a-1}" cy="${b}" r="2.6" fill="#fff8f4"/>`).join('')}</g>`+
+      `<path d="M-11 -9 Q-4 -13.5 7 -11.5" stroke="#fff" stroke-width="1.4" fill="none" opacity=".55" stroke-linecap="round"/></g></g>`;
+    return `<svg viewBox="0 0 90 60" xmlns="http://www.w3.org/2000/svg" style="overflow:visible"><defs><linearGradient id="dieGlass" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ff4a4f"/><stop offset=".45" stop-color="#c3161f"/><stop offset="1" stop-color="#6e070c"/></linearGradient></defs>`+
+      `<g class="dice"><rect x="4" y="6" width="82" height="50" rx="10" fill="#000" opacity="0"/>${list.map(d=>die(...d)).join('')}</g></svg>`;
   }
 
   // more things on the table: the card case, a dealer button, a score pad and loose chips
@@ -1201,7 +1212,7 @@
     });
   }
   function wireDice(){
-    document.querySelectorAll('#table .dice').forEach(g=>{if(g.dataset.wired)return;g.dataset.wired='1';
+    document.querySelectorAll('#table .dice, #cornerSpill .dice').forEach(g=>{if(g.dataset.wired)return;g.dataset.wired='1';
       g.setAttribute('role','button');g.setAttribute('aria-label','Roll the dice');g.setAttribute('tabindex','0');
       g.addEventListener('click',()=>rollPair(g));g.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();rollPair(g);}});});
   }
@@ -1234,9 +1245,10 @@
       ${chip(560,96,92,B,8,1,1)}${chip(410,84,80,B,-14,1,1)}${chip(600,290,96,B,-6,1,4)}
       ${chip(480,220,84,Rd,-24,.62,5)}${chip(350,260,74,Rd,12,.7,4)}${chip(580,440,80,Rd,30,1,2)}${chip(450,380,66,Rd,-10,.55,6)}
       ${chip(290,140,58,Rd,0,1,1)}
-      ${die(180,110,68,-14,P[5])}${die(250,370,74,10,P[6])}${die(360,470,64,-8,P[3])}
+
     </svg>`;
-    const el=document.createElement('div');el.id='cornerSpill';el.setAttribute('aria-hidden','true');el.innerHTML=svg;
+    const el=document.createElement('div');el.id='cornerSpill';el.innerHTML=svg+`<div class="spill-dice">${dice([[20,20,-14,5],[46,44,10,6],[70,22,-8,3]])}</div>`;
+    el.firstElementChild.setAttribute('aria-hidden','true');
     document.body.appendChild(el);
   }
   function shadeC(hex,k){const n=parseInt(hex.slice(1),16),f=c=>Math.round(k>0?c+(255-c)*k:c*(1+k));return '#'+((1<<24)+(f(n>>16)<<16)+(f(n>>8&255)<<8)+f(n&255)).toString(16).slice(1);}
