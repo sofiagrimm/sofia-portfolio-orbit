@@ -308,7 +308,7 @@
     </div>
 
     <div class="right-panel">
-      <div class="globe-label">test globe &nbsp;&middot;&nbsp; drag to rotate &nbsp;&middot;&nbsp; hover pins to explore</div>
+      <div class="globe-label">drag to rotate &nbsp;&middot;&nbsp; click a pin, then another, to fly between them</div>
       <canvas id="globeCanvas"></canvas>
       <div id="pinTooltip">
         <div class="tt-label" id="ttLabel"></div>
@@ -447,6 +447,124 @@
     });
     scene.add(pinGroup);
 
+
+    // ── Flights: a little white plane. Before any pin is picked it circles the earth;
+    //    click a pin, then another, and it flies there while a dashed route draws behind it.
+    function makePlaneTexture(){
+      const c=document.createElement('canvas');c.width=c.height=256;const x=c.getContext('2d');
+      const ink='#3d4250',white='#fbfbf8',shade='#e3e6ee',glass='#bcd7ee';
+      x.lineJoin='round';x.lineCap='round';x.lineWidth=3.2;x.strokeStyle=ink;
+      // wings
+      x.fillStyle=white;
+      x.beginPath();x.moveTo(116,104);x.lineTo(18,160);x.quadraticCurveTo(14,172,26,172);x.lineTo(116,146);x.closePath();x.fill();x.stroke();
+      x.beginPath();x.moveTo(140,104);x.lineTo(238,160);x.quadraticCurveTo(242,172,230,172);x.lineTo(140,146);x.closePath();x.fill();x.stroke();
+      // engines
+      x.fillStyle=shade;[[70,136],[186,136]].forEach(([ex,ey])=>{x.beginPath();x.ellipse(ex,ey,7,14,0,0,7);x.fill();x.stroke();});
+      // tail
+      x.fillStyle=white;
+      x.beginPath();x.moveTo(120,200);x.lineTo(80,226);x.quadraticCurveTo(78,234,88,233);x.lineTo(122,222);x.closePath();x.fill();x.stroke();
+      x.beginPath();x.moveTo(136,200);x.lineTo(176,226);x.quadraticCurveTo(178,234,168,233);x.lineTo(134,222);x.closePath();x.fill();x.stroke();
+      // fuselage with a soft shaded side
+      x.beginPath();x.moveTo(128,14);x.bezierCurveTo(146,16,146,44,146,70);x.lineTo(144,226);x.quadraticCurveTo(128,246,112,226);x.lineTo(110,70);x.bezierCurveTo(110,44,110,16,128,14);x.closePath();
+      x.fillStyle=white;x.fill();x.save();x.clip();x.fillStyle=shade;x.fillRect(132,0,30,256);x.restore();x.stroke();
+      // windows and cockpit
+      x.fillStyle=glass;for(let y=64;y<200;y+=12){x.beginPath();x.arc(118,y,2.6,0,7);x.fill();x.beginPath();x.arc(138,y,2.6,0,7);x.fill();}
+      x.beginPath();x.moveTo(118,36);x.quadraticCurveTo(128,28,138,36);x.lineTo(136,44);x.quadraticCurveTo(128,40,120,44);x.closePath();x.fill();x.lineWidth=2;x.stroke();
+      // little highlight strokes, like the drawn reference
+      x.strokeStyle='#ffffff';x.lineWidth=2.4;x.beginPath();x.moveTo(36,160);x.lineTo(84,134);x.moveTo(116,90);x.lineTo(116,180);x.stroke();
+      const t=new THREE.CanvasTexture(c);t.colorSpace=THREE.SRGBColorSpace;t.anisotropy=4;return t;
+    }
+    function makeShadowTexture(){
+      const c=document.createElement('canvas');c.width=c.height=64;const x=c.getContext('2d');const g=x.createRadialGradient(32,32,2,32,32,30);
+      g.addColorStop(0,'rgba(20,30,60,.45)');g.addColorStop(1,'rgba(20,30,60,0)');x.fillStyle=g;x.fillRect(0,0,64,64);return new THREE.CanvasTexture(c);
+    }
+    const plane=new THREE.Mesh(new THREE.PlaneGeometry(0.21,0.21),new THREE.MeshBasicMaterial({map:makePlaneTexture(),transparent:true,depthWrite:false,side:THREE.DoubleSide}));
+    const planeShadow=new THREE.Mesh(new THREE.PlaneGeometry(0.15,0.15),new THREE.MeshBasicMaterial({map:makeShadowTexture(),transparent:true,depthWrite:false}));
+    plane.renderOrder=5;pinGroup.add(planeShadow,plane);
+
+    const UP=new THREE.Vector3();
+    function placeMesh(mesh,pos,forward){
+      UP.copy(pos).normalize();
+      const f=forward.clone().sub(UP.clone().multiplyScalar(forward.dot(UP))).normalize();
+      const r=new THREE.Vector3().crossVectors(f,UP).normalize();
+      const m=new THREE.Matrix4().makeBasis(r,f,UP);m.setPosition(pos);
+      mesh.matrixAutoUpdate=false;mesh.matrix.copy(m);mesh.matrixWorldNeedsUpdate=true;
+    }
+    function slerp(a,b,t){
+      const om=Math.acos(Math.min(1,Math.max(-1,a.dot(b))));if(om<1e-4)return a.clone();
+      const s=Math.sin(om);return a.clone().multiplyScalar(Math.sin((1-t)*om)/s).add(b.clone().multiplyScalar(Math.sin(t*om)/s));
+    }
+    const pinDir=id=>{const p=PINS[id];return latLngToVec3(p.lat,p.lng,1).normalize();};
+    const CRUISE=1.07;
+    const routes=[];      // dashed lines already flown
+    let flight=null;      // {a,b,lift,dur,start,line}
+    let parked=null;      // {dir,phase}
+    let lastPin=null;
+    // idle loop: a great circle tilted across the globe
+    const idleU=new THREE.Vector3(1,0.15,0).normalize(),idleV=new THREE.Vector3(0,0.35,1).normalize();
+    idleV.sub(idleU.clone().multiplyScalar(idleV.dot(idleU))).normalize();
+    let idleA=0,curDir=new THREE.Vector3(1,0,0),curAlt=CRUISE;
+
+    function startFlight(toId,drawLine){
+      const a=curDir.clone().normalize(),b=pinDir(toId),ang=Math.acos(Math.min(1,a.dot(b)));
+      let line=null;
+      if(drawLine){
+        const N=160,pts=[];const lift=0.03+0.16*ang/Math.PI;
+        for(let i=0;i<=N;i++){const t=i/N;pts.push(slerp(a,b,t).multiplyScalar(1.012+lift*Math.sin(Math.PI*t)*0.85));}
+        const geo=new THREE.BufferGeometry().setFromPoints(pts);
+        line=new THREE.Line(geo,new THREE.LineDashedMaterial({color:0xfffbf0,dashSize:0.022,gapSize:0.018,transparent:true,opacity:0.95,depthWrite:false}));
+        line.computeLineDistances();geo.setDrawRange(0,0);pinGroup.add(line);
+        routes.push(line);
+        while(routes.length>5){const old=routes.shift();pinGroup.remove(old);old.geometry.dispose();}
+        routes.forEach((r,i)=>{r.material.opacity=i===routes.length-1?1:0.4+0.1*i;});
+      }
+      flight={a,b,ang,lift:0.03+0.16*ang/Math.PI,dur:900+ang*1700,start:performance.now(),line,to:toId};
+      if(typeof faceDir==='function'){const mid=a.clone().add(b);faceDir(mid.lengthSq()>1e-4?mid.normalize():b);}
+      parked=null;
+    }
+    function selectPin(id){
+      if(!PINS[id])return;
+      const draw=lastPin!==null&&lastPin!==id;
+      if(lastPin===id&&!flight)return;
+      startFlight(id,draw);lastPin=id;
+      pinObjects.forEach(p=>p.head.scale.setScalar(p.id===id?1.35:1));
+    }
+    function flightTick(now){
+      let pos,ahead;
+      if(flight){
+        const raw=Math.min(1,(now-flight.start)/flight.dur),t=raw<.5?2*raw*raw:1-Math.pow(-2*raw+2,2)/2;
+        const alt=t=>CRUISE+flight.lift*Math.sin(Math.PI*t);
+        curDir=slerp(flight.a,flight.b,t);curAlt=alt(t);
+        pos=curDir.clone().multiplyScalar(curAlt);ahead=slerp(flight.a,flight.b,Math.min(1,t+0.01)).multiplyScalar(alt(Math.min(1,t+0.01)));
+        if(flight.line){const n=flight.line.geometry.attributes.position.count;flight.line.geometry.setDrawRange(0,Math.ceil(n*t));}
+        if(raw>=1){parked={dir:flight.b.clone(),phase:0};if(flight.line)flight.line.geometry.setDrawRange(0,Infinity);flight=null;}
+        if(ahead.distanceTo(pos)<1e-5)ahead=pos.clone().add(new THREE.Vector3(0,0,0.001));
+      }else if(parked){
+        // small loops above the pin it just landed on
+        parked.phase+=0.012;const d=parked.dir,e1=new THREE.Vector3(0,1,0).cross(d).normalize();if(e1.lengthSq()<.1)e1.set(1,0,0);const e2=new THREE.Vector3().crossVectors(d,e1);
+        const ring=a=>d.clone().add(e1.clone().multiplyScalar(Math.cos(a)*0.09)).add(e2.clone().multiplyScalar(Math.sin(a)*0.09)).normalize();
+        curDir=ring(parked.phase);curAlt=CRUISE;pos=curDir.clone().multiplyScalar(curAlt);ahead=ring(parked.phase+0.05).multiplyScalar(curAlt);
+      }else{
+        // loop over the side of the earth facing you, so the plane is always in view while the globe turns under it
+        idleA+=0.0045;const inv=pinGroup.quaternion.clone().invert();
+        const dirAt=a=>new THREE.Vector3(0.62*Math.cos(a),0.38*Math.sin(a*1.0)+0.08*Math.sin(a*2),1).normalize().applyQuaternion(inv);
+        curDir=dirAt(idleA);curAlt=CRUISE+0.02;pos=curDir.clone().multiplyScalar(curAlt);ahead=dirAt(idleA+0.02).multiplyScalar(curAlt);
+      }
+      placeMesh(plane,pos,ahead.clone().sub(pos));
+      placeMesh(planeShadow,curDir.clone().multiplyScalar(1.004),ahead.clone().sub(pos));
+      const h=curAlt-1;planeShadow.material.opacity=Math.max(.25,1-h*3);
+    }
+
+    // a click (not a drag) on a pin starts a flight
+    let downAt=null;
+    canvas.addEventListener('pointerdown',e=>{downAt={x:e.clientX,y:e.clientY};});
+    canvas.addEventListener('pointerup',e=>{
+      if(!downAt)return;const moved=Math.hypot(e.clientX-downAt.x,e.clientY-downAt.y);downAt=null;if(moved>6)return;
+      const rect=canvas.getBoundingClientRect();const m=new THREE.Vector2(((e.clientX-rect.left)/rect.width)*2-1,-((e.clientY-rect.top)/rect.height)*2+1);
+      const rc=new THREE.Raycaster();rc.setFromCamera(m,camera);const hits=rc.intersectObjects(pinObjects.map(p=>p.head));
+      if(hits.length){const found=pinObjects.find(p=>p.head===hits[0].object);selectPin(found.id);
+        document.querySelectorAll('.entry').forEach(el=>el.classList.toggle('active',el.dataset.pin===found.id));}
+    });
     let isDragging=false,prevMouse={x:0,y:0},rotX=0.3,rotY=-0.5,velX=0,velY=0;
     const ROT=0.008;
     canvas.addEventListener('mousedown',e=>{isDragging=true;prevMouse={x:e.clientX,y:e.clientY};velX=velY=0;});
@@ -484,10 +602,14 @@
       document.querySelectorAll('.entry').forEach(e=>e.classList.remove('active'));
       el.classList.add('active');
       const pin=PINS[id];if(!pin)return;
-      targetRotX=-(pin.lat*Math.PI/180)*0.7;
-      targetRotY=-(pin.lng+90)*Math.PI/180;
-      animating=true;
+      selectPin(id);
     };
+    // turn the globe so a direction (in globe coordinates) faces the viewer
+    function faceDir(v){
+      const ry=Math.atan2(-v.x,v.z),rx=Math.atan2(v.y,Math.hypot(v.x,v.z));
+      let ty=ry;while(ty-rotY>Math.PI)ty-=2*Math.PI;while(ty-rotY<-Math.PI)ty+=2*Math.PI;
+      targetRotY=ty;targetRotX=Math.max(-Math.PI/2.2,Math.min(Math.PI/2.2,rx));animating=true;lastInteract=performance.now();
+    }
 
     let lastInteract=performance.now();
     ['mousedown','touchstart'].forEach(ev=>canvas.addEventListener(ev,()=>{lastInteract=performance.now();}));
@@ -505,9 +627,9 @@
       const pulse=0.85+0.15*Math.sin(t*0.003);
       pinObjects.forEach(p=>{
         const h=hoveredPin&&hoveredPin.id===p.id;
-        p.head.material.emissiveIntensity=h?1.2:0.6*pulse;
-        p.head.scale.setScalar(h?1.5:1.0);
+        p.head.scale.setScalar(h?1.5:(p.id===lastPin?1.35:1.0));
       });
+      flightTick(performance.now());
       renderer.render(scene,camera);
     }
     requestAnimationFrame(animate);
