@@ -124,10 +124,19 @@
       result.innerHTML = '<b>' + number + '</b>' + (number === 0 ? 'green' : '') + ' off to ' + page[0];
       result.classList.add('on');
       setTimeout(function () {
-        document.body.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 350, fill: 'forwards' });
+        fadeOut = document.body.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 350, fill: 'forwards' });
         setTimeout(function () { location.href = page[1]; }, 330);
       }, still ? 600 : 1500);
     })(t0);
   }
   btn.addEventListener('click', spin);
+  // Coming back with the Back button, browsers restore this page exactly as it was left: faded
+  // out, mid-spin. Undo all of that so the table is there again and the wheel can spin.
+  var fadeOut = null;
+  addEventListener('pageshow', function (e) {
+    if (fadeOut) { fadeOut.cancel(); fadeOut = null; }
+    document.body.getAnimations().forEach(function (a) { a.cancel(); });
+    document.body.style.opacity = '';
+    spinning = false; result.classList.remove('on'); hint.style.opacity = '';
+  });
 })();
