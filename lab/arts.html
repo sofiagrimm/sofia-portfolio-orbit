@@ -452,7 +452,7 @@ const PAINTINGS = [
       Object.assign(pic.style,{left:(wl*100)+'%',top:(wt*100)+'%',width:(ww*100)+'%',height:(wh*100)+'%'});
       b.style.maxWidth=(boxAR<1?560:660)+'px';
       requestAnimationFrame(()=>{const r=pic.getBoundingClientRect();addEyes(pic,img.src,{x:0,y:0,w:r.width,h:r.height},k);
-        const cv=document.createElement('canvas');cv.className='live';pic.appendChild(cv);const L=window.LivingMesh?LivingMesh(cv,img.src,k===2?null:('p'+k+'-'+img.src.split('/').pop().slice(0,40)),LM[k].fig):null;
+        const cv=document.createElement('canvas');cv.className='live';pic.appendChild(cv);const L=window.LivingMesh?LivingMesh(cv,img.src,k>=2?null:('p'+k+'-'+img.src.split('/').pop().slice(0,40)),LM[k].fig,k===2?'sky':k===3?'water':'face'):null;
         if(L){b.__live=L;}});};
     if(img.complete&&img.naturalWidth)build();else img.addEventListener('load',build,{once:true});
     // two offers under each painting: point at one and the sitter reacts in the frame
