@@ -220,9 +220,10 @@
     #cardframe,#table,#arch{contain:layout paint}
     .card-scene{will-change:transform}
     .rast{display:block;width:100%;height:auto;aspect-ratio:250/350;-webkit-user-drag:none;user-select:none}
-    #cornerSpill{position:absolute;top:70px;right:0;width:clamp(260px,26vw,430px);z-index:3;pointer-events:none;filter:drop-shadow(-10px 14px 18px rgba(0,0,0,.45))}
+    #cornerSpill{position:absolute;top:84px;right:10px;width:300px;z-index:3;pointer-events:none;filter:drop-shadow(-10px 14px 18px rgba(0,0,0,.45))}
     #cornerSpill svg{display:block;width:100%;height:auto}
-    #cornerSpill .spill-dice{position:absolute;left:14%;top:34%;width:36%;pointer-events:none}
+    #cornerSpill .spill-dice{position:absolute;left:2%;top:46%;width:34%;pointer-events:none}
+    #cornerSpill .stack{pointer-events:auto;cursor:grab}
     #cornerSpill .spill-dice .dice{pointer-events:auto;cursor:pointer}
     #cornerSpill .dice:focus{outline:none}#cornerSpill .dice:focus-visible{outline:2px solid #f3d38a}
     html,body{overflow-x:clip}
@@ -258,6 +259,7 @@
     @media (prefers-reduced-motion:reduce){#spot b{animation:none;opacity:.35}}
     /* the cards in the light read a touch brighter and cast deeper shadows */
     @media(min-width:760px){#memoryGrid .card-scene{filter:brightness(1.04) drop-shadow(0 22px 18px rgba(12,0,0,.5))}}
+    #table .traychips{position:absolute;left:30%;top:-6%;width:70%;transform:rotate(18deg)}
   </style>
 </head>
 <body>
@@ -859,9 +861,6 @@
       <rect x="0" y="0" width="320" height="276" rx="16" fill="url(#trBody)"/>
       <path d="M14 8 H306" stroke="#fff" stroke-opacity=".14" stroke-width="2" stroke-linecap="round"/>
       ${cols.map((c,k)=>chan(14+k*50,c,k)).join('')}
-      <g class="sstack" data-n="1"><g transform="translate(218 40) rotate(-12)"><ellipse cx="4" cy="6" rx="34" ry="34" fill="#000" opacity=".5"/><circle r="34" fill="#c94f7c"/><circle r="30" fill="none" stroke="#fbe3ec" stroke-width="8" stroke-dasharray="7 9"/><circle r="20" fill="#1a1a1e"/>
-        ${[...Array(8)].map((_,i)=>`<path d="M0 0 L${(18*Math.cos(i*Math.PI/4)).toFixed(1)} ${(18*Math.sin(i*Math.PI/4)).toFixed(1)}" stroke="#e8c26a" stroke-width="2"/>`).join('')}<circle r="6" fill="#e8c26a"/><circle r="34" fill="url(#trChip)"/></g></g>
-      <g class="sstack" data-n="1"><g transform="translate(292 22) rotate(18)"><ellipse cx="4" cy="6" rx="30" ry="30" fill="#000" opacity=".5"/><circle r="30" fill="#18181b"/><circle r="26" fill="none" stroke="#efefef" stroke-width="7" stroke-dasharray="6 8"/><circle r="15" fill="#18181b" stroke="#efefef" stroke-width="1.4"/><circle r="30" fill="url(#trChip)"/></g></g>
     </svg>`;
   }
   function dealer(){
@@ -926,7 +925,7 @@
       if(mobile&&(gi%2||g.y<14)) return;
       if(g.wide&&innerWidth<1200) return;   // only where there's room beside the hand            // fewer cards on phones, none over the nav
       const scale=mobile?.42:1, w=g.w*scale;
-      if(g.prop){const el=document.createElement('div');el.className='pc';el.dataset.spec=JSON.stringify(g);el.style.width=(g.w*scale)+'px';placeAt(el,g);el.style.transform=`rotate(${g.rot}deg)`;el.innerHTML={box:deckBox,dealer:dealer,pad:scorepad,tray:chipTray}[g.prop]();table.appendChild(el);return;}
+      if(g.prop){const el=document.createElement('div');el.className='pc';el.dataset.spec=JSON.stringify(g);el.style.width=(g.w*scale)+'px';placeAt(el,g);el.style.transform=`rotate(${g.rot}deg)`;el.innerHTML={box:deckBox,dealer:dealer,pad:scorepad,tray:chipTray}[g.prop]()+(g.prop==='tray'?`<div class="traychips">${chips([[70,40,2,2],[104,30,1,3]])}</div>`:'');table.appendChild(el);return;}
       if(g.chips||g.dice){const el=document.createElement('div');el.className='pc';el.dataset.spec=JSON.stringify(g);el.style.width=(g.w*scale)+'px';placeAt(el,g);el.style.transform=`rotate(${g.rot}deg)`;el.innerHTML=g.chips?chips(g.chips):dice();table.appendChild(el);return;}
       const list=g.pile?Array.from({length:g.pile},()=>null):(g.fan||[g.one]);
       list.forEach((rs,k)=>{
@@ -1186,39 +1185,51 @@
       bitmapize(url,W,H,u=>{im.src=u;});});
   }
   function wireChips(){
-    document.querySelectorAll('#table .stack').forEach(st=>{
+    document.querySelectorAll('#table .stack, #cornerSpill .stack').forEach(st=>{
       if(st.dataset.wired)return;st.dataset.wired='1';
       const els=[...st.querySelectorAll('.chip')].sort((a,b)=>b.dataset.j-a.dataset.j); // bottom first
       const n=els.length,sw=+st.dataset.sw||56;
-      const chips=els.map((el,i)=>({el,i,y:0,v:0,x:0,vx:0,r:0,mode:'rest'}));
-      let running=false,timers=[],k=1;
-      // the physics runs in the table's drawing units; one transform per chip moves it on screen
-      const render=c=>{c.el.style.transform=`translate3d(${(c.x*k).toFixed(2)}px,${(c.y*k).toFixed(2)}px,0) rotate(${c.r.toFixed(2)}deg)`;};
-      function loop(){
-        let busy=false;
-        chips.forEach(c=>{
-          if(c.mode==='lift'){ // springy rise to a fanned height, with a little sway
-            const ty=-(10+c.i*7.5+(c.i*c.i)*.35),tx=Math.sin(c.i*1.7)*1.6;
-            c.v+=(ty-c.y)*.16;c.v*=.72;c.y+=c.v;c.vx+=(tx-c.x)*.12;c.vx*=.7;c.x+=c.vx;c.r=c.vx*3+Math.sin(c.i)*2;
-            if(Math.abs(c.v)>.02||Math.abs(ty-c.y)>.05)busy=true;
-          }else if(c.mode==='fall'){ // gravity, a bounce or two, settle
-            c.v+=.55;c.y+=c.v;c.x*=.9;c.r*=.85;
-            if(c.y>=0){c.y=0;if(c.v>1.2){chipAudio.clack(c.i,n,Math.min(1,c.v/7));c.v=-c.v*.26;}else{c.v=0;c.x=0;c.r=0;c.mode='rest';}}
+      // y: height above its resting place (negative = up), all in the table's drawing units
+      const chips=els.map((el,i)=>({el,i,y:0,vy:0,x:0,vx:0,r:0,vr:0,w:0,vw:0,sq:0,mode:'rest'}));
+      let raf=0,last=0,timers=[],k=1;
+      const render=c=>{const tilt=c.r+c.w*1.4,sy=1-Math.abs(c.w)*.012-c.sq;
+        c.el.style.transform=`translate3d(${(c.x*k).toFixed(2)}px,${(c.y*k).toFixed(2)}px,0) rotate(${tilt.toFixed(2)}deg) scaleY(${sy.toFixed(3)})`;};
+      function loop(now){
+        const dt=Math.min(.033,(now-(last||now))/1000)||.016;last=now;let busy=false;
+        chips.forEach((c,idx)=>{
+          if(c.mode==='lift'){ // held: a loose fan between the fingers, each chip a little further over
+            const ty=-(9+c.i*7+(c.i*c.i)*.3),tx=c.i*.9-n*.3,tr=-2+c.i*.5;
+            c.vy+=((ty-c.y)*260-c.vy*22)*dt;c.vx+=((tx-c.x)*180-c.vx*18)*dt;c.vr+=((tr-c.r)*160-c.vr*16)*dt;
+            c.y+=c.vy*dt;c.x+=c.vx*dt;c.r+=c.vr*dt;
+            if(Math.abs(c.vy)+Math.abs(ty-c.y)>.05)busy=true;
+          }else if(c.mode==='fall'){ // let go: gravity, a slight drift back to centre, a quick straightening
+            c.vy+=980*dt;c.y+=c.vy*dt;c.x+=(0-c.x)*Math.min(1,dt*7);c.r+=(0-c.r)*Math.min(1,dt*6);
+            if(c.y>=0){c.y=0;const hit=c.vy;
+              if(hit>55){c.vy=-hit*.18;c.vw+=(Math.random()<.5?-1:1)*hit*.12;c.sq=Math.min(.08,hit*.0007);
+                chipAudio.clack(c.i,n,Math.min(1,hit/260));
+                // the chips already down take the knock and give a little
+                for(let j=0;j<idx;j++){const d=chips[j];if(d.mode!=='lift'){d.vy+=hit*.05*(1-(idx-j)/(n+1));if(d.mode==='rest')d.mode='settle';}}}
+              else{c.vy=0;c.mode='settle';}}
             busy=true;
+          }
+          if(c.mode==='settle'||c.mode==='fall'){ // rocking to a stop, like a coin
+            c.vw+=(-c.w*420-c.vw*9)*dt;c.w+=c.vw*dt;c.sq+=(0-c.sq)*Math.min(1,dt*18);
+            if(c.mode==='settle'){c.vy+=((0-c.y)*300-c.vy*24)*dt;c.y+=c.vy*dt;c.x*=.8;c.r*=.8;
+              if(Math.abs(c.w)+Math.abs(c.vw)*.05+Math.abs(c.y)+Math.abs(c.vy)*.02<.02){c.w=c.vw=c.y=c.vy=c.sq=0;c.x=c.r=0;c.mode='rest';}else busy=true;}
           }
           render(c);
         });
-        if(busy)requestAnimationFrame(loop);else running=false;
+        if(busy)raf=requestAnimationFrame(loop);else{raf=0;last=0;}
       }
-      const go=()=>{if(!running){running=true;requestAnimationFrame(loop);}};
+      const go=()=>{if(!raf)raf=requestAnimationFrame(loop);};
       const clear=()=>{timers.forEach(clearTimeout);timers=[];};
       const raise=()=>{clear();chipAudio.lift();k=st.clientWidth/sw;
-        if(stillChips){chips.forEach(c=>{c.y=-(10+c.i*7.5);render(c);});return;}
-        chips.forEach(c=>{c.mode='lift';c.v-=1.5+c.i*.3;});go();};
+        if(stillChips){chips.forEach(c=>{c.y=-(9+c.i*7);render(c);});return;}
+        chips.forEach(c=>{c.mode='lift';c.vy-=40+c.i*8;});go();};
       const drop=()=>{clear();
-        if(stillChips){chips.forEach(c=>{c.y=0;c.x=0;c.r=0;render(c);});chipAudio.clack(0,n,.6);return;}
-        // count them down: the bottom chip lets go first, then each one on top of it
-        chips.forEach((c,k)=>timers.push(setTimeout(()=>{c.mode='fall';c.v=Math.min(c.v,0)*.2;go();},k*85)));};
+        if(stillChips){chips.forEach(c=>{c.y=0;c.x=0;c.r=0;render(c);});chipAudio.clack(0,n,.5);return;}
+        // count them down: the bottom chip lets go first, then each one on top of it, a beat apart
+        chips.forEach((c,j)=>timers.push(setTimeout(()=>{c.mode='fall';c.vy=Math.min(c.vy,0)*.3;go();},j*70+Math.random()*12)));};
       st.addEventListener('pointerenter',raise);
       st.addEventListener('pointerleave',drop);
       st.addEventListener('pointerdown',e=>{chipAudio.init();if(e.pointerType!=='mouse'){raise();timers.push(setTimeout(drop,700));}});
@@ -1285,35 +1296,10 @@
   function cornerSpill(){
     let old=document.getElementById('cornerSpill');if(old)old.remove();
     if(innerWidth<760)return;
-    const chip=(x,y,r,col,rot,tilt,n)=>{ // a dice-pattern casino chip, optionally a short stack seen at an angle
-      const edge=col==='#151517'?'#ecebe6':'#f3efe8',sy=tilt||1;let g='';
-      for(let k=(n||1)-1;k>=0;k--){const yy=y+k*r*.16;
-        g+=`<g transform="translate(${x} ${yy}) rotate(${rot}) scale(1 ${sy})">
-          <circle r="${r}" fill="${k?shadeC(col,-.35):col}"/>${k?'':`
-          ${[...Array(8)].map((_,i)=>`<rect x="${-r*.13}" y="${-r}" width="${r*.26}" height="${r*.24}" rx="${r*.03}" fill="${edge}" transform="rotate(${i*45})"/>`).join('')}
-          ${[...Array(8)].map((_,i)=>`<g transform="rotate(${i*45+22.5}) translate(0 ${-r*.86})">${[[-1,-1],[1,1],[1,-1],[-1,1]].map(([a,b])=>`<circle cx="${a*r*.045}" cy="${b*r*.045}" r="${r*.022}" fill="${edge}" opacity=".8"/>`).join('')}</g>`).join('')}
-          <circle r="${r*.7}" fill="none" stroke="${edge}" stroke-width="${r*.02}" opacity=".5"/>
-          <circle r="${r*.62}" fill="${shadeC(col,.06)}"/>
-          <circle r="${r}" fill="url(#csSheen)"/>`}</g>`;}
-      return `<g class="sstack" data-n="${n||1}">${g}</g>`;};
-    const die=(x,y,s,rot,pips)=>`<g transform="translate(${x} ${y}) rotate(${rot})">
-      <rect x="${-s/2+s*.12}" y="${-s/2+s*.16}" width="${s}" height="${s}" rx="${s*.2}" fill="#000" opacity=".35"/>
-      <rect x="${-s/2}" y="${-s/2}" width="${s}" height="${s}" rx="${s*.2}" fill="url(#csDie)" opacity=".93"/>
-      <rect x="${-s/2+s*.06}" y="${-s/2+s*.06}" width="${s*.88}" height="${s*.88}" rx="${s*.16}" fill="none" stroke="#ff8a8a" stroke-width="${s*.03}" opacity=".45"/>
-      ${pips.map(([a,b])=>`<circle cx="${a*s*.25}" cy="${b*s*.25}" r="${s*.075}" fill="#fff8f4"/>`).join('')}
-      <path d="M${-s*.38} ${-s*.3} Q${-s*.1} ${-s*.46} ${s*.3} ${-s*.4}" stroke="#fff" stroke-width="${s*.05}" fill="none" opacity=".55" stroke-linecap="round"/></g>`;
-    const P={1:[[0,0]],2:[[-1,-1],[1,1]],3:[[-1,-1],[0,0],[1,1]],4:[[-1,-1],[1,-1],[-1,1],[1,1]],5:[[-1,-1],[1,-1],[0,0],[-1,1],[1,1]],6:[[-1,-1],[1,-1],[-1,0],[1,0],[-1,1],[1,1]]};
-    const B='#151517',Rd='#c3161f';
-    const svg=`<svg viewBox="0 0 620 520" xmlns="http://www.w3.org/2000/svg" style="overflow:hidden">
-      <defs><radialGradient id="csSheen" cx="35%" cy="28%" r="70%"><stop offset="0" stop-color="#fff" stop-opacity=".28"/><stop offset=".5" stop-color="#fff" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".25"/></radialGradient>
-        <linearGradient id="csDie" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ff4a4f"/><stop offset=".45" stop-color="#c3161f"/><stop offset="1" stop-color="#6e070c"/></linearGradient></defs>
-      ${chip(560,96,92,B,8,1,1)}${chip(410,84,80,B,-14,1,1)}${chip(600,290,96,B,-6,1,4)}
-      ${chip(480,220,84,Rd,-24,.62,5)}${chip(350,260,74,Rd,12,.7,4)}${chip(580,440,80,Rd,30,1,2)}${chip(450,380,66,Rd,-10,.55,6)}
-      ${chip(290,140,58,Rd,0,1,1)}
-
-    </svg>`;
-    const el=document.createElement('div');el.id='cornerSpill';el.innerHTML=svg+`<div class="spill-dice">${dice([[20,20,-14,5],[46,44,10,6],[70,22,-8,3]])}</div>`;
-    el.firstElementChild.setAttribute('aria-hidden','true');
+    // black and red stacks spilling in from the corner, some tall, some short, a couple knocked over
+    const stacks=[[112,30,6,3],[90,44,3,3],[128,58,4,2],[104,70,7,2],[78,26,2,2],[126,92,5,3],[96,98,2,3],[64,56,1,2],[118,8,3,3],[82,82,4,3]];
+    const el=document.createElement('div');el.id='cornerSpill';
+    el.innerHTML=chips(stacks)+`<div class="spill-dice">${dice([[20,20,-14,5],[46,44,10,6],[70,22,-8,3]])}</div>`;
     document.body.appendChild(el);
   }
   function shadeC(hex,k){const n=parseInt(hex.slice(1),16),f=c=>Math.round(k>0?c+(255-c)*k:c*(1+k));return '#'+((1<<24)+(f(n>>16)<<16)+(f(n>>8&255)<<8)+f(n&255)).toString(16).slice(1);}
