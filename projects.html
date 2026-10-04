@@ -98,7 +98,7 @@
     }
     .card-face{border-radius:12px}
     .card-flipper{border-radius:12px}
-    .card-back{background:transparent;border:0;box-shadow:0 14px 28px rgba(0,0,0,.45),0 2px 4px rgba(0,0,0,.35);display:block}
+    .card-back{background:transparent;border:0;box-shadow:0 10px 22px rgba(0,0,0,.45),0 1px 3px rgba(0,0,0,.35);display:block;border-radius:14px}
     .card-scene:not(.flipped):hover .card-back,.card-scene.revealed:hover .card-back{box-shadow:0 22px 40px rgba(0,0,0,.55),0 2px 4px rgba(0,0,0,.35);border:0}
     .card-back .cb-aurora,.card-back .cb-shimmer,.card-back .cb-burst{display:none}
     .card-back svg{position:absolute;inset:0;width:100%;height:100%}
@@ -184,36 +184,62 @@
       spade:"M50 4 C64 25 93 40 93 61 C93 75 81 83 68 81 C62 80 57 77 54 72 C55 81 59 89 67 95 L33 95 C41 89 45 81 46 72 C43 77 38 80 32 81 C19 83 7 75 7 61 C7 40 36 25 50 4Z",
       club:"M50 12 a17 17 0 1 1 -0.1 0Z M28 42 a17 17 0 1 1 -0.1 0Z M72 42 a17 17 0 1 1 -0.1 0Z M46 58 C46 76 42 86 33 95 L67 95 C58 86 54 76 54 58Z"
     };
-    const RED="#d0443e", INKC="#2c3048";
+    const RED="#c9524b", INKC="#1f1d1c";
     function suitColor(s){return (s==='heart'||s==='diamond')?RED:INKC;}
-    function paintSuit(s,x,y,size,fid,op){
-      const c=suitColor(s), k=size/100;
-      return `<g transform="translate(${x-size/2} ${y-size/2}) scale(${k})">
-        <path d="${SUIT_PATH[s]}" fill="${c}" opacity="${op||.82}" filter="url(#wc${fid})"/>
-        <path d="${SUIT_PATH[s]}" fill="none" stroke="${c}" stroke-width="${2.2/k*0.6}" opacity=".45" filter="url(#wc${fid})"/></g>`;
+    function pip(s,x,y,size,extra){
+      const k=size/100;
+      return `<path d="${SUIT_PATH[s]}" fill="${suitColor(s)}" transform="translate(${x-size/2} ${y-size/2}) scale(${k})" ${extra||''}/>`;
     }
+    // Old printed card: worn off-white stock, crisp ink, faded edges.
     function makeCardBackSVG(idx){
-      const h=HAND[idx]||HAND[0], fid=idx+Math.random().toString(36).slice(2,6);
+      const h=HAND[idx]||HAND[0], f=idx+Math.random().toString(36).slice(2,6);
       const defs=`<defs>
-        <filter id="wc${fid}" x="-10%" y="-10%" width="120%" height="120%"><feTurbulence type="fractalNoise" baseFrequency=".035" numOctaves="3" seed="${idx+2}"/><feDisplacementMap in="SourceGraphic" scale="6"/><feGaussianBlur stdDeviation=".5"/></filter>
-        <filter id="ink${fid}"><feTurbulence type="fractalNoise" baseFrequency=".03" numOctaves="2" seed="${idx+9}"/><feDisplacementMap in="SourceGraphic" scale="3"/></filter>
-        <linearGradient id="pp${fid}" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fdfaf3"/><stop offset=".7" stop-color="#f6f0e3"/><stop offset="1" stop-color="#e8e0cf"/></linearGradient>
+        <radialGradient id="age${f}" cx="45%" cy="40%" r="80%"><stop offset="0" stop-color="#f7f3ea"/><stop offset=".65" stop-color="#efe9dc"/><stop offset="1" stop-color="#ddd3bf"/></radialGradient>
+        <filter id="spk${f}" x="0" y="0" width="100%" height="100%"><feTurbulence type="fractalNoise" baseFrequency=".9" numOctaves="2" seed="${idx+3}" result="n"/>
+          <feColorMatrix in="n" type="matrix" values="0 0 0 0 .35  0 0 0 0 .3  0 0 0 0 .22  0 0 0 -2.2 1.35"/><feComposite in2="SourceGraphic" operator="in"/></filter>
+        <filter id="blot${f}" x="-20%" y="-20%" width="140%" height="140%"><feTurbulence type="fractalNoise" baseFrequency=".012" numOctaves="2" seed="${idx+11}"/><feColorMatrix type="matrix" values="0 0 0 0 .55  0 0 0 0 .48  0 0 0 0 .36  0 0 0 -1.4 .6"/><feComposite in2="SourceGraphic" operator="in"/></filter>
+        <filter id="wear${f}"><feTurbulence type="fractalNoise" baseFrequency=".6" numOctaves="1" seed="${idx+5}"/><feDisplacementMap in="SourceGraphic" scale="1.4"/></filter>
+        <clipPath id="clip${f}"><rect x="5" y="5" width="240" height="340" rx="15"/></clipPath>
+        <pattern id="robe${f}" width="14" height="14" patternUnits="userSpaceOnUse"><rect width="14" height="14" fill="#e8c46a"/><rect width="7" height="14" fill="${RED}"/><circle cx="10.5" cy="7" r="1.6" fill="${INKC}"/></pattern>
       </defs>`;
-      const card=`<rect x="6" y="6" width="238" height="338" rx="16" fill="url(#pp${fid})"/>
-        <path d="M232 20 L238 330" stroke="#b9b2a4" stroke-width="10" opacity=".35" filter="url(#wc${fid})"/>
-        <rect x="6" y="6" width="238" height="338" rx="16" fill="none" stroke="#3a3632" stroke-width="3" filter="url(#ink${fid})"/>`;
+      const stock=`<g clip-path="url(#clip${f})"><rect x="5" y="5" width="240" height="340" fill="url(#age${f})"/>
+        <rect x="5" y="5" width="240" height="340" fill="#fff" filter="url(#blot${f})" opacity=".6"/>
+        <rect x="5" y="5" width="240" height="340" fill="#fff" filter="url(#spk${f})" opacity=".18"/></g>
+        <rect x="5.5" y="5.5" width="239" height="339" rx="15" fill="none" stroke="#bfb39b" stroke-width="1.2" opacity=".8"/>`;
       let face='';
+      const serif="'IM Fell English',Georgia,serif";
       if(h.rank==='JOKER'){
-        face=`${'JOKER'.split('').map((ch,i)=>`<text x="30" y="${62+i*36}" font-family="'IM Fell English',Georgia,serif" font-size="34" fill="${INKC}" text-anchor="middle">${ch}</text>`).join('')}
-          <g transform="translate(140 150)" filter="url(#wc${fid})"><path d="M0 -46 L13 -14 L46 -12 L20 9 L29 42 L0 23 L-29 42 L-20 9 L-46 -12 L-13 -14Z" fill="${RED}" opacity=".8"/></g>
-          <circle cx="182" cy="96" r="5" fill="${INKC}" opacity=".7"/><circle cx="96" cy="214" r="4" fill="${RED}" opacity=".7"/>`;
+        face=`${'JOKER'.split('').map((ch,i)=>`<text x="28" y="${58+i*34}" font-family="${serif}" font-size="30" fill="${INKC}" text-anchor="middle">${ch}</text>`).join('')}
+          <path d="M140 108 L151 136 L181 138 L158 157 L166 186 L140 170 L114 186 L122 157 L99 138 L129 136Z" fill="${RED}"/>`;
       } else {
         const c=suitColor(h.suit);
-        const corner=`<text x="30" y="52" font-family="'IM Fell English',Georgia,serif" font-size="34" fill="${c}" text-anchor="middle" opacity=".92">${h.rank}</text>${paintSuit(h.suit,30,74,24,fid,.9)}`;
-        face=`${corner}<g transform="rotate(180 125 175)">${corner}</g>${paintSuit(h.suit,125,160,h.rank==='A'?118:96,fid)}`;
+        const corner=`<text x="28" y="48" font-family="${serif}" font-size="32" fill="${c}" text-anchor="middle">${h.rank}</text>${pip(h.suit,28,68,20)}`;
+        let mid='';
+        if(h.rank==='A'){
+          mid=pip(h.suit,125,168,44);
+        } else {
+          // court card: framed panel with the suit and a patterned robe, like an old K or Q
+          mid=`<g filter="url(#wear${f})">
+            <rect x="56" y="44" width="138" height="262" fill="#f4efe4" stroke="${INKC}" stroke-width="1.6"/>
+            <path d="M56 175 L194 175" stroke="${INKC}" stroke-width="1" opacity=".55"/>
+            ${pip(h.suit,84,80,36)}
+            <path d="M118 62 l7 -12 l7 12 l7 -12 l7 12 v9 h-28z" fill="#e8c46a" stroke="${INKC}" stroke-width="1.2"/>
+            <circle cx="132" cy="84" r="12" fill="#f2dcc4" stroke="${INKC}" stroke-width="1.2"/>
+            <path d="M110 100 Q132 92 154 100 L164 170 L100 170Z" fill="url(#robe${f})" stroke="${INKC}" stroke-width="1.2"/>
+            <path d="M123 100 L132 128 L141 100" fill="#2f4a8a" stroke="${INKC}" stroke-width="1"/>
+            <g transform="rotate(180 125 175)">
+              <path d="M118 62 l7 -12 l7 12 l7 -12 l7 12 v9 h-28z" fill="#e8c46a" stroke="${INKC}" stroke-width="1.2"/>
+              <circle cx="132" cy="84" r="12" fill="#f2dcc4" stroke="${INKC}" stroke-width="1.2"/>
+              <path d="M110 100 Q132 92 154 100 L164 170 L100 170Z" fill="url(#robe${f})" stroke="${INKC}" stroke-width="1.2"/>
+              <path d="M123 100 L132 128 L141 100" fill="#2f4a8a" stroke="${INKC}" stroke-width="1"/>
+              ${pip(h.suit,84,80,36)}
+            </g>
+            </g></g>`;
+        }
+        face=`${corner}<g transform="rotate(180 125 175)">${corner}</g>${mid}`;
       }
-      const label=`<text x="125" y="${h.rank==='JOKER'?300:282}" font-family="'Nanum Pen Script',cursive" font-size="30" fill="#24306b" text-anchor="middle">${h.label}</text>`;
-      return `<svg viewBox="0 0 250 350" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">${defs}${card}${face}${label}</svg>`;
+      const label=`<text x="125" y="${h.rank==='A'?262:328}" font-family="'Nanum Pen Script',cursive" font-size="27" fill="#24306b" text-anchor="middle" opacity=".9" transform="rotate(-3 125 ${h.rank==='A'?262:328})">${h.label}</text>`;
+      return `<svg viewBox="0 0 250 350" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">${defs}${stock}${face}${label}</svg>`;
     }
 
     function makeFrontHTML(p){
