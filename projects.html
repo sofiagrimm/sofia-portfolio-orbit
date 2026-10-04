@@ -696,17 +696,39 @@
         <path d="M0 -62 C-20 -80 -40 -70 -36 -52 M0 -62 C20 -80 40 -70 36 -52 M0 62 C-20 80 -40 70 -36 52 M0 62 C20 80 40 70 36 52"/>
         <circle r="6" fill="#f3f7ef"/></g></svg>`;
   }
+  // Chips drawn as real stacks seen from a little above: each chip has a coloured edge with
+  // white inserts running round it, a glossy top with an inlay ring, and the stack wobbles a
+  // touch where the chips don't sit perfectly square. Each chip is still its own group so a
+  // stack can be lifted and dropped back chip by chip.
+  let chipUid=0;
   function chips(stacks){
-    // each chip is its own group so a stack can be picked up and dropped back chip by chip
-    const one=(x,y,n,col,edge)=>{let g=`<g class="stack" data-n="${n}">`;
-      for(let j=n-1;j>=0;j--){const yy=y+j*5;
-        g+=`<g class="chip" data-j="${j}"><ellipse cx="${x}" cy="${yy+3}" rx="22" ry="22" fill="${j?'#00000033':'none'}"/><circle cx="${x}" cy="${yy}" r="22" fill="${col}"/><circle cx="${x}" cy="${yy}" r="20" fill="none" stroke="${edge}" stroke-width="5" stroke-dasharray="6 7.5"/>`+
-          (j===0?`<circle cx="${x}" cy="${y}" r="13" fill="none" stroke="${edge}" stroke-width="1.6" stroke-dasharray="3 3"/><circle cx="${x}" cy="${y}" r="9" fill="${col}" stroke="${edge}" stroke-width="1"/>`:
-                 `<circle cx="${x}" cy="${yy}" r="13" fill="none" stroke="${edge}" stroke-width="1.6" stroke-dasharray="3 3"/><circle cx="${x}" cy="${yy}" r="9" fill="${col}" stroke="${edge}" stroke-width="1"/>`)+`</g>`;}
+    const RX=22,RY=10,TH=6.2;
+    const COL=[['#1d7a4f','#f4f1ea'],['#f4f1ea','#1d7a4f'],['#c8232c','#f6f2ec'],['#151517','#f2f1ec'],['#2457a8','#f4f1ea'],['#e0b23f','#7a5a1c']];
+    const id='cg'+(chipUid++);
+    const defs=`<defs><linearGradient id="${id}s" x1="0" x2="1"><stop offset="0" stop-color="#000" stop-opacity=".5"/><stop offset=".3" stop-color="#fff" stop-opacity=".12"/><stop offset=".55" stop-color="#fff" stop-opacity=".02"/><stop offset="1" stop-color="#000" stop-opacity=".55"/></linearGradient>
+      <radialGradient id="${id}t" cx="40%" cy="30%" r="75%"><stop offset="0" stop-color="#fff" stop-opacity=".35"/><stop offset=".55" stop-color="#fff" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".2"/></radialGradient></defs>`;
+    const one=(x,y,n,col,edge,seed)=>{
+      let g=`<g class="stack" data-n="${n}"><ellipse cx="${x+2}" cy="${y+(n-1)*TH+TH+RY*.55}" rx="${RX*1.25}" ry="${RY*1.15}" fill="#000" opacity=".35"/>`;
+      for(let j=n-1;j>=0;j--){
+        const jit=Math.sin((j+1)*12.9898+seed*78.233)*43758.5453,dx=((jit-Math.floor(jit))-.5)*2.6,cx=x+dx,cy=y+j*TH,turn=((jit*7)%1)*45;
+        // the edge band: front half of the cylinder, with white inserts foreshortened round the curve
+        let band=`<path d="M${cx-RX} ${cy} A${RX} ${RY} 0 0 0 ${cx+RX} ${cy} L${cx+RX} ${cy+TH} A${RX} ${RY} 0 0 1 ${cx-RX} ${cy+TH}Z" fill="${col}"/>`;
+        for(let k=0;k<8;k++){const th=(k/8)*Math.PI*2+turn*Math.PI/180,c=Math.cos(th),sn=Math.sin(th);if(sn<=.05)continue;
+          const bx=cx+RX*c,by=cy+RY*sn,w=Math.max(.8,3.6*sn);
+          band+=`<path d="M${(bx-w).toFixed(2)} ${(by+.4).toFixed(2)} L${(bx+w).toFixed(2)} ${(by+.4).toFixed(2)} L${(bx+w).toFixed(2)} ${(by+TH-.4).toFixed(2)} L${(bx-w).toFixed(2)} ${(by+TH-.4).toFixed(2)}Z" fill="${edge}"/>`;}
+        band+=`<path d="M${cx-RX} ${cy} A${RX} ${RY} 0 0 0 ${cx+RX} ${cy} L${cx+RX} ${cy+TH} A${RX} ${RY} 0 0 1 ${cx-RX} ${cy+TH}Z" fill="url(#${id}s)"/>`;
+        // the top face
+        let top=`<ellipse cx="${cx}" cy="${cy}" rx="${RX}" ry="${RY}" fill="${col}"/>`;
+        for(let k=0;k<8;k++){const th=(k/8)*Math.PI*2+turn*Math.PI/180;
+          top+=`<g transform="translate(${(cx+RX*.86*Math.cos(th)).toFixed(2)} ${(cy+RY*.86*Math.sin(th)).toFixed(2)}) scale(1 ${RY/RX})"><rect x="-2.6" y="-1.8" width="5.2" height="3.6" fill="${edge}" transform="rotate(${(th*180/Math.PI+90).toFixed(1)})"/></g>`;}
+        top+=`<ellipse cx="${cx}" cy="${cy}" rx="${RX*.66}" ry="${RY*.66}" fill="none" stroke="${edge}" stroke-width=".9" opacity=".75"/>
+          <ellipse cx="${cx}" cy="${cy}" rx="${RX*.56}" ry="${RY*.56}" fill="${col}" stroke="#000" stroke-opacity=".25" stroke-width=".6"/>
+          <ellipse cx="${cx}" cy="${cy}" rx="${RX}" ry="${RY}" fill="url(#${id}t)"/>`;
+        g+=`<g class="chip" data-j="${j}" data-cx="${cx.toFixed(2)}" data-cy="${cy.toFixed(2)}">${band}${top}</g>`;
+      }
       return g+`</g>`;};
-    const COL=[[GREEN,'#f4f1ea'],['#f4f1ea',GREEN],['#b8333b','#f4f1ea'],['#232327','#f4f1ea'],['#2d5b9a','#f4f1ea'],['#e9c46a','#7a5a1c']];
-    let g='';stacks.forEach(([x,y,n,c])=>{const [a,b]=COL[c||0];g+=one(x,y,n,a,b);});
-    return `<svg viewBox="0 0 140 120" xmlns="http://www.w3.org/2000/svg" style="overflow:visible">${g}</svg>`;
+    let g='';stacks.forEach(([x,y,n,c],k)=>{const [a,b]=COL[c||0];g+=one(x,y-(n-1)*2,n,a,b,k+n);});
+    return `<svg viewBox="0 0 140 120" xmlns="http://www.w3.org/2000/svg" style="overflow:visible">${defs}${g}</svg>`;
   }
   function dice(){
     const pipsAt={1:[[0,0]],2:[[-7,-7],[7,7]],3:[[-7,-7],[0,0],[7,7]],4:[[-7,-7],[7,-7],[-7,7],[7,7]],5:[[-7,-7],[7,-7],[0,0],[-7,7],[7,7]],6:[[-7,-7],[7,-7],[-7,0],[7,0],[-7,7],[7,7]]};
@@ -1050,8 +1072,8 @@
     document.querySelectorAll('#table .stack').forEach(st=>{
       if(st.dataset.wired)return;st.dataset.wired='1';
       const els=[...st.querySelectorAll('.chip')].sort((a,b)=>b.dataset.j-a.dataset.j); // bottom first
-      const n=els.length,c0=els[0].querySelector('circle'),cx=+c0.getAttribute('cx');
-      const chips=els.map((el,i)=>({el,i,y:0,v:0,x:0,vx:0,r:0,mode:'rest',cy:+el.querySelector('circle').getAttribute('cy')}));
+      const n=els.length,cx=+(els[0].dataset.cx||0);
+      const chips=els.map((el,i)=>({el,i,y:0,v:0,x:0,vx:0,r:0,mode:'rest',cy:+(el.dataset.cy||0)}));
       let running=false,timers=[];
       const render=c=>c.el.setAttribute('transform',`translate(${c.x.toFixed(2)} ${c.y.toFixed(2)}) rotate(${c.r.toFixed(2)} ${cx} ${c.cy})`);
       function loop(){
