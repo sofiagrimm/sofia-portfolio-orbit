@@ -299,6 +299,17 @@
   @media (max-width:900px){.ghead{flex-direction:column}.ghead-right{display:none}.left-panel{top:250px !important}.strip-nav,.spin{display:none}}
   .entry::before{left:auto !important;right:14px !important;margin-left:0 !important;width:64px !important;top:-12px !important}
   .ghead .note{padding-right:84px}
+
+  /* handwritten labels on the pins */
+  .pin-notes{position:fixed;inset:0;z-index:11;pointer-events:none}
+  .pin-note{position:absolute;left:0;top:0;transition:opacity .25s;white-space:nowrap;padding-left:16px;margin-top:-34px}
+  .pin-note::before{content:"";position:absolute;left:0;top:30px;width:14px;height:1.5px;background:#2b2724;transform:rotate(-30deg);transform-origin:left}
+  .pin-note b{display:block;font-family:'Nanum Pen Script',cursive;font-weight:400;font-size:28px;line-height:.9;color:#2b2724;text-shadow:0 0 6px #efe8dc,0 0 10px #efe8dc}
+  .pin-note span{display:inline-block;margin-top:2px;font:600 10px 'Inter',sans-serif;letter-spacing:.08em;text-transform:uppercase;color:#2b2724;background:var(--c);padding:2px 7px;border-radius:999px}
+  /* the card strip: fades at the right edge and says it scrolls */
+  .left-panel{-webkit-mask:linear-gradient(90deg,#000 88%,transparent);mask:linear-gradient(90deg,#000 88%,transparent);cursor:grab}
+  .left-panel.dragging{cursor:grabbing;user-select:none}
+  @media (max-width:900px){.pin-note b{font-size:20px}}
 </style>
 </head>
 <body>
@@ -812,6 +823,7 @@
 
     let targetRotX=rotX,targetRotY=rotY,animating=false;
     window.focusPin=function(id,el){
+      {const card=el||document.querySelector(`.entry[data-pin="${id}"]`);if(card)card.scrollIntoView({behavior:'smooth',inline:'center',block:'nearest'});}
       document.querySelectorAll('.entry').forEach(e=>e.classList.remove('active'));
       el.classList.add('active');
       const pin=PINS[id];if(!pin)return;
@@ -847,10 +859,50 @@
       });
       flightTick(performance.now());
       renderer.render(scene,camera);
+      updateLabels();
+    }
+    // pins get handwritten labels on the paper, following the globe as it turns.
+    // The three Yale pins sit almost on top of each other, so they share one label.
+    const LABEL_GROUPS=[['higley','cushing','pcdd'],['fermilab'],['msu'],['stanford'],['sevilla'],['cambridge']];
+    const labelLayer=document.createElement('div');labelLayer.className='pin-notes';labelLayer.setAttribute('aria-hidden','true');document.body.appendChild(labelLayer);
+    const labels=LABEL_GROUPS.map(ids=>{const d=document.createElement('div');d.className='pin-note';const P0=PINS[ids[0]];
+      d.innerHTML=`<b>${ids.length>1?'Yale':P0.name}</b><span>${P0.sub}${ids.length>1?' · '+ids.length+' projects':''}</span>`;
+      d.style.setProperty('--c','#'+P0.color.toString(16).padStart(6,'0'));labelLayer.appendChild(d);return {ids,d};});
+    const _v=new THREE.Vector3();
+    function updateLabels(){
+      const r=canvas.getBoundingClientRect(),placed=[];
+      // where each label wants to go
+      const want=labels.map(L=>{
+        const objs=pinObjects.filter(p=>L.ids.includes(p.id));if(!objs.length)return {L,vis:false};
+        let x=0,y=0,z=0;objs.forEach(p=>{p.head.getWorldPosition(_v);x+=_v.x;y+=_v.y;z+=_v.z;});x/=objs.length;y/=objs.length;z/=objs.length;
+        const facing=z/Math.hypot(x,y,z);_v.set(x,y,z).project(camera);
+        const sx=r.left+(_v.x*.5+.5)*r.width,sy=r.top+(-_v.y*.5+.5)*r.height;
+        return {L,sx,sy,facing,vis:facing>.25&&sy<innerHeight-30&&sy>60,w:L.d.offsetWidth||140,h:44};
+      }).sort((a,b)=>(b.facing||0)-(a.facing||0));
+      // the most front-facing labels go first; anything that would overlap steps down a line, or bows out
+      want.forEach(o=>{
+        if(!o.vis){o.L.d.style.opacity=0;return;}
+        let dy=0,ok=false;
+        for(let t=0;t<3&&!ok;t++){const box={l:o.sx,r:o.sx+o.w+16,t:o.sy-34+dy,b:o.sy-34+dy+o.h};
+          ok=!placed.some(p=>!(box.r<p.l||box.l>p.r||box.b<p.t||box.t>p.b));if(ok)placed.push(box);else dy+=o.h*.9;}
+        o.L.d.style.opacity=ok?Math.min(1,(o.facing-.25)*4):0;
+        o.L.d.style.transform=`translate(${o.sx.toFixed(1)}px,${(o.sy+dy).toFixed(1)}px)`;
+      });
     }
     requestAnimationFrame(animate);
   </script>
 
+<script>
+(function(){
+  const strip=document.querySelector('.left-panel');if(!strip)return;
+  let down=null,moved=false;
+  strip.addEventListener('pointerdown',e=>{if(e.pointerType!=='mouse')return;down={x:e.clientX,s:strip.scrollLeft};moved=false;});
+  addEventListener('pointermove',e=>{if(!down)return;const d=e.clientX-down.x;if(Math.abs(d)>4){moved=true;strip.classList.add('dragging');}strip.scrollLeft=down.s-d;});
+  addEventListener('pointerup',()=>{down=null;setTimeout(()=>strip.classList.remove('dragging'),0);});
+  strip.addEventListener('click',e=>{if(moved){e.stopPropagation();e.preventDefault();moved=false;}},true);
+  strip.addEventListener('wheel',e=>{if(Math.abs(e.deltaY)>Math.abs(e.deltaX)){strip.scrollLeft+=e.deltaY;e.preventDefault();}},{passive:false});
+})();
+</script>
 <!-- camera roll: a scrapbook page for each place, opened from the button that appears after you land -->
 <button class="roll-btn" id="rollBtn" type="button" hidden></button>
 <div class="roll-overlay" id="roll" role="dialog" aria-modal="true" aria-labelledby="rollPlace" hidden>
