@@ -223,7 +223,7 @@
     #cornerSpill svg{display:block;width:100%;height:auto}
     html,body{overflow-x:clip}
     .chipset{position:relative;width:100%;aspect-ratio:140/120}
-    .chipset .stack{position:absolute}
+    .chipset .stack{position:absolute;will-change:transform;contain:layout style}
     .chipset .chip{position:absolute;display:block;height:auto;-webkit-user-drag:none;user-select:none}
     .chipset .cshadow{position:absolute;border-radius:50%;background:radial-gradient(closest-side,rgba(0,0,0,.42),rgba(0,0,0,0))}
   </style>
@@ -675,10 +675,20 @@
     const withFont=FELL?svg.replace(/<svg([^>]*)>/,`<svg$1><style>@font-face{font-family:'IM Fell English';src:url(${FELL}) format('woff2')}</style>`):svg;
     return 'data:image/svg+xml;charset=utf-8,'+encodeURIComponent(withFont);
   }
+  const BITMAP={},BITMAP_WAIT={};
+  function bitmapize(url,w,h,apply){
+    if(BITMAP[url])return apply(BITMAP[url]);
+    (BITMAP_WAIT[url]=BITMAP_WAIT[url]||[]).push(apply);if(BITMAP_WAIT[url].length>1)return;
+    const im=new Image();im.decoding='async';
+    im.onload=()=>{try{const c=document.createElement('canvas');c.width=w;c.height=h;c.getContext('2d').drawImage(im,0,0,w,h);
+      c.toBlob(b=>{if(!b)return;const u=URL.createObjectURL(b);BITMAP[url]=u;(BITMAP_WAIT[url]||[]).forEach(f=>f(u));delete BITMAP_WAIT[url];},'image/png');}catch(e){}};
+    im.src=url;
+  }
   function art(key,make){
     if(!ARTSRC[key])ARTSRC[key]=make();
     if(!ART[key])ART[key]=artURL(key,ARTSRC[key]);
-    const im=new Image();im.decoding='async';im.alt='';im.className='rast';im.dataset.art=key;im.src=ART[key];im.draggable=false;return im;
+    const im=new Image();im.decoding='async';im.alt='';im.className='rast';im.dataset.art=key;im.src=ART[key];im.draggable=false;
+    const url=ART[key];bitmapize(url,500,700,u=>{if(im.dataset.art===key&&ART[key]===url)im.src=u;});return im;
   }
   function setArt(el,key,make){el.textContent='';el.appendChild(art(key,make));}
   // fetch the corner font once and redraw the card images with it
@@ -688,7 +698,7 @@
     const buf=await (await fetch(u)).arrayBuffer();let bin='';const b=new Uint8Array(buf);for(let i=0;i<b.length;i+=8192)bin+=String.fromCharCode.apply(null,b.subarray(i,i+8192));
     FELL='data:font/woff2;base64,'+btoa(bin);
     Object.keys(ART).forEach(k=>delete ART[k]);
-    document.querySelectorAll('img.rast').forEach(im=>{const k=im.dataset.art;if(!ART[k])ART[k]=artURL(k,ARTSRC[k]);im.src=ART[k];});
+    document.querySelectorAll('img.rast').forEach(im=>{const k=im.dataset.art;if(!ART[k])ART[k]=artURL(k,ARTSRC[k]);const url=ART[k];im.src=url;bitmapize(url,500,700,u=>{if(ART[k]===url)im.src=u;});});
   }catch(e){}})();
   const GREEN="#2e7656";
   function back(){
@@ -734,7 +744,7 @@
         `<i class="cshadow" style="left:${(x-RX*1.25+2-sx)/sw*100}%;top:${(y+(n-1)*TH+TH+RY*.55-RY*1.15-sy)/sh*100}%;width:${RX*2.5/sw*100}%;height:${RY*2.3/sh*100}%"></i>`;
       for(let j=n-1;j>=0;j--){
         const jit=Math.sin((j+1)*12.9898+(k+n)*78.233)*43758.5453,f=jit-Math.floor(jit),dx=(f-.5)*2.6,cx=x+dx,cy=y+j*TH;
-        html+=`<img class="chip" data-j="${j}" alt="" draggable="false" src="${chipSrc(c||0,Math.floor(f*8))}" style="left:${(cx-RX-2-sx)/sw*100}%;top:${(cy-RY-2-sy)/sh*100}%;width:${IW/sw*100}%">`;
+        html+=`<img class="chip" data-j="${j}" alt="" draggable="false" data-src="${c||0}-${Math.floor(f*8)}" src="${chipSrc(c||0,Math.floor(f*8))}" style="left:${(cx-RX-2-sx)/sw*100}%;top:${(cy-RY-2-sy)/sh*100}%;width:${IW/sw*100}%">`;
       }
       html+='</div>';
     });
@@ -1095,7 +1105,13 @@
   const stillChips=matchMedia('(prefers-reduced-motion: reduce)').matches;
   // each stack runs a tiny physics sim: springs lift the chips into a loose fan, then on
   // release each chip falls under gravity, bounces once or twice, and clacks as it lands
+  function bitmapChips(){
+    const RX=CHIP_RX,RY=CHIP_RY,TH=CHIP_TH,W=(2*RX+4)*4,H=(2*RY+TH+4)*4;
+    document.querySelectorAll('.chipset .chip[data-src]').forEach(im=>{const [c,t]=im.dataset.src.split('-').map(Number),url=chipSrc(c,t);
+      bitmapize(url,W,H,u=>{im.src=u;});});
+  }
   function wireChips(){
+    bitmapChips();
     document.querySelectorAll('#table .stack').forEach(st=>{
       if(st.dataset.wired)return;st.dataset.wired='1';
       const els=[...st.querySelectorAll('.chip')].sort((a,b)=>b.dataset.j-a.dataset.j); // bottom first
@@ -1118,11 +1134,11 @@
           }
           render(c);
         });
-        if(busy)requestAnimationFrame(loop);else{running=false;if(chips.every(c=>c.mode==='rest'))els.forEach(e=>e.style.willChange='');}
+        if(busy)requestAnimationFrame(loop);else running=false;
       }
       const go=()=>{if(!running){running=true;requestAnimationFrame(loop);}};
       const clear=()=>{timers.forEach(clearTimeout);timers=[];};
-      const raise=()=>{clear();chipAudio.lift();k=st.clientWidth/sw;els.forEach(e=>e.style.willChange='transform');
+      const raise=()=>{clear();chipAudio.lift();k=st.clientWidth/sw;
         if(stillChips){chips.forEach(c=>{c.y=-(10+c.i*7.5);render(c);});return;}
         chips.forEach(c=>{c.mode='lift';c.v-=1.5+c.i*.3;});go();};
       const drop=()=>{clear();
