@@ -353,7 +353,7 @@
     const container = canvas.parentElement;
 
     const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: false });
-    renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+    renderer.setPixelRatio(Math.min(devicePixelRatio,1.5));
     renderer.setClearColor(0x060d18, 1);
 
     const scene = new THREE.Scene();

@@ -204,6 +204,7 @@
   .nav-links a{white-space:nowrap}
   @media (max-width:1400px){.nav-links a{padding:7px 10px;letter-spacing:.1em}}
   @media (max-width:1240px){.nav-links a{padding:6px 7px;font-size:12px;letter-spacing:.07em}.nav-links .divider{display:none}}
+  html,body{overflow-x:clip}
 </style>
   <style>
     /* six tabs: let the nav scroll sideways on small screens instead of spilling off */
@@ -303,7 +304,7 @@
     import('https://unpkg.com/three@0.161.0/build/three.module.js').then(function(THREE){
 
       var renderer = new THREE.WebGLRenderer({antialias:true,alpha:false});
-      renderer.setPixelRatio(Math.min(window.devicePixelRatio,2));
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio,1.5));
       renderer.setSize(window.innerWidth,window.innerHeight);
       renderer.setClearColor(0x060d18,1);
       document.body.insertBefore(renderer.domElement, document.body.firstChild);

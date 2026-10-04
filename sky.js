@@ -9,7 +9,7 @@
         radial-gradient(ellipse 70% 45% at 65% 38%, rgba(120,150,230,.16) 0%, transparent 70%),
         radial-gradient(ellipse 60% 40% at 20% 70%, rgba(60,140,170,.14) 0%, transparent 70%),
         linear-gradient(180deg,#0a1530 0%,#10224a 30%,#163566 58%,#1b4a6e 82%,#205468 100%)}
-    #skyStars{position:fixed;inset:0;width:100%;height:100%;z-index:1;pointer-events:none}
+    #skyStars{position:fixed;inset:0;width:100%;height:100%;z-index:1;pointer-events:none;will-change:contents}
     .sky-clouds{position:fixed;inset:0;z-index:2;pointer-events:none;width:100%;height:100%}
     .sky-grass{position:fixed;left:0;right:0;bottom:0;height:clamp(70px,11vh,120px);z-index:3;pointer-events:none;width:100%}
     .nebula{display:none}
@@ -59,7 +59,12 @@
     '<path d="' + tufts(94, 20, 22, 42) + '" fill="#0b2f27"/>';
 
   var first = document.body.firstChild;
-  [g, c, clouds, grass].forEach(function (el) { document.body.insertBefore(el, first); });
+  // the soft clouds are a blurred drawing; turn them into a picture once so the blur isn't redone every frame
+  clouds.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
+  var cloudImg = document.createElement('img'); cloudImg.className = 'sky-clouds'; cloudImg.alt = ''; cloudImg.setAttribute('aria-hidden', 'true');
+  cloudImg.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(new XMLSerializer().serializeToString(clouds));
+  cloudImg.style.objectFit = 'cover';
+  [g, c, cloudImg, grass].forEach(function (el) { document.body.insertBefore(el, first); });
 
   // ── The real sky over New Haven, looking north, running ~240x faster than real time.
   //    Stars are placed from their actual right ascension / declination, so the
@@ -113,12 +118,20 @@
     return { x: W / 2 + az / span * (W / 2), y: horizon - (alt * 180 / Math.PI) / 90 * horizon * 1.08, alt: alt };
   }
   function twinkle(now, s) { return still ? 0.9 : 0.55 + 0.45 * Math.abs(Math.sin(now * 0.0012 * s.s + s.p)); }
+  // glows are painted once into little sprites and stamped, instead of building a gradient per star per frame
+  var GLOW = {};
+  function glowSprite(col) { if (GLOW[col]) return GLOW[col]; var s = document.createElement('canvas'); s.width = s.height = 64; var x = s.getContext('2d'), g = x.createRadialGradient(32, 32, 0, 32, 32, 32);
+    g.addColorStop(0, col); g.addColorStop(1, 'rgba(255,255,255,0)'); x.fillStyle = g; x.fillRect(0, 0, 64, 64); return (GLOW[col] = s); }
   function dot(x, y, r, col, a, glow) {
-    if (glow) { var g = ctx.createRadialGradient(x, y, 0, x, y, r * 5); g.addColorStop(0, col); g.addColorStop(1, 'rgba(255,255,255,0)');
-      ctx.globalAlpha = a * 0.4; ctx.fillStyle = g; ctx.beginPath(); ctx.arc(x, y, r * 5, 0, 6.28); ctx.fill(); }
-    ctx.globalAlpha = a; ctx.fillStyle = col; ctx.beginPath(); ctx.arc(x, y, r, 0, 6.28); ctx.fill();
+    if (glow) { ctx.globalAlpha = a * 0.4; ctx.drawImage(glowSprite(col), x - r * 5, y - r * 5, r * 10, r * 10); }
+    ctx.globalAlpha = a; ctx.fillStyle = col;
+    if (r < 1.3) { ctx.fillRect(x - r, y - r, r * 2, r * 2); return; } // tiny stars: a square is indistinguishable and far cheaper
+    ctx.beginPath(); ctx.arc(x, y, r, 0, 6.28); ctx.fill();
   }
+  var lastDraw = 0;
   function draw(now) {
+    // about 30 frames a second is plenty for a slowly turning sky, and halves the work
+    if (!still) { requestAnimationFrame(draw); if (now - lastDraw < 32 || document.hidden) return; lastDraw = now; }
     var L = lst(t0 + (now - p0) * SPEED);
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0); ctx.clearRect(0, 0, W, Hh);
     for (var i = 0; i < field.length; i++) { var f = field[i], p = project(f.ra, f.dec, L); if (!p || p.x < -10 || p.x > W + 10) continue;
@@ -147,8 +160,8 @@
       if (n >= 3) { ctx.globalAlpha = 0.35; ctx.fillStyle = '#cfe0ff'; ctx.fillText(k.name.toLowerCase(), sx / n + 10, sy / n - 12); }
     });
     ctx.globalAlpha = 1;
-    if (!still) requestAnimationFrame(draw); else setTimeout(function () { draw(performance.now()); }, 60000);
+    if (still) setTimeout(function () { draw(performance.now()); }, 60000);
   }
-  size(); draw(performance.now());
+  size(); lastDraw = -1e9; draw(performance.now());
   addEventListener('resize', function () { size(); if (still) draw(performance.now()); });
 })();

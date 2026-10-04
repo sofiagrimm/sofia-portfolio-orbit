@@ -303,6 +303,7 @@
   .nav-links a{white-space:nowrap}
   @media (max-width:1400px){.nav-links a{padding:7px 10px;letter-spacing:.1em}}
   @media (max-width:1240px){.nav-links a{padding:6px 7px;font-size:12px;letter-spacing:.07em}.nav-links .divider{display:none}}
+  html,body{overflow-x:clip}
 </style>
   <style>
     /* six tabs: let the nav scroll sideways on small screens instead of spilling off */
@@ -702,8 +703,8 @@
   <!-- Stars background -->
   <script type="module">
     import('https://unpkg.com/three@0.161.0/build/three.module.js').then(THREE=>{
-      const renderer=new THREE.WebGLRenderer({antialias:true,alpha:false});
-      renderer.setPixelRatio(Math.min(window.devicePixelRatio,2));
+      const renderer=new THREE.WebGLRenderer({antialias:false,alpha:false,powerPreference:'low-power'});
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio,1.25));
       renderer.setSize(window.innerWidth,window.innerHeight);
       renderer.setClearColor(0x060d18,1);
       document.body.appendChild(renderer.domElement);
@@ -720,7 +721,7 @@
       geo.setAttribute('aSize',new THREE.BufferAttribute(sz,1));
       const mat=new THREE.ShaderMaterial({uniforms:{time:{value:0}},vertexShader:`attribute float aSize;attribute float phase;attribute float speed;uniform float time;varying float vB;void main(){float r=abs(sin(time*speed+phase));vB=.7+.3*pow(r,.3);vec4 mv=modelViewMatrix*vec4(position,1.);gl_PointSize=aSize*(1.+2.*max(0.,r-.75)/.25)*(300./-mv.z);gl_Position=projectionMatrix*mv;}`,fragmentShader:`varying float vB;void main(){vec2 uv=gl_PointCoord-vec2(.5);if(length(uv)>.5)discard;float c=1.-smoothstep(0.,.45,length(uv));gl_FragColor=vec4(vec3(.75,.88,1.)*vB,c*vB);}`,transparent:true,depthWrite:false});
       scene.add(new THREE.Points(geo,mat));
-      (function loop(t){requestAnimationFrame(loop);mat.uniforms.time.value=t*.001;renderer.render(scene,camera);})(0);
+      (function(){let last=-1e9;const still=matchMedia('(prefers-reduced-motion: reduce)').matches;function loop(t){if(!still)requestAnimationFrame(loop);if(document.hidden||t-last<32)return;last=t;mat.uniforms.time.value=t*.001;renderer.render(scene,camera);}requestAnimationFrame(loop);})();
     });
   </script>
 <script src="gh.js"></script>

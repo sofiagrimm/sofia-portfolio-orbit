@@ -199,6 +199,7 @@
   .nav-links a{white-space:nowrap}
   @media (max-width:1400px){.nav-links a{padding:7px 10px;letter-spacing:.1em}}
   @media (max-width:1240px){.nav-links a{padding:6px 7px;font-size:12px;letter-spacing:.07em}.nav-links .divider{display:none}}
+  html,body{overflow-x:clip}
 </style>
   <style>
     /* six tabs: let the nav scroll sideways on small screens instead of spilling off */
@@ -352,7 +353,7 @@
     const container = canvas.parentElement;
 
     const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: false });
-    renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+    renderer.setPixelRatio(Math.min(devicePixelRatio,1.5));
     renderer.setClearColor(0x060d18, 1);
 
     const scene = new THREE.Scene();
