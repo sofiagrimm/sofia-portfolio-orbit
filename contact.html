@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Contact | Sofia Grimm</title>
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Inter:wght@300;400;500&family=IM+Fell+English:ital@0;1&family=IM+Fell+English+SC&family=Pinyon+Script&family=Nanum+Pen+Script&family=Courier+Prime:wght@400;700&family=DM+Serif+Display&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Inter:wght@300;400;500&family=IM+Fell+English:ital@0;1&family=IM+Fell+English+SC&family=Pinyon+Script&family=Nanum+Pen+Script&family=Courier+Prime:wght@400;700&family=DM+Serif+Display&family=Gwendolyn:wght@700&display=swap');
     *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
     html,body{width:100%;min-height:100%;background:#060d18;font-family:'Inter',sans-serif;color:#e9f0ff;}
     canvas{display:block;position:fixed;inset:0;z-index:0}
@@ -135,6 +135,22 @@
     .ks-flower{width:19%;right:-9%;top:-12%;transform:rotate(18deg)}
     .emboss-front{position:absolute;left:32%;width:36%;bottom:5%}
     @media (max-width:720px){.ks-ace{display:none}.ks-flower{width:17%;right:-3%;top:-9%}}
+    /* the postcard that slips out after the letter */
+    .postcard{position:absolute;z-index:8;left:var(--pcX);top:var(--pcY);width:var(--pcW);aspect-ratio:3/2;opacity:0;visibility:hidden;
+      transform:translateY(40px) rotate(-4deg) scale(.92);transition:opacity .6s ease,transform .9s cubic-bezier(.2,.8,.25,1);filter:drop-shadow(0 16px 24px rgba(0,0,0,.45))}
+    .postcard.in{opacity:1;visibility:visible;transform:rotate(5deg)}
+    .pc-frame{position:absolute;inset:0;width:100%;height:100%}
+    .pc-inner{position:absolute;inset:7.5% 6%;background:#f4efe1;border-radius:3px;display:grid;grid-template-columns:1.25fr 1fr;padding:9% 5% 5%;gap:4%}
+    .pc-inner::before{content:"";position:absolute;left:55%;top:18%;bottom:12%;width:1px;background:#c9c0ad}
+    .pc-head{position:absolute;top:5%;left:0;right:0;text-align:center;font-family:'Courier Prime',monospace;font-size:clamp(8px,1.6vw,11px);letter-spacing:.2em;color:#9a917f}
+    .pc-bow{position:absolute;left:4%;top:3%;width:16%;transform:rotate(-12deg)}
+    .pc-msg{font-family:'Gwendolyn',cursive;font-weight:700;color:#a1243a;font-size:clamp(15px,3.1vw,22px);line-height:1.05;margin-top:6%}
+    .pc-right{position:relative;display:flex;flex-direction:column;align-items:flex-end;gap:6px}
+    .pc-stamp{width:30%;transform:rotate(3deg)}
+    .pc-waves{position:absolute;right:22%;top:6%;width:42%}
+    .pc-lines{width:100%;margin-top:auto;display:grid;gap:clamp(6px,1.6vw,12px);margin-bottom:6%}
+    .pc-lines span{display:block;border-bottom:1px solid #c9c0ad;font-family:'Gwendolyn',cursive;font-weight:700;color:#a1243a;font-size:clamp(13px,2.4vw,18px);line-height:1.1;min-height:1.1em}
+    @media (prefers-reduced-motion:reduce){.postcard{transition:none}}
     .hint{font-family:'Nanum Pen Script',cursive;font-size:28px;color:#c9d6ff;text-align:center;margin-top:10px;opacity:0;transition:opacity .5s}
     .hint.on{opacity:1}
     .sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
@@ -296,6 +312,25 @@
           </g>
         </svg>
       </button>
+      <aside class="postcard" id="postcard" aria-label="A postcard from Sofia">
+        <svg class="pc-frame" viewBox="0 0 450 300" preserveAspectRatio="none" aria-hidden="true"><defs><mask id="pcPerf"><rect width="450" height="300" fill="#fff"/><g fill="#000"><circle cx="22" cy="0" r="9"/><circle cx="22" cy="300" r="9"/><circle cx="56" cy="0" r="9"/><circle cx="56" cy="300" r="9"/><circle cx="90" cy="0" r="9"/><circle cx="90" cy="300" r="9"/><circle cx="124" cy="0" r="9"/><circle cx="124" cy="300" r="9"/><circle cx="158" cy="0" r="9"/><circle cx="158" cy="300" r="9"/><circle cx="192" cy="0" r="9"/><circle cx="192" cy="300" r="9"/><circle cx="226" cy="0" r="9"/><circle cx="226" cy="300" r="9"/><circle cx="260" cy="0" r="9"/><circle cx="260" cy="300" r="9"/><circle cx="294" cy="0" r="9"/><circle cx="294" cy="300" r="9"/><circle cx="328" cy="0" r="9"/><circle cx="328" cy="300" r="9"/><circle cx="362" cy="0" r="9"/><circle cx="362" cy="300" r="9"/><circle cx="396" cy="0" r="9"/><circle cx="396" cy="300" r="9"/><circle cx="430" cy="0" r="9"/><circle cx="430" cy="300" r="9"/><circle cx="0" cy="22" r="9"/><circle cx="450" cy="22" r="9"/><circle cx="0" cy="56" r="9"/><circle cx="450" cy="56" r="9"/><circle cx="0" cy="90" r="9"/><circle cx="450" cy="90" r="9"/><circle cx="0" cy="124" r="9"/><circle cx="450" cy="124" r="9"/><circle cx="0" cy="158" r="9"/><circle cx="450" cy="158" r="9"/><circle cx="0" cy="192" r="9"/><circle cx="450" cy="192" r="9"/><circle cx="0" cy="226" r="9"/><circle cx="450" cy="226" r="9"/><circle cx="0" cy="260" r="9"/><circle cx="450" cy="260" r="9"/><circle cx="0" cy="294" r="9"/><circle cx="450" cy="294" r="9"/></g></mask></defs>
+          <rect width="450" height="300" fill="#eda9ba" mask="url(#pcPerf)"/></svg>
+        <div class="pc-inner">
+          <div class="pc-head" aria-hidden="true">POSTCARD</div>
+          <svg class="pc-bow" viewBox="0 0 120 90" aria-hidden="true"><defs><linearGradient id="pcSatin" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fbd7e0"/><stop offset=".45" stop-color="#f0a7ba"/><stop offset=".7" stop-color="#fbd2dc"/><stop offset="1" stop-color="#e48aa2"/></linearGradient></defs>
+            <path d="M58 34 C40 10 8 4 6 22 C4 38 30 44 56 40Z" fill="url(#pcSatin)" stroke="#d98197" stroke-width="1.2"/><path d="M62 34 C80 10 112 4 114 22 C116 38 90 44 64 40Z" fill="url(#pcSatin)" stroke="#d98197" stroke-width="1.2"/>
+            <path d="M54 42 C46 58 34 74 24 86 L34 88 C42 76 52 62 58 46Z" fill="url(#pcSatin)" stroke="#d98197" stroke-width="1.2"/><path d="M66 42 C74 58 86 74 96 86 L86 88 C78 76 68 62 62 46Z" fill="url(#pcSatin)" stroke="#d98197" stroke-width="1.2"/>
+            <ellipse cx="60" cy="38" rx="9" ry="10" fill="url(#pcSatin)" stroke="#d98197" stroke-width="1.2"/></svg>
+          <p class="pc-msg">hi,<br>this is a tiny reminder that you're welcome here.<br><br>take a look around, and write whenever.</p>
+          <div class="pc-right" aria-hidden="true">
+            <svg class="pc-stamp" viewBox="0 0 60 72"><rect x="1" y="1" width="58" height="70" fill="#fff" stroke="#e7b3c0" stroke-dasharray="3 2"/><rect x="6" y="6" width="48" height="60" fill="#f6d3dc"/>
+              <circle cx="30" cy="34" r="11" fill="#fbeaf0" stroke="#c86f86" stroke-width="1.4"/><ellipse cx="30" cy="34" rx="19" ry="5" fill="none" stroke="#c86f86" stroke-width="1.4" transform="rotate(-18 30 34)"/>
+              <text x="30" y="17" text-anchor="middle" font-family="Courier New,monospace" font-size="6" fill="#a8546b">NEW HAVEN</text><text x="48" y="61" text-anchor="end" font-family="Courier New,monospace" font-size="7" fill="#a8546b">29¢</text></svg>
+            <svg class="pc-waves" viewBox="0 0 80 40" fill="none" stroke="#c8413b" stroke-width="1.4" opacity=".7"><path d="M0 8 q8 -5 16 0 t16 0 t16 0 t16 0 t16 0"/><path d="M0 16 q8 -5 16 0 t16 0 t16 0 t16 0 t16 0"/><path d="M0 24 q8 -5 16 0 t16 0 t16 0 t16 0 t16 0"/><path d="M0 32 q8 -5 16 0 t16 0 t16 0 t16 0 t16 0"/></svg>
+            <div class="pc-lines"><span>to: you</span><span>wherever you are</span><span></span></div>
+          </div>
+        </div>
+      </aside>
     </div>
     <p class="hint" id="hint">break the seal</p>
     <noscript><p style="text-align:center;color:#dfe7ff">Email me at <a style="color:#fff" href="mailto:sofia.grimm@yale.edu">sofia.grimm@yale.edu</a>.</p></noscript>
@@ -331,6 +366,7 @@
     function layout(){
       const W=stage.clientWidth,E=W*.62,P=E*.8,LW=W*.88,S=Math.min(100,W*.17);
       Object.assign(g,{W,E,P,LW,S,Y0:P+40,Yf:3*P-E*.32});
+      const r0=stage.style,pcW=W*(W<560?.86:.62);r0.setProperty('--pcW',pcW+'px');r0.setProperty('--pcX',(W<560?(W-pcW)/2:W-pcW+W*.04)+'px');r0.setProperty('--pcY',(3*P-E*.32+E*.18)+'px');
       const r=stage.style;
       r.setProperty('--W',W+'px');r.setProperty('--E',E+'px');r.setProperty('--P',P+'px');r.setProperty('--LW',LW+'px');r.setProperty('--LX',(W-LW)/2+'px');r.setProperty('--S',S+'px');
       const svg=$('waxsvg');svg.style.width=(S*1.6)+'px';svg.style.height=(S*3.2)+'px';svg.style.left=(W/2-S*.8)+'px';svg.style.top=(E*.58-S*3.2*.75)+'px';
@@ -466,6 +502,7 @@
       sound.unfold();letter.classList.add('unfold-top');await wait(1200);
       sound.unfold();letter.classList.add('unfold-bottom');await wait(1200);
       letter.classList.add('done');flat.removeAttribute('aria-hidden');
+      sound.slide(.7);stage.style.setProperty('--stageH',(g.Yf+g.E*.18+(parseFloat(stage.style.getPropertyValue('--pcW'))/1.5)+60)+'px');$('postcard').classList.add('in');
       const first=flat.querySelector('a');if(first)first.focus({preventScroll:true});
     }
     seal.addEventListener('click',openLetter);
