@@ -18,9 +18,8 @@
     background:radial-gradient(ellipse 48% 44% at 50% 46%,rgba(255,250,232,.13),transparent 72%),
       radial-gradient(ellipse 105% 92% at 50% 46%,transparent 40%,rgba(1,8,16,.82) 100%),
       linear-gradient(180deg,rgba(6,16,48,.45),transparent 38%,transparent 70%,rgba(1,8,16,.35))}
-  #pool .dof{position:absolute;inset:0;pointer-events:none;-webkit-backdrop-filter:blur(5px);backdrop-filter:blur(5px);transition:opacity 1s;
-    -webkit-mask-image:radial-gradient(ellipse 52% 48% at 50% 48%,transparent 58%,#000 100%);mask-image:radial-gradient(ellipse 52% 48% at 50% 48%,transparent 58%,#000 100%)}
-  #pool .film{position:absolute;inset:-20%;pointer-events:none;opacity:.14;mix-blend-mode:overlay;animation:film .6s steps(4) infinite;transition:opacity 1s;
+  #pool .dof{position:absolute;inset:0;pointer-events:none;transition:opacity 1s;background:radial-gradient(ellipse 58% 54% at 50% 48%,transparent 62%,rgba(0,10,14,.35) 100%)}
+  #pool .film{position:absolute;inset:-20%;pointer-events:none;opacity:.07;will-change:transform;animation:film .6s steps(4) infinite;transition:opacity 1s;
     background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23n)'/%3E%3C/svg%3E")}
   @keyframes film{0%{transform:translate(0,0)}25%{transform:translate(-3%,2%)}50%{transform:translate(2%,-3%)}75%{transform:translate(-2%,-1%)}100%{transform:translate(1%,3%)}}
   #pool .flash{position:absolute;inset:0;pointer-events:none;background:#fff8e6;opacity:0}
@@ -41,24 +40,31 @@
   #pool .shade{position:absolute;left:50%;top:0;width:min(46vw,560px);transform:translate(-50%,-42%);pointer-events:none;z-index:1;transform-origin:50% -200px;animation:sway 6s ease-in-out infinite alternate;transition:top 1.4s cubic-bezier(.6,0,.3,1),opacity 1s}
   #pool .shade.gone{top:-40vh;opacity:0}
   @keyframes sway{from{rotate:-1.6deg}to{rotate:1.6deg}}
-  #pool .lamp{animation:glow 6s ease-in-out infinite alternate}
-  @keyframes glow{from{background-position:-2vw 0,0 0}to{background-position:2vw 0,0 0}}
+  #pool .lamp{animation:glow 6s ease-in-out infinite alternate;will-change:transform;inset:-4% !important}
+  @keyframes glow{from{transform:translateX(-2vw)}to{transform:translateX(2vw)}}
   #pool .bar{position:absolute;left:0;right:0;height:0;background:#0b0b0c;z-index:3;transition:height .35s cubic-bezier(.3,0,.2,1)}
   #pool .bar.t{top:0}#pool .bar.b{bottom:0}
   #pool.cine .bar{height:9vh}
   #pool .stamp{position:absolute;left:50%;top:46%;z-index:4;pointer-events:none;font:200 clamp(56px,9vw,130px)/1 'Inter','Helvetica Neue',Arial,sans-serif;letter-spacing:.45em;text-indent:.45em;color:#f3eee4;
     text-shadow:0 0 40px rgba(159,216,214,.55);opacity:0;transform:translate(-50%,-50%) rotate(0deg) scale(1.6)}
   #pool .pdie{cursor:pointer}
-  html.pool-moving body > *:not(#pool){translate:var(--pool-dx,0px) var(--pool-dy,0px);will-change:translate;backface-visibility:hidden}
+  html.pool-moving body > *:not(#pool):not(script):not(style){will-change:transform;backface-visibility:hidden}
   `;
   var st = document.createElement('style'); st.textContent = css; document.head.appendChild(st);
 
   var NS = 'http://www.w3.org/2000/svg';
+  var pageLayers = null;
+  function movePage(x, y, hide) {
+    // re-read each time: the table adds a few of its own layers once the page has loaded
+    pageLayers = [].filter.call(document.body.children, function (e) { return e.id !== 'pool' && e.tagName !== 'SCRIPT' && e.tagName !== 'STYLE'; });
+    var t = (x || y) ? 'translate3d(' + x + 'px,' + y + 'px,0)' : '';
+    for (var i = 0; i < pageLayers.length; i++) { pageLayers[i].style.transform = t; pageLayers[i].style.visibility = hide ? 'hidden' : ''; }
+  }
   var pool = document.createElement('div'); pool.id = 'pool'; pool.tabIndex = 0;
   pool.setAttribute('role', 'dialog'); pool.setAttribute('aria-label', 'Opening: break the rack to get to the card table');
   pool.innerHTML = '<div class="world"><svg></svg></div><div class="dof"></div><div class="lamp"></div><div class="film"></div><div class="flash"></div>' +
     '<p class="prompt"><b>break the rack.</b>drag back to aim &amp; pull<br>then let go</p><div class="banner">sofia grimm\u2019s <span>pool hall</span> &amp; card room</div>' +
-    '<div class="motes">' + Array.from({ length: 16 }, function (_, i) { return '<i style="left:' + (20 + Math.random() * 60) + '%;top:' + (15 + Math.random() * 60) + '%;--d:' + (8 + Math.random() * 8) + 's;--dl:-' + (Math.random() * 10) + 's;--mx:' + ((Math.random() - .5) * 120) + 'px;--my:' + (-40 - Math.random() * 80) + 'px"></i>'; }).join('') + '</div>' +
+    '<div class="motes">' + Array.from({ length: 8 }, function (_, i) { return '<i style="left:' + (20 + Math.random() * 60) + '%;top:' + (15 + Math.random() * 60) + '%;--d:' + (8 + Math.random() * 8) + 's;--dl:-' + (Math.random() * 10) + 's;--mx:' + ((Math.random() - .5) * 120) + 'px;--my:' + (-40 - Math.random() * 80) + 'px"></i>'; }).join('') + '</div>' +
     '<div class="meter"><b></b><small>power</small></div><button class="skip" type="button">skip</button><button class="snd" type="button" aria-pressed="true">sound: on</button>' +
     '<div class="bar t"></div><div class="bar b"></div><div class="stamp" aria-hidden="true">BREAK</div>' +
     '<svg class="shade" viewBox="0 0 560 260" aria-hidden="true"><path d="M280 0 V60" stroke="#1a1a1a" stroke-width="5"/><path d="M40 230 Q60 90 280 70 Q500 90 520 230Z" fill="#1f5a3c"/>' +
@@ -228,13 +234,13 @@
     // the real page sits just past the foot rail and slides in with the camera; while it's
     // far off screen it's parked once instead of being moved every frame
     var dist = END - cam.u;
-    if (dist > SU * 1.05) { if (!pageParked) { pageParked = true; var far = P(SU * 1.5, 0); document.documentElement.style.setProperty('--pool-dx', far.x + 'px'); document.documentElement.style.setProperty('--pool-dy', far.y + 'px'); } return; }
+    if (dist > SU * 1.05) { if (!pageParked) { pageParked = true; var far = P(SU * 1.5, 0); movePage(far.x, far.y, true); } return; }
     pageParked = false; var pd = P(dist, 0);
     // as the card table comes into view, drop the costly lens blur and film grain first,
     // so the slide onto the table is just two flat layers moving together
     if (!fxOff) { fxOff = true; ['.dof', '.film'].forEach(function (q) { var e = pool.querySelector(q); if (!e) return;
       e.animate([{ opacity: getComputedStyle(e).opacity }, { opacity: 0 }], { duration: 500, fill: 'forwards' }).finished.then(function () { e.style.display = 'none'; }); }); }
-    document.documentElement.style.setProperty('--pool-dx', (pd.x + sx) + 'px'); document.documentElement.style.setProperty('--pool-dy', (pd.y + sy) + 'px');
+    movePage(pd.x + sx, pd.y + sy);
   }
 
   function draw() {
@@ -390,7 +396,7 @@
   }
 
   function cleanup() {
-    document.documentElement.classList.remove('pool-moving'); document.documentElement.style.removeProperty('--pool-dx'); document.documentElement.style.removeProperty('--pool-dy');
+    document.documentElement.classList.remove('pool-moving'); movePage(0, 0);
     document.documentElement.style.overflow = ''; pool.remove(); st.remove();
   }
   function finish() {

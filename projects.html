@@ -221,6 +221,10 @@
     #cornerSpill{position:absolute;top:70px;right:0;width:clamp(260px,26vw,430px);z-index:3;pointer-events:none;filter:drop-shadow(-10px 14px 18px rgba(0,0,0,.45))}
     #cornerSpill svg{display:block;width:100%;height:auto}
     html,body{overflow-x:clip}
+    .chipset{position:relative;width:100%;aspect-ratio:140/120}
+    .chipset .stack{position:absolute}
+    .chipset .chip{position:absolute;display:block;height:auto;will-change:transform;-webkit-user-drag:none;user-select:none}
+    .chipset .cshadow{position:absolute;border-radius:50%;background:radial-gradient(closest-side,rgba(0,0,0,.42),rgba(0,0,0,0))}
   </style>
 </head>
 <body>
@@ -698,39 +702,42 @@
         <path d="M0 -62 C-20 -80 -40 -70 -36 -52 M0 -62 C20 -80 40 -70 36 -52 M0 62 C-20 80 -40 70 -36 52 M0 62 C20 80 40 70 36 52"/>
         <circle r="6" fill="#f3f7ef"/></g></svg>`;
   }
-  // Chips drawn as real stacks seen from a little above: each chip has a coloured edge with
-  // white inserts running round it, a glossy top with an inlay ring, and the stack wobbles a
-  // touch where the chips don't sit perfectly square. Each chip is still its own group so a
-  // stack can be lifted and dropped back chip by chip.
-  let chipUid=0;
+  // Chips drawn as real stacks seen from a little above. Each chip design is drawn once into an
+  // image and every chip on the table is just that picture, positioned with plain CSS, so lifting
+  // and dropping them is handled by the graphics card instead of redrawing vector art every frame.
+  const CHIP_RX=22,CHIP_RY=10,CHIP_TH=6.2;
+  const CHIP_COL=[['#1d7a4f','#f4f1ea'],['#f4f1ea','#1d7a4f'],['#c8232c','#f6f2ec'],['#151517','#f2f1ec'],['#2457a8','#f4f1ea'],['#e0b23f','#7a5a1c']];
+  const CHIP_IMG={};
+  function chipSrc(c,turnIdx){
+    const key=c+'-'+turnIdx;if(CHIP_IMG[key])return CHIP_IMG[key];
+    const [col,edge]=CHIP_COL[c],RX=CHIP_RX,RY=CHIP_RY,TH=CHIP_TH,turn=turnIdx*11.25*Math.PI/180;
+    let band=`<path d="M${-RX} 0 A${RX} ${RY} 0 0 0 ${RX} 0 L${RX} ${TH} A${RX} ${RY} 0 0 1 ${-RX} ${TH}Z" fill="${col}"/>`;
+    for(let k=0;k<8;k++){const th=(k/8)*Math.PI*2+turn,cc=Math.cos(th),sn=Math.sin(th);if(sn<=.05)continue;
+      const bx=RX*cc,by=RY*sn,w=Math.max(.8,3.6*sn);band+=`<rect x="${(bx-w).toFixed(2)}" y="${(by+.4).toFixed(2)}" width="${(2*w).toFixed(2)}" height="${(TH-.8).toFixed(2)}" fill="${edge}"/>`;}
+    band+=`<path d="M${-RX} 0 A${RX} ${RY} 0 0 0 ${RX} 0 L${RX} ${TH} A${RX} ${RY} 0 0 1 ${-RX} ${TH}Z" fill="url(#s)"/>`;
+    let top=`<ellipse rx="${RX}" ry="${RY}" fill="${col}"/>`;
+    for(let k=0;k<8;k++){const th=(k/8)*Math.PI*2+turn;
+      top+=`<g transform="translate(${(RX*.86*Math.cos(th)).toFixed(2)} ${(RY*.86*Math.sin(th)).toFixed(2)}) scale(1 ${RY/RX})"><rect x="-2.6" y="-1.8" width="5.2" height="3.6" fill="${edge}" transform="rotate(${(th*180/Math.PI+90).toFixed(1)})"/></g>`;}
+    top+=`<ellipse rx="${RX*.66}" ry="${RY*.66}" fill="none" stroke="${edge}" stroke-width=".9" opacity=".75"/><ellipse rx="${RX*.56}" ry="${RY*.56}" fill="${col}" stroke="#000" stroke-opacity=".25" stroke-width=".6"/><ellipse rx="${RX}" ry="${RY}" fill="url(#t)"/>`;
+    const svg=`<svg xmlns="http://www.w3.org/2000/svg" viewBox="${-RX-2} ${-RY-2} ${2*RX+4} ${2*RY+TH+4}" width="${(2*RX+4)*4}" height="${(2*RY+TH+4)*4}"><defs>
+      <linearGradient id="s" x1="0" x2="1"><stop offset="0" stop-color="#000" stop-opacity=".5"/><stop offset=".3" stop-color="#fff" stop-opacity=".12"/><stop offset=".55" stop-color="#fff" stop-opacity=".02"/><stop offset="1" stop-color="#000" stop-opacity=".55"/></linearGradient>
+      <radialGradient id="t" cx="40%" cy="30%" r="75%"><stop offset="0" stop-color="#fff" stop-opacity=".35"/><stop offset=".55" stop-color="#fff" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".2"/></radialGradient></defs>${band}${top}</svg>`;
+    return (CHIP_IMG[key]='data:image/svg+xml;charset=utf-8,'+encodeURIComponent(svg));
+  }
   function chips(stacks){
-    const RX=22,RY=10,TH=6.2;
-    const COL=[['#1d7a4f','#f4f1ea'],['#f4f1ea','#1d7a4f'],['#c8232c','#f6f2ec'],['#151517','#f2f1ec'],['#2457a8','#f4f1ea'],['#e0b23f','#7a5a1c']];
-    const id='cg'+(chipUid++);
-    const defs=`<defs><linearGradient id="${id}s" x1="0" x2="1"><stop offset="0" stop-color="#000" stop-opacity=".5"/><stop offset=".3" stop-color="#fff" stop-opacity=".12"/><stop offset=".55" stop-color="#fff" stop-opacity=".02"/><stop offset="1" stop-color="#000" stop-opacity=".55"/></linearGradient>
-      <radialGradient id="${id}t" cx="40%" cy="30%" r="75%"><stop offset="0" stop-color="#fff" stop-opacity=".35"/><stop offset=".55" stop-color="#fff" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".2"/></radialGradient></defs>`;
-    const one=(x,y,n,col,edge,seed)=>{
-      let g=`<g class="stack" data-n="${n}"><ellipse cx="${x+2}" cy="${y+(n-1)*TH+TH+RY*.55}" rx="${RX*1.25}" ry="${RY*1.15}" fill="#000" opacity=".35"/>`;
+    const RX=CHIP_RX,RY=CHIP_RY,TH=CHIP_TH,IW=2*RX+4,IH=2*RY+TH+4;
+    let html='<div class="chipset">';
+    stacks.forEach(([x,y0,n,c],k)=>{
+      const y=y0-(n-1)*2,sx=x-RX-6,sy=y-RY-6,sw=2*RX+12,sh=(n-1)*TH+2*RY+TH+18;
+      html+=`<div class="stack" data-n="${n}" data-sw="${sw}" style="left:${sx/140*100}%;top:${sy/120*100}%;width:${sw/140*100}%;height:${sh/120*100}%">`+
+        `<i class="cshadow" style="left:${(x-RX*1.25+2-sx)/sw*100}%;top:${(y+(n-1)*TH+TH+RY*.55-RY*1.15-sy)/sh*100}%;width:${RX*2.5/sw*100}%;height:${RY*2.3/sh*100}%"></i>`;
       for(let j=n-1;j>=0;j--){
-        const jit=Math.sin((j+1)*12.9898+seed*78.233)*43758.5453,dx=((jit-Math.floor(jit))-.5)*2.6,cx=x+dx,cy=y+j*TH,turn=((jit*7)%1)*45;
-        // the edge band: front half of the cylinder, with white inserts foreshortened round the curve
-        let band=`<path d="M${cx-RX} ${cy} A${RX} ${RY} 0 0 0 ${cx+RX} ${cy} L${cx+RX} ${cy+TH} A${RX} ${RY} 0 0 1 ${cx-RX} ${cy+TH}Z" fill="${col}"/>`;
-        for(let k=0;k<8;k++){const th=(k/8)*Math.PI*2+turn*Math.PI/180,c=Math.cos(th),sn=Math.sin(th);if(sn<=.05)continue;
-          const bx=cx+RX*c,by=cy+RY*sn,w=Math.max(.8,3.6*sn);
-          band+=`<path d="M${(bx-w).toFixed(2)} ${(by+.4).toFixed(2)} L${(bx+w).toFixed(2)} ${(by+.4).toFixed(2)} L${(bx+w).toFixed(2)} ${(by+TH-.4).toFixed(2)} L${(bx-w).toFixed(2)} ${(by+TH-.4).toFixed(2)}Z" fill="${edge}"/>`;}
-        band+=`<path d="M${cx-RX} ${cy} A${RX} ${RY} 0 0 0 ${cx+RX} ${cy} L${cx+RX} ${cy+TH} A${RX} ${RY} 0 0 1 ${cx-RX} ${cy+TH}Z" fill="url(#${id}s)"/>`;
-        // the top face
-        let top=`<ellipse cx="${cx}" cy="${cy}" rx="${RX}" ry="${RY}" fill="${col}"/>`;
-        for(let k=0;k<8;k++){const th=(k/8)*Math.PI*2+turn*Math.PI/180;
-          top+=`<g transform="translate(${(cx+RX*.86*Math.cos(th)).toFixed(2)} ${(cy+RY*.86*Math.sin(th)).toFixed(2)}) scale(1 ${RY/RX})"><rect x="-2.6" y="-1.8" width="5.2" height="3.6" fill="${edge}" transform="rotate(${(th*180/Math.PI+90).toFixed(1)})"/></g>`;}
-        top+=`<ellipse cx="${cx}" cy="${cy}" rx="${RX*.66}" ry="${RY*.66}" fill="none" stroke="${edge}" stroke-width=".9" opacity=".75"/>
-          <ellipse cx="${cx}" cy="${cy}" rx="${RX*.56}" ry="${RY*.56}" fill="${col}" stroke="#000" stroke-opacity=".25" stroke-width=".6"/>
-          <ellipse cx="${cx}" cy="${cy}" rx="${RX}" ry="${RY}" fill="url(#${id}t)"/>`;
-        g+=`<g class="chip" data-j="${j}" data-cx="${cx.toFixed(2)}" data-cy="${cy.toFixed(2)}">${band}${top}</g>`;
+        const jit=Math.sin((j+1)*12.9898+(k+n)*78.233)*43758.5453,f=jit-Math.floor(jit),dx=(f-.5)*2.6,cx=x+dx,cy=y+j*TH;
+        html+=`<img class="chip" data-j="${j}" alt="" draggable="false" src="${chipSrc(c||0,Math.floor(f*8))}" style="left:${(cx-RX-2-sx)/sw*100}%;top:${(cy-RY-2-sy)/sh*100}%;width:${IW/sw*100}%">`;
       }
-      return g+`</g>`;};
-    let g='';stacks.forEach(([x,y,n,c],k)=>{const [a,b]=COL[c||0];g+=one(x,y-(n-1)*2,n,a,b,k+n);});
-    return `<svg viewBox="0 0 140 120" xmlns="http://www.w3.org/2000/svg" style="overflow:visible">${defs}${g}</svg>`;
+      html+='</div>';
+    });
+    return html+'</div>';
   }
   function dice(){
     const pipsAt={1:[[0,0]],2:[[-7,-7],[7,7]],3:[[-7,-7],[0,0],[7,7]],4:[[-7,-7],[7,-7],[-7,7],[7,7]],5:[[-7,-7],[7,-7],[0,0],[-7,7],[7,7]],6:[[-7,-7],[7,-7],[-7,0],[7,0],[-7,7],[7,7]]};
@@ -1074,10 +1081,11 @@
     document.querySelectorAll('#table .stack').forEach(st=>{
       if(st.dataset.wired)return;st.dataset.wired='1';
       const els=[...st.querySelectorAll('.chip')].sort((a,b)=>b.dataset.j-a.dataset.j); // bottom first
-      const n=els.length,cx=+(els[0].dataset.cx||0);
-      const chips=els.map((el,i)=>({el,i,y:0,v:0,x:0,vx:0,r:0,mode:'rest',cy:+(el.dataset.cy||0)}));
-      let running=false,timers=[];
-      const render=c=>c.el.setAttribute('transform',`translate(${c.x.toFixed(2)} ${c.y.toFixed(2)}) rotate(${c.r.toFixed(2)} ${cx} ${c.cy})`);
+      const n=els.length,sw=+st.dataset.sw||56;
+      const chips=els.map((el,i)=>({el,i,y:0,v:0,x:0,vx:0,r:0,mode:'rest'}));
+      let running=false,timers=[],k=1;
+      // the physics runs in the table's drawing units; one transform per chip moves it on screen
+      const render=c=>{c.el.style.transform=`translate3d(${(c.x*k).toFixed(2)}px,${(c.y*k).toFixed(2)}px,0) rotate(${c.r.toFixed(2)}deg)`;};
       function loop(){
         let busy=false;
         chips.forEach(c=>{
@@ -1096,7 +1104,7 @@
       }
       const go=()=>{if(!running){running=true;requestAnimationFrame(loop);}};
       const clear=()=>{timers.forEach(clearTimeout);timers=[];};
-      const raise=()=>{clear();chipAudio.lift();
+      const raise=()=>{clear();chipAudio.lift();k=st.clientWidth/sw;
         if(stillChips){chips.forEach(c=>{c.y=-(10+c.i*7.5);render(c);});return;}
         chips.forEach(c=>{c.mode='lift';c.v-=1.5+c.i*.3;});go();};
       const drop=()=>{clear();
@@ -1197,9 +1205,11 @@
   function layoutTable(){
     if(window.__arranging&&layoutTable.done)return;layoutTable.done=true;
     // measure the table where it really sits, even while the opening is sliding it into view
-    const de=document.documentElement,pm=de.classList.contains('pool-moving');if(pm)de.classList.remove('pool-moving');
+    const de=document.documentElement,pm=de.classList.contains('pool-moving');
+    const kids=[...document.body.children],saved=kids.map(k=>k.style.transform);
+    if(pm){de.classList.remove('pool-moving');kids.forEach(k=>{if(k.id!=='pool')k.style.transform='';});}
     cornerSpill();lay();buildFrame();fitArch();clearArch();fillEmpty();wireChips();wireDice();
-    if(pm)de.classList.add('pool-moving');
+    if(pm){de.classList.add('pool-moving');kids.forEach((k,i)=>{if(k.id!=='pool')k.style.transform=saved[i];});}
   }
   addEventListener('load',layoutTable);layoutTable();
   addEventListener('resize',()=>{clearTimeout(layoutTable.t);layoutTable.t=setTimeout(layoutTable,150);});
