@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Contact | Sofia Grimm</title>
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Inter:wght@300;400;500&family=IM+Fell+English:ital@0;1&family=IM+Fell+English+SC&family=Pinyon+Script&family=Nanum+Pen+Script&family=Courier+Prime:wght@400;700&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Inter:wght@300;400;500&family=IM+Fell+English:ital@0;1&family=IM+Fell+English+SC&family=Pinyon+Script&family=Nanum+Pen+Script&family=Courier+Prime:wght@400;700&family=DM+Serif+Display&display=swap');
     *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
     html,body{width:100%;min-height:100%;background:#060d18;font-family:'Inter',sans-serif;color:#e9f0ff;}
     canvas{display:block;position:fixed;inset:0;z-index:0}
@@ -30,97 +30,114 @@
     .nav-links a:hover,.nav-links a.active{color:rgba(220,235,255,0.9);background:rgba(100,140,255,0.08);}
     .nav-links .divider{color:rgba(100,130,200,0.2);font-size:13px;user-select:none;}
 
-    .page{position:relative;z-index:10;max-width:640px;margin:0 auto;padding:118px 24px 90px;}
-    :root{
-      --paper:#efe7d6;--paper-2:#e6dcc6;--paper-shade:#d8ccb2;
-      --ink:#2b2620;--ink-soft:#6a6052;--blue:#6f93d6;--wax:#a3262c;--wax-dark:#741a1f;--postmark:#c2463d;
-    }
-    .lead{font-family:'Nanum Pen Script',cursive;font-size:34px;line-height:1;color:#f1ecdc;transform:rotate(-2deg);margin:0 0 22px 6px}
-    .stack{display:flex;flex-direction:column;align-items:center;gap:18px}
+    .page{position:relative;z-index:10;max-width:680px;margin:0 auto;padding:104px 20px 80px;}
+    :root{--kraft:#e7dcc6;--kraft-2:#d9caad;--kraft-edge:#c4b190;--ink:#2b2620;--navy:#24306b;--wax:#6f1c27;--wax-hi:#a8414e;--wax-lo:#3f0c13}
 
-    /* letter cards: hidden until the seal is broken */
-    .sheet{width:100%;background:radial-gradient(ellipse at 30% 20%,#fdf6f4 0%,#f8ebe8 60%,#efdcd8 100%);color:var(--ink);
-      box-shadow:0 18px 40px rgba(0,0,0,.5),0 2px 4px rgba(0,0,0,.35);border-radius:2px;position:relative;z-index:5}
-    .js .sheet{opacity:0;transform:translateY(140px) scale(.94);max-height:0;margin-bottom:-18px;overflow:hidden;
-      transition:opacity .6s ease,transform .8s cubic-bezier(.2,.8,.2,1),max-height .8s ease,margin .8s ease}
-    .js .open .sheet{opacity:1;transform:none;max-height:520px;margin-bottom:0}
-    .js .stack:not(.open) .sheet{padding-top:0;padding-bottom:0;outline:0;box-shadow:none}
-    .js .open .sheet.second{transition-delay:.25s}
-    .js .open .sheet.first{transition-delay:.55s}
+    .lead{font-family:'Nanum Pen Script',cursive;font-size:32px;line-height:1;color:#f1ecdc;transform:rotate(-2deg);margin:0 0 6px 4px}
+    .readout{display:flex;flex-wrap:wrap;gap:4px 14px;margin:0 0 14px 4px;font-family:'Courier Prime',monospace;font-size:11px;letter-spacing:.06em;color:rgba(200,215,255,.35)}
+    .readout span{transition:color .3s}
+    .readout span.on{color:#f1ecdc}
+    .readout span.done{color:rgba(200,215,255,.6)}
+    .controls{display:flex;gap:10px;margin:0 0 6px 4px}
+    .ctl{font-family:'Courier Prime',monospace;font-size:12px;color:#c9d6ff;background:none;border:1px solid rgba(200,215,255,.25);border-radius:20px;padding:4px 12px;cursor:pointer}
+    .ctl:hover,.ctl:focus-visible{border-color:#c9d6ff;outline:none}
 
-    .member{padding:16px 22px 18px;text-align:center}
-    .member .row{display:flex;justify-content:space-between;font-family:'IM Fell English SC',Georgia,serif;font-size:13px;letter-spacing:.06em;color:var(--ink-soft)}
-    .mono{display:flex;align-items:center;justify-content:center;gap:4px;margin:6px 0 2px;color:var(--blue)}
-    .mono span{font-family:'Pinyon Script',cursive;font-size:clamp(64px,13vw,92px);line-height:1}
-    .mono svg{width:clamp(54px,10vw,74px);height:auto}
-    .member .no{font-family:'IM Fell English SC',Georgia,serif;font-size:13px;letter-spacing:.08em;color:var(--ink-soft)}
+    /* stage: every piece is a sibling so the letter can slip between the envelope's layers */
+    .stage{position:relative;width:100%;height:var(--stageH,640px);transition:height .9s cubic-bezier(.6,0,.2,1)}
+    .stage > *{position:absolute;left:0;top:0}
+    .envpart{left:0;width:var(--W);height:var(--E);transform:translateY(var(--envY));transition:transform 1.1s cubic-bezier(.6,0,.2,1)}
+    .back{z-index:1;border-radius:4px;background:linear-gradient(170deg,#eee4d0,var(--kraft-2));box-shadow:0 26px 50px rgba(0,0,0,.55),0 2px 5px rgba(0,0,0,.35)}
+    .back::after{content:"";position:absolute;inset:0;border-radius:4px;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .3  0 0 0 0 .25  0 0 0 0 .15  0 0 0 .5 0'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)' opacity='.25'/%3E%3C/svg%3E")}
+    .pocket{z-index:3;pointer-events:none}
+    .pocket svg{width:100%;height:100%;display:block}
+    .flapwrap{z-index:5;perspective:1600px;pointer-events:none}
+    .flap{position:absolute;left:0;top:0;width:100%;height:58%;transform-origin:50% 0;transform-style:preserve-3d;transform:rotateX(0deg);filter:drop-shadow(0 3px 3px rgba(60,40,10,.3))}
+    .flap .face{position:absolute;inset:0;clip-path:polygon(0 0,100% 0,52% 98%,50% 100%,48% 98%);backface-visibility:hidden}
+    .flap .out{background:linear-gradient(180deg,#efe6d3,#dfd0b4)}
+    .flap .in{background:linear-gradient(0deg,#e9dcc2,#d6c4a2);transform:rotateX(180deg)}
+    .flap .sheen{position:absolute;inset:0;clip-path:polygon(0 0,100% 0,50% 100%);background:linear-gradient(100deg,transparent 35%,rgba(255,255,255,.45) 50%,transparent 65%);background-size:300% 100%;background-position:120% 0;opacity:0}
+    .flap .sheen.go{animation:sheen 1.4s ease-in-out}
+    @keyframes sheen{0%{opacity:0;background-position:120% 0}30%{opacity:1}100%{opacity:0;background-position:-40% 0}}
+    .flapwrap.behind{z-index:0}
 
-    .invite{padding:clamp(28px,6vw,40px) clamp(24px,6vw,44px) 34px;text-align:left}
-    .js .open .invite,.invite{min-height:0}
-    .open .invite{min-height:330px}
-    .invite h1{font-family:'Nanum Pen Script',cursive;font-weight:400;font-size:clamp(40px,8vw,54px);line-height:.95;color:#24306b;transform:rotate(-2deg);transform-origin:left}
-    .invite p{font-family:'Courier Prime',monospace;font-size:15px;line-height:1.6;color:#3b342b;max-width:36ch;margin:16px 0 0}
-    .invite ul{list-style:none;margin:20px 0 0;display:grid;gap:4px;font-family:'Courier Prime',monospace;font-size:15px}
-    .invite a{color:var(--ink);text-decoration:underline;text-decoration-color:#2b262066;text-underline-offset:3px}
-    .invite a:hover,.invite a:focus-visible{text-decoration-color:var(--ink)}
-    .invite .sig{font-family:'Nanum Pen Script',cursive;font-size:38px;line-height:1;color:#24306b;margin-top:16px;transform:rotate(-4deg);display:inline-block}
+    /* the folded letter: three panels; top folds down over the front, bottom folds up behind */
+    .letter{z-index:2;left:var(--LX);width:var(--LW);height:var(--P);transform:translateY(var(--letY));transition:transform 1s cubic-bezier(.6,0,.2,1),opacity .5s;transform-style:preserve-3d;perspective:2000px}
+    .letter.front{z-index:6}
+    .panel{position:absolute;left:0;width:100%;height:var(--P);transform-style:preserve-3d;transition:transform 1.15s cubic-bezier(.55,0,.25,1)}
+    .panel .pf,.panel .pb{position:absolute;inset:0;backface-visibility:hidden;overflow:hidden}
+    .panel .pf{background:linear-gradient(180deg,#fbf8f1,#f5efe3)}
+    .panel .pb{background:linear-gradient(180deg,#f3ecdf,#ebe2d1);transform:rotateX(180deg)}
+    .pt{top:calc(var(--P) * -1);transform-origin:50% 100%;transform:rotateX(-179.5deg)}
+    .pm{top:0}
+    .pb-panel{top:var(--P);transform-origin:50% 0;transform:rotateX(179.5deg)}
+    .letter.unfold-top .pt{transform:rotateX(0)}
+    .letter.unfold-bottom .pb-panel{transform:rotateX(0)}
+    .pt .pf{box-shadow:inset 0 -6px 8px -6px rgba(80,60,30,.25)}
+    .pb-panel .pf{box-shadow:inset 0 6px 8px -6px rgba(80,60,30,.25)}
+    .pm .pf{box-shadow:0 10px 24px rgba(0,0,0,.35)}
+    .pt .pb::after{content:"for you";position:absolute;left:0;right:0;top:42%;text-align:center;font-family:'Nanum Pen Script',cursive;font-size:30px;color:var(--navy);transform:rotate(180deg)}
+    .clip{position:absolute;left:0;width:100%;height:calc(var(--P) * 3)}
+    .pt .clip{top:0}.pm .clip{top:calc(var(--P) * -1)}.pb-panel .clip{top:calc(var(--P) * -2)}
 
-    /* a wax seal being made: wax drips, puddles, then a brass stamp presses it */
-    .waxmaker{position:absolute;right:clamp(14px,4vw,30px);bottom:4px;width:clamp(112px,26vw,150px);height:auto;pointer-events:none;overflow:visible}
-    .waxmaker *{transform-box:fill-box}
-    .open .waxmaker .stick{animation:stick 1.3s 1.25s cubic-bezier(.4,.1,.3,1) both}
-    .open .waxmaker .flame{animation:flicker .18s 1.25s 7 alternate both, gone .2s 2.45s both}
-    .open .waxmaker .drip{animation:drip .45s cubic-bezier(.6,0,.9,.6) both}
-    .open .waxmaker .d1{animation-delay:1.55s}.open .waxmaker .d2{animation-delay:1.85s}.open .waxmaker .d3{animation-delay:2.1s}
-    .open .waxmaker .puddle{animation:puddle 1s 1.9s cubic-bezier(.2,.8,.3,1) both}
-    .open .waxmaker .stamp{animation:stamp 1.35s 2.6s cubic-bezier(.5,0,.3,1) both}
-    .open .waxmaker .emboss{animation:emboss .3s 3.15s ease-out both}
-    .waxmaker .stick,.waxmaker .drip,.waxmaker .stamp{opacity:0}
-    .waxmaker .puddle{transform:scale(0);transform-origin:center}
-    .waxmaker .emboss{opacity:0}
-    @keyframes stick{0%{opacity:0;transform:translate(60px,-50px) rotate(30deg)}20%{opacity:1;transform:translate(0,0) rotate(0)}80%{opacity:1;transform:translate(0,0) rotate(-6deg)}100%{opacity:0;transform:translate(70px,-60px) rotate(25deg)}}
-    @keyframes flicker{from{transform:scale(1,1)}to{transform:scale(.8,1.15)}}
-    @keyframes gone{to{opacity:0}}
-    @keyframes drip{0%{opacity:1;transform:translateY(0) scale(.6)}90%{opacity:1;transform:translateY(46px) scale(1,1.2)}100%{opacity:0;transform:translateY(50px) scale(1.4,.4)}}
-    @keyframes puddle{0%{transform:scale(0)}35%{transform:scale(.55)}70%{transform:scale(.85)}100%{transform:scale(1)}}
-    @keyframes stamp{0%{opacity:0;transform:translateY(-80px)}25%{opacity:1;transform:translateY(-6px)}38%{transform:translateY(4px) scaleY(.97)}55%{transform:translateY(4px) scaleY(.97)}80%{opacity:1;transform:translateY(-70px)}100%{opacity:0;transform:translateY(-90px)}}
-    @keyframes emboss{from{opacity:0;transform:scale(.96)}to{opacity:1;transform:scale(1)}}
+    /* the real, readable letter that replaces the panels once unfolded */
+    .flat{position:absolute;left:0;top:calc(var(--P) * -1);width:100%;height:calc(var(--P) * 3);opacity:0;pointer-events:none;background:linear-gradient(180deg,#fbf8f1,#f5efe3);box-shadow:0 16px 34px rgba(0,0,0,.45)}
+    .flat::before,.flat::after{content:"";position:absolute;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(120,100,70,.28),transparent)}
+    .flat::before{top:33.33%}.flat::after{top:66.66%}
+    .letter.done .flat{opacity:1;pointer-events:auto}
+    .letter.done .panel{visibility:hidden}
+
+    .content{position:absolute;inset:0;padding:clamp(22px,5vw,40px);color:var(--ink);display:flex;flex-direction:column}
+    .lh{display:flex;justify-content:space-between;align-items:flex-end;border-bottom:1px solid rgba(43,38,32,.25);padding-bottom:10px;font-family:'Courier Prime',monospace;font-size:11px;letter-spacing:.04em;color:#6a6052}
+    .lh .mono{font-family:'DM Serif Display',Georgia,serif;font-size:30px;letter-spacing:.02em;color:var(--navy);line-height:1}
+    .content h1{font-family:'Nanum Pen Script',cursive;font-weight:400;font-size:clamp(40px,8vw,56px);line-height:.95;color:var(--navy);margin-top:clamp(28px,6vw,48px);transform:rotate(-1.5deg);transform-origin:left}
+    .content p{font-family:'Courier Prime',monospace;font-size:15px;line-height:1.7;max-width:38ch;margin-top:18px;color:#3b342b}
+    .content ul{list-style:none;margin-top:22px;font-family:'Courier Prime',monospace;font-size:15px;display:grid;gap:6px}
+    .content a{color:var(--ink);text-decoration:underline;text-decoration-color:rgba(43,38,32,.4);text-underline-offset:3px}
+    .content a:hover,.content a:focus-visible{text-decoration-color:var(--ink)}
+    .content .sig{margin-top:auto;font-family:'Nanum Pen Script',cursive;font-size:42px;color:var(--navy);transform:rotate(-4deg);transform-origin:left;line-height:1}
+    .content .foot{font-family:'Courier Prime',monospace;font-size:11px;color:#8a7f6e;margin-top:8px}
+
+    /* wax, tools, post marks: positioned at the flap tip */
+    .waxlayer{z-index:7;pointer-events:none}
+    .waxlayer svg{position:absolute;overflow:visible}
+    .tool{transition:transform .6s cubic-bezier(.4,0,.2,1),opacity .4s;opacity:0}
+    .seal{z-index:8;position:absolute;width:var(--S);height:var(--S);left:calc(var(--W) / 2 - var(--S) / 2);top:calc(var(--envY) + var(--E) * .58 - var(--S) / 2);border:0;background:none;padding:0;cursor:pointer;opacity:0;pointer-events:none;transition:top 1.1s cubic-bezier(.6,0,.2,1)}
+    .seal.ready{pointer-events:auto}
+    .seal:focus-visible{outline:3px solid #9cc0ff;outline-offset:6px;border-radius:50%}
+    .seal.ready:hover .halves{transform:scale(1.04) rotate(-3deg)}
+    .seal svg{width:100%;height:100%;overflow:visible}
+    .halves{transition:transform .25s}
+    .half{transition:transform .9s cubic-bezier(.2,.7,.3,1),opacity .9s}
+    .seal.cracked .h1{transform:translate(-9px,4px) rotate(-14deg)}
+    .seal.cracked .h2{transform:translate(9px,6px) rotate(12deg)}
+    .seal.gone .half{opacity:0;transform:translate(0,40px) rotate(30deg)}
+    .seal.gone .crack{opacity:0;transition:opacity .4s}
+    .stage.no-anim,.stage.no-anim *{transition:none !important}
+    .crack{stroke-dasharray:120;stroke-dashoffset:120;transition:stroke-dashoffset .35s ease-out}
+    .seal.cracking .crack{stroke-dashoffset:0}
+    .shine{opacity:0}
+    .seal.shine-on .shine{animation:sealshine 1s ease-out}
+    @keyframes sealshine{0%{opacity:0;transform:translateX(-30px)}40%{opacity:.8}100%{opacity:0;transform:translateX(30px)}}
+    .crumb{position:absolute;width:5px;height:4px;border-radius:2px;background:var(--wax);z-index:9;pointer-events:none}
+    .ring{position:absolute;border:2px solid rgba(255,240,220,.7);border-radius:50%;z-index:9;pointer-events:none;animation:ring .6s ease-out forwards}
+    @keyframes ring{from{opacity:.9;transform:scale(.4)}to{opacity:0;transform:scale(1.6)}}
+
+    .post{z-index:4;pointer-events:none}
+    .postmark{position:absolute;right:6%;top:12%;width:24%;color:#7a2a2f;opacity:0;transform:scale(1.5) rotate(-14deg)}
+    .postmark.thunk{animation:thunk .35s cubic-bezier(.3,1.6,.5,1) forwards}
+    @keyframes thunk{0%{opacity:0;transform:scale(1.6) rotate(-14deg)}100%{opacity:.8;transform:scale(1) rotate(-14deg)}}
+    .stamps{position:absolute;right:5%;bottom:10%;width:22%;transform:rotate(6deg);opacity:0;transition:opacity .4s,transform .5s cubic-bezier(.3,1.4,.5,1)}
+    .stamps.in{opacity:1;transform:rotate(4deg)}
+    .return{position:absolute;left:6%;bottom:12%;font-family:'Courier Prime',monospace;font-size:11px;line-height:1.5;color:#6a5d47;opacity:.85}
+
+    .hint{font-family:'Nanum Pen Script',cursive;font-size:28px;color:#c9d6ff;text-align:center;margin-top:10px;opacity:0;transition:opacity .5s}
+    .hint.on{opacity:1}
+    .sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+
     @media (prefers-reduced-motion:reduce){
-      .open .waxmaker *{animation:none !important}
-      .open .waxmaker .puddle{transform:none}.open .waxmaker .emboss{opacity:1}
-    }
-
-    /* envelope */
-    .envelope{position:relative;width:100%;aspect-ratio:16/10;perspective:1400px}
-    .env-body{position:absolute;inset:0;background:linear-gradient(170deg,#f8c3cb,#eea3b0);box-shadow:0 22px 44px rgba(0,0,0,.55),0 2px 5px rgba(0,0,0,.35);border-radius:3px;overflow:hidden}
-    .env-body svg.folds{position:absolute;inset:0;width:100%;height:100%}
-    .flap{position:absolute;left:0;right:0;top:0;height:58%;transform-origin:top center;filter:drop-shadow(0 2px 2px rgba(150,60,80,.28));transition:transform .7s cubic-bezier(.4,.1,.2,1);z-index:3;transform-style:preserve-3d}
-    .flap .face{position:absolute;inset:0;clip-path:polygon(0 0,100% 0,50% 100%);backface-visibility:hidden}
-    .flap .out{background:linear-gradient(180deg,#f9c9d0,#f1adb9)}
-    .flap .out svg{position:absolute;inset:0;width:100%;height:100%}
-    .flap .in{background:#f7d3d8;transform:rotateX(180deg)}
-    .open .flap{transform:rotateX(178deg);z-index:1}
-    .keepsakes svg{position:absolute;pointer-events:none;filter:drop-shadow(0 10px 14px rgba(0,0,0,.45))}
-    .ks-ace{width:22%;left:-17%;top:4%;transform:rotate(-14deg);z-index:0}
-    .ks-flower{width:20%;right:-12%;top:-14%;transform:rotate(18deg);z-index:6}
-    .ks-stamps{width:26%;right:-15%;bottom:-10%;transform:rotate(8deg);z-index:6}
-    @media (max-width:720px){.ks-ace{display:none}.ks-flower{width:18%;right:-4%;top:-10%}.ks-stamps{width:24%;right:-3%;bottom:-8%}}
-    .seal{position:absolute;left:50%;top:58%;width:clamp(64px,13vw,86px);aspect-ratio:1;transform:translate(-50%,-50%);z-index:4;
-      border:0;background:none;cursor:pointer;padding:0;transition:transform .35s ease,opacity .45s ease}
-    .seal:hover{transform:translate(-50%,-50%) scale(1.06) rotate(-4deg)}
-    .seal:focus-visible{outline:3px solid #9cc0ff;outline-offset:4px;border-radius:50%}
-    .open .seal{opacity:0;transform:translate(-50%,-30%) scale(.7) rotate(20deg);pointer-events:none}
-    .postmark{position:absolute;color:var(--postmark);opacity:.85;z-index:4;pointer-events:none}
-    .pm1{left:5%;bottom:8%;width:24%;transform:rotate(-14deg)}
-    .pm2{right:4%;top:44%;width:34%;color:#6d6658;opacity:.7;transform:rotate(6deg)}
-    .emboss-front{position:absolute;left:30%;width:40%;bottom:6%;z-index:2;pointer-events:none}
-    .hint{font-family:'Nanum Pen Script',cursive;font-size:26px;color:#c9d6ff;margin-top:14px;text-align:center;transition:opacity .4s}
-    .open + .hint{opacity:0}
-    .fallback{margin-top:22px;text-align:center;font-size:13px;color:rgba(200,215,255,.6)}
-    .fallback a{color:#dfe7ff}
-
-    @media (prefers-reduced-motion:reduce){
-      .js .sheet,.flap,.seal{transition:none !important}
+      .stage,.envpart,.letter,.panel,.seal,.half,.tool{transition:none !important}
+      .postmark.thunk,.flap .sheen.go,.seal.shine-on .shine,.ring{animation:none !important}
+      .postmark.thunk{opacity:.8;transform:rotate(-14deg)}
     }
     .coords{position:fixed;bottom:32px;left:48px;z-index:20;font-size:10px;letter-spacing:0.18em;color:rgba(110,130,190,0.28);font-weight:300;pointer-events:none;}
 
@@ -169,132 +186,260 @@
   </nav>
   <main class="page">
     <p class="lead">there's a letter here for you</p>
-    <div class="stack" id="stack">
-      <section class="sheet member first" aria-label="Card">
-        <div class="row"><span>Issued from New Haven</span><span>41.31° N 72.93° W</span></div>
-        <div class="mono" aria-label="S G monogram">
-          <span>S</span>
-          <svg viewBox="0 0 80 70" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-            <path d="M40 64 C40 48 38 38 30 26"/><path d="M39 46 C46 40 54 40 60 44"/><path d="M36 36 C30 34 22 36 18 42"/>
-            <g transform="translate(30 20)"><circle cx="0" cy="-7" r="6"/><circle cx="7" cy="1" r="6"/><circle cx="-7" cy="1" r="6"/><circle cx="0" cy="0" r="1.2" fill="currentColor"/></g>
-            <g transform="translate(60 44) scale(.7)"><circle cx="0" cy="-7" r="6"/><circle cx="7" cy="1" r="6"/><circle cx="-7" cy="1" r="6"/></g>
-            <path d="M18 42 c-4 -2 -6 2 -3 4 c3 2 6 -1 3 -4z"/>
-          </svg>
-          <span>G</span>
-        </div>
-        <div class="no">Member no. 2029</div>
-      </section>
+    <div class="readout" id="readout" aria-hidden="true"><span>01 letter in</span><span>02 fold</span><span>03 wax</span><span>04 press</span><span>05 post</span></div>
+    <div class="controls">
+      <button class="ctl" id="skip" type="button">skip</button>
+      <button class="ctl" id="sound" type="button" aria-pressed="true">sound: on</button>
+    </div>
+    <p class="sr-only">A sealed letter from Sofia. Open it with the wax seal button, or email her directly at sofia.grimm@yale.edu.</p>
 
-      <section class="sheet invite second" aria-labelledby="invite-title">
-        <h1 id="invite-title">hi! write me something</h1>
-        <p>A question about my research, something you're building, a book I should read, or just hello. I read everything.</p>
-        <ul>
-          <li><a href="mailto:sofia.grimm@yale.edu">sofia.grimm@yale.edu</a></li>
-          <li><a href="https://www.linkedin.com/in/sofia-grimm/" target="_blank" rel="noopener noreferrer">linkedin</a> &nbsp;/&nbsp; <a href="https://github.com/sofiagrimm" target="_blank" rel="noopener noreferrer">github</a></li>
-        </ul>
-        <div class="sig">sofia</div>
-        <svg class="waxmaker" viewBox="0 0 120 160" aria-hidden="true">
-          <defs>
-            <radialGradient id="waxG" cx="38%" cy="32%" r="72%"><stop offset="0" stop-color="#fbe1e7"/><stop offset=".5" stop-color="#f0b2c0"/><stop offset="1" stop-color="#d48699"/></radialGradient>
-            <linearGradient id="brass" x1="0" x2="1"><stop offset="0" stop-color="#8a6a2a"/><stop offset=".45" stop-color="#e6c573"/><stop offset="1" stop-color="#9b7832"/></linearGradient>
-            <linearGradient id="wood" x1="0" x2="1"><stop offset="0" stop-color="#4b301c"/><stop offset=".5" stop-color="#7a5232"/><stop offset="1" stop-color="#4b301c"/></linearGradient>
-          </defs>
-          <!-- the puddle of wax, then the finished seal pressed into it -->
-          <path class="puddle" d="M60 92 C75 90 89 98 91 112 C93 127 85 140 70 146 C55 151 37 147 31 133 C25 120 30 104 42 97 C47 94 53 92 60 92Z" fill="url(#waxG)"/>
-          <g class="emboss">
-            <path d="M60 92 C75 90 89 98 91 112 C93 127 85 140 70 146 C55 151 37 147 31 133 C25 120 30 104 42 97 C47 94 53 92 60 92Z" fill="url(#waxG)"/>
-            <circle cx="61" cy="121" r="21" fill="none" stroke="#c97a8e" stroke-width="2.2" opacity=".75"/><circle cx="61" cy="120" r="21" fill="none" stroke="#fde6eb" stroke-width="1.2" opacity=".8"/>
-            <circle cx="61" cy="120.5" r="17.5" fill="#eeadbc"/>
-            <text x="61" y="129" text-anchor="middle" font-family="Pinyon Script,cursive" font-size="24" fill="#c06a80">sg</text>
-            <path d="M44 108 C48 101 55 98 62 98" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" opacity=".6"/>
-          </g>
-          <!-- drips -->
-          <ellipse class="drip d1" cx="60" cy="66" rx="4" ry="5" fill="#ec9fb1"/>
-          <ellipse class="drip d2" cx="58" cy="66" rx="3.5" ry="4.5" fill="#ec9fb1"/>
-          <ellipse class="drip d3" cx="62" cy="66" rx="3.5" ry="4.5" fill="#ec9fb1"/>
-          <!-- sealing wax stick with a little flame at its tip -->
-          <g class="stick">
-            <rect x="58" y="6" width="10" height="56" rx="3" fill="#ec9fb1" transform="rotate(14 63 34)"/>
-            <path class="flame" d="M58 70 C52 62 56 54 60 48 C63 55 68 60 62 70Z" fill="#f5b942" opacity=".9" transform="translate(-2 -4)"/>
-          </g>
-          <!-- brass stamp with a wooden handle -->
-          <g class="stamp">
-            <rect x="52" y="22" width="18" height="52" rx="8" fill="url(#wood)"/>
-            <rect x="46" y="72" width="30" height="8" rx="2" fill="url(#brass)"/>
-            <path d="M42 80 L80 80 L78 96 L44 96Z" fill="url(#brass)"/>
-          </g>
-        </svg>
-      </section>
+    <div class="stage" id="stage">
+      <div class="envpart back"></div>
 
-      <div class="envelope">
-        <div class="keepsakes" aria-hidden="true">
-          <svg class="ks-ace" viewBox="0 0 250 350"><rect x="4" y="4" width="242" height="342" rx="14" fill="#f3ead9" stroke="#cdbf9f" stroke-width="2"/>
-            <circle cx="125" cy="175" r="70" fill="none" stroke="#9fb7a0" stroke-width="10" stroke-dasharray="3 9" opacity=".8"/><circle cx="125" cy="175" r="60" fill="none" stroke="#e7b3bd" stroke-width="5" stroke-dasharray="2 12" opacity=".8"/>
-            <path d="M125 210 C95 188 82 172 82 154 C82 140 93 130 106 130 C114 130 121 135 125 143 C129 135 136 130 144 130 C157 130 168 140 168 154 C168 172 155 188 125 210Z" fill="#d33f45"/>
-            <text x="28" y="50" font-family="'IM Fell English',Georgia,serif" font-size="34" fill="#c43a40" text-anchor="middle">A</text><path d="M28 78 C20 72 17 68 17 63 C17 59 20 57 23 57 C25 57 27 58 28 60 C29 58 31 57 33 57 C36 57 39 59 39 63 C39 68 36 72 28 78Z" fill="#d33f45"/></svg>
-          <svg class="ks-flower" viewBox="0 0 100 100"><g transform="translate(50 50)">
-            <g fill="#f2b9c4" stroke="#d98ea0" stroke-width=".8" opacity=".95"><ellipse rx="13" ry="22" transform="rotate(0) translate(0 -20)"/><ellipse rx="13" ry="22" transform="rotate(72) translate(0 -20)"/><ellipse rx="13" ry="22" transform="rotate(144) translate(0 -20)"/><ellipse rx="13" ry="22" transform="rotate(216) translate(0 -20)"/><ellipse rx="13" ry="22" transform="rotate(288) translate(0 -20)"/></g>
-            <circle r="8" fill="#e7b85a"/><circle r="4" fill="#c98f3a"/><path d="M6 6 C20 26 26 40 22 48" stroke="#7d9a68" stroke-width="2" fill="none"/></g></svg>
-          <svg class="ks-stamps" viewBox="0 0 120 70">
-            <defs><mask id="perf"><rect width="120" height="70" fill="#fff"/><circle cx="4" cy="2" r="2" fill="#000"/><circle cx="4" cy="68" r="2" fill="#000"/><circle cx="10" cy="2" r="2" fill="#000"/><circle cx="10" cy="68" r="2" fill="#000"/><circle cx="16" cy="2" r="2" fill="#000"/><circle cx="16" cy="68" r="2" fill="#000"/><circle cx="22" cy="2" r="2" fill="#000"/><circle cx="22" cy="68" r="2" fill="#000"/><circle cx="28" cy="2" r="2" fill="#000"/><circle cx="28" cy="68" r="2" fill="#000"/><circle cx="34" cy="2" r="2" fill="#000"/><circle cx="34" cy="68" r="2" fill="#000"/><circle cx="40" cy="2" r="2" fill="#000"/><circle cx="40" cy="68" r="2" fill="#000"/><circle cx="46" cy="2" r="2" fill="#000"/><circle cx="46" cy="68" r="2" fill="#000"/><circle cx="52" cy="2" r="2" fill="#000"/><circle cx="52" cy="68" r="2" fill="#000"/><circle cx="58" cy="2" r="2" fill="#000"/><circle cx="58" cy="68" r="2" fill="#000"/><circle cx="64" cy="2" r="2" fill="#000"/><circle cx="64" cy="68" r="2" fill="#000"/><circle cx="70" cy="2" r="2" fill="#000"/><circle cx="70" cy="68" r="2" fill="#000"/><circle cx="76" cy="2" r="2" fill="#000"/><circle cx="76" cy="68" r="2" fill="#000"/><circle cx="82" cy="2" r="2" fill="#000"/><circle cx="82" cy="68" r="2" fill="#000"/><circle cx="88" cy="2" r="2" fill="#000"/><circle cx="88" cy="68" r="2" fill="#000"/><circle cx="94" cy="2" r="2" fill="#000"/><circle cx="94" cy="68" r="2" fill="#000"/><circle cx="100" cy="2" r="2" fill="#000"/><circle cx="100" cy="68" r="2" fill="#000"/><circle cx="106" cy="2" r="2" fill="#000"/><circle cx="106" cy="68" r="2" fill="#000"/><circle cx="112" cy="2" r="2" fill="#000"/><circle cx="112" cy="68" r="2" fill="#000"/><circle cx="118" cy="2" r="2" fill="#000"/><circle cx="118" cy="68" r="2" fill="#000"/><circle cx="2" cy="4" r="2" fill="#000"/><circle cx="118" cy="4" r="2" fill="#000"/><circle cx="60" cy="4" r="2" fill="#000"/><circle cx="2" cy="10" r="2" fill="#000"/><circle cx="118" cy="10" r="2" fill="#000"/><circle cx="60" cy="10" r="2" fill="#000"/><circle cx="2" cy="16" r="2" fill="#000"/><circle cx="118" cy="16" r="2" fill="#000"/><circle cx="60" cy="16" r="2" fill="#000"/><circle cx="2" cy="22" r="2" fill="#000"/><circle cx="118" cy="22" r="2" fill="#000"/><circle cx="60" cy="22" r="2" fill="#000"/><circle cx="2" cy="28" r="2" fill="#000"/><circle cx="118" cy="28" r="2" fill="#000"/><circle cx="60" cy="28" r="2" fill="#000"/><circle cx="2" cy="34" r="2" fill="#000"/><circle cx="118" cy="34" r="2" fill="#000"/><circle cx="60" cy="34" r="2" fill="#000"/><circle cx="2" cy="40" r="2" fill="#000"/><circle cx="118" cy="40" r="2" fill="#000"/><circle cx="60" cy="40" r="2" fill="#000"/><circle cx="2" cy="46" r="2" fill="#000"/><circle cx="118" cy="46" r="2" fill="#000"/><circle cx="60" cy="46" r="2" fill="#000"/><circle cx="2" cy="52" r="2" fill="#000"/><circle cx="118" cy="52" r="2" fill="#000"/><circle cx="60" cy="52" r="2" fill="#000"/><circle cx="2" cy="58" r="2" fill="#000"/><circle cx="118" cy="58" r="2" fill="#000"/><circle cx="60" cy="58" r="2" fill="#000"/><circle cx="2" cy="64" r="2" fill="#000"/><circle cx="118" cy="64" r="2" fill="#000"/><circle cx="60" cy="64" r="2" fill="#000"/></mask></defs>
-            <g mask="url(#perf)"><rect width="120" height="70" fill="#f7f1e4"/><rect x="8" y="8" width="44" height="54" fill="#c9545a"/><rect x="68" y="8" width="44" height="54" fill="#c9545a"/>
-            <circle cx="30" cy="32" r="12" fill="#f3d9d2"/><circle cx="90" cy="32" r="12" fill="#f3d9d2"/><text x="30" y="56" font-family="Courier New,monospace" font-size="8" fill="#fff" text-anchor="middle">2¢</text><text x="90" y="56" font-family="Courier New,monospace" font-size="8" fill="#fff" text-anchor="middle">2¢</text></g>
-            <path d="M0 20 q15 -8 30 0 t30 0 t30 0 t30 0 M0 32 q15 -8 30 0 t30 0 t30 0 t30 0" fill="none" stroke="#3a3a3a" stroke-width="1.6" opacity=".55"/></svg>
-        </div>
-        <div class="env-body">
-          <svg class="folds" viewBox="0 0 160 100" preserveAspectRatio="none" aria-hidden="true">
-            <path d="M0 100 L68 48 Q80 40 92 48 L160 100 Z" fill="#f2adb9" stroke="#dd8d9c" stroke-width=".35"/>
-            <path d="M0 0 L62 52" stroke="#e396a5" stroke-width=".35"/><path d="M160 0 L98 52" stroke="#e396a5" stroke-width=".35"/>
-          </svg>
-        </div>
-        <div class="flap"><div class="face out"><svg viewBox="0 0 160 58" preserveAspectRatio="none" aria-hidden="true">
-            <path d="M8 1 Q44 26 80 52" fill="none" stroke="#5b8a52" stroke-width=".6"/><path d="M152 1 Q116 26 80 52" fill="none" stroke="#5b8a52" stroke-width=".6"/>
-            <ellipse cx="20.1" cy="12.3" rx="2.4" ry="1" fill="#5b8a52" transform="rotate(35 23.1 13.3)"/><ellipse cx="133.9" cy="12.3" rx="2.4" ry="1" fill="#5b8a52" transform="rotate(-35 136.9 13.3)"/><ellipse cx="39.1" cy="21.1" rx="2.4" ry="1" fill="#5b8a52" transform="rotate(35 36.1 22.1)"/><ellipse cx="126.9" cy="21.1" rx="2.4" ry="1" fill="#5b8a52" transform="rotate(-35 123.9 22.1)"/><ellipse cx="46.0" cy="29.9" rx="2.4" ry="1" fill="#5b8a52" transform="rotate(35 49.0 30.9)"/><ellipse cx="108.0" cy="29.9" rx="2.4" ry="1" fill="#5b8a52" transform="rotate(-35 111.0 30.9)"/><ellipse cx="65.0" cy="38.8" rx="2.4" ry="1" fill="#5b8a52" transform="rotate(35 62.0 39.8)"/><ellipse cx="101.0" cy="38.8" rx="2.4" ry="1" fill="#5b8a52" transform="rotate(-35 98.0 39.8)"/><g transform="translate(16.6 5.9)"><circle r="1.6" cx="0" cy="-1.8" fill="#d23a4a"/><circle r="1.6" cx="1.7" cy="-.5" fill="#d23a4a"/><circle r="1.6" cx="1" cy="1.5" fill="#d23a4a"/><circle r="1.6" cx="-1" cy="1.5" fill="#d23a4a"/><circle r="1.6" cx="-1.7" cy="-.5" fill="#d23a4a"/><circle r=".8" fill="#f6d28b"/></g><g transform="translate(143.4 5.9)"><circle r="1.6" cx="0" cy="-1.8" fill="#d23a4a"/><circle r="1.6" cx="1.7" cy="-.5" fill="#d23a4a"/><circle r="1.6" cx="1" cy="1.5" fill="#d23a4a"/><circle r="1.6" cx="-1" cy="1.5" fill="#d23a4a"/><circle r="1.6" cx="-1.7" cy="-.5" fill="#d23a4a"/><circle r=".8" fill="#f6d28b"/></g><g transform="translate(29.6 14.7)"><circle r="1.6" cx="0" cy="-1.8" fill="#d23a4a"/><circle r="1.6" cx="1.7" cy="-.5" fill="#d23a4a"/><circle r="1.6" cx="1" cy="1.5" fill="#d23a4a"/><circle r="1.6" cx="-1" cy="1.5" fill="#d23a4a"/><circle r="1.6" cx="-1.7" cy="-.5" fill="#d23a4a"/><circle r=".8" fill="#f6d28b"/></g><g transform="translate(130.4 14.7)"><circle r="1.6" cx="0" cy="-1.8" fill="#d23a4a"/><circle r="1.6" cx="1.7" cy="-.5" fill="#d23a4a"/><circle r="1.6" cx="1" cy="1.5" fill="#d23a4a"/><circle r="1.6" cx="-1" cy="1.5" fill="#d23a4a"/><circle r="1.6" cx="-1.7" cy="-.5" fill="#d23a4a"/><circle r=".8" fill="#f6d28b"/></g><g transform="translate(42.6 23.5)"><circle r="1.6" cx="0" cy="-1.8" fill="#d23a4a"/><circle r="1.6" cx="1.7" cy="-.5" fill="#d23a4a"/><circle r="1.6" cx="1" cy="1.5" fill="#d23a4a"/><circle r="1.6" cx="-1" cy="1.5" fill="#d23a4a"/><circle r="1.6" cx="-1.7" cy="-.5" fill="#d23a4a"/><circle r=".8" fill="#f6d28b"/></g><g transform="translate(117.4 23.5)"><circle r="1.6" cx="0" cy="-1.8" fill="#d23a4a"/><circle r="1.6" cx="1.7" cy="-.5" fill="#d23a4a"/><circle r="1.6" cx="1" cy="1.5" fill="#d23a4a"/><circle r="1.6" cx="-1" cy="1.5" fill="#d23a4a"/><circle r="1.6" cx="-1.7" cy="-.5" fill="#d23a4a"/><circle r=".8" fill="#f6d28b"/></g><g transform="translate(55.5 32.3)"><circle r="1.6" cx="0" cy="-1.8" fill="#d23a4a"/><circle r="1.6" cx="1.7" cy="-.5" fill="#d23a4a"/><circle r="1.6" cx="1" cy="1.5" fill="#d23a4a"/><circle r="1.6" cx="-1" cy="1.5" fill="#d23a4a"/><circle r="1.6" cx="-1.7" cy="-.5" fill="#d23a4a"/><circle r=".8" fill="#f6d28b"/></g><g transform="translate(104.5 32.3)"><circle r="1.6" cx="0" cy="-1.8" fill="#d23a4a"/><circle r="1.6" cx="1.7" cy="-.5" fill="#d23a4a"/><circle r="1.6" cx="1" cy="1.5" fill="#d23a4a"/><circle r="1.6" cx="-1" cy="1.5" fill="#d23a4a"/><circle r="1.6" cx="-1.7" cy="-.5" fill="#d23a4a"/><circle r=".8" fill="#f6d28b"/></g><g transform="translate(68.5 41.2)"><circle r="1.6" cx="0" cy="-1.8" fill="#d23a4a"/><circle r="1.6" cx="1.7" cy="-.5" fill="#d23a4a"/><circle r="1.6" cx="1" cy="1.5" fill="#d23a4a"/><circle r="1.6" cx="-1" cy="1.5" fill="#d23a4a"/><circle r="1.6" cx="-1.7" cy="-.5" fill="#d23a4a"/><circle r=".8" fill="#f6d28b"/></g><g transform="translate(91.5 41.2)"><circle r="1.6" cx="0" cy="-1.8" fill="#d23a4a"/><circle r="1.6" cx="1.7" cy="-.5" fill="#d23a4a"/><circle r="1.6" cx="1" cy="1.5" fill="#d23a4a"/><circle r="1.6" cx="-1" cy="1.5" fill="#d23a4a"/><circle r="1.6" cx="-1.7" cy="-.5" fill="#d23a4a"/><circle r=".8" fill="#f6d28b"/></g></svg></div><div class="face in"></div></div>
-        <svg class="postmark pm1" viewBox="0 0 120 120" aria-hidden="true">
-          <defs><path id="pmArc" d="M60 60 m-42 0 a42 42 0 1 1 84 0"/></defs>
-          <circle cx="60" cy="60" r="54" fill="none" stroke="currentColor" stroke-width="3"/>
-          <circle cx="60" cy="60" r="30" fill="none" stroke="currentColor" stroke-width="2"/>
-          <text font-family="Courier New,monospace" font-size="14" font-weight="700" fill="currentColor" letter-spacing="3"><textPath href="#pmArc" startOffset="50%" text-anchor="middle">NEW HAVEN</textPath></text>
-          <text x="60" y="58" font-family="Courier New,monospace" font-size="13" font-weight="700" fill="currentColor" text-anchor="middle">OCT</text>
-          <text x="60" y="73" font-family="Courier New,monospace" font-size="13" font-weight="700" fill="currentColor" text-anchor="middle">2026</text>
-        </svg>
-        <svg class="postmark pm2" viewBox="0 0 160 90" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.2">
-          <circle cx="40" cy="45" r="32"/><circle cx="40" cy="45" r="22"/>
-          <path d="M78 22 q10 -6 20 0 t20 0 t20 0 t20 0"/><path d="M78 36 q10 -6 20 0 t20 0 t20 0 t20 0"/><path d="M78 50 q10 -6 20 0 t20 0 t20 0 t20 0"/><path d="M78 64 q10 -6 20 0 t20 0 t20 0 t20 0"/>
-        </svg>
-        <svg class="emboss-front" viewBox="0 0 160 40" aria-hidden="true">
-          <g transform="translate(80 9)"><path d="M0 7 C-6 2 -8 -1 -8 -3.5 C-8 -6 -6 -7.5 -4 -7.5 C-2.2 -7.5 -.8 -6.5 0 -5 C.8 -6.5 2.2 -7.5 4 -7.5 C6 -7.5 8 -6 8 -3.5 C8 -1 6 2 0 7Z" fill="none" stroke="#fff" stroke-width="1.4" opacity=".55" transform="translate(.6 .6)"/>
-          <path d="M0 7 C-6 2 -8 -1 -8 -3.5 C-8 -6 -6 -7.5 -4 -7.5 C-2.2 -7.5 -.8 -6.5 0 -5 C.8 -6.5 2.2 -7.5 4 -7.5 C6 -7.5 8 -6 8 -3.5 C8 -1 6 2 0 7Z" fill="none" stroke="#d47c8c" stroke-width="1.2"/></g>
-          <text x="80.6" y="33.6" text-anchor="middle" font-family="Pinyon Script,cursive" font-size="15" fill="#fff" opacity=".55">for you</text>
-          <text x="80" y="33" text-anchor="middle" font-family="Pinyon Script,cursive" font-size="15" fill="#c9667b">for you</text></svg>
-        <button class="seal" id="seal" aria-controls="stack" aria-expanded="false" aria-label="Break the seal to open the letter">
-          <svg viewBox="0 0 100 100" aria-hidden="true">
-            <defs><radialGradient id="pearl" cx="38%" cy="30%" r="75%"><stop offset="0" stop-color="#fbe1e7"/><stop offset=".45" stop-color="#f0b2c0"/><stop offset="1" stop-color="#d98a9d"/></radialGradient>
-              <linearGradient id="sheen" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fff" stop-opacity=".7"/><stop offset=".4" stop-color="#fff" stop-opacity="0"/></linearGradient></defs>
-            <path d="M50 4 C62 3 66 10 76 12 C86 15 90 24 93 33 C97 42 94 50 97 60 C98 71 90 77 84 84 C77 92 68 93 58 96 C47 99 38 95 29 92 C19 88 12 82 7 72 C3 63 5 54 3 44 C3 33 9 25 16 17 C25 9 38 5 50 4Z" fill="url(#pearl)" stroke="#d08497" stroke-width="1"/>
-            <path d="M50 4 C62 3 66 10 76 12 C86 15 90 24 93 33 C97 42 94 50 97 60 C98 71 90 77 84 84 C77 92 68 93 58 96 C47 99 38 95 29 92 C19 88 12 82 7 72 C3 63 5 54 3 44 C3 33 9 25 16 17 C25 9 38 5 50 4Z" fill="url(#sheen)"/>
-            <circle cx="50" cy="51" r="33" fill="none" stroke="#c97a8e" stroke-width="2.2" opacity=".75"/>
-            <circle cx="50" cy="50" r="33" fill="none" stroke="#fde6eb" stroke-width="1.4" opacity=".8"/>
-            <circle cx="50" cy="51" r="27" fill="#eeadbc"/>
-            <path d="M30 44 C38 34 52 38 54 46 C56 54 66 56 70 48 M34 62 C42 66 50 58 58 64" fill="none" stroke="#fff" stroke-width="1.6" opacity=".35" stroke-linecap="round"/>
-            <circle cx="33" cy="40" r="1.6" fill="#fff" opacity=".5"/><circle cx="36" cy="36" r="1" fill="#fff" opacity=".5"/>
-            <text x="50.8" y="63.8" text-anchor="middle" font-family="Pinyon Script,cursive" font-size="34" fill="#fde9ee" opacity=".9">sg</text>
-            <text x="50" y="63" text-anchor="middle" font-family="Pinyon Script,cursive" font-size="34" fill="#c06a80">sg</text>
-          </svg>
-        </button>
+      <div class="letter" id="letter">
+        <div class="panel pt" aria-hidden="true"><div class="pf"><div class="clip"></div></div><div class="pb"></div></div>
+        <div class="panel pm" aria-hidden="true"><div class="pf"><div class="clip"></div></div><div class="pb"></div></div>
+        <div class="panel pb-panel" aria-hidden="true"><div class="pf"><div class="clip"></div></div><div class="pb"></div></div>
+        <div class="flat" id="flat" aria-hidden="true"></div>
       </div>
+
+      <div class="envpart pocket"><svg viewBox="0 0 160 100" preserveAspectRatio="none" aria-hidden="true">
+        <path d="M0 0 L74 54 Q80 58 86 54 L160 0 L160 100 L0 100Z" fill="#e3d6bc"/>
+        <path d="M0 100 L70 52 Q80 45 90 52 L160 100Z" fill="#dccdb0" stroke="#c4b190" stroke-width=".35"/>
+        <path d="M0 0 L74 54 Q80 58 86 54 L160 0" fill="none" stroke="#c9b796" stroke-width=".35"/>
+      </svg></div>
+
+      <div class="envpart post">
+        <svg class="postmark" id="postmark" viewBox="0 0 120 120" aria-hidden="true">
+          <defs><path id="pmArc" d="M60 60 m-42 0 a42 42 0 1 1 84 0"/></defs>
+          <circle cx="60" cy="60" r="54" fill="none" stroke="currentColor" stroke-width="3"/><circle cx="60" cy="60" r="30" fill="none" stroke="currentColor" stroke-width="2"/>
+          <text font-family="Courier New,monospace" font-size="14" font-weight="700" fill="currentColor" letter-spacing="3"><textPath href="#pmArc" startOffset="50%" text-anchor="middle">NEW HAVEN</textPath></text>
+          <text x="60" y="65" font-family="Courier New,monospace" font-size="13" font-weight="700" fill="currentColor" text-anchor="middle">CT</text>
+        </svg>
+        <svg class="stamps" id="stamps" viewBox="0 0 120 70" aria-hidden="true">
+          <defs><mask id="perf"><rect width="120" height="70" fill="#fff"/><g fill="#000" id="perfdots"></g></mask></defs>
+          <g mask="url(#perf)"><rect width="120" height="70" fill="#f6f1e6"/><rect x="8" y="8" width="44" height="54" fill="#2f4170"/><rect x="68" y="8" width="44" height="54" fill="#6f1c27"/>
+            <circle cx="30" cy="31" r="11" fill="#e9e1cf"/><circle cx="90" cy="31" r="11" fill="#e9e1cf"/>
+            <text x="30" y="56" font-family="Courier New,monospace" font-size="8" fill="#fff" text-anchor="middle">3¢</text><text x="90" y="56" font-family="Courier New,monospace" font-size="8" fill="#fff" text-anchor="middle">3¢</text></g>
+          <path d="M-6 22 q15 -8 30 0 t30 0 t30 0 t30 0 M-6 36 q15 -8 30 0 t30 0 t30 0 t30 0" fill="none" stroke="#2b2620" stroke-width="1.6" opacity=".5"/>
+        </svg>
+        <div class="return" aria-hidden="true">S. Grimm<br>New Haven, CT</div>
+      </div>
+
+      <div class="envpart flapwrap behind" id="flapwrap">
+        <div class="flap" id="flap"><div class="face out"><div class="sheen" id="sheen"></div></div><div class="face in"></div></div>
+      </div>
+
+      <div class="envpart waxlayer" id="waxlayer">
+        <svg id="waxsvg" viewBox="0 0 100 200" aria-hidden="true">
+          <defs>
+            <radialGradient id="waxG" cx="38%" cy="32%" r="72%"><stop offset="0" stop-color="#a8414e"/><stop offset=".55" stop-color="#6f1c27"/><stop offset="1" stop-color="#3f0c13"/></radialGradient>
+            <linearGradient id="brass" x1="0" x2="1"><stop offset="0" stop-color="#7d5f25"/><stop offset=".45" stop-color="#e3c477"/><stop offset="1" stop-color="#8f6d2c"/></linearGradient>
+            <linearGradient id="wood" x1="0" x2="1"><stop offset="0" stop-color="#2e1f14"/><stop offset=".5" stop-color="#5b3e28"/><stop offset="1" stop-color="#2e1f14"/></linearGradient>
+          </defs>
+          <path id="puddle" d="M50 122 C65 120 79 128 81 142 C83 157 75 170 60 176 C45 181 27 177 21 163 C15 150 20 134 32 127 C37 124 43 122 50 122Z" fill="url(#waxG)" style="transform-box:fill-box;transform-origin:center;transform:scale(0)"/>
+          <g id="drips" fill="#7d2230"><ellipse cx="50" cy="96" rx="3.4" ry="4.4" opacity="0"/><ellipse cx="48" cy="96" rx="3" ry="4" opacity="0"/><ellipse cx="52" cy="96" rx="3" ry="4" opacity="0"/></g>
+          <g id="stick" style="opacity:0">
+            <rect x="45" y="20" width="10" height="66" rx="3" fill="#6f1c27"/><rect x="47" y="22" width="2.5" height="60" rx="1" fill="#a8414e" opacity=".7"/>
+            <path id="flame" d="M50 104 C44 96 47 88 50 80 C53 88 57 96 50 104Z" fill="#f5b942" opacity=".95" style="transform-box:fill-box;transform-origin:50% 100%"/>
+            <path d="M50 101 C47 97 48 92 50 88 C52 92 53 97 50 101Z" fill="#fff3c4"/>
+          </g>
+          <g id="stamp" style="opacity:0">
+            <rect x="40" y="40" width="20" height="58" rx="9" fill="url(#wood)"/>
+            <rect x="34" y="96" width="32" height="8" rx="2" fill="url(#brass)"/>
+            <path d="M28 104 L72 104 L70 122 L30 122Z" fill="url(#brass)"/>
+            <path d="M31 107 L69 107" stroke="#fff3c4" stroke-width="1" opacity=".6"/>
+          </g>
+        </svg>
+      </div>
+
+      <button class="seal" id="seal" aria-label="Break the wax seal to open the letter" disabled>
+        <svg viewBox="0 0 100 100" aria-hidden="true">
+          <defs>
+            <clipPath id="leftHalf"><path d="M-10 -10 L52 -10 L46 20 L55 38 L44 55 L54 72 L47 110 L-10 110Z"/></clipPath>
+            <clipPath id="rightHalf"><path d="M52 -10 L110 -10 L110 110 L47 110 L54 72 L44 55 L55 38 L46 20Z"/></clipPath>
+            <g id="sealArt">
+              <path d="M50 4 C62 3 66 10 76 12 C86 15 90 24 93 33 C97 42 94 50 97 60 C98 71 90 77 84 84 C77 92 68 93 58 96 C47 99 38 95 29 92 C19 88 12 82 7 72 C3 63 5 54 3 44 C3 33 9 25 16 17 C25 9 38 5 50 4Z" fill="url(#waxG)"/>
+              <circle cx="50" cy="51" r="32" fill="none" stroke="#3f0c13" stroke-width="2.4" opacity=".8"/>
+              <circle cx="50" cy="50" r="32" fill="none" stroke="#c2606c" stroke-width="1" opacity=".6"/>
+              <circle cx="50" cy="51" r="26" fill="#6a1a25"/>
+              <text x="50.8" y="61.6" text-anchor="middle" font-family="'DM Serif Display',Georgia,serif" font-size="27" fill="#a8414e" opacity=".7">SG</text>
+              <text x="50" y="61" text-anchor="middle" font-family="'DM Serif Display',Georgia,serif" font-size="27" fill="#3a0a10">SG</text>
+              <path d="M24 32 C30 22 40 18 50 18" fill="none" stroke="#e08a95" stroke-width="2.4" stroke-linecap="round" opacity=".55"/>
+            </g>
+          </defs>
+          <g class="halves">
+            <g class="half h1"><g clip-path="url(#leftHalf)"><use href="#sealArt"/></g></g>
+            <g class="half h2"><g clip-path="url(#rightHalf)"><use href="#sealArt"/></g></g>
+            <path class="crack" d="M52 0 L46 20 L55 38 L44 55 L54 72 L47 100" fill="none" stroke="#2a0509" stroke-width="1.6" stroke-linejoin="round"/>
+            <rect class="shine" x="20" y="10" width="14" height="80" fill="#fff" opacity="0" transform="rotate(20 50 50)" style="mix-blend-mode:screen"/>
+          </g>
+        </svg>
+      </button>
     </div>
     <p class="hint" id="hint">break the seal</p>
-    <noscript><p class="fallback">Email me at <a href="mailto:sofia.grimm@yale.edu">sofia.grimm@yale.edu</a>.</p></noscript>
+    <noscript><p style="text-align:center;color:#dfe7ff">Email me at <a style="color:#fff" href="mailto:sofia.grimm@yale.edu">sofia.grimm@yale.edu</a>.</p></noscript>
   </main>
   <script>
-    (function(){
-      var stack=document.getElementById('stack'),seal=document.getElementById('seal');
-      seal.addEventListener('click',function(){
-        stack.classList.add('open');seal.setAttribute('aria-expanded','true');
-        setTimeout(function(){var f=stack.querySelector('.invite a');if(f)f.focus({preventScroll:true});},1100);
-      });
-    })();
+  (function(){
+    const $=id=>document.getElementById(id);
+    const stage=$('stage'),letter=$('letter'),flat=$('flat'),flap=$('flap'),flapwrap=$('flapwrap'),seal=$('seal'),hint=$('hint');
+    const still=matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const steps=[...$('readout').children];
+    const T=ms=>still?0:ms, wait=ms=>new Promise(r=>setTimeout(r,T(ms)));
+    let skipped=false;
+
+    // perforations for the stamps
+    let dots='';for(let x=4;x<120;x+=6)dots+=`<circle cx="${x}" cy="2" r="2"/><circle cx="${x}" cy="68" r="2"/>`;
+    for(let y=4;y<70;y+=6)dots+=`<circle cx="2" cy="${y}" r="2"/><circle cx="118" cy="${y}" r="2"/><circle cx="60" cy="${y}" r="2"/>`;
+    $('perfdots').innerHTML=dots;
+
+    // the letter's words, laid out once for the flat sheet and cloned into the three folding panels
+    const words=`<div class="content">
+      <div class="lh"><span class="mono">SG</span><span>New Haven, CT<br>41.31° N 72.93° W</span></div>
+      <h1>hi! write me something</h1>
+      <p>A question about my research, something you're building, a book I should read, or just hello. I read everything.</p>
+      <ul><li><a href="mailto:sofia.grimm@yale.edu">sofia.grimm@yale.edu</a></li>
+        <li><a href="https://www.linkedin.com/in/sofia-grimm/" target="_blank" rel="noopener noreferrer">linkedin</a> &nbsp;/&nbsp; <a href="https://github.com/sofiagrimm" target="_blank" rel="noopener noreferrer">github</a></li></ul>
+      <div class="sig">sofia</div><div class="foot">sofiagrimm.com</div></div>`;
+    flat.innerHTML=words;
+    document.querySelectorAll('.panel .clip').forEach(c=>{c.innerHTML=words;c.querySelectorAll('a').forEach(a=>a.tabIndex=-1);});
+
+    // geometry, all from the stage width
+    const g={};
+    const state={phase:'start'};
+    function layout(){
+      const W=stage.clientWidth,E=W*.62,P=E*.8,LW=W*.88,S=Math.min(100,W*.17);
+      Object.assign(g,{W,E,P,LW,S,Y0:P+40,Yf:3*P-E*.32});
+      const r=stage.style;
+      r.setProperty('--W',W+'px');r.setProperty('--E',E+'px');r.setProperty('--P',P+'px');r.setProperty('--LW',LW+'px');r.setProperty('--LX',(W-LW)/2+'px');r.setProperty('--S',S+'px');
+      const svg=$('waxsvg');svg.style.width=(S*1.6)+'px';svg.style.height=(S*3.2)+'px';svg.style.left=(W/2-S*.8)+'px';svg.style.top=(E*.58-S*3.2*.75)+'px';
+      apply();
+    }
+    function apply(){
+      const r=stage.style,s=state.phase;
+      const envY= s==='open'?g.Yf:g.Y0;
+      let letY= {start:g.Y0-g.P-30,inside:g.Y0+g.E*.12,out:g.Y0-g.P-16,open:g.P}[state.let||'start'];
+      r.setProperty('--envY',envY+'px');r.setProperty('--letY',letY+'px');
+      r.setProperty('--stageH',(s==='open'?g.Yf+g.E+30:g.Y0+g.E+30)+'px');
+    }
+    addEventListener('resize',layout);
+
+    // tiny synthesized sounds: paper, wax, a soft thump. Only ever plays after a click.
+    const sound={on:!still,ctx:null,
+      init(){if(!this.ctx){try{this.ctx=new (window.AudioContext||window.webkitAudioContext)();}catch(e){}}},
+      noise(dur,{f=2000,q=.8,type='bandpass',gain=.15,attack=.01,release=.1,wobble=0}={}){
+        if(!this.on||!this.ctx)return;const c=this.ctx,n=Math.ceil(c.sampleRate*dur),b=c.createBuffer(1,n,c.sampleRate),d=b.getChannelData(0);
+        for(let i=0;i<n;i++)d[i]=(Math.random()*2-1)*(wobble?(.55+.45*Math.sin(i/c.sampleRate*wobble*6.28+Math.random()*.6)):1);
+        const src=c.createBufferSource();src.buffer=b;const fl=c.createBiquadFilter();fl.type=type;fl.frequency.value=f;fl.Q.value=q;
+        const gn=c.createGain(),t=c.currentTime;gn.gain.setValueAtTime(0,t);gn.gain.linearRampToValueAtTime(gain,t+attack);gn.gain.setValueAtTime(gain,t+Math.max(attack,dur-release));gn.gain.linearRampToValueAtTime(0,t+dur);
+        src.connect(fl).connect(gn).connect(c.destination);src.start();},
+      thump(freq=90,gain=.25){if(!this.on||!this.ctx)return;const c=this.ctx,o=c.createOscillator(),gn=c.createGain(),t=c.currentTime;o.frequency.setValueAtTime(freq,t);o.frequency.exponentialRampToValueAtTime(40,t+.18);gn.gain.setValueAtTime(gain,t);gn.gain.exponentialRampToValueAtTime(.001,t+.2);o.connect(gn).connect(c.destination);o.start();o.stop(t+.22);},
+      crack(){this.noise(.05,{f:3500,q:1.2,gain:.5,attack:.001,release:.04});setTimeout(()=>this.noise(.03,{f:5200,q:2,gain:.3,attack:.001,release:.025}),45);},
+      crumbs(){for(let i=0;i<7;i++)setTimeout(()=>this.noise(.012,{f:4000+Math.random()*3000,q:3,gain:.12,attack:.001,release:.01}),120+i*(40+Math.random()*50));},
+      paper(dur){this.noise(dur,{f:2600,q:.6,gain:.09,attack:.15,release:.3,wobble:9});},
+      slide(dur){this.noise(dur,{f:1100,q:.5,type:'lowpass',gain:.12,attack:.2,release:.35,wobble:3});},
+      unfold(){this.noise(.45,{f:3000,q:.7,gain:.14,attack:.02,release:.25,wobble:14});setTimeout(()=>this.thump(140,.08),380);}
+    };
+    $('sound').addEventListener('click',e=>{sound.on=!sound.on;sound.init();e.currentTarget.textContent='sound: '+(sound.on?'on':'off');e.currentTarget.setAttribute('aria-pressed',sound.on);});
+    if(still){$('sound').textContent='sound: off';$('sound').setAttribute('aria-pressed','false');}
+
+    function stepOn(i){steps.forEach((s,k)=>{s.classList.toggle('on',k===i);if(k<i)s.classList.add('done');});}
+    const A=(el,frames,opts)=>el.animate(frames,{duration:T(opts.duration||600),easing:opts.easing||'cubic-bezier(.4,0,.2,1)',fill:'forwards',delay:T(opts.delay||0)}).finished;
+
+    function sealedState(){
+      skipped=true;
+      state.phase='closed';state.let='inside';apply();
+      flap.getAnimations().forEach(a=>a.cancel());flap.style.transform='rotateX(0deg)';flapwrap.classList.remove('behind');
+      letter.style.opacity=1;
+      ['stick','stamp'].forEach(id=>{$(id).getAnimations().forEach(a=>a.cancel());$(id).style.opacity=0;});
+      $('puddle').style.opacity=0;
+      seal.style.opacity=1;seal.disabled=false;seal.classList.add('ready');
+      $('postmark').classList.add('thunk');$('stamps').classList.add('in');
+      steps.forEach(s=>{s.classList.remove('on');s.classList.add('done');});
+      hint.classList.add('on');$('skip').hidden=true;
+    }
+    $('skip').addEventListener('click',sealedState);
+
+    async function assemble(){
+      flap.style.transform='rotateX(180deg)';
+      letter.style.opacity=0;
+      await wait(300); if(skipped)return;
+      // 01: the letter, already folded, drops into the envelope
+      stepOn(0);
+      letter.style.transition='none';letter.style.opacity=1;void letter.offsetWidth;letter.style.transition='';
+      await A(letter,[{opacity:0,filter:'blur(4px)'},{opacity:1,filter:'blur(0)'}],{duration:400});
+      state.let='inside';apply(); await wait(1100); if(skipped)return;
+      // 02: the flap folds down over it
+      stepOn(1);
+      flapwrap.classList.remove('behind');
+      $('sheen').classList.add('go');
+      await A(flap,[{transform:'rotateX(180deg)'},{transform:'rotateX(0deg)'}],{duration:1000,easing:'cubic-bezier(.5,0,.2,1)'}); if(skipped)return;
+      flap.style.transform='rotateX(0deg)';
+      // 03: wax stick comes in, three drops fall, the puddle spreads
+      stepOn(2);
+      const stick=$('stick'),flame=$('flame');
+      await A(stick,[{opacity:0,transform:'translate(40px,-50px) rotate(25deg)'},{opacity:1,transform:'translate(0,0) rotate(0deg)'}],{duration:500,easing:'cubic-bezier(.2,.8,.3,1)'}); if(skipped)return;
+      flame.animate([{transform:'scale(1,1)'},{transform:'scale(.85,1.15)'}],{duration:T(160),iterations:12,direction:'alternate'});
+      const drips=[...$('drips').children];
+      drips.forEach((d,i)=>A(d,[{opacity:1,transform:'translateY(0)'},{opacity:1,transform:'translateY(42px)',offset:.85},{opacity:0,transform:'translateY(48px) scale(1.4,.5)'}],{duration:420,delay:i*280,easing:'cubic-bezier(.6,0,.9,.6)'}));
+      A($('puddle'),[{transform:'scale(0)'},{transform:'scale(.45)',offset:.35},{transform:'scale(.75)',offset:.7},{transform:'scale(1)'}],{duration:1000,delay:300,easing:'cubic-bezier(.2,.8,.3,1)'});
+      await wait(1300); if(skipped)return;
+      await A(stick,[{opacity:1,transform:'translate(0,0) rotate(0deg)'},{opacity:0,transform:'translate(50px,-60px) rotate(22deg)'}],{duration:450}); if(skipped)return;
+      // 04: the brass stamp comes down, presses, lifts
+      stepOn(3);
+      const stamp=$('stamp');
+      await A(stamp,[{opacity:0,transform:'translateY(-70px)'},{opacity:1,transform:'translateY(-4px)'}],{duration:600,easing:'cubic-bezier(.3,0,.2,1)'}); if(skipped)return;
+      await A(stamp,[{transform:'translateY(-4px)'},{transform:'translateY(6px) scaleY(.97)'}],{duration:160,easing:'cubic-bezier(.6,0,1,1)'}); if(skipped)return;
+      const b=seal.getBoundingClientRect(),sr=stage.getBoundingClientRect();
+      const ring=document.createElement('div');ring.className='ring';ring.style.width=ring.style.height=g.S+'px';ring.style.left=(b.left-sr.left)+'px';ring.style.top=(b.top-sr.top)+'px';stage.appendChild(ring);setTimeout(()=>ring.remove(),700);
+      $('puddle').style.opacity=0;seal.style.opacity=1;
+      await wait(380); if(skipped)return;
+      await A(stamp,[{opacity:1,transform:'translateY(6px)'},{opacity:0,transform:'translateY(-80px)'}],{duration:600}); if(skipped)return;
+      seal.classList.add('shine-on');
+      // 05: postmark and stamps
+      stepOn(4);
+      $('stamps').classList.add('in'); await wait(350);
+      $('postmark').classList.add('thunk'); await wait(500); if(skipped)return;
+      sealedState();
+    }
+
+    function crumbs(){
+      const b=seal.getBoundingClientRect(),sr=stage.getBoundingClientRect(),cx=b.left-sr.left+b.width/2,cy=b.top-sr.top+b.height/2;
+      for(let i=0;i<10;i++){const c=document.createElement('span');c.className='crumb';c.style.left=cx+'px';c.style.top=cy+'px';stage.appendChild(c);
+        const dx=(Math.random()-.5)*b.width*1.4,dy=b.height*(.5+Math.random()*.9),rot=Math.random()*360;
+        c.animate([{transform:'translate(0,0) rotate(0)',opacity:1},{transform:`translate(${dx}px,${dy}px) rotate(${rot}deg)`,opacity:0}],{duration:T(700+Math.random()*400),easing:'cubic-bezier(.2,.6,.4,1)',fill:'forwards'});
+        setTimeout(()=>c.remove(),1300);}
+    }
+
+    async function openLetter(){
+      if(!seal.classList.contains('ready'))return;
+      seal.classList.remove('ready');seal.disabled=true;hint.classList.remove('on');
+      sound.init();
+      // crack the wax
+      sound.crack();seal.classList.add('cracking');await wait(380);
+      seal.classList.add('cracked');crumbs();sound.crumbs();await wait(650);
+      seal.classList.add('gone');
+      // peel the flap open, slowly
+      sound.paper(1.6);$('sheen').classList.remove('go');void $('sheen').offsetWidth;$('sheen').classList.add('go');
+      const peel=A(flap,[{transform:'rotateX(0deg)'},{transform:'rotateX(180deg)'}],{duration:1600,easing:'cubic-bezier(.45,0,.25,1)'});
+      await wait(800);flapwrap.classList.add('behind');await peel;flap.style.transform='rotateX(180deg)';
+      // slide the letter out
+      sound.slide(1.2);state.let='out';apply();await wait(1250);
+      letter.classList.add('front');
+      // set the envelope down and bring the letter into place
+      sound.slide(.9);state.phase='open';state.let='open';apply();await wait(1150);
+      // unfold, top then bottom
+      sound.unfold();letter.classList.add('unfold-top');await wait(1200);
+      sound.unfold();letter.classList.add('unfold-bottom');await wait(1200);
+      letter.classList.add('done');flat.removeAttribute('aria-hidden');
+      const first=flat.querySelector('a');if(first)first.focus({preventScroll:true});
+    }
+    seal.addEventListener('click',openLetter);
+
+    stage.classList.add('no-anim');layout();requestAnimationFrame(()=>requestAnimationFrame(()=>stage.classList.remove('no-anim')));
+    if(still){sealedState();} else assemble();
+  })();
   </script>
   <div class="coords">41.3083&deg; N &nbsp; 72.9279&deg; W</div>
 
