@@ -49,7 +49,7 @@
   #pool .stamp{position:absolute;left:50%;top:46%;z-index:4;pointer-events:none;font:200 clamp(56px,9vw,130px)/1 'Inter','Helvetica Neue',Arial,sans-serif;letter-spacing:.45em;text-indent:.45em;color:#f3eee4;
     text-shadow:0 0 40px rgba(159,216,214,.55);opacity:0;transform:translate(-50%,-50%) rotate(0deg) scale(1.6)}
   #pool .pdie{cursor:pointer}
-  html.pool-moving body > *:not(#pool):not(script):not(style){will-change:transform;backface-visibility:hidden}
+
   `;
   var st = document.createElement('style'); st.textContent = css; document.head.appendChild(st);
 
@@ -128,6 +128,7 @@
   function defs() {
     var d = el('defs', {});
     d.innerHTML = '<pattern id="pFleck" width="160" height="160" patternUnits="userSpaceOnUse"><image href="' + FLECK + '" width="160" height="160"/></pattern>' +
+      '<radialGradient id="redFelt" cx="30%" cy="45%" r="80%"><stop offset="0" stop-color="#8a2a2c" stop-opacity=".9"/><stop offset=".6" stop-color="#6e1f22" stop-opacity="0"/><stop offset="1" stop-color="#3a0c0f" stop-opacity=".6"/></radialGradient>' +
       '<linearGradient id="rackWood" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#7a5434"/><stop offset=".5" stop-color="#4e331d"/><stop offset="1" stop-color="#6b4528"/></linearGradient>' +
       '<pattern id="pSpeckPat" width="96" height="96" patternUnits="userSpaceOnUse"><image href="' + SPECK + '" width="96" height="96"/></pattern>' + '<filter id="pSpeck" x="0" y="0" width="100%" height="100%"><feTurbulence type="fractalNoise" baseFrequency="1.4" numOctaves="1" seed="3"/>' +
       '<feColorMatrix values="0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 -2.6 1.5"/><feComposite in2="SourceGraphic" operator="in"/></filter>' +
@@ -167,6 +168,9 @@
     // the pool table runs three screens long; past its foot rail the world is empty,
     // so the real card table (the Projects page) shows through
     var rail = R * 2.1, cush = R * .45;
+    var tail = (land ? 4.6 : 4.6) * SU;
+    rectUV(END - R, 0, tail - END + R, SV, { fill: '#6e1f22' });
+    rectUV(END - R, 0, tail - END + R, SV, { fill: 'url(#redFelt)' });
     rectUV(0, 0, END, SV, { fill: FELT });
     rectUV(0, 0, END, SV, { fill: 'url(#pFleck)', opacity: '.55' });
     rectUV(0, SV * .2, END, SV * .6, { fill: '#2c7a52', opacity: '.16' });
@@ -244,16 +248,12 @@
   function setCamera() {
     var sx = (Math.random() - .5) * cam.shake, sy = (Math.random() - .5) * cam.shake, off = P(-cam.u, 0), z = cam.z || 1, f = cam.f || { x: W / 2, y: H / 2 };
     world.style.transform = 'translate3d(' + f.x + 'px,' + f.y + 'px,0) scale(' + z + ') translate3d(' + (off.x + sx - f.x) + 'px,' + (off.y + sy - f.y) + 'px,0)';
-    // the real page sits just past the foot rail and slides in with the camera; while it's
-    // far off screen it's parked once instead of being moved every frame
     var dist = END - cam.u;
-    if (dist > SU * 1.05) { if (!pageParked) { pageParked = true; var far = P(SU * 1.5, 0); movePage(far.x, far.y, true); } return; }
-    pageParked = false; var pd = P(dist, 0);
+    if (dist > SU * 1.05) return;
     // as the card table comes into view, drop the costly lens blur and film grain first,
     // so the slide onto the table is just two flat layers moving together
     if (!fxOff) { fxOff = true; ['.dof', '.film'].forEach(function (q) { var e = pool.querySelector(q); if (!e) return;
       e.animate([{ opacity: getComputedStyle(e).opacity }, { opacity: 0 }], { duration: 500, fill: 'forwards' }).finished.then(function () { e.style.display = 'none'; }); }); }
-    movePage(pd.x + sx, pd.y + sy);
   }
 
   function draw() {
@@ -371,7 +371,7 @@
     state = 'cruise'; audio.roll(true); audio.bass(true); pool.classList.remove('cine'); pool.querySelector('.shade').classList.add('gone');
     var wall = R * 2.1 + R * .45 + R, b0 = land ? { u: eight.x, v: eight.y } : { u: eight.y, v: eight.x };
     path = [b0, { u: SU * 1.6, v: wall }, { u: END - R * 2.8, v: SV * .6 }, { u: END + SU * .32, v: SV * .64 }, { u: END + SU * 1.5, v: SV * .7 }];
-    legs = [{ d: 3000, e: 'out' }, { d: 4300, e: 'lin' }, { d: 1400, e: 'hop' }, { d: 2600, e: 'lin' }];
+    legs = [{ d: 3000, e: 'out' }, { d: 4300, e: 'lin' }, { d: 1400, e: 'hop' }, { d: 1500, e: 'lin' }];
     legIdx = 0; legT0 = now;
     var cand = balls.filter(function (b) { return b !== eight && b !== shooter; }).sort(function (a, b) { return (land ? b.x - a.x : b.y - a.y); })[0];
     pocketBall = cand; pocketBall.vx = pocketBall.vy = 0; pocketFrom = { x: cand.x, y: cand.y }; pocketT0 = now + 900;
@@ -409,7 +409,7 @@
   }
 
   function cleanup() {
-    document.documentElement.classList.remove('pool-moving'); movePage(0, 0);
+    document.documentElement.classList.remove('pool-moving');
     document.documentElement.style.overflow = ''; pool.remove(); st.remove();
   }
   function finish() {
@@ -418,7 +418,7 @@
     var from = cam.u, t0 = performance.now(), d = Math.min(700, Math.abs(END - from) * 1.2 + 1);
     (function settle(now) { var k = Math.min(1, (now - t0) / d), e = 1 - Math.pow(1 - k, 3); cam.u = from + (END - from) * e; cam.shake = 0; setCamera();
       if (k < 1) return requestAnimationFrame(settle);
-      pool.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 450, easing: 'ease-out', fill: 'forwards' }).finished.then(cleanup); })(t0);
+      pool.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 700, easing: 'ease-in-out', fill: 'forwards' }).finished.then(cleanup); })(t0);
   }
   pool.querySelector('.skip').addEventListener('click', function () {
     audio.bass(false);
