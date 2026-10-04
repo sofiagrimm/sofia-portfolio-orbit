@@ -49,7 +49,7 @@
   #pool .stamp{position:absolute;left:50%;top:46%;z-index:4;pointer-events:none;font:200 clamp(56px,9vw,130px)/1 'Inter','Helvetica Neue',Arial,sans-serif;letter-spacing:.45em;text-indent:.45em;color:#f3eee4;
     text-shadow:0 0 40px rgba(159,216,214,.55);opacity:0;transform:translate(-50%,-50%) rotate(0deg) scale(1.6)}
   #pool .pdie{cursor:pointer}
-  html.pool-moving body > *:not(#pool){translate:var(--pool-dx,0px) var(--pool-dy,0px)}
+  html.pool-moving body > *:not(#pool){translate:var(--pool-dx,0px) var(--pool-dy,0px);will-change:translate;backface-visibility:hidden}
   `;
   var st = document.createElement('style'); st.textContent = css; document.head.appendChild(st);
 
@@ -221,7 +221,7 @@
     cam = { u: 0, shake: 0, z: 1 }; pageParked = false; setCamera(); draw();
   }
 
-  var pageParked = false;
+  var pageParked = false, fxOff = false;
   function setCamera() {
     var sx = (Math.random() - .5) * cam.shake, sy = (Math.random() - .5) * cam.shake, off = P(-cam.u, 0), z = cam.z || 1, f = cam.f || { x: W / 2, y: H / 2 };
     world.style.transform = 'translate3d(' + f.x + 'px,' + f.y + 'px,0) scale(' + z + ') translate3d(' + (off.x + sx - f.x) + 'px,' + (off.y + sy - f.y) + 'px,0)';
@@ -230,6 +230,10 @@
     var dist = END - cam.u;
     if (dist > SU * 1.05) { if (!pageParked) { pageParked = true; var far = P(SU * 1.5, 0); document.documentElement.style.setProperty('--pool-dx', far.x + 'px'); document.documentElement.style.setProperty('--pool-dy', far.y + 'px'); } return; }
     pageParked = false; var pd = P(dist, 0);
+    // as the card table comes into view, drop the costly lens blur and film grain first,
+    // so the slide onto the table is just two flat layers moving together
+    if (!fxOff) { fxOff = true; ['.dof', '.film'].forEach(function (q) { var e = pool.querySelector(q); if (!e) return;
+      e.animate([{ opacity: getComputedStyle(e).opacity }, { opacity: 0 }], { duration: 500, fill: 'forwards' }).finished.then(function () { e.style.display = 'none'; }); }); }
     document.documentElement.style.setProperty('--pool-dx', (pd.x + sx) + 'px'); document.documentElement.style.setProperty('--pool-dy', (pd.y + sy) + 'px');
   }
 
@@ -388,13 +392,14 @@
   function cleanup() {
     document.documentElement.classList.remove('pool-moving'); document.documentElement.style.removeProperty('--pool-dx'); document.documentElement.style.removeProperty('--pool-dy');
     document.documentElement.style.overflow = ''; pool.remove(); st.remove();
-    dispatchEvent(new Event('resize'));
   }
   function finish() {
     audio.bass(false);
     if (state === 'gone') return; state = 'gone'; audio.roll(false); sessionStorage.setItem('sg-pool-done', '1');
-    cam.u = END; setCamera();
-    pool.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 350, fill: 'forwards' }).finished.then(cleanup);
+    var from = cam.u, t0 = performance.now(), d = Math.min(700, Math.abs(END - from) * 1.2 + 1);
+    (function settle(now) { var k = Math.min(1, (now - t0) / d), e = 1 - Math.pow(1 - k, 3); cam.u = from + (END - from) * e; cam.shake = 0; setCamera();
+      if (k < 1) return requestAnimationFrame(settle);
+      pool.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 450, easing: 'ease-out', fill: 'forwards' }).finished.then(cleanup); })(t0);
   }
   pool.querySelector('.skip').addEventListener('click', function () {
     audio.bass(false);
