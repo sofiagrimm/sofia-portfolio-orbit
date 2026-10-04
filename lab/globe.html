@@ -396,10 +396,10 @@
       const ctx = c.getContext('2d');
       ctx.filter = 'blur(6px)'; ctx.imageSmoothingEnabled = true; ctx.drawImage(m, 0, 0, W, H); ctx.filter = 'none';
       const img = ctx.getImageData(0, 0, W, H), d = img.data;
-      const ocean = [47, 128, 212], land = [163, 214, 90];
+      const ocean = [70, 110, 150], land = [158, 182, 138];
       for (let i = 0; i < d.length; i += 4) {
         const a = d[i+3] / 255, isLand = a > 0.5;
-        const base = isLand ? land : ocean, n = (Math.random() - 0.5) * 26;
+        const base = isLand ? land : ocean, n = (Math.random() - 0.5) * 14;
         d[i] = Math.max(0, Math.min(255, base[0] + n)); d[i+1] = Math.max(0, Math.min(255, base[1] + n)); d[i+2] = Math.max(0, Math.min(255, base[2] + n)); d[i+3] = 255;
       }
       ctx.putImageData(img, 0, 0);
@@ -407,7 +407,7 @@
     }
 
     const earthGeo = new THREE.SphereGeometry(GLOBE_R, 128, 64);
-    const earthMat = new THREE.MeshBasicMaterial({ color:0x2f80d4 });
+    const earthMat = new THREE.MeshBasicMaterial({ color:0x466e96 });
     const earthMesh = new THREE.Mesh(earthGeo, earthMat);
     scene.add(earthMesh);
     buildEarthTexture().then(ec => {
