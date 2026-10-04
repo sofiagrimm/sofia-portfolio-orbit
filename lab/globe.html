@@ -6,7 +6,7 @@
   <title>globe test | Sofia Grimm</title>
   <meta name="robots" content="noindex">
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Inter:wght@300;400;500&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Inter:wght@300;400;500&family=Gwendolyn:wght@700&family=Courier+Prime:wght@400;700&family=Nanum+Pen+Script&display=swap');
     *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
     html,body{width:100%;height:100%;background:#060d18;font-family:'Inter',sans-serif;color:#e9f0ff;}
 
@@ -550,11 +550,31 @@
       if(typeof faceDir==='function'){const mid=a.clone().add(b);faceDir(mid.lengthSq()>1e-4?mid.normalize():b);}
       parked=null;
     }
+    let prevPin=null;
+    const rollBtn=document.getElementById('rollBtn'),roll=document.getElementById('roll');
+    function showRollButton(id){const p=PINS[id];rollBtn.textContent='open the camera roll: '+p.name;rollBtn.hidden=false;rollBtn.dataset.pin=id;}
+    function openRoll(id){
+      const p=PINS[id],entry=document.querySelector('.entry[data-pin="'+id+'"]');
+      document.getElementById('rollPlace').textContent=p.sub.split(',')[0];
+      document.getElementById('rollLabel').textContent=p.name;
+      document.getElementById('rollText').textContent=entry?entry.querySelector('.entry-body').textContent.trim():'';
+      const from=prevPin&&PINS[prevPin]?PINS[prevPin].sub.split(',')[0]:'New Haven';
+      document.getElementById('tFrom').textContent=from;document.getElementById('tTo').textContent=p.sub.split(',')[0];
+      const photos=(window.ROLLS&&window.ROLLS[id])||[],strip=document.getElementById('rollStrip');strip.innerHTML='';
+      const n=Math.max(4,photos.length);
+      for(let i=0;i<n;i++){const ph=photos[i],f=document.createElement('figure');f.className='roll-frame'+(ph?'':' empty');
+        f.innerHTML=ph?`<img src="${ph.src}" alt="${ph.caption||''}"><figcaption>${ph.caption||''}</figcaption>`:'<span>developing…</span>';strip.appendChild(f);}
+      roll.hidden=false;document.getElementById('rollClose').focus();
+    }
+    rollBtn.addEventListener('click',()=>openRoll(rollBtn.dataset.pin));
+    document.getElementById('rollClose').addEventListener('click',()=>{roll.hidden=true;rollBtn.focus();});
+    roll.addEventListener('click',e=>{if(e.target===roll){roll.hidden=true;}});
+    addEventListener('keydown',e=>{if(e.key==='Escape'&&!roll.hidden)roll.hidden=true;});
     function selectPin(id){
       if(!PINS[id])return;
       const draw=lastPin!==null&&lastPin!==id;
       if(lastPin===id&&!flight)return;
-      startFlight(id,draw);lastPin=id;
+      prevPin=lastPin;rollBtn.hidden=true;startFlight(id,draw);lastPin=id;
       pinObjects.forEach(p=>p.head.scale.setScalar(p.id===id?1.35:1));
     }
     function flightTick(now){
@@ -565,7 +585,7 @@
         curDir=slerp(flight.a,flight.b,t);curAlt=alt(t);
         pos=curDir.clone().multiplyScalar(curAlt);ahead=slerp(flight.a,flight.b,Math.min(1,t+0.01)).multiplyScalar(alt(Math.min(1,t+0.01)));
         if(flight.line){const n=flight.line.geometry.attributes.position.count;flight.line.geometry.setDrawRange(0,Math.ceil(n*t));}
-        if(raw>=1){parked={dir:flight.b.clone(),phase:0};if(flight.line)flight.line.geometry.setDrawRange(0,Infinity);flight=null;}
+        if(raw>=1){showRollButton(flight.to);parked={dir:flight.b.clone(),phase:0};if(flight.line)flight.line.geometry.setDrawRange(0,Infinity);flight=null;}
         if(ahead.distanceTo(pos)<1e-5)ahead=pos.clone().add(new THREE.Vector3(0,0,0.001));
       }else if(parked){
         // small loops above the pin it just landed on
@@ -670,5 +690,73 @@
     }
     requestAnimationFrame(animate);
   </script>
+
+<!-- camera roll: a scrapbook page for each place, opened from the button that appears after you land -->
+<button class="roll-btn" id="rollBtn" type="button" hidden></button>
+<div class="roll-overlay" id="roll" role="dialog" aria-modal="true" aria-labelledby="rollPlace" hidden>
+  <div class="roll-page">
+    <button class="roll-close" id="rollClose" type="button" aria-label="Close camera roll">close</button>
+    <h2 class="roll-title"><span>Camera roll:</span><em id="rollPlace"></em></h2>
+    <div class="roll-film">
+      <svg class="roll-can" viewBox="0 0 120 190" aria-hidden="true">
+        <rect x="34" y="2" width="52" height="16" rx="5" fill="#2b2b2b"/><rect x="8" y="16" width="104" height="168" rx="12" fill="#2b2b2b"/>
+        <rect x="14" y="30" width="92" height="140" rx="6" fill="#7c8f3a"/><rect x="14" y="30" width="18" height="140" fill="#5f6f2a"/>
+        <text x="72" y="100" font-family="Courier New,monospace" font-size="15" font-weight="700" fill="#f3efe1" transform="rotate(-90 72 100)" text-anchor="middle">35mm · SG 200</text>
+        <text x="96" y="100" font-family="Courier New,monospace" font-size="9" fill="#f3efe1" transform="rotate(-90 96 100)" text-anchor="middle">for color prints</text>
+        <rect x="48" y="178" width="24" height="10" rx="2" fill="#1d1d1d"/>
+      </svg>
+      <div class="roll-strip" id="rollStrip"></div>
+    </div>
+    <div class="roll-bottom">
+      <div class="roll-note"><p class="roll-label" id="rollLabel"></p><p id="rollText"></p></div>
+      <div class="roll-ticket" aria-hidden="true">
+        <div class="t-top">BOARDING PASS</div>
+        <div class="t-route"><div><small>from</small><b id="tFrom"></b></div><svg viewBox="0 0 40 20"><path d="M2 10 H30 M24 4 L32 10 L24 16" fill="none" stroke="#24306b" stroke-width="2"/></svg><div><small>to</small><b id="tTo"></b></div></div>
+        <div class="t-foot"><span>seat 1A</span><span>gate SG</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+<style>
+  .roll-btn{position:fixed;left:50%;bottom:28px;transform:translateX(-50%);z-index:40;font:15px 'Courier Prime',monospace;color:#24306b;background:#fbf6ee;border:0;border-radius:999px;padding:10px 20px;box-shadow:0 10px 24px rgba(0,0,0,.45);cursor:pointer}
+  .roll-btn:hover,.roll-btn:focus-visible{background:#fff;outline:2px solid #9cc0ff;outline-offset:3px}
+  .roll-overlay{position:fixed;inset:0;z-index:60;display:flex;align-items:center;justify-content:center;padding:18px;background:rgba(4,8,22,.7);backdrop-filter:blur(4px)}
+  .roll-overlay[hidden]{display:none}
+  .roll-page{position:relative;width:min(980px,100%);max-height:92vh;overflow:auto;background:#fbf6ee;border-radius:6px;padding:clamp(18px,3vw,34px);box-shadow:0 30px 70px rgba(0,0,0,.6);color:#2b2620;
+    animation:rollIn .45s cubic-bezier(.2,.8,.2,1)}
+  @keyframes rollIn{from{opacity:0;transform:translateY(18px) scale(.98)}to{opacity:1;transform:none}}
+  .roll-close{position:absolute;right:16px;top:14px;font:13px 'Courier Prime',monospace;background:none;border:1px solid #cfc6b3;border-radius:6px;padding:4px 10px;cursor:pointer;color:#2b2620}
+  .roll-title{font-family:'Cormorant Garamond',serif;font-weight:400;font-size:clamp(28px,4vw,40px);line-height:1;display:flex;flex-direction:column}
+  .roll-title em{font-family:'Gwendolyn',cursive;font-style:normal;font-weight:700;font-size:1.35em;margin:-.1em 0 0 1.4em;color:#24306b}
+  .roll-film{display:flex;align-items:center;margin:22px 0 18px;overflow-x:auto;padding-bottom:6px}
+  .roll-can{flex:0 0 auto;width:clamp(70px,9vw,100px);margin-right:-6px;position:relative;z-index:1;filter:drop-shadow(0 8px 10px rgba(0,0,0,.3))}
+  .roll-strip{flex:0 0 auto;display:flex;gap:10px;padding:26px 14px;background:#2a2a2a;border-radius:2px;position:relative;
+    background-image:radial-gradient(circle at 50% 50%,transparent 0,transparent 0),
+      repeating-linear-gradient(90deg,#fbf6ee 0 10px,transparent 10px 22px),repeating-linear-gradient(90deg,#fbf6ee 0 10px,transparent 10px 22px);
+    background-size:auto,100% 12px,100% 12px;background-position:0 0,0 7px,0 calc(100% - 7px);background-repeat:no-repeat,repeat-x,repeat-x}
+  .roll-frame{width:clamp(150px,20vw,210px);aspect-ratio:4/3;background:#3a3a3a;overflow:hidden;position:relative}
+  .roll-frame img{width:100%;height:100%;object-fit:cover;display:block}
+  .roll-frame.empty{background:repeating-linear-gradient(-35deg,#555 0 2px,#4a4a4a 2px 6px)}
+  .roll-frame.empty span{position:absolute;inset:0;display:grid;place-items:center;font-family:'Nanum Pen Script',cursive;font-size:24px;color:#d9d4c7}
+  .roll-frame figcaption{position:absolute;left:6px;bottom:4px;font:11px 'Courier Prime',monospace;color:#fff;text-shadow:0 1px 2px #000}
+  .roll-bottom{display:grid;grid-template-columns:1.6fr 1fr;gap:22px;align-items:start}
+  .roll-note{background:repeating-linear-gradient(to bottom,transparent 0 25px,#cfd7e6 25px 26px),#fffdf8;padding:14px 18px 18px;border-left:2px solid #e8a3a3;box-shadow:0 6px 16px rgba(0,0,0,.12);transform:rotate(-.6deg)}
+  .roll-note p{font:15px/26px 'Courier Prime',monospace;color:#3b342b}
+  .roll-note .roll-label{font-family:'Nanum Pen Script',cursive;font-size:26px;color:#24306b;line-height:26px}
+  .roll-ticket{background:#f3ead8;border:1px dashed #b9ab8a;border-radius:8px;padding:12px 16px;font-family:'Courier Prime',monospace;color:#24306b;transform:rotate(2deg);box-shadow:0 6px 16px rgba(0,0,0,.12)}
+  .t-top{font-size:11px;letter-spacing:.2em;color:#8a7c5c}
+  .t-route{display:flex;align-items:center;gap:10px;margin:8px 0}
+  .t-route small{display:block;font-size:10px;color:#8a7c5c}.t-route b{font-size:15px}
+  .t-route svg{width:40px;flex:0 0 auto}
+  .t-foot{display:flex;justify-content:space-between;font-size:11px;color:#8a7c5c;border-top:1px dashed #b9ab8a;padding-top:6px}
+  @media (max-width:700px){.roll-bottom{grid-template-columns:1fr}}
+  @media (prefers-reduced-motion:reduce){.roll-page{animation:none}}
+</style>
+<script>
+  // Photos for each place go here: {src:'img/…', caption:'…'}. Places without photos show "developing…" frames.
+  window.ROLLS = {
+    higley:[], cushing:[], pcdd:[], fermilab:[], msu:[], stanford:[], sevilla:[], cambridge:[]
+  };
+</script>
 </body>
 </html>
