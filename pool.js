@@ -108,8 +108,13 @@
       o.frequency.setValueAtTime(f, t); if (glide) o.frequency.exponentialRampToValueAtTime(f * glide, t + dur * .7);
       g.gain.setValueAtTime(.0001, t); g.gain.exponentialRampToValueAtTime(gain, t + .008); g.gain.exponentialRampToValueAtTime(.0001, t + dur); o.connect(g).connect(audio.out()); o.start(t); o.stop(t + dur + .05); },
     PENTA: [261.63, 293.66, 329.63, 392, 440, 523.25, 587.33, 659.25, 783.99, 880],
-    clack: function (v) { this.note(this.PENTA[Math.floor(Math.random() * 10)] * (Math.random() < .5 ? 1 : 2), .3, .05 * Math.min(1, Math.max(.2, v)), 'triangle'); v = Math.max(.15, Math.min(1, v)); this.noise(.04, 3000 + Math.random() * 900, 1.3, .5 * v); this.tone(1700 + Math.random() * 400, .06, .08 * v); this.tone(380, .05, .1 * v, 'triangle'); },
-    cue: function () { this.note(196, .18, .06, 'sine', 0, 1.5); this.noise(.05, 1400, 1, .5); this.tone(220, .08, .2, 'triangle'); },
+    clack: function (v) { v = Math.max(.15, Math.min(1, v)); this.noise(.025, 2100 + Math.random() * 300, 2.2, .55 * v); this.tone(980 + Math.random() * 80, .07, .07 * v, 'sine'); this.tone(170, .09, .12 * v, 'sine');
+      this.note(this.PENTA[Math.floor(Math.random() * 5)] * .5, .4, .05 * v, 'triangle'); return; v = Math.max(.15, Math.min(1, v)); this.noise(.04, 3000 + Math.random() * 900, 1.3, .5 * v); this.tone(1700 + Math.random() * 400, .06, .08 * v); this.tone(380, .05, .1 * v, 'triangle'); },
+    cue: function () { this.noise(.04, 700, .8, .45, 'lowpass'); this.tone(150, .14, .2, 'sine'); this.note(392, .12, .03, 'sine', .02); return; this.noise(.05, 1400, 1, .5); this.tone(220, .08, .2, 'triangle'); },
+    cushion: function () { this.tone(95, .16, .22, 'sine'); this.noise(.05, 300, .7, .25, 'lowpass'); this.note(130.81, .3, .05, 'triangle', .01, 1.25); },
+    gulp: function () { this.noise(.08, 500, 1.4, .3); this.note(620, .35, .07, 'sine', .05, .32); this.tone(90, .25, .15, 'sine', .12); },
+    whistle: function () { this.note(420, .45, .05, 'sine', 0, 2.6); },
+    tok: function (v) { var b = [784, 659.25, 880, 587.33][Math.floor(Math.random() * 4)]; this.note(b, .11, .1 * v, 'triangle', 0, .86); this.noise(.06, 260, .7, .25 * v, 'lowpass'); },
     boing: function () { this.note(320, .45, .09, 'sine', 0, .45); this.note(640, .3, .03, 'sine', .02, .5); },
     twinkle: function () { var self = this; [5, 7, 9, 8, 6].forEach(function (k, j) { self.note(self.PENTA[k] * 2, .5, .03, 'sine', j * .12); }); },
     thump: function () { this.boing(); this.tone(110, .25, .35, 'sine'); this.noise(.08, 400, .7, .3, 'lowpass'); },
@@ -292,7 +297,7 @@
     (function f(now) { var k = Math.min(1, (now - t0) / 900), e = 1 - Math.pow(1 - k, 3), hop = Math.abs(Math.sin(k * Math.PI * 2.5)) * (1 - k) * 30;
       g.setAttribute('transform', base + ' translate(28 28) rotate(' + (sp * e) + ') translate(' + (-28) + ' ' + (-28 - hop) + ')');
       if (k < .85 && Math.random() < .3) { var v = 1 + Math.floor(Math.random() * 6), pips = g.querySelectorAll('.pp'); pips.forEach(function (p) { p.remove(); }); PIP[v].forEach(function (q) { el('circle', { cx: q[0], cy: q[1], r: 5.5, fill: '#fff8f4', class: 'pp' }, g); }); }
-      if (Math.abs(Math.sin(k * Math.PI * 2.5)) < .08 && k > .1) audio.clack(.3 * (1 - k) + .1);
+      if (Math.abs(Math.sin(k * Math.PI * 2.5)) < .08 && k > .1) audio.tok(.4 * (1 - k) + .15);
       if (k < 1) requestAnimationFrame(f); else { g.setAttribute('transform', base); g.__rolling = false; } })(t0); }
   pool.addEventListener('click', function (e) { var d = e.target.closest && e.target.closest('.pdie'); if (d) { audio.init(); rollDie(d); } });
   pool.addEventListener('pointerdown', function (e) {
@@ -385,7 +390,7 @@
     pocketBall = cand; pocketBall.vx = pocketBall.vy = 0; pocketFrom = { x: cand.x, y: cand.y }; pocketT0 = now + 900;
     var pk = P(END / 2, SV - R * 2.1 * .4); pocketAt = { x: pk.x, y: pk.y };
   }
-  var pocketBall = null, pocketFrom, pocketAt, pocketT0, pocketed = false, heart = null;
+  var hopped = false, pocketBall = null, pocketFrom, pocketAt, pocketT0, pocketed = false, heart = null;
   function buildHeart() {
     // one smooth spline (Catmull-Rom) through a handful of points: a sweep in from where the ball
     // landed, up and round the right lobe, a soft dip at the top, round the left lobe, back through
@@ -419,7 +424,7 @@
     var k = Math.min(1, t), e = 1 - Math.pow(1 - k, 2);
     var nx = pocketFrom.x + (pocketAt.x - pocketFrom.x) * e, ny = pocketFrom.y + (pocketAt.y - pocketFrom.y) * e;
     pocketBall.ph += Math.hypot(nx - pocketBall.x, ny - pocketBall.y) / R; pocketBall.hd = Math.atan2(ny - pocketBall.y, nx - pocketBall.x); pocketBall.x = nx; pocketBall.y = ny;
-    if (k >= 1) { pocketed = true; audio.tone(160, .3, .3); audio.noise(.12, 600, .7, .25, 'lowpass');
+    if (k >= 1) { pocketed = true; audio.gulp();
       pocketBall.g.animate([{ transform: 'translate(' + nx + 'px,' + ny + 'px) scale(1)', opacity: 1 }, { transform: 'translate(' + nx + 'px,' + ny + 'px) scale(.2)', opacity: 0 }], { duration: 260, fill: 'forwards' });
       var tag = document.createElement('div'); tag.className = 'tag'; tag.textContent = 'nice shot.'; pool.appendChild(tag);
       var sp = pocketAt, scr = P(0, 0), off = P(-cam.u, 0); tag.style.left = (sp.x + off.x - 40) + 'px'; tag.style.top = (sp.y + off.y - 70) + 'px';
@@ -441,13 +446,14 @@
     var sp = Math.hypot(q.x - eight.x, q.y - eight.y);
     trailSpeed = sp; eight.ph += sp / R; if (sp > .05) eight.hd = Math.atan2(q.y - eight.y, q.x - eight.x); eight.x = q.x; eight.y = q.y;
     eight.lift = leg.e === 'hop' && t < .82 ? Math.sin(Math.PI * t / .82) : 0;
+    if (leg.e === 'hop' && !hopped) { hopped = true; audio.whistle(); }
     audio.level(sp * .012 * (eight.lift > .1 ? .15 : 1));
     // time-based easing so the camera is just as smooth at any frame rate; once the ball is over
     // the rail the camera heads straight for the card table and settles there
     var cdt = Math.min(.1, (now - (cam.t || now)) / 1000); cam.t = now;
     var tgt = legIdx >= 2 ? END : Math.max(0, Math.min(END, u - SU * .42)), rate = legIdx >= 2 ? 3.2 : 2.6;
     cam.u += (tgt - cam.u) * (1 - Math.exp(-rate * cdt));
-    if (legIdx === 0 && t >= 1 && !bounced) { bounced = true; audio.clack(.6); cam.shake = R * .15; }
+    if (legIdx === 0 && t >= 1 && !bounced) { bounced = true; audio.cushion(); cam.shake = R * .15; }
     if (legIdx === 2 && t > .82 && !landed) { landed = true; audio.thump(); cam.shake = R * .3;
       pool.querySelector('.lamp').style.opacity = 0; pool.querySelector('.dof').style.opacity = 0; pool.querySelector('.film').style.opacity = 0; pool.querySelector('.motes').style.opacity = 0;
       document.querySelectorAll('#memoryGrid .card-scene').forEach(function (sc, i) { sc.animate([{ translate: '0 0' }, { translate: '0 -22px' }, { translate: '0 0' }], { duration: 520, delay: 250 + i * 70, easing: 'cubic-bezier(.3,1.4,.5,1)' }); }); }

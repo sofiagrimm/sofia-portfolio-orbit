@@ -1117,27 +1117,32 @@
       const g2=c.createGain();g2.gain.value=.18;g.gain.setValueAtTime(.0001,t);g.gain.exponentialRampToValueAtTime(gain,t+.008);g.gain.exponentialRampToValueAtTime(.0001,t+dur);
       o.connect(g);o2.connect(g2).connect(g);g.connect(c.destination);o.start(t);o2.start(t);o.stop(t+dur+.05);o2.stop(t+dur+.05);},
     PENTA:[523.25,587.33,659.25,783.99,880,1046.5,1174.66,1318.51,1567.98,1760],
-    clack(i,n,vol=1){
-      this.note(this.PENTA[(n-1-i+10)%10]*(i%2?1:.5),.28,.05*vol,'triangle');
-      const c=this.ctx;if(!c||c.state!=='running')return;const t=c.currentTime,pitch=1+(Math.random()-.5)*.12-i*.006;
-      // the click of clay on clay: a bright tick, a short knock and a tiny ring
-      const len=Math.ceil(c.sampleRate*.05),buf=c.createBuffer(1,len,c.sampleRate),d=buf.getChannelData(0);
-      for(let k=0;k<len;k++)d[k]=(Math.random()*2-1)*Math.exp(-k/(c.sampleRate*.004));
-      const src=c.createBufferSource();src.buffer=buf;const bp=c.createBiquadFilter();bp.type='bandpass';bp.frequency.value=3200*pitch;bp.Q.value=1.4;
-      const g1=c.createGain();g1.gain.value=.42*vol;src.connect(bp).connect(g1).connect(c.destination);src.start(t);
-      const o=c.createOscillator(),g2=c.createGain();o.type='sine';o.frequency.setValueAtTime(2350*pitch,t);o.frequency.exponentialRampToValueAtTime(1900*pitch,t+.06);
-      g2.gain.setValueAtTime(.06,t);g2.gain.exponentialRampToValueAtTime(.0005,t+.09);o.connect(g2).connect(c.destination);o.start(t);o.stop(t+.1);
-      const k2=c.createOscillator(),g3=c.createGain();k2.type='triangle';k2.frequency.setValueAtTime(420*pitch,t);g3.gain.setValueAtTime(.08,t);g3.gain.exponentialRampToValueAtTime(.0005,t+.05);
-      k2.connect(g3).connect(c.destination);k2.start(t);k2.stop(t+.06);
-    },
+    // shared building blocks: a filtered burst of noise, and a tone with a quick attack and decay
+    burst(dur,type,f,q,gain,delay=0){const c=this.ctx;if(!c||c.state!=='running')return;const t=c.currentTime+delay,len=Math.ceil(c.sampleRate*dur),buf=c.createBuffer(1,len,c.sampleRate),d=buf.getChannelData(0);
+      for(let k=0;k<len;k++)d[k]=(Math.random()*2-1)*Math.exp(-k/(c.sampleRate*dur*.22));const s=c.createBufferSource();s.buffer=buf;const fl=c.createBiquadFilter();fl.type=type;fl.frequency.value=f;fl.Q.value=q;
+      const g=c.createGain();g.gain.value=gain;s.connect(fl).connect(g).connect(c.destination);s.start(t);},
+    tone(f,dur,gain,type='sine',delay=0,to=0){const c=this.ctx;if(!c||c.state!=='running')return;const t=c.currentTime+delay,o=c.createOscillator(),g=c.createGain();o.type=type;o.frequency.setValueAtTime(f,t);
+      if(to)o.frequency.exponentialRampToValueAtTime(to,t+dur*.8);g.gain.setValueAtTime(.0001,t);g.gain.exponentialRampToValueAtTime(gain,t+.004);g.gain.exponentialRampToValueAtTime(.0001,t+dur);
+      o.connect(g).connect(c.destination);o.start(t);o.stop(t+dur+.03);},
+    // CHIPS: clay chips meeting clay chips. A bright, glassy click with a little ceramic ring,
+    // and a tiny glockenspiel ping that climbs as the stack builds back up.
+    clack(i,n,vol=1){const p=1+(Math.random()-.5)*.08;
+      this.burst(.03,'bandpass',4200*p,6,.5*vol);this.burst(.02,'bandpass',6100*p,8,.25*vol,.004);
+      this.tone(3400*p,.09,.05*vol,'sine',0,3100*p);
+      this.tone(this.PENTA[Math.min(9,5+(n-1-i))]*2,.35,.02*vol,'sine',.01);},
+    // DICE: acrylic dice tumbling on felt. A hollow wooden "tok" (like a temple block) and a soft
+    // muffled thud from the felt underneath, a different block note on every bounce.
+    tok(vol=1,b=0){const blocks=[784,659.25,880,587.33,1046.5],f=blocks[(b+Math.floor(Math.random()*2))%blocks.length];
+      this.tone(f,.11,.11*vol,'triangle',0,f*.86);this.tone(f*2.7,.04,.03*vol,'sine');
+      this.burst(.04,'bandpass',1300,3,.18*vol);this.burst(.07,'lowpass',260,.7,.3*vol);},
     // cards: a soft paper slide, a crisp snap when one flips, a riffle for the shuffle
     paper(dur,f,gain){const c=this.ctx;if(!c||c.state!=='running')return;const t=c.currentTime,len=Math.ceil(c.sampleRate*dur),buf=c.createBuffer(1,len,c.sampleRate),d=buf.getChannelData(0);
       for(let k=0;k<len;k++)d[k]=(Math.random()*2-1)*Math.sin(Math.PI*k/len);const s=c.createBufferSource();s.buffer=buf;const fl=c.createBiquadFilter();fl.type='bandpass';fl.frequency.value=f;fl.Q.value=.8;
       const g=c.createGain();g.gain.value=gain;s.connect(fl).connect(g).connect(c.destination);s.start(t);},
     slide(){this.paper(.12,2400,.03);this.note(this.PENTA[6+Math.floor(Math.random()*4)],.4,.018,'sine');},
-    snap(){this.note(392,.22,.06,'sine',0,2.2);this.note(1318.51,.5,.025,'sine',.08);const c=this.ctx;if(!c||c.state!=='running')return;this.paper(.05,3600,.22);const o=c.createOscillator(),g=c.createGain(),t=c.currentTime;o.type='triangle';o.frequency.setValueAtTime(900,t);o.frequency.exponentialRampToValueAtTime(300,t+.05);g.gain.setValueAtTime(.08,t);g.gain.exponentialRampToValueAtTime(.0005,t+.06);o.connect(g).connect(c.destination);o.start(t);o.stop(t+.07);},
-    riffle(){[0,2,4,5,7,9].forEach((k,j)=>this.note(this.PENTA[k%10],.25,.03,'triangle',.25+j*.07));for(let k=0;k<26;k++)setTimeout(()=>this.paper(.018,3000+Math.random()*1500,.1),240+k*22+Math.random()*8);setTimeout(()=>this.paper(.08,1800,.12),240+26*22+60);},
-    lift(){this.note(440,.25,.035,'sine',0,1.6);const c=this.ctx;if(!c||c.state!=='running')return;const t=c.currentTime,len=Math.ceil(c.sampleRate*.18),buf=c.createBuffer(1,len,c.sampleRate),d=buf.getChannelData(0);
+    snap(){this.tone(1046.5,.6,.05,'sine');this.tone(1052,.6,.03,'sine');this.tone(1568,.35,.015,'sine',.02);const c=this.ctx;if(!c||c.state!=='running')return;this.paper(.05,3600,.22);const o=c.createOscillator(),g=c.createGain(),t=c.currentTime;o.type='triangle';o.frequency.setValueAtTime(900,t);o.frequency.exponentialRampToValueAtTime(300,t+.05);g.gain.setValueAtTime(.08,t);g.gain.exponentialRampToValueAtTime(.0005,t+.06);o.connect(g).connect(c.destination);o.start(t);o.stop(t+.07);},
+    riffle(){for(let j=0;j<10;j++)this.tone(1400+j*90,.05,.015,'sine',.24+j*.055);for(let k=0;k<26;k++)setTimeout(()=>this.paper(.018,3000+Math.random()*1500,.1),240+k*22+Math.random()*8);setTimeout(()=>this.paper(.08,1800,.12),240+26*22+60);},
+    lift(){this.tone(520,.18,.03,'sine',0,1040);const c=this.ctx;if(!c||c.state!=='running')return;const t=c.currentTime,len=Math.ceil(c.sampleRate*.18),buf=c.createBuffer(1,len,c.sampleRate),d=buf.getChannelData(0);
       for(let k=0;k<len;k++)d[k]=(Math.random()*2-1)*.5*Math.sin(Math.PI*k/len);const s=c.createBufferSource();s.buffer=buf;const f=c.createBiquadFilter();f.type='highpass';f.frequency.value=2500;
       const g=c.createGain();g.gain.value=.05;s.connect(f).connect(g).connect(c.destination);s.start(t);}
   };
@@ -1235,7 +1240,7 @@
       const body=d.querySelector('.dbody'),sh=d.querySelector('.dshadow');let frame=0,bounces=0;
       (function step(){
         frame++;vz-=.55;z+=vz;x+=vx;y+=vy;r+=vr;
-        if(z<=0){z=0;if(vz<-1.4){vz=-vz*.42;vx*=.7;vy*=.7;vr*=.6;bounces++;chipAudio.clack(3,6,Math.min(1,.25+bounces*.1));}else{vz=0;vx*=.8;vy*=.8;vr*=.75;}}
+        if(z<=0){z=0;if(vz<-1.4){vz=-vz*.42;vx*=.7;vy*=.7;vr*=.6;bounces++;chipAudio.tok(Math.min(1,.35+bounces*.12),bounces);}else{vz=0;vx*=.8;vy*=.8;vr*=.75;}}
         if(frame%4===0&&(z>0||Math.abs(vr)>2))setFace(d,1+Math.floor(Math.random()*6));
         // keep them on their own patch of felt
         if(x<12||x>78){vx=-vx*.6;x=Math.max(12,Math.min(78,x));}if(y<14||y>46){vy=-vy*.6;y=Math.max(14,Math.min(46,y));}
@@ -1298,7 +1303,8 @@
     const base=box.style.transform;let busy=false,drag=null,energy=0,lastX=0,lastY=0,lastHop=0;
     // the hidden card that pops out of the top
     const pop=document.createElement('div');pop.className='tuckpop';pop.appendChild(art('back',back));box.insertBefore(pop,box.firstChild);
-    const rattle=(v)=>{for(let k=0;k<Math.round(3+v*6);k++)setTimeout(()=>chipAudio.paper(.02,1800+Math.random()*1800,.06+v*.12),k*28+Math.random()*12);};
+    const rattle=(v)=>{chipAudio.burst(.12,'highpass',5200,.7,.12+v*.2);chipAudio.burst(.09,'lowpass',320,.8,.25*v,.03);chipAudio.tone(180,.12,.06*v,'sine',.02,120);
+      for(let k=0;k<Math.round(3+v*5);k++)setTimeout(()=>chipAudio.paper(.025,2200+Math.random()*1400,.05+v*.08),k*30+Math.random()*12);};
     const hop=()=>{const t=performance.now();if(t-lastHop<700)return;lastHop=t;chipAudio.slide();
       pop.animate([{transform:'translateY(0)'},{transform:'translateY(-42%) rotate(-4deg)',offset:.4},{transform:'translateY(-38%) rotate(3deg)',offset:.6},{transform:'translateY(0)'}],{duration:700,easing:'cubic-bezier(.3,.7,.3,1)'});};
     function shake(){
