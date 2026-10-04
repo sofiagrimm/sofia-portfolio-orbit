@@ -194,6 +194,8 @@
     .page .card-scene,.page .deck,.page a,.page button,.page .deck-wrap{pointer-events:auto}
     #table .stack{pointer-events:auto;cursor:grab}
     #table .chip{transform-box:view-box}
+    #table .dice{pointer-events:auto;cursor:pointer}
+    #table .dice:focus{outline:none}#table .dice:focus-visible{outline:2px solid #f3d38a}
     /* ten tabs: keep them on one line on laptop widths */
   .nav-links a{white-space:nowrap}
   @media (max-width:1400px){.nav-links a{padding:7px 10px;letter-spacing:.1em}}
@@ -673,8 +675,9 @@
   }
   function dice(){
     const pipsAt={1:[[0,0]],2:[[-7,-7],[7,7]],3:[[-7,-7],[0,0],[7,7]],4:[[-7,-7],[7,-7],[-7,7],[7,7]],5:[[-7,-7],[7,-7],[0,0],[-7,7],[7,7]],6:[[-7,-7],[7,-7],[-7,0],[7,0],[-7,7],[7,7]]};
-    const die=(x,y,r,v)=>`<g transform="translate(${x} ${y}) rotate(${r})"><rect x="-13" y="-10" width="28" height="28" rx="6" fill="#8e1c22"/><rect x="-15" y="-14" width="28" height="28" rx="6" fill="#d3383f"/><rect x="-12" y="-11" width="10" height="5" rx="2" fill="#fff" opacity=".25"/>${pipsAt[v].map(([a,b])=>`<circle cx="${a-1}" cy="${b}" r="2.6" fill="#fff"/>`).join('')}</g>`;
-    return `<svg viewBox="0 0 90 60" xmlns="http://www.w3.org/2000/svg">${die(24,28,-14,5)}${die(62,32,22,3)}</svg>`;
+    // each die is its own group (shadow, body, pips) so it can be picked up and rolled
+    const die=(x,y,r,v)=>`<g class="die" data-x="${x}" data-y="${y}" data-r="${r}" data-v="${v}" transform="translate(${x} ${y}) rotate(${r})"><rect class="dshadow" x="-13" y="-10" width="28" height="28" rx="6" fill="#8e1c22"/><g class="dbody"><rect x="-15" y="-14" width="28" height="28" rx="6" fill="#d3383f"/><rect x="-12" y="-11" width="10" height="5" rx="2" fill="#fff" opacity=".25"/><g class="pips">${pipsAt[v].map(([a,b])=>`<circle cx="${a-1}" cy="${b}" r="2.6" fill="#fff"/>`).join('')}</g></g></g>`;
+    return `<svg viewBox="0 0 90 60" xmlns="http://www.w3.org/2000/svg" style="overflow:visible"><g class="dice"><rect x="4" y="6" width="82" height="50" rx="10" fill="#000" opacity="0"/>${die(24,28,-14,5)}${die(62,32,22,3)}</g></svg>`;
   }
 
   // more things on the table: the card case, a dealer button, a score pad and loose chips
@@ -1024,11 +1027,41 @@
       if(overlapsHand(el)||touchesBand(el)||overlapsAny(el,'#table .pc',4)||docBox(el).b>floor+h*.4)el.remove();else placed++;
     }
   }
+
+  // ── Dice: click (or tap) a pair to roll it. They hop, tumble and skid, faces flickering,
+  //    clatter as they land and settle on new numbers.
+  const PIPS6={1:[[0,0]],2:[[-7,-7],[7,7]],3:[[-7,-7],[0,0],[7,7]],4:[[-7,-7],[7,-7],[-7,7],[7,7]],5:[[-7,-7],[7,-7],[0,0],[-7,7],[7,7]],6:[[-7,-7],[7,-7],[-7,0],[7,0],[-7,7],[7,7]]};
+  const setFace=(d,v)=>{d.dataset.v=v;d.querySelector('.pips').innerHTML=PIPS6[v].map(([a,b])=>`<circle cx="${a-1}" cy="${b}" r="2.6" fill="#fff"/>`).join('');};
+  function rollPair(g){
+    if(g.dataset.rolling)return;g.dataset.rolling='1';chipAudio.init();
+    const dice=[...g.querySelectorAll('.die')];let done=0;
+    dice.forEach((d,k)=>{
+      let x=+d.dataset.x,y=+d.dataset.y,r=+d.dataset.r,z=0,vx=(Math.random()-.5)*5+(k?2:-2),vy=(Math.random()-.5)*4,vz=4+Math.random()*2,vr=(Math.random()<.5?-1:1)*(18+Math.random()*14);
+      const body=d.querySelector('.dbody'),sh=d.querySelector('.dshadow');let frame=0,bounces=0;
+      (function step(){
+        frame++;vz-=.55;z+=vz;x+=vx;y+=vy;r+=vr;
+        if(z<=0){z=0;if(vz<-1.4){vz=-vz*.42;vx*=.7;vy*=.7;vr*=.6;bounces++;chipAudio.clack(3,6,Math.min(1,.25+bounces*.1));}else{vz=0;vx*=.8;vy*=.8;vr*=.75;}}
+        if(frame%4===0&&(z>0||Math.abs(vr)>2))setFace(d,1+Math.floor(Math.random()*6));
+        // keep them on their own patch of felt
+        if(x<12||x>78){vx=-vx*.6;x=Math.max(12,Math.min(78,x));}if(y<14||y>46){vy=-vy*.6;y=Math.max(14,Math.min(46,y));}
+        d.setAttribute('transform',`translate(${x.toFixed(2)} ${y.toFixed(2)}) rotate(${r.toFixed(1)})`);
+        body.setAttribute('transform',`translate(0 ${(-z).toFixed(2)}) scale(${(1+z*.012).toFixed(3)})`);
+        sh.setAttribute('opacity',(1-Math.min(.6,z*.03)).toFixed(2));
+        if(z>0||Math.abs(vx)+Math.abs(vy)+Math.abs(vr)>.25)requestAnimationFrame(step);
+        else{d.dataset.x=x;d.dataset.y=y;d.dataset.r=r;setFace(d,1+Math.floor(Math.random()*6));if(++done===dice.length)delete g.dataset.rolling;}
+      })();
+    });
+  }
+  function wireDice(){
+    document.querySelectorAll('#table .dice').forEach(g=>{if(g.dataset.wired)return;g.dataset.wired='1';
+      g.setAttribute('role','button');g.setAttribute('aria-label','Roll the dice');g.setAttribute('tabindex','0');
+      g.addEventListener('click',()=>rollPair(g));g.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();rollPair(g);}});});
+  }
   function layoutTable(){
     if(window.__arranging&&layoutTable.done)return;layoutTable.done=true;
     // measure the table where it really sits, even while the opening is sliding it into view
     const de=document.documentElement,pm=de.classList.contains('pool-moving');if(pm)de.classList.remove('pool-moving');
-    lay();buildFrame();fitArch();clearArch();fillEmpty();wireChips();
+    lay();buildFrame();fitArch();clearArch();fillEmpty();wireChips();wireDice();
     if(pm)de.classList.add('pool-moving');
   }
   addEventListener('load',layoutTable);layoutTable();
