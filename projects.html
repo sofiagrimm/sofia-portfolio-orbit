@@ -689,22 +689,17 @@
       c.toBlob(b=>{if(!b)return;const u=URL.createObjectURL(b);BITMAP[url]=u;(BITMAP_WAIT[url]||[]).forEach(f=>f(u));delete BITMAP_WAIT[url];},'image/png');}catch(e){}};
     im.src=url;
   }
+  const PREBUILT=k=>'img/table/'+k.replace('10','T')+'.webp';
   function art(key,make){
+    if(/^(c(10|[2-9AJQK])(spade|heart|diamond|club)|back)$/.test(key)){
+      const im=new Image();im.decoding='async';im.loading='lazy';im.alt='';im.className='rast';im.dataset.art=key;im.src=PREBUILT(key);im.draggable=false;return im;}
     if(!ARTSRC[key])ARTSRC[key]=make();
     if(!ART[key])ART[key]=artURL(key,ARTSRC[key]);
     const im=new Image();im.decoding='async';im.alt='';im.className='rast';im.dataset.art=key;im.src=ART[key];im.draggable=false;
     const url=ART[key];bitmapize(url,500,700,u=>{if(im.dataset.art===key&&ART[key]===url)im.src=u;});return im;
   }
   function setArt(el,key,make){el.textContent='';el.appendChild(art(key,make));}
-  // fetch the corner font once and redraw the card images with it
-  (async()=>{try{
-    const css=await (await fetch('https://fonts.googleapis.com/css2?family=IM+Fell+English&display=swap')).text();
-    const urls=[...css.matchAll(/url\((https:[^)]+\.woff2)\)/g)].map(m=>m[1]);const u=urls[urls.length-1];if(!u)return;
-    const buf=await (await fetch(u)).arrayBuffer();let bin='';const b=new Uint8Array(buf);for(let i=0;i<b.length;i+=8192)bin+=String.fromCharCode.apply(null,b.subarray(i,i+8192));
-    FELL='data:font/woff2;base64,'+btoa(bin);
-    Object.keys(ART).forEach(k=>delete ART[k]);
-    document.querySelectorAll('img.rast').forEach(im=>{const k=im.dataset.art;if(!ART[k])ART[k]=artURL(k,ARTSRC[k]);const url=ART[k];im.src=url;bitmapize(url,500,700,u=>{if(ART[k]===url)im.src=u;});});
-  }catch(e){}})();
+  // (the corner font is baked into the pre-drawn card images, so nothing needs fetching here)
   const GREEN="#2e7656";
   function back(){
     const f='b'+(uid++);
@@ -749,7 +744,7 @@
         `<i class="cshadow" style="left:${(x-RX*1.25+2-sx)/sw*100}%;top:${(y+(n-1)*TH+TH+RY*.55-RY*1.15-sy)/sh*100}%;width:${RX*2.5/sw*100}%;height:${RY*2.3/sh*100}%"></i>`;
       for(let j=n-1;j>=0;j--){
         const jit=Math.sin((j+1)*12.9898+(k+n)*78.233)*43758.5453,f=jit-Math.floor(jit),dx=(f-.5)*2.6,cx=x+dx,cy=y+j*TH;
-        html+=`<img class="chip" data-j="${j}" alt="" draggable="false" data-src="${c||0}-${Math.floor(f*8)}" src="${chipSrc(c||0,Math.floor(f*8))}" style="left:${(cx-RX-2-sx)/sw*100}%;top:${(cy-RY-2-sy)/sh*100}%;width:${IW/sw*100}%">`;
+        html+=`<img class="chip" data-j="${j}" alt="" draggable="false" src="img/table/chip${c||0}-${Math.floor(f*8)}.webp" style="left:${(cx-RX-2-sx)/sw*100}%;top:${(cy-RY-2-sy)/sh*100}%;width:${IW/sw*100}%">`;
       }
       html+='</div>';
     });
@@ -1116,7 +1111,6 @@
       bitmapize(url,W,H,u=>{im.src=u;});});
   }
   function wireChips(){
-    bitmapChips();
     document.querySelectorAll('#table .stack').forEach(st=>{
       if(st.dataset.wired)return;st.dataset.wired='1';
       const els=[...st.querySelectorAll('.chip')].sort((a,b)=>b.dataset.j-a.dataset.j); // bottom first
@@ -1288,7 +1282,8 @@
     cornerSpill();lay();buildFrame();fitArch();clearArch();fillEmpty();wireChips();wireDice();wireBox();
     if(pm){de.classList.add('pool-moving');kids.forEach((k,i)=>{if(k.id!=='pool')k.style.transform=saved[i];});}
   }
-  window.__lt=layoutTable;addEventListener('load',layoutTable);layoutTable();
+  if(/[?&]buildart\b/.test(location.search))window.__tableArt={card,back,chipSrc,artURL,CHIP_COL};
+  window.__lt=layoutTable;layoutTable();const firstW=innerWidth;addEventListener('load',()=>{if(innerWidth!==firstW)layoutTable();});
   let laidW=innerWidth;
   addEventListener('resize',()=>{clearTimeout(layoutTable.t);layoutTable.t=setTimeout(()=>{if(Math.abs(innerWidth-laidW)<2)return;laidW=innerWidth;layoutTable();},300);});
 
