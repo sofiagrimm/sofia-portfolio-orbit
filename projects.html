@@ -235,6 +235,12 @@
     #table .tuckbox svg{position:relative;z-index:1}
     #table .tuckpop{position:absolute;left:12%;top:4%;width:76%;z-index:0;pointer-events:none}
     .sstack{pointer-events:auto;cursor:pointer}
+    .deck-wrap,.feltprint{user-select:none;-webkit-user-select:none}
+    #cardframe .fc.movable,#table .pc.movable{pointer-events:auto;cursor:grab;touch-action:none;user-select:none;-webkit-user-select:none}
+    #cardframe .fc.held,#table .pc.held{cursor:grabbing;z-index:5}
+    .movable.held .rast{box-shadow:0 22px 30px rgba(20,0,0,.5);scale:1.05;transition:scale .15s,box-shadow .15s}
+    .movable .rast{transition:scale .2s,box-shadow .2s}
+    @media (max-width:760px){#cardframe .fc.movable{touch-action:auto}}
   </style>
 </head>
 <body>
@@ -1302,13 +1308,68 @@
       g.addEventListener('pointerdown',e=>{chipAudio.init();if(e.pointerType!=='mouse'){lift();setTimeout(drop,600);}});
     });
   }
+
+  // ── Loose cards: pick any background card up and move it. It lifts off the felt as you grab
+  //    it, swings a little as you drag, slides on with whatever speed you let go at, and comes to
+  //    rest. Double-click a card to flip it face down (and back).
+  function wireCardDrag(){
+    if(window.__arranging)return;
+    const sel='#cardframe .fc, #table .pc';
+    document.querySelectorAll(sel).forEach(el=>{
+      if(el.dataset.drag)return;
+      const spec=el.dataset.spec?JSON.parse(el.dataset.spec):null;
+      if(el.closest('#table')&&!(spec&&(spec.pile||spec.one)))return;   // only cards, not chips, dice or the box
+      el.dataset.drag='1';el.classList.add('movable');
+      let st=null,raf=0;
+      const rotOf=()=>{const m=/rotate\((-?[\d.]+)deg\)/.exec(el.style.transform||'');return m?+m[1]:0;};
+      const parentBox=()=>{const p=el.offsetParent||document.body;return {w:p.scrollWidth||document.documentElement.clientWidth,h:p.scrollHeight||document.documentElement.scrollHeight};};
+      function begin(e){
+        if(e.button!==0)return;e.preventDefault();cancelAnimationFrame(raf);chipAudio.init();chipAudio.slide();
+        // fold any nudge and percentage placement into plain pixels so it can move freely
+        const tr=(el.style.translate||'0px 0px').split(' ').map(parseFloat);
+        const x=el.offsetLeft+(tr[0]||0),y=el.offsetTop+(tr[1]||0);
+        el.style.translate='';el.style.left=x+'px';el.style.top=y+'px';
+        st={x,y,rot:rotOf(),px:e.clientX,py:e.clientY,vx:0,vy:0,t:performance.now(),moved:false};
+        el.parentNode.appendChild(el);el.classList.add('held');el.setPointerCapture(e.pointerId);
+      }
+      function move(e){
+        if(!st)return;const now=performance.now(),dt=Math.max(8,now-st.t),dx=e.clientX-st.px,dy=e.clientY-st.py;
+        if(Math.abs(dx)+Math.abs(dy)>2)st.moved=true;
+        st.x+=dx;st.y+=dy;st.vx=st.vx*.6+dx/dt*16*.4;st.vy=st.vy*.6+dy/dt*16*.4;st.px=e.clientX;st.py=e.clientY;st.t=now;
+        const swing=Math.max(-14,Math.min(14,st.vx*1.2));
+        el.style.left=st.x+'px';el.style.top=st.y+'px';el.style.transform=`rotate(${(st.rot+swing).toFixed(1)}deg)`;
+      }
+      function end(){
+        if(!st)return;el.classList.remove('held');const s0=st;st=null;
+        if(!s0.moved){el.style.transform=`rotate(${s0.rot}deg)`;return;}
+        chipAudio.slide();
+        // glide on and settle, spinning a touch in the direction it was thrown
+        let x=s0.x,y=s0.y,vx=s0.vx,vy=s0.vy,rot=s0.rot+Math.max(-14,Math.min(14,s0.vx*1.2)),vr=s0.vx*.25;const B=parentBox();
+        (function glide(){vx*=.9;vy*=.9;vr*=.88;x+=vx;y+=vy;rot+=vr;
+          if(x<-el.offsetWidth*.6||x>B.w-el.offsetWidth*.4){vx=-vx*.5;x=Math.max(-el.offsetWidth*.6,Math.min(B.w-el.offsetWidth*.4,x));}
+          if(y<40||y>B.h-el.offsetHeight*.5){vy=-vy*.5;y=Math.max(40,Math.min(B.h-el.offsetHeight*.5,y));}
+          el.style.left=x+'px';el.style.top=y+'px';el.style.transform=`rotate(${rot.toFixed(1)}deg)`;
+          if(Math.abs(vx)+Math.abs(vy)+Math.abs(vr)>.15)raf=requestAnimationFrame(glide);})();
+      }
+      el.addEventListener('pointerdown',begin);el.addEventListener('pointermove',move);
+      el.addEventListener('pointerup',end);el.addEventListener('pointercancel',end);
+      // flip it over
+      el.addEventListener('dblclick',e=>{e.preventDefault();const im=el.querySelector('img.rast');if(!im)return;chipAudio.snap();
+        const face=el.dataset.face||im.dataset.art;
+        el.animate([{scale:'1 1'},{scale:'0 1'}],{duration:130,easing:'ease-in'}).finished.then(()=>{
+          const down=im.dataset.art!=='back';el.dataset.face=face;
+          const [r,s]=(el.dataset.card||'').split('|');
+          im.replaceWith(down?art('back',back):(face==='back'?art('back',back):art(face,()=>card(r,s))));
+          el.animate([{scale:'0 1'},{scale:'1 1'}],{duration:150,easing:'ease-out'});});});
+    });
+  }
   function layoutTable(){
     if(window.__arranging&&layoutTable.done)return;layoutTable.done=true;
     // measure the table where it really sits, even while the opening is sliding it into view
     const de=document.documentElement,pm=de.classList.contains('pool-moving');
     const kids=[...document.body.children],saved=kids.map(k=>k.style.transform);
     if(pm){de.classList.remove('pool-moving');kids.forEach(k=>{if(k.id!=='pool')k.style.transform='';});}
-    cornerSpill();lay();buildFrame();fitArch();clearArch();fillEmpty();wireChips();wireDice();wireBox();wireLooseChips();
+    cornerSpill();lay();buildFrame();fitArch();clearArch();fillEmpty();wireChips();wireDice();wireBox();wireLooseChips();wireCardDrag();
     if(pm){de.classList.add('pool-moving');kids.forEach((k,i)=>{if(k.id!=='pool')k.style.transform=saved[i];});}
   }
   if(/[?&]buildart\b/.test(location.search))window.__tableArt={card,back,chipSrc,artURL,CHIP_COL};
