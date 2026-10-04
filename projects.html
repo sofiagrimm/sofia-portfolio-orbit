@@ -84,7 +84,7 @@
     #cardPopupInner.dismissing{opacity:0;transform:scale(0.45) translateY(30px);filter:blur(6px);transition:opacity .36s cubic-bezier(.55,0,.45,1),transform .36s cubic-bezier(.55,0,.45,1),filter .36s cubic-bezier(.55,0,.45,1);}
     #cardPopupClose{position:absolute;top:-16px;right:-16px;width:36px;height:36px;background:rgba(12,22,80,0.90);border:1px solid rgba(150,175,255,0.35);border-radius:50%;color:rgba(210,225,255,0.90);font-size:14px;display:flex;align-items:center;justify-content:center;cursor:pointer;z-index:10;transition:background .18s,color .18s,transform .18s,box-shadow .18s;backdrop-filter:blur(10px);box-shadow:0 4px 20px rgba(0,0,0,.5);}
     #cardPopupClose:hover{background:rgba(80,100,220,0.60);color:#fff;transform:scale(1.15) rotate(90deg);box-shadow:0 6px 28px rgba(80,120,255,.4);}
-    #cardPopupFlipper{width:100%;height:100%;transform-style:preserve-3d;transition:transform .65s cubic-bezier(.22,1,.36,1);border-radius:14px;will-change:transform;}
+    #cardPopupFlipper{cursor:pointer;width:100%;height:100%;transform-style:preserve-3d;transition:transform .65s cubic-bezier(.22,1,.36,1);border-radius:14px;will-change:transform;}
     #cardPopupFlipper.flipped{transform:rotateY(180deg);}
 
 
@@ -208,7 +208,7 @@
   <main class="page">
     <div class="page-eyebrow">Projects</div>
     <h1 class="page-title">Things I've <em>built.</em></h1>
-    <p class="page-subtitle">Click any card to reveal it. The code lives on <a href="https://github.com/sofiagrimm" data-gh style="color:inherit">GitHub</a>.</p>
+    <p class="page-subtitle">Click any card to reveal it, and again to flip it back. The code lives on <a href="https://github.com/sofiagrimm" data-gh style="color:inherit">GitHub</a>.</p>
 <svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
       <pattern id="deckLattice" width="14" height="14" patternUnits="userSpaceOnUse"><rect width="14" height="14" fill="#2e7656"/><path d="M7 1.5 L12.5 7 L7 12.5 L1.5 7Z" fill="none" stroke="#e9f2e6" stroke-width=".9"/></pattern>
       <symbol id="deckBack" viewBox="0 0 250 350">
@@ -514,13 +514,14 @@
       setTimeout(()=>{
         popupOverlay.classList.remove('visible');
         popupInner.classList.remove('dismissing');
-        activeSceneEl.classList.add('flipped','revealed');
+        if(popupFlipper.classList.contains('flipped')){activeSceneEl.classList.add('flipped','revealed');activeSceneEl.setAttribute('aria-label',PROJECTS[activeIdx].title+', turned over; press to flip back');}else activeSceneEl.classList.remove('flipped','revealed');
         activeSceneEl=null;activeIdx=-1;popupLocked=false;
       },380);
     }
 
     popupClose.addEventListener('click',closePopup);
     popupOverlay.addEventListener('click',(e)=>{if(e.target===popupOverlay)closePopup();});
+    popupFlipper.addEventListener('click',(e)=>{if(e.target.closest('.fr-link')||popupLocked)return;popupFlipper.classList.toggle('flipped');});
     document.addEventListener('keydown',(e)=>{if(e.key==='Escape')closePopup();});
 
     const grid=document.getElementById('memoryGrid');
@@ -539,12 +540,14 @@
           
         }
       },{once:true});
-      scene.addEventListener('click',(e)=>{
-        if(e.target.closest('.fr-link'))return;
+      // face up: open it. Already turned over: flip it back to the picture side.
+      const act=()=>{
         if(popupLocked)return;
+        if(scene.classList.contains('flipped')){scene.classList.remove('flipped','revealed');scene.setAttribute('aria-label',p.title);return;}
         openPopup(scene,i);
-      });
-      scene.addEventListener('keydown',(e)=>{if((e.key==='Enter'||e.key===' ')&&e.target===scene){e.preventDefault();if(!popupLocked)openPopup(scene,i);}});
+      };
+      scene.addEventListener('click',(e)=>{if(e.target.closest('.fr-link'))return;act();});
+      scene.addEventListener('keydown',(e)=>{if((e.key==='Enter'||e.key===' ')&&e.target===scene){e.preventDefault();act();}});
     });
 
     // Shuffle & draw: riffle the deck, then pull a random project card (never the same one twice in a row).
