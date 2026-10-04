@@ -575,8 +575,7 @@
     let mid='';
     if(rank==='A') mid=paint(125,170,120);
     else if(['K','Q','J'].includes(rank)) mid=`<rect x="58" y="58" width="134" height="234" fill="none" stroke="${INK}" stroke-width="2" filter="url(#ink${f})"/>${paint(125,135,70)}<g transform="rotate(180 125 175)">${paint(125,135,70)}</g><text x="125" y="186" font-family="'IM Fell English',Georgia,serif" font-size="38" fill="${c}" text-anchor="middle" opacity=".85">${rank}</text>`;
-    else { const n=parseInt(rank,10), rows=Math.ceil(n/2); let pips='';
-      for(let i=0;i<n;i++){const colx=(n%2&&i===n-1)?125:(i%2?160:90), row=Math.floor(i/2); const y=(n%2&&i===n-1)?175:80+row*(190/Math.max(1,rows-1||1)); pips+=paint(colx,y,46);} mid=pips; }
+    else { mid=(PIPS[rank]||[]).map(([col,y])=>paint(PIP[col],y,38)).join(''); }
     return `<svg viewBox="0 0 250 350" xmlns="http://www.w3.org/2000/svg"><defs>
       <filter id="wc${f}" x="-10%" y="-10%" width="120%" height="120%"><feTurbulence type="fractalNoise" baseFrequency=".035" numOctaves="3" seed="${uid}"/><feDisplacementMap in="SourceGraphic" scale="6"/><feGaussianBlur stdDeviation=".5"/></filter>
       <filter id="ink${f}"><feTurbulence type="fractalNoise" baseFrequency=".03" numOctaves="2" seed="${uid+7}"/><feDisplacementMap in="SourceGraphic" scale="3"/></filter>
@@ -718,11 +717,11 @@
   function buildFrame(){
     const vw=innerWidth,vh=innerHeight,mobile=vw<760,w=mobile?72:138,h=w*1.4;frame.innerHTML='';let i=0;
     const place=(x,y,rot)=>{const [r,s]=BORDER_CARDS[i%BORDER_CARDS.length];const el=document.createElement('div');el.className='fc';el.style.width=w+'px';
-      el.style.left=x+'px';el.style.top=y+'px';el.style.transform=`rotate(${rot}deg)`;el.innerHTML=printed(r,s);frame.appendChild(el);i++;};
+      el.style.left=x+'px';el.style.top=y+'px';el.style.transform=`rotate(${rot}deg)`;el.innerHTML=card(r,s);frame.appendChild(el);i++;};
     // left edge, top to bottom
-    if(vw>=1200) for(let y=64;y<vh-h*.4;y+=h*.62){place(-w*.45+rnd(i+1)*w*.3,y,(rnd(i+7)-.5)*50);}
+    if(vw>=1200) for(let y=70;y<vh-h*.6;y+=h*.92){place(-w*.5+rnd(i+1)*w*.25,y,(rnd(i+7)-.5)*36);}
     // bottom edge, left to right
-    for(let x=-w*.2;x<vw;x+=w*.72){place(x,vh-h*.62+rnd(i+3)*h*.18,(rnd(i+11)-.5)*44);}
+    for(let x=-w*.1;x<vw;x+=w*1.12){place(x,vh-h*.55+rnd(i+3)*h*.14,(rnd(i+11)-.5)*30);}
   }
   buildFrame(); addEventListener('resize',()=>{clearTimeout(buildFrame.t);buildFrame.t=setTimeout(buildFrame,150);});
 
