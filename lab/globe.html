@@ -377,7 +377,7 @@
     async function buildEarthTexture() {
       // Chunky, felt-like map: draw land small, blow it up and threshold it so coasts come out
       // rounded and tiny islands melt away, then add a speckle like a felt or crayon print.
-      const W = 2048, H = 1024, MW = 640, MH = 320;
+      const W = 2048, H = 1024, MW = 2048, MH = 1024;
       const m = document.createElement('canvas'); m.width = MW; m.height = MH;
       const mx = m.getContext('2d'); mx.fillStyle = '#fff';
       function px(lon, lat) { return [(lon + 180) / 360 * MW, (90 - lat) / 180 * MH]; }
@@ -394,21 +394,13 @@
       }
       const c = document.createElement('canvas'); c.width = W; c.height = H;
       const ctx = c.getContext('2d');
-      ctx.filter = 'blur(6px)'; ctx.imageSmoothingEnabled = true; ctx.drawImage(m, 0, 0, W, H); ctx.filter = 'none';
+      ctx.filter = 'blur(2.5px)'; ctx.drawImage(m, 0, 0, W, H); ctx.filter = 'none';
       const img = ctx.getImageData(0, 0, W, H), d = img.data;
       const ocean = [128, 182, 230], land = [184, 226, 158];
       for (let i = 0; i < d.length; i += 4) {
         const a = d[i+3] / 255, isLand = a > 0.5;
         const base = isLand ? land : ocean, n = (Math.random() - 0.5) * 16;
         d[i] = Math.max(0, Math.min(255, base[0] + n)); d[i+1] = Math.max(0, Math.min(255, base[1] + n)); d[i+2] = Math.max(0, Math.min(255, base[2] + n)); d[i+3] = 255;
-      }
-      // soft white ice caps; this also hides the smearing the flat map gets near the poles
-      for (let y = 0; y < H; y++) {
-        const lat = 90 - (y + .5) / H * 180;
-        for (let x = 0; x < W; x++) {
-          const lon = x / W * 360 - 180, capN = 76 + 1.6 * Math.sin(lon * Math.PI / 36) + .8 * Math.sin(lon * Math.PI / 11), capS = -69 + 1.8 * Math.sin(lon * Math.PI / 30) + .9 * Math.sin(lon * Math.PI / 9);
-          if (lat > capN || lat < capS) { const i = (y * W + x) * 4, n = (Math.random() - 0.5) * 10; d[i] = 244 + n; d[i+1] = 248 + n; d[i+2] = 252 + n; }
-        }
       }
       ctx.putImageData(img, 0, 0);
       return c;
@@ -499,9 +491,29 @@
       g.addColorStop(0,'rgba(20,30,60,.45)');g.addColorStop(1,'rgba(20,30,60,0)');x.fillStyle=g;x.fillRect(0,0,64,64);return new THREE.CanvasTexture(c);
     }
     // a billboard sprite that always faces you and turns to point the way it's flying
-    const planeTex=[makePlaneTexture(false),makePlaneTexture(true)];
-    const plane=new THREE.Sprite(new THREE.SpriteMaterial({map:planeTex[0],transparent:true,depthWrite:false}));plane.scale.set(0.26,0.26,1);
-    const NOSE=Math.atan2(-(460-232),700-80); // the drawing's nose points a little downhill
+    // a little 3D airliner in the same white, simple style as the reference drawing,
+    // so it banks and turns in proper perspective as it goes round the earth
+    function buildPlane(){
+      const g=new THREE.Group(),white=new THREE.MeshLambertMaterial({color:0xffffff,emissive:0x8a909c}),soft=new THREE.MeshLambertMaterial({color:0xdfe3ea,emissive:0x707680}),
+        ink=new THREE.MeshBasicMaterial({color:0x3d4250,side:THREE.BackSide}),glass=new THREE.MeshBasicMaterial({color:0x8fb1d6});
+      const outlined=(geo,mat,s=1.06)=>{const m=new THREE.Mesh(geo,mat),o=new THREE.Mesh(geo,ink);o.scale.setScalar(s);const k=new THREE.Group();k.add(o,m);return k;};
+      const body=outlined(new THREE.CylinderGeometry(.07,.07,.72,20),white);g.add(body);
+      const nose=outlined(new THREE.SphereGeometry(.07,20,14),white);nose.scale.set(1,1.7,1);nose.position.y=.36;g.add(nose);
+      const tail=outlined(new THREE.ConeGeometry(.07,.32,20),white);tail.rotation.x=Math.PI;tail.position.set(0,-.52,.012);g.add(tail);
+      const flat=(pts,depth,mat)=>{const sh=new THREE.Shape();sh.moveTo(pts[0][0],pts[0][1]);pts.slice(1).forEach(p=>sh.lineTo(p[0],p[1]));sh.closePath();
+        const geo=new THREE.ExtrudeGeometry(sh,{depth,bevelEnabled:false});geo.translate(0,0,-depth/2);return new THREE.Mesh(geo,mat);};
+      [1,-1].forEach(side=>{
+        const wing=flat([[0,.12],[side*.62,-.14],[side*.64,-.22],[0,-.06]],.016,white);wing.position.z=-.025;g.add(wing);
+        const stab=flat([[0,-.42],[side*.22,-.56],[side*.23,-.6],[0,-.53]],.012,white);stab.position.z=.01;g.add(stab);
+        const eng=new THREE.Mesh(new THREE.CylinderGeometry(.03,.034,.12,12),soft);eng.position.set(side*.26,.02,-.065);g.add(eng);
+        for(let i=0;i<10;i++){const w=new THREE.Mesh(new THREE.SphereGeometry(.011,8,6),glass);w.position.set(side*.068,-.24+i*.055,.018);g.add(w);}
+      });
+      const fin=flat([[-.36,0],[-.64,0],[-.66,.24],[-.56,.24]],.014,white);fin.geometry.rotateX(Math.PI/2);fin.geometry.rotateZ(Math.PI/2);fin.position.z=.05;g.add(fin);
+      [[-.03,.42],[.03,.42]].forEach(([x,y])=>{const c=new THREE.Mesh(new THREE.SphereGeometry(.016,8,6),glass);c.position.set(x,y,.045);g.add(c);});
+      return g;
+    }
+    const plane=buildPlane();plane.renderOrder=5;plane.userData.s=0.2;
+    const planeLight=new THREE.DirectionalLight(0xffffff,1.6);planeLight.position.set(2,3,4);scene.add(planeLight);
     const planeShadow=new THREE.Mesh(new THREE.PlaneGeometry(0.15,0.15),new THREE.MeshBasicMaterial({map:makeShadowTexture(),transparent:true,depthWrite:false}));
     plane.renderOrder=5;pinGroup.add(planeShadow,plane);
 
@@ -510,7 +522,7 @@
       UP.copy(pos).normalize();
       const f=forward.clone().sub(UP.clone().multiplyScalar(forward.dot(UP))).normalize();
       const r=new THREE.Vector3().crossVectors(f,UP).normalize();
-      const m=new THREE.Matrix4().makeBasis(r,f,UP);m.setPosition(pos);
+      const m=new THREE.Matrix4().makeBasis(r,f,UP);if(mesh.userData.s)m.multiply(new THREE.Matrix4().makeScale(mesh.userData.s,mesh.userData.s,mesh.userData.s));m.setPosition(pos);
       mesh.matrixAutoUpdate=false;mesh.matrix.copy(m);mesh.matrixWorldNeedsUpdate=true;
     }
     function slerp(a,b,t){
@@ -598,15 +610,8 @@
         const dirAt=a=>new THREE.Vector3(0.62*Math.cos(a),0.38*Math.sin(a*1.0)+0.08*Math.sin(a*2),1).normalize().applyQuaternion(inv);
         curDir=dirAt(idleA);curAlt=CRUISE+0.02;pos=curDir.clone().multiplyScalar(curAlt);ahead=dirAt(idleA+0.02).multiplyScalar(curAlt);
       }
-      plane.position.copy(pos);
-      // point the sprite along the direction of travel as seen on screen
-      pinGroup.updateMatrixWorld();
-      const sp=pos.clone().applyMatrix4(pinGroup.matrixWorld).project(camera),sa=ahead.clone().applyMatrix4(pinGroup.matrixWorld).project(camera);
-      const dx=sa.x-sp.x,dy=sa.y-sp.y;
-      if(Math.abs(dx)+Math.abs(dy)>1e-6){const left=dx<0;plane.material.map=planeTex[left?1:0];const ang=Math.atan2(dy,dx);const nose=left?Math.atan2(Math.sin(NOSE),-Math.cos(NOSE)):NOSE;plane.material.rotation=ang-nose;}
-      // hide the plane when it's round the back of the earth
-      const camLocal=camera.position.clone().applyMatrix4(new THREE.Matrix4().copy(pinGroup.matrixWorld).invert());
-      plane.visible=pos.clone().normalize().dot(camLocal.clone().normalize())>-0.15;
+      // nose along the route, belly toward the earth, with a slight bank into turns
+      placeMesh(plane,pos,ahead.clone().sub(pos));
       placeMesh(planeShadow,curDir.clone().multiplyScalar(1.004),ahead.clone().sub(pos));
       const h=curAlt-1;planeShadow.material.opacity=Math.max(.25,1-h*3);
     }
