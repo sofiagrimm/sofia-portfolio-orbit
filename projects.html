@@ -129,6 +129,9 @@
     .fr-body{font-family:'Courier Prime',monospace;font-size:11.5px;line-height:1.55;color:#3b342b}
     .fr-link{font-family:'Nanum Pen Script',cursive;font-size:21px;letter-spacing:0;text-transform:none;color:#24306b;border-bottom:1px solid #24306b55}
     .fr-link:hover{color:#16204f}
+    .fr-road{position:absolute;right:0;top:0;bottom:0;width:27%;height:100%;border-radius:0 12px 12px 0;pointer-events:none}
+    .card-front:has(.fr-road) > :not(.fr-road){margin-right:25%}
+    .card-front:has(.fr-road) .fr-body{font-size:11px;line-height:1.5}
     #cardPopupClose{background:#f3ecdd;color:#2b2620;border:0}
     #cardPopupClose:hover{background:#fff;color:#2b2620;box-shadow:0 6px 20px rgba(0,0,0,.4)}
     @media (prefers-reduced-motion:reduce){.card-scene{animation:none;opacity:1;transition:none}.card-flipper{transition:none}}
@@ -345,6 +348,35 @@
       return `<svg viewBox="0 0 250 350" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">${defs}${paper}${corners}${SCENES[h.scene]()}${label}</svg>`;
     }
 
+    // Winding road with little cars, for the back of the Red Cross card.
+    function roadSVG(){
+      const f='rd'+Math.random().toString(36).slice(2,6);
+      const P=[[64,-10],[8,58],[6,104],[46,140],[86,176],[90,226],[52,264],[14,300],[12,352],[60,410]];
+      // cubic segments: P0 c1 c2 P1, P1 c1 c2 P2 ...
+      const seg=[[P[0],P[1],P[2],P[3]],[P[3],P[4],P[5],P[6]],[P[6],P[7],P[8],P[9]]];
+      const d=`M${P[0]} C${P[1]} ${P[2]} ${P[3]} C${P[4]} ${P[5]} ${P[6]} C${P[7]} ${P[8]} ${P[9]}`;
+      function at(si,t){const [a,b,c,e]=seg[si],u=1-t;
+        const x=u*u*u*a[0]+3*u*u*t*b[0]+3*u*t*t*c[0]+t*t*t*e[0], y=u*u*u*a[1]+3*u*u*t*b[1]+3*u*t*t*c[1]+t*t*t*e[1];
+        const dx=3*u*u*(b[0]-a[0])+6*u*t*(c[0]-b[0])+3*t*t*(e[0]-c[0]), dy=3*u*u*(b[1]-a[1])+6*u*t*(c[1]-b[1])+3*t*t*(e[1]-c[1]);
+        return [x,y,Math.atan2(dy,dx)*180/Math.PI];}
+      const car=(si,t,col,off)=>{const [x,y,a]=at(si,t);
+        return `<g transform="translate(${x.toFixed(1)} ${y.toFixed(1)}) rotate(${(a+90).toFixed(1)}) translate(${off} 0)">
+          <rect x="-5" y="-8" width="10" height="16" rx="3.5" fill="${col}" stroke="#3a3632" stroke-width=".8"/>
+          <rect x="-3.6" y="-5" width="7.2" height="4" rx="1.2" fill="#bfe0ee" stroke="#3a3632" stroke-width=".5"/>
+          <rect x="-3.6" y="2.4" width="7.2" height="2.6" rx="1" fill="#bfe0ee" stroke="#3a3632" stroke-width=".5" opacity=".8"/></g>`;};
+      return `<svg class="fr-road" viewBox="0 0 100 400" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+        <defs><filter id="${f}" x="-10%" y="-5%" width="120%" height="110%"><feTurbulence type="fractalNoise" baseFrequency=".09" numOctaves="3" seed="7" result="n"/>
+          <feColorMatrix in="n" type="matrix" values="0 0 0 0 .2  0 0 0 0 .2  0 0 0 0 .2  0 0 0 -1.6 .9" result="m"/><feComposite in="m" in2="SourceGraphic" operator="in" result="spots"/>
+          <feMerge><feMergeNode in="SourceGraphic"/><feMergeNode in="spots"/></feMerge></filter></defs>
+        <path d="${d}" fill="none" stroke="#7d7b78" stroke-width="30" stroke-linecap="butt" filter="url(#${f})"/>
+        <path d="${d}" fill="none" stroke="#fbfaf6" stroke-width="25" opacity=".95"/>
+        <path d="${d}" fill="none" stroke="#8a8784" stroke-width="22" filter="url(#${f})"/>
+        <path d="${d}" fill="none" stroke="#fbfaf6" stroke-width="1.6" stroke-dasharray="5 6"/>
+        <circle cx="62" cy="152" r="2.4" fill="#4a4745" opacity=".6"/><circle cx="24" cy="318" r="2" fill="#4a4745" opacity=".55"/>
+        ${car(0,.18,'#e7d27a',-5)}${car(1,.32,'#e8743b',5)}${car(1,.82,'#e7d27a',-5)}${car(2,.45,'#5f86a8',5)}
+      </svg>`;
+    }
+
     function makeFrontHTML(p){
       const linkAttr=(p.link&&p.link!=='#')
         ?`href="${p.link}" target="_blank" rel="noopener"`
@@ -356,6 +388,7 @@
         <div class="fr-title">${p.title}</div>
         <div class="fr-body">${p.body}</div>
         <a class="fr-link" ${linkAttr}>${p.linkLabel}</a>
+        ${/Red Cross/.test(p.title)?roadSVG():''}
       `;
     }
 
