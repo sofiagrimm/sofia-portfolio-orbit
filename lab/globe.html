@@ -540,12 +540,20 @@
     idleV.sub(idleU.clone().multiplyScalar(idleV.dot(idleU))).normalize();
     let idleA=0,curDir=new THREE.Vector3(1,0,0),curAlt=CRUISE;
 
+    // A flight-map arc: the great circle, bowed sideways toward the pole and lifted off the
+    // surface in the middle, so routes curve like the arcs on airline maps.
+    function arcDir(a,b,t,ang){
+      let n=new THREE.Vector3().crossVectors(a,b);if(n.lengthSq()<1e-8)n.set(0,1,0);n.normalize();if(n.y<0)n.negate();
+      const bow=Math.min(0.42,0.38*ang+0.06);
+      return slerp(a,b,t).add(n.multiplyScalar(bow*Math.sin(Math.PI*t))).normalize();
+    }
+    function arcAlt(t,ang,base){return base+(0.05+0.24*ang/Math.PI)*Math.sin(Math.PI*t);}
     function startFlight(toId,drawLine){
       const a=curDir.clone().normalize(),b=pinDir(toId),ang=Math.acos(Math.min(1,a.dot(b)));
       let line=null;
       if(drawLine){
         const N=160,pts=[];const lift=0.03+0.16*ang/Math.PI;
-        for(let i=0;i<=N;i++){const t=i/N;pts.push(slerp(a,b,t).multiplyScalar(1.012+lift*Math.sin(Math.PI*t)*0.85));}
+        for(let i=0;i<=N;i++){const t=i/N;pts.push(arcDir(a,b,t,ang).multiplyScalar(arcAlt(t,ang,1.012)));}
         // round white dots, evenly spaced, with a soft dark halo so they read on the pale ocean
         const dotTex=(()=>{const c=document.createElement('canvas');c.width=c.height=64;const x=c.getContext('2d');
           const g=x.createRadialGradient(32,32,0,32,32,32);g.addColorStop(0,'rgba(20,30,70,.55)');g.addColorStop(1,'rgba(20,30,70,0)');x.fillStyle=g;x.fillRect(0,0,64,64);
@@ -619,9 +627,9 @@
       let pos,ahead;
       if(flight){
         const raw=Math.min(1,(now-flight.start)/flight.dur),t=raw<.5?2*raw*raw:1-Math.pow(-2*raw+2,2)/2;
-        const alt=t=>CRUISE+flight.lift*Math.sin(Math.PI*t);
-        curDir=slerp(flight.a,flight.b,t);curAlt=alt(t);
-        pos=curDir.clone().multiplyScalar(curAlt);ahead=slerp(flight.a,flight.b,Math.min(1,t+0.01)).multiplyScalar(alt(Math.min(1,t+0.01)));
+        const t2=Math.min(1,t+0.01);
+        curDir=arcDir(flight.a,flight.b,t,flight.ang);curAlt=arcAlt(t,flight.ang,CRUISE-0.05);
+        pos=curDir.clone().multiplyScalar(curAlt);ahead=arcDir(flight.a,flight.b,t2,flight.ang).multiplyScalar(arcAlt(t2,flight.ang,CRUISE-0.05));
         if(flight.line){const n=flight.line.geometry.attributes.position.count;flight.line.geometry.setDrawRange(0,Math.ceil(n*t));}
         if(raw>=1){showRollButton(flight.to);parked={dir:flight.b.clone(),phase:0};if(flight.line)flight.line.geometry.setDrawRange(0,Infinity);flight=null;}
         if(ahead.distanceTo(pos)<1e-5)ahead=pos.clone().add(new THREE.Vector3(0,0,0.001));
