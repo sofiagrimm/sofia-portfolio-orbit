@@ -138,6 +138,12 @@
   .paper-stack .paper-text{left:16%;right:16%;top:22%;font-family:'Nanum Pen Script',cursive;font-size:clamp(22px,12cqw,32px);line-height:1.05;color:#3b3415}
   .paper-grid .paper-text{left:18%;right:8%;top:18%;font-family:'Nanum Pen Script',cursive;font-size:clamp(22px,12cqw,32px);line-height:1.05;color:#4a1f2c}
   .paper-stack.s1{margin-top:0}
+  /* a paper airplane folded from notebook paper, drifting by */
+  .paper-plane{position:absolute;right:2%;top:30px;width:clamp(150px,20vw,260px);z-index:3;pointer-events:none;
+    filter:drop-shadow(0 18px 18px rgba(0,0,0,.35));animation:glide 9s ease-in-out infinite alternate}
+  @keyframes glide{0%{transform:translate(0,0) rotate(-6deg)}50%{transform:translate(-26px,14px) rotate(-2deg)}100%{transform:translate(-8px,-12px) rotate(-9deg)}}
+  @media (max-width:760px){.paper-plane{width:110px;right:0;top:70px}}
+  @media (prefers-reduced-motion:reduce){.paper-plane{animation:none;transform:rotate(-6deg)}}
   footer{position:relative;z-index:10;padding-bottom:110px !important;}
   footer{text-align:center;padding:0 0 48px;color:#7f8fb8;font-size:13px}
   footer a{color:#c9d6ff}
@@ -170,6 +176,32 @@
 </header>
 
 <section class="hello">
+  <svg class="paper-plane" viewBox="80 150 580 450" aria-hidden="true">
+    <defs>
+      <pattern id="ppA" width="40" height="40" patternUnits="userSpaceOnUse" patternTransform="rotate(-24)"><rect width="40" height="40" fill="#f7f6f2"/><path d="M0 39.5 H40" stroke="#b9b3c9" stroke-width="1.4"/></pattern>
+      <pattern id="ppB" width="40" height="40" patternUnits="userSpaceOnUse" patternTransform="rotate(68)"><rect width="40" height="40" fill="#e9e8e3"/><path d="M0 39.5 H40" stroke="#b5afc4" stroke-width="1.4"/></pattern>
+      <pattern id="ppC" width="38" height="38" patternUnits="userSpaceOnUse" patternTransform="rotate(-62)"><rect width="38" height="38" fill="#fbfaf7"/><path d="M0 37.5 H38" stroke="#bdb7cc" stroke-width="1.3"/></pattern>
+      <clipPath id="ppBack"><path d="M636 168 L90 410 L330 428 Z"/></clipPath>
+      <clipPath id="ppFront"><path d="M636 168 L340 468 L548 552 Z"/></clipPath>
+    </defs>
+    <path d="M330 428 L346 586 L410 470 Z" fill="url(#ppB)"/>
+    <path d="M636 168 L90 410 L330 428 Z" fill="url(#ppA)"/>
+    <g clip-path="url(#ppBack)" font-family="'Nanum Pen Script',cursive" fill="#3d3a44" opacity=".75">
+      <text x="196" y="392" font-size="40" transform="rotate(-22 196 392)">hi! look</text>
+      <text x="268" y="430" font-size="38" transform="rotate(-22 268 430)">up, the sky</text>
+      <path d="M140 450 L560 270" stroke="#7fb59a" stroke-width="2"/>
+      <circle cx="226" cy="420" r="9" fill="#2b3550"/>
+    </g>
+    <path d="M636 168 L420 350 L330 428 L400 420 Z" fill="#eeede8"/>
+    <path d="M636 168 L340 468 L548 552 Z" fill="url(#ppC)"/>
+    <g clip-path="url(#ppFront)" font-family="'Nanum Pen Script',cursive" fill="#3d3a44" opacity=".75">
+      <text x="400" y="470" font-size="42" transform="rotate(-48 400 470)">wow,</text>
+      <text x="446" y="486" font-size="40" transform="rotate(-48 446 486)">stars</text>
+      <circle cx="462" cy="492" r="9" fill="#2b3550"/>
+    </g>
+    <path d="M636 168 L90 410 L330 428 Z M636 168 L340 468 L548 552 Z M330 428 L346 586 L410 470" fill="none" stroke="#c9c6bf" stroke-width="1.5" stroke-linejoin="round"/>
+    <path d="M636 168 L330 428" stroke="#d6d3cc" stroke-width="2"/>
+  </svg>
   <p class="wow">wow! look at all those stars <span aria-hidden="true">✩</span></p>
   <span class="hi">hi! i'm</span><br>
   <h1>sofia grimm<span class="tape" aria-hidden="true">that's me</span></h1>
