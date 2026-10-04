@@ -724,6 +724,33 @@
       <text x="86" y="216" text-anchor="middle" font-family="Courier New,monospace" font-size="6.2" letter-spacing="1.2" fill="#1f4f3a">NEW HAVEN, CT</text>
     </svg>`;
   }
+  // a black chip tray, like the ones on a dealer's table: channels of chips lying on their sides,
+  // a couple of loose chips resting on top
+  function chipTray(){
+    const cols=[['#1f7a4f','#e9f2e6'],['#1f8fa0','#e8f6f8'],['#18181b','#efefef'],['#c94f7c','#fbe3ec'],['#18181b','#efefef'],['#d8a83a','#fff4d6']];
+    const chan=(x,c,k)=>{let g=`<rect x="${x}" y="22" width="44" height="236" rx="22" fill="#0b0b0d"/><rect x="${x+3}" y="22" width="38" height="236" rx="19" fill="url(#trTrough)"/>`;
+      const top=k%2?40:70;
+      g+=`<rect x="${x+4}" y="${top}" width="36" height="${244-top}" rx="6" fill="${c[0]}"/>`;
+      for(let y=top+3;y<250;y+=7.5)g+=`<path d="M${x+5} ${y} H${x+39}" stroke="#000" stroke-opacity=".28" stroke-width="1"/>`+
+        [8,20,32].map((dx,j)=>`<rect x="${x+dx-3+((y/7.5|0)%2)*2}" y="${y+1.4}" width="5" height="3.6" fill="${c[1]}" opacity="${.85-j*.05}"/>`).join('');
+      g+=`<rect x="${x+4}" y="${top}" width="36" height="${244-top}" rx="6" fill="url(#trRound)"/>`;
+      return g;};
+    return `<svg viewBox="0 0 330 300" xmlns="http://www.w3.org/2000/svg" style="overflow:visible">
+      <defs>
+        <linearGradient id="trBody" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#3a3a40"/><stop offset=".25" stop-color="#16161a"/><stop offset="1" stop-color="#050506"/></linearGradient>
+        <linearGradient id="trTrough" x1="0" x2="1"><stop offset="0" stop-color="#2d2d33"/><stop offset=".5" stop-color="#0d0d10"/><stop offset="1" stop-color="#26262b"/></linearGradient>
+        <linearGradient id="trRound" x1="0" x2="1"><stop offset="0" stop-color="#000" stop-opacity=".45"/><stop offset=".35" stop-color="#fff" stop-opacity=".18"/><stop offset=".6" stop-color="#fff" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".5"/></linearGradient>
+        <radialGradient id="trChip" cx="40%" cy="35%" r="70%"><stop offset="0" stop-color="#fff" stop-opacity=".35"/><stop offset=".6" stop-color="#fff" stop-opacity="0"/></radialGradient>
+      </defs>
+      <rect x="10" y="16" width="320" height="280" rx="18" fill="#000" opacity=".45"/>
+      <rect x="0" y="0" width="320" height="276" rx="16" fill="url(#trBody)"/>
+      <path d="M14 8 H306" stroke="#fff" stroke-opacity=".14" stroke-width="2" stroke-linecap="round"/>
+      ${cols.map((c,k)=>chan(14+k*50,c,k)).join('')}
+      <g transform="translate(218 40) rotate(-12)"><ellipse cx="4" cy="6" rx="34" ry="34" fill="#000" opacity=".5"/><circle r="34" fill="#c94f7c"/><circle r="30" fill="none" stroke="#fbe3ec" stroke-width="8" stroke-dasharray="7 9"/><circle r="20" fill="#1a1a1e"/>
+        ${[...Array(8)].map((_,i)=>`<path d="M0 0 L${(18*Math.cos(i*Math.PI/4)).toFixed(1)} ${(18*Math.sin(i*Math.PI/4)).toFixed(1)}" stroke="#e8c26a" stroke-width="2"/>`).join('')}<circle r="6" fill="#e8c26a"/><circle r="34" fill="url(#trChip)"/></g>
+      <g transform="translate(292 22) rotate(18)"><ellipse cx="4" cy="6" rx="30" ry="30" fill="#000" opacity=".5"/><circle r="30" fill="#18181b"/><circle r="26" fill="none" stroke="#efefef" stroke-width="7" stroke-dasharray="6 8"/><circle r="15" fill="#18181b" stroke="#efefef" stroke-width="1.4"/><circle r="30" fill="url(#trChip)"/></g>
+    </svg>`;
+  }
   function dealer(){
     return `<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><circle cx="50" cy="54" r="44" fill="#00000055"/><circle cx="50" cy="50" r="44" fill="#f7f4ec" stroke="#d4ccbb" stroke-width="2"/>
       <circle cx="50" cy="50" r="36" fill="none" stroke="#1d1d1d" stroke-width="1.4"/>
@@ -764,9 +791,10 @@
     {chips:[[30,40,4],[78,30,3,1],[104,72,5,2]], x:80, y:4, w:300, rot:0, wide:1},
     {chips:[[24,30,1,3]], x:35, y:21, w:240, rot:0},
     {prop:'dealer', x:28, y:66, w:124, rot:0},
+    {prop:'tray', x:6, y:70, w:330, rot:-24, wide:1},
     {prop:'pad', x:60, y:60, w:200, rot:5, wide:1},
     {chips:[[24,30,5,2],[60,42,3,3],[96,30,2,5]], x:40, y:70, w:300, rot:0},
-    {dice:1, x:16, y:74, w:150, rot:12},
+    {dice:1, x:30, y:80, w:150, rot:12},
     {pile:3, x:80, y:62, w:168, rot:14, wide:1},
     {one:['K','diamond'], x:12, y:58, w:160, rot:-14, wide:1},
     {dice:1, x:72, y:82, w:140, rot:-28},
@@ -781,7 +809,7 @@
       if(mobile&&(gi%2||g.y<14)) return;
       if(g.wide&&innerWidth<1200) return;   // only where there's room beside the hand            // fewer cards on phones, none over the nav
       const scale=mobile?.42:1, w=g.w*scale;
-      if(g.prop){const el=document.createElement('div');el.className='pc';el.dataset.spec=JSON.stringify(g);el.style.width=(g.w*scale)+'px';el.style.left=g.x+'%';el.style.top=g.y+'%';el.style.transform=`rotate(${g.rot}deg)`;el.innerHTML={box:deckBox,dealer:dealer,pad:scorepad}[g.prop]();table.appendChild(el);return;}
+      if(g.prop){const el=document.createElement('div');el.className='pc';el.dataset.spec=JSON.stringify(g);el.style.width=(g.w*scale)+'px';el.style.left=g.x+'%';el.style.top=g.y+'%';el.style.transform=`rotate(${g.rot}deg)`;el.innerHTML={box:deckBox,dealer:dealer,pad:scorepad,tray:chipTray}[g.prop]();table.appendChild(el);return;}
       if(g.chips||g.dice){const el=document.createElement('div');el.className='pc';el.dataset.spec=JSON.stringify(g);el.style.width=(g.w*scale)+'px';el.style.left=g.x+'%';el.style.top=g.y+'%';el.style.transform=`rotate(${g.rot}deg)`;el.innerHTML=g.chips?chips(g.chips):dice();table.appendChild(el);return;}
       const list=g.pile?Array.from({length:g.pile},()=>null):(g.fan||[g.one]);
       list.forEach((rs,k)=>{
@@ -1071,5 +1099,6 @@
 </script>
 <script src="gh.js"></script>
 <script src="arrange.js"></script>
+<script src="roulette.js"></script>
 </body>
 </html>
