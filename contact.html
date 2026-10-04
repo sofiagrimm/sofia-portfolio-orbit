@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Contact | Sofia Grimm</title>
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Inter:wght@300;400;500&family=IM+Fell+English:ital@0;1&family=IM+Fell+English+SC&family=Pinyon+Script&family=Nanum+Pen+Script&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Inter:wght@300;400;500&family=IM+Fell+English:ital@0;1&family=IM+Fell+English+SC&family=Pinyon+Script&family=Nanum+Pen+Script&family=Courier+Prime:wght@400;700&display=swap');
     *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
     html,body{width:100%;min-height:100%;background:#060d18;font-family:'Inter',sans-serif;color:#e9f0ff;}
     canvas{display:block;position:fixed;inset:0;z-index:0}
@@ -55,16 +55,38 @@
     .mono svg{width:clamp(54px,10vw,74px);height:auto}
     .member .no{font-family:'IM Fell English SC',Georgia,serif;font-size:13px;letter-spacing:.08em;color:var(--ink-soft)}
 
-    .invite{padding:clamp(28px,6vw,44px) clamp(26px,7vw,56px);text-align:center;outline:1px solid #2b262066;outline-offset:-12px}
-    .invite::before{content:"";position:absolute;inset:17px;border:1px solid #2b262033;pointer-events:none}
-    .corner{position:absolute;width:44px;height:44px;color:#2b2620}
-    .c1{top:8px;left:8px}.c2{top:8px;right:8px;transform:scaleX(-1)}.c3{bottom:8px;left:8px;transform:scaleY(-1)}.c4{bottom:8px;right:8px;transform:scale(-1)}
-    .invite h1{font-family:'IM Fell English',Georgia,serif;font-style:italic;font-weight:400;font-size:clamp(26px,5vw,34px);line-height:1.15;color:var(--ink)}
-    .invite p{font-family:'IM Fell English',Georgia,serif;font-size:17px;line-height:1.55;color:#3b342b;max-width:37ch;margin:14px auto 0}
-    .invite ul{list-style:none;margin:22px auto 0;display:grid;gap:6px;font-family:'IM Fell English',Georgia,serif;font-size:16px}
+    .invite{padding:clamp(28px,6vw,40px) clamp(24px,6vw,44px) 34px;text-align:left;min-height:330px}
+    .invite h1{font-family:'Nanum Pen Script',cursive;font-weight:400;font-size:clamp(40px,8vw,54px);line-height:.95;color:#24306b;transform:rotate(-2deg);transform-origin:left}
+    .invite p{font-family:'Courier Prime',monospace;font-size:15px;line-height:1.6;color:#3b342b;max-width:36ch;margin:16px 0 0}
+    .invite ul{list-style:none;margin:20px 0 0;display:grid;gap:4px;font-family:'Courier Prime',monospace;font-size:15px}
     .invite a{color:var(--ink);text-decoration:underline;text-decoration-color:#2b262066;text-underline-offset:3px}
     .invite a:hover,.invite a:focus-visible{text-decoration-color:var(--ink)}
-    .invite .sig{font-family:'Nanum Pen Script',cursive;font-size:36px;line-height:1;color:#24306b;margin-top:18px;transform:rotate(-3deg)}
+    .invite .sig{font-family:'Nanum Pen Script',cursive;font-size:38px;line-height:1;color:#24306b;margin-top:16px;transform:rotate(-4deg);display:inline-block}
+
+    /* a wax seal being made: wax drips, puddles, then a brass stamp presses it */
+    .waxmaker{position:absolute;right:clamp(14px,4vw,30px);bottom:4px;width:clamp(112px,26vw,150px);height:auto;pointer-events:none;overflow:visible}
+    .waxmaker *{transform-box:fill-box}
+    .open .waxmaker .stick{animation:stick 1.3s 1.25s cubic-bezier(.4,.1,.3,1) both}
+    .open .waxmaker .flame{animation:flicker .18s 1.25s 7 alternate both, gone .2s 2.45s both}
+    .open .waxmaker .drip{animation:drip .45s cubic-bezier(.6,0,.9,.6) both}
+    .open .waxmaker .d1{animation-delay:1.55s}.open .waxmaker .d2{animation-delay:1.85s}.open .waxmaker .d3{animation-delay:2.1s}
+    .open .waxmaker .puddle{animation:puddle 1s 1.9s cubic-bezier(.2,.8,.3,1) both}
+    .open .waxmaker .stamp{animation:stamp 1.35s 2.6s cubic-bezier(.5,0,.3,1) both}
+    .open .waxmaker .emboss{animation:emboss .3s 3.15s ease-out both}
+    .waxmaker .stick,.waxmaker .drip,.waxmaker .stamp{opacity:0}
+    .waxmaker .puddle{transform:scale(0);transform-origin:center}
+    .waxmaker .emboss{opacity:0}
+    @keyframes stick{0%{opacity:0;transform:translate(60px,-50px) rotate(30deg)}20%{opacity:1;transform:translate(0,0) rotate(0)}80%{opacity:1;transform:translate(0,0) rotate(-6deg)}100%{opacity:0;transform:translate(70px,-60px) rotate(25deg)}}
+    @keyframes flicker{from{transform:scale(1,1)}to{transform:scale(.8,1.15)}}
+    @keyframes gone{to{opacity:0}}
+    @keyframes drip{0%{opacity:1;transform:translateY(0) scale(.6)}90%{opacity:1;transform:translateY(46px) scale(1,1.2)}100%{opacity:0;transform:translateY(50px) scale(1.4,.4)}}
+    @keyframes puddle{0%{transform:scale(0)}35%{transform:scale(.55)}70%{transform:scale(.85)}100%{transform:scale(1)}}
+    @keyframes stamp{0%{opacity:0;transform:translateY(-80px)}25%{opacity:1;transform:translateY(-6px)}38%{transform:translateY(4px) scaleY(.97)}55%{transform:translateY(4px) scaleY(.97)}80%{opacity:1;transform:translateY(-70px)}100%{opacity:0;transform:translateY(-90px)}}
+    @keyframes emboss{from{opacity:0;transform:scale(.96)}to{opacity:1;transform:scale(1)}}
+    @media (prefers-reduced-motion:reduce){
+      .open .waxmaker *{animation:none !important}
+      .open .waxmaker .puddle{transform:none}.open .waxmaker .emboss{opacity:1}
+    }
 
     /* envelope */
     .envelope{position:relative;width:100%;aspect-ratio:16/10;perspective:1400px}
@@ -154,14 +176,44 @@
       </section>
 
       <section class="sheet invite second" aria-labelledby="invite-title">
-        <svg class="corner c1" viewBox="0 0 44 44" fill="none" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" aria-hidden="true"><path d="M3 3 C16 3 22 8 22 16 C22 22 17 24 14 21 C11 18 14 14 18 16"/><path d="M3 3 C3 16 8 22 16 22 C22 22 24 17 21 14 C18 11 14 14 16 18"/><path d="M3 3 L11 11"/><path d="M26 4 C30 2 34 4 36 3 M4 26 C2 30 4 34 3 36"/><circle cx="11" cy="11" r="1.4" fill="currentColor"/></svg><svg class="corner c2" viewBox="0 0 44 44" fill="none" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" aria-hidden="true"><path d="M3 3 C16 3 22 8 22 16 C22 22 17 24 14 21 C11 18 14 14 18 16"/><path d="M3 3 C3 16 8 22 16 22 C22 22 24 17 21 14 C18 11 14 14 16 18"/><path d="M3 3 L11 11"/><path d="M26 4 C30 2 34 4 36 3 M4 26 C2 30 4 34 3 36"/><circle cx="11" cy="11" r="1.4" fill="currentColor"/></svg><svg class="corner c3" viewBox="0 0 44 44" fill="none" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" aria-hidden="true"><path d="M3 3 C16 3 22 8 22 16 C22 22 17 24 14 21 C11 18 14 14 18 16"/><path d="M3 3 C3 16 8 22 16 22 C22 22 24 17 21 14 C18 11 14 14 16 18"/><path d="M3 3 L11 11"/><path d="M26 4 C30 2 34 4 36 3 M4 26 C2 30 4 34 3 36"/><circle cx="11" cy="11" r="1.4" fill="currentColor"/></svg><svg class="corner c4" viewBox="0 0 44 44" fill="none" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" aria-hidden="true"><path d="M3 3 C16 3 22 8 22 16 C22 22 17 24 14 21 C11 18 14 14 18 16"/><path d="M3 3 C3 16 8 22 16 22 C22 22 24 17 21 14 C18 11 14 14 16 18"/><path d="M3 3 L11 11"/><path d="M26 4 C30 2 34 4 36 3 M4 26 C2 30 4 34 3 36"/><circle cx="11" cy="11" r="1.4" fill="currentColor"/></svg>
-        <h1 id="invite-title">You're invited to write to me.</h1>
-        <p>About research, consulting, something you're building, or a book you think I'd like. I read everything that comes in.</p>
+        <h1 id="invite-title">hi! write me something</h1>
+        <p>A question about my research, something you're building, a book I should read, or just hello. I read everything.</p>
         <ul>
           <li><a href="mailto:sofia.grimm@yale.edu">sofia.grimm@yale.edu</a></li>
-          <li><a href="https://www.linkedin.com/in/sofia-grimm/" target="_blank" rel="noopener noreferrer">linkedin</a> &nbsp;&middot;&nbsp; <a href="https://github.com/sofiagrimm" target="_blank" rel="noopener noreferrer">github</a></li>
+          <li><a href="https://www.linkedin.com/in/sofia-grimm/" target="_blank" rel="noopener noreferrer">linkedin</a> &nbsp;/&nbsp; <a href="https://github.com/sofiagrimm" target="_blank" rel="noopener noreferrer">github</a></li>
         </ul>
         <div class="sig">sofia</div>
+        <svg class="waxmaker" viewBox="0 0 120 160" aria-hidden="true">
+          <defs>
+            <radialGradient id="waxG" cx="40%" cy="35%" r="70%"><stop offset="0" stop-color="#d0434a"/><stop offset=".6" stop-color="#a3262c"/><stop offset="1" stop-color="#6e161b"/></radialGradient>
+            <linearGradient id="brass" x1="0" x2="1"><stop offset="0" stop-color="#8a6a2a"/><stop offset=".45" stop-color="#e6c573"/><stop offset="1" stop-color="#9b7832"/></linearGradient>
+            <linearGradient id="wood" x1="0" x2="1"><stop offset="0" stop-color="#4b301c"/><stop offset=".5" stop-color="#7a5232"/><stop offset="1" stop-color="#4b301c"/></linearGradient>
+          </defs>
+          <!-- the puddle of wax, then the finished seal pressed into it -->
+          <path class="puddle" d="M60 92 C75 90 89 98 91 112 C93 127 85 140 70 146 C55 151 37 147 31 133 C25 120 30 104 42 97 C47 94 53 92 60 92Z" fill="url(#waxG)"/>
+          <g class="emboss">
+            <path d="M60 92 C75 90 89 98 91 112 C93 127 85 140 70 146 C55 151 37 147 31 133 C25 120 30 104 42 97 C47 94 53 92 60 92Z" fill="url(#waxG)"/>
+            <circle cx="61" cy="120" r="21" fill="none" stroke="#5e1217" stroke-width="2.5" opacity=".7"/>
+            <circle cx="61" cy="120" r="18" fill="#b33038"/>
+            <text x="61" y="129" text-anchor="middle" font-family="Pinyon Script,cursive" font-size="24" fill="#5e1217">sg</text>
+            <path d="M44 108 C48 101 55 98 62 98" fill="none" stroke="#ef7c82" stroke-width="2.4" stroke-linecap="round" opacity=".75"/>
+          </g>
+          <!-- drips -->
+          <ellipse class="drip d1" cx="60" cy="66" rx="4" ry="5" fill="#b02c33"/>
+          <ellipse class="drip d2" cx="58" cy="66" rx="3.5" ry="4.5" fill="#b02c33"/>
+          <ellipse class="drip d3" cx="62" cy="66" rx="3.5" ry="4.5" fill="#b02c33"/>
+          <!-- sealing wax stick with a little flame at its tip -->
+          <g class="stick">
+            <rect x="58" y="6" width="10" height="56" rx="3" fill="#b02c33" transform="rotate(14 63 34)"/>
+            <path class="flame" d="M58 70 C52 62 56 54 60 48 C63 55 68 60 62 70Z" fill="#f5b942" opacity=".9" transform="translate(-2 -4)"/>
+          </g>
+          <!-- brass stamp with a wooden handle -->
+          <g class="stamp">
+            <rect x="52" y="22" width="18" height="52" rx="8" fill="url(#wood)"/>
+            <rect x="46" y="72" width="30" height="8" rx="2" fill="url(#brass)"/>
+            <path d="M42 80 L80 80 L78 96 L44 96Z" fill="url(#brass)"/>
+          </g>
+        </svg>
       </section>
 
       <div class="envelope">
