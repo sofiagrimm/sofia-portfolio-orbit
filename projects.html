@@ -188,6 +188,12 @@
     .memory-grid .card-scene,.memory-grid .card-flipper{isolation:isolate}
     @media(min-width:1200px){.page{min-height:1480px}}
     .sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+
+    /* chips you can pick up: the page box lets clicks through to the table except on its own controls */
+    .page{pointer-events:none}
+    .page .card-scene,.page .deck,.page a,.page button,.page .deck-wrap{pointer-events:auto}
+    #table .stack{pointer-events:auto;cursor:grab}
+    #table .chip{transform-box:view-box}
   </style>
   <style>
     /* six tabs: let the nav scroll sideways on small screens instead of spilling off */
@@ -616,13 +622,16 @@
         <circle r="6" fill="#f3f7ef"/></g></svg>`;
   }
   function chips(stacks){
-    const one=(x,y,n,col,edge)=>{let g='';
+    // each chip is its own group so a stack can be picked up and dropped back chip by chip
+    const one=(x,y,n,col,edge)=>{let g=`<g class="stack" data-n="${n}">`;
       for(let j=n-1;j>=0;j--){const yy=y+j*5;
-        g+=`<ellipse cx="${x}" cy="${yy+3}" rx="22" ry="22" fill="${j?'#00000033':'none'}"/><circle cx="${x}" cy="${yy}" r="22" fill="${col}"/><circle cx="${x}" cy="${yy}" r="20" fill="none" stroke="${edge}" stroke-width="5" stroke-dasharray="6 7.5"/>`;}
-      return g+`<circle cx="${x}" cy="${y}" r="13" fill="none" stroke="${edge}" stroke-width="1.6" stroke-dasharray="3 3"/><circle cx="${x}" cy="${y}" r="9" fill="${col}" stroke="${edge}" stroke-width="1"/>`;};
+        g+=`<g class="chip" data-j="${j}"><ellipse cx="${x}" cy="${yy+3}" rx="22" ry="22" fill="${j?'#00000033':'none'}"/><circle cx="${x}" cy="${yy}" r="22" fill="${col}"/><circle cx="${x}" cy="${yy}" r="20" fill="none" stroke="${edge}" stroke-width="5" stroke-dasharray="6 7.5"/>`+
+          (j===0?`<circle cx="${x}" cy="${y}" r="13" fill="none" stroke="${edge}" stroke-width="1.6" stroke-dasharray="3 3"/><circle cx="${x}" cy="${y}" r="9" fill="${col}" stroke="${edge}" stroke-width="1"/>`:
+                 `<circle cx="${x}" cy="${yy}" r="13" fill="none" stroke="${edge}" stroke-width="1.6" stroke-dasharray="3 3"/><circle cx="${x}" cy="${yy}" r="9" fill="${col}" stroke="${edge}" stroke-width="1"/>`)+`</g>`;}
+      return g+`</g>`;};
     const COL=[[GREEN,'#f4f1ea'],['#f4f1ea',GREEN],['#b8333b','#f4f1ea'],['#232327','#f4f1ea'],['#2d5b9a','#f4f1ea'],['#e9c46a','#7a5a1c']];
     let g='';stacks.forEach(([x,y,n,c])=>{const [a,b]=COL[c||0];g+=one(x,y,n,a,b);});
-    return `<svg viewBox="0 0 140 120" xmlns="http://www.w3.org/2000/svg">${g}</svg>`;
+    return `<svg viewBox="0 0 140 120" xmlns="http://www.w3.org/2000/svg" style="overflow:visible">${g}</svg>`;
   }
   function dice(){
     const pipsAt={1:[[0,0]],2:[[-7,-7],[7,7]],3:[[-7,-7],[0,0],[7,7]],4:[[-7,-7],[7,-7],[-7,7],[7,7]],5:[[-7,-7],[7,-7],[0,0],[-7,7],[7,7]],6:[[-7,-7],[7,-7],[-7,0],[7,0],[-7,7],[7,7]]};
@@ -849,7 +858,58 @@
       if(!ok||nb.r>document.documentElement.clientWidth+40||nb.l<-60||nb.t<60||(el.closest('#table')&&overlapsHand(el)))el.style.display='none';
     });
   }
-  function layoutTable(){lay();buildFrame();fitArch();clearArch();}
+
+  // ── Counting chips: hover lifts a stack up off the felt, fanned out between your fingers;
+  //    move away and they drop back one at a time, each with a little clack.
+  const chipAudio={ctx:null,
+    init(){if(!this.ctx){try{this.ctx=new (window.AudioContext||window.webkitAudioContext)();}catch(e){}}if(this.ctx&&this.ctx.state==='suspended')this.ctx.resume();},
+    clack(i,n){
+      const c=this.ctx;if(!c||c.state!=='running')return;const t=c.currentTime,pitch=1+(Math.random()-.5)*.12-i*.006;
+      // the click of clay on clay: a bright tick, a short knock and a tiny ring
+      const len=Math.ceil(c.sampleRate*.05),buf=c.createBuffer(1,len,c.sampleRate),d=buf.getChannelData(0);
+      for(let k=0;k<len;k++)d[k]=(Math.random()*2-1)*Math.exp(-k/(c.sampleRate*.004));
+      const src=c.createBufferSource();src.buffer=buf;const bp=c.createBiquadFilter();bp.type='bandpass';bp.frequency.value=3200*pitch;bp.Q.value=1.4;
+      const g1=c.createGain();g1.gain.value=.42;src.connect(bp).connect(g1).connect(c.destination);src.start(t);
+      const o=c.createOscillator(),g2=c.createGain();o.type='sine';o.frequency.setValueAtTime(2350*pitch,t);o.frequency.exponentialRampToValueAtTime(1900*pitch,t+.06);
+      g2.gain.setValueAtTime(.06,t);g2.gain.exponentialRampToValueAtTime(.0005,t+.09);o.connect(g2).connect(c.destination);o.start(t);o.stop(t+.1);
+      const k2=c.createOscillator(),g3=c.createGain();k2.type='triangle';k2.frequency.setValueAtTime(420*pitch,t);g3.gain.setValueAtTime(.08,t);g3.gain.exponentialRampToValueAtTime(.0005,t+.05);
+      k2.connect(g3).connect(c.destination);k2.start(t);k2.stop(t+.06);
+    },
+    lift(){const c=this.ctx;if(!c||c.state!=='running')return;const t=c.currentTime,len=Math.ceil(c.sampleRate*.18),buf=c.createBuffer(1,len,c.sampleRate),d=buf.getChannelData(0);
+      for(let k=0;k<len;k++)d[k]=(Math.random()*2-1)*.5*Math.sin(Math.PI*k/len);const s=c.createBufferSource();s.buffer=buf;const f=c.createBiquadFilter();f.type='highpass';f.frequency.value=2500;
+      const g=c.createGain();g.gain.value=.05;s.connect(f).connect(g).connect(c.destination);s.start(t);}
+  };
+  // browsers only allow sound after a click or key press, so the first one anywhere switches it on
+  ['pointerdown','keydown'].forEach(ev=>addEventListener(ev,()=>chipAudio.init(),{once:false,passive:true}));
+  const stillChips=matchMedia('(prefers-reduced-motion: reduce)').matches;
+  function wireChips(){
+    document.querySelectorAll('#table .stack').forEach(st=>{
+      if(st.dataset.wired)return;st.dataset.wired='1';
+      const chips=[...st.querySelectorAll('.chip')].sort((a,b)=>b.dataset.j-a.dataset.j); // bottom first
+      const n=chips.length;let up=false,timers=[];
+      const clear=()=>{timers.forEach(clearTimeout);timers=[];};
+      const raise=()=>{
+        if(up)return;up=true;clear();chipAudio.lift();
+        chips.forEach((c,i)=>{const rise=14+i*9;c.getAnimations().forEach(a=>a.cancel());
+          c.animate([{transform:'translate(0,0)'},{transform:`translate(${(i%2?1:-1)*1.2}px,${-rise}px)`}],{duration:stillChips?0:260+i*30,easing:'cubic-bezier(.2,.8,.25,1)',fill:'forwards'});});
+      };
+      const drop=()=>{
+        if(!up)return;up=false;clear();
+        // bottom chip lands first, then each one on top of it: count them down
+        chips.forEach((c,i)=>{timers.push(setTimeout(()=>{
+          const from=getComputedStyle(c).transform;
+          c.getAnimations().forEach(a=>a.cancel());
+          const a=c.animate([{transform:from==='none'?'translate(0,0)':from},{transform:'translate(0,1.2px)',offset:.82},{transform:'translate(0,-1px)',offset:.92},{transform:'translate(0,0)'}],
+            {duration:stillChips?0:170,easing:'cubic-bezier(.55,0,.9,.5)',fill:'forwards'});
+          setTimeout(()=>chipAudio.clack(i,n),stillChips?0:140);
+        },stillChips?0:i*95));});
+      };
+      st.addEventListener('pointerenter',raise);
+      st.addEventListener('pointerleave',drop);
+      st.addEventListener('pointerdown',e=>{chipAudio.init();if(e.pointerType!=='mouse'){raise();timers.push(setTimeout(drop,650));}});
+    });
+  }
+  function layoutTable(){lay();buildFrame();fitArch();clearArch();wireChips();}
   addEventListener('load',layoutTable);layoutTable();
   addEventListener('resize',()=>{clearTimeout(layoutTable.t);layoutTable.t=setTimeout(layoutTable,150);});
 
