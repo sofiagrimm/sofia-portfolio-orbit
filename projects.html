@@ -559,12 +559,7 @@
       const{burst}=buildPopupCard(idx);
       popupInner.classList.remove('dismissing');
       popupOverlay.classList.add('visible');
-      setTimeout(()=>{
-        popupFlipper.classList.add('flipped');
-        popupInner.classList.add('bursting');
-        burst.addEventListener('animationend',()=>{popupInner.classList.remove('bursting');},{once:true});
-        setTimeout(()=>{popupLocked=false;},700);
-      },2200);
+      setTimeout(()=>{popupLocked=false;},600);
     }
 
     function closePopup(){
