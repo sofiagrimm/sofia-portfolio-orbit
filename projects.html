@@ -140,8 +140,25 @@
   /* decorative playing cards scattered across the page, like a table */
   body{position:relative}
   #table{position:absolute;left:0;top:0;width:100%;z-index:2;pointer-events:none;overflow:hidden}
-  #table .pc{position:absolute;opacity:.55;filter:drop-shadow(0 8px 14px rgba(0,0,0,.5)) brightness(.85) saturate(.85)}
+  #table .pc{position:absolute;opacity:.92;filter:drop-shadow(0 8px 12px rgba(40,0,0,.55))}
   #table .pc svg{display:block;width:100%;height:auto}
+
+    /* red felt card table */
+    html,body{background:#6e1f22}
+    body{background:
+      radial-gradient(ellipse 80% 70% at 50% 45%, rgba(255,140,120,.10) 0%, transparent 60%),
+      radial-gradient(ellipse 120% 100% at 50% 50%, transparent 55%, rgba(30,0,4,.55) 100%),
+      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 .5 0'/%3E%3C/filter%3E%3Crect width='220' height='220' filter='url(%23n)' opacity='.35'/%3E%3C/svg%3E"),
+      linear-gradient(160deg,#842a2c,#6e1f22 55%,#5a1719);background-attachment:fixed}
+    .page-eyebrow{color:rgba(255,226,214,.6)}
+    .page-title{color:#fff6ee}.page-title em{color:#f6c9cf}
+    .page-subtitle{color:rgba(255,226,214,.65)}
+    .rule{background:linear-gradient(90deg,rgba(255,226,214,.5),transparent)}
+    .nav-links a{color:rgba(255,226,214,.65)}
+    .nav-links a:hover,.nav-links a.active{color:#fff6ee;background:rgba(255,255,255,.08)}
+    .nav-links .divider{color:rgba(255,226,214,.25)}
+    .nav-name{color:#fff6ee}
+    .coords{color:rgba(255,226,214,.35)}
   </style>
   <style>
     /* six tabs: let the nav scroll sideways on small screens instead of spilling off */
@@ -154,7 +171,6 @@
 </head>
 <body>
 <div id="table" aria-hidden="true"></div>
-  <div class="nebula"></div>
   <nav>
     <a class="nav-name" href="index.html">Sofia Grimm</a>
     <div class="nav-links">
@@ -174,14 +190,14 @@
     <h1 class="page-title">Things I've <em>built.</em></h1>
     <p class="page-subtitle">Click any card to reveal it.</p>
 <svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
-      <pattern id="lattice" width="12" height="12" patternUnits="userSpaceOnUse"><rect width="12" height="12" fill="#c8323a"/><path d="M6 1 L11 6 L6 11 L1 6Z" fill="none" stroke="#fff" stroke-width="1"/><circle cx="6" cy="6" r="1" fill="#fff"/></pattern>
-      <pattern id="band" width="16" height="16" patternUnits="userSpaceOnUse"><rect width="16" height="16" fill="#c8323a"/><path d="M0 16 Q8 0 16 16" fill="none" stroke="#fff" stroke-width="1.3"/><circle cx="8" cy="12" r="1.6" fill="#fff"/></pattern>
+      <pattern id="lattice" width="12" height="12" patternUnits="userSpaceOnUse"><rect width="12" height="12" fill="#2e7656"/><path d="M6 1 L11 6 L6 11 L1 6Z" fill="none" stroke="#fff" stroke-width="1"/><circle cx="6" cy="6" r="1" fill="#fff"/></pattern>
+      <pattern id="band" width="16" height="16" patternUnits="userSpaceOnUse"><rect width="16" height="16" fill="#2e7656"/><path d="M0 16 Q8 0 16 16" fill="none" stroke="#fff" stroke-width="1.3"/><circle cx="8" cy="12" r="1.6" fill="#fff"/></pattern>
       <symbol id="deckBack" viewBox="0 0 250 350">
         <rect x="1" y="1" width="248" height="348" rx="16" fill="#fbfbf8" stroke="#d9d6cf"/>
         <rect x="16" y="16" width="218" height="318" rx="6" fill="url(#band)"/>
         <rect x="34" y="34" width="182" height="282" fill="url(#lattice)" stroke="#fff" stroke-width="2"/>
         <rect x="40" y="40" width="170" height="270" fill="none" stroke="#fff" stroke-width="1"/>
-        <g transform="translate(125 175)"><circle r="30" fill="#c8323a" stroke="#fff" stroke-width="2.5"/>
+        <g transform="translate(125 175)"><circle r="30" fill="#2e7656" stroke="#fff" stroke-width="2.5"/>
           <g fill="none" stroke="#fff" stroke-width="2"><path d="M0 -22 C14 -14 14 14 0 22 C-14 14 -14 -14 0 -22Z"/><path d="M-22 0 C-14 -14 14 -14 22 0 C14 14 -14 14 -22 0Z"/></g>
           <circle r="4" fill="#fff"/></g>
       </symbol></defs></svg>
@@ -488,29 +504,6 @@
       });
     })();
   </script>
-  <script type="module">
-    import('https://unpkg.com/three@0.161.0/build/three.module.js').then(THREE=>{
-      const renderer=new THREE.WebGLRenderer({antialias:true,alpha:false});
-      renderer.setPixelRatio(Math.min(window.devicePixelRatio,2));
-      renderer.setSize(window.innerWidth,window.innerHeight);
-      renderer.setClearColor(0x060d18,1);
-      document.body.appendChild(renderer.domElement);
-      const scene=new THREE.Scene();
-      const camera=new THREE.PerspectiveCamera(36,window.innerWidth/window.innerHeight,0.1,500);
-      camera.position.set(0,0,46);camera.lookAt(0,0,0);
-      window.addEventListener('resize',()=>{camera.aspect=window.innerWidth/window.innerHeight;camera.updateProjectionMatrix();renderer.setSize(window.innerWidth,window.innerHeight);});
-      const N=7000,pos=new Float32Array(N*3),ph=new Float32Array(N),sp=new Float32Array(N),sz=new Float32Array(N);
-      for(let i=0;i<N;i++){pos[i*3]=(Math.random()-.5)*220;pos[i*3+1]=(Math.random()-.5)*160;pos[i*3+2]=-Math.random()*260;ph[i]=Math.random()*Math.PI*2;sp[i]=.002+Math.random()*.005;sz[i]=.1+Math.random()*.2;}
-      const geo=new THREE.BufferGeometry();
-      geo.setAttribute('position',new THREE.BufferAttribute(pos,3));
-      geo.setAttribute('phase',new THREE.BufferAttribute(ph,1));
-      geo.setAttribute('speed',new THREE.BufferAttribute(sp,1));
-      geo.setAttribute('aSize',new THREE.BufferAttribute(sz,1));
-      const mat=new THREE.ShaderMaterial({uniforms:{time:{value:0}},vertexShader:`attribute float aSize;attribute float phase;attribute float speed;uniform float time;varying float vB;void main(){float r=abs(sin(time*speed+phase));vB=.7+.3*pow(r,.3);vec4 mv=modelViewMatrix*vec4(position,1.);gl_PointSize=aSize*(1.+2.*max(0.,r-.75)/.25)*(300./-mv.z);gl_Position=projectionMatrix*mv;}`,fragmentShader:`varying float vB;void main(){vec2 uv=gl_PointCoord-vec2(.5);if(length(uv)>.5)discard;float c=1.-smoothstep(0.,.45,length(uv));gl_FragColor=vec4(vec3(.75,.88,1.)*vB,c*vB);}`,transparent:true,depthWrite:false});
-      scene.add(new THREE.Points(geo,mat));
-      (function loop(t){requestAnimationFrame(loop);mat.uniforms.time.value=t*.001;renderer.render(scene,camera);})(0);
-    });
-  </script>
 <script>
 // Hand-inked, watercolor playing cards scattered like a table. Purely decorative.
 // Skips the combos already used for projects (3♦ 5♠ 4♥ 6♣ 7♠ 8♦ 9♥ and the Joker).
@@ -542,18 +535,45 @@
       <rect x="6" y="6" width="238" height="338" rx="16" fill="none" stroke="#38342f" stroke-width="3" filter="url(#ink${f})"/>
       ${corner}<g transform="rotate(180 125 175)">${corner}</g>${mid}</svg>`;
   }
-  // fanned groups, like the references, plus loose cards
+
+  const GREEN="#2e7656";
+  function back(){
+    const f='b'+(uid++);
+    return `<svg viewBox="0 0 250 350" xmlns="http://www.w3.org/2000/svg"><defs>
+      <pattern id="gl${f}" width="14" height="14" patternUnits="userSpaceOnUse"><rect width="14" height="14" fill="${GREEN}"/><path d="M7 1.5 L12.5 7 L7 12.5 L1.5 7Z" fill="none" stroke="#e9f2e6" stroke-width=".9"/></pattern></defs>
+      <rect x="4" y="4" width="242" height="342" rx="16" fill="#f7f3ea" stroke="#d8d0bf" stroke-width="2"/>
+      <rect x="20" y="20" width="210" height="310" rx="6" fill="${GREEN}"/>
+      <rect x="30" y="30" width="190" height="290" fill="url(#gl${f})" stroke="#e9f2e6" stroke-width="2"/>
+      <g transform="translate(125 175)" fill="none" stroke="#f3f7ef" stroke-width="2.4">
+        <path d="M0 -62 L34 0 L0 62 L-34 0Z" fill="${GREEN}"/><path d="M0 -44 L22 0 L0 44 L-22 0Z"/>
+        <path d="M0 -62 C-20 -80 -40 -70 -36 -52 M0 -62 C20 -80 40 -70 36 -52 M0 62 C-20 80 -40 70 -36 52 M0 62 C20 80 40 70 36 52"/>
+        <circle r="6" fill="#f3f7ef"/></g></svg>`;
+  }
+  function chips(stacks){
+    const one=(x,y,n,col,edge)=>{let g='';
+      for(let j=n-1;j>=0;j--){const yy=y+j*5;
+        g+=`<ellipse cx="${x}" cy="${yy+3}" rx="22" ry="22" fill="${j?'#00000033':'none'}"/><circle cx="${x}" cy="${yy}" r="22" fill="${col}"/><circle cx="${x}" cy="${yy}" r="20" fill="none" stroke="${edge}" stroke-width="5" stroke-dasharray="6 7.5"/>`;}
+      return g+`<circle cx="${x}" cy="${y}" r="13" fill="none" stroke="${edge}" stroke-width="1.6" stroke-dasharray="3 3"/><circle cx="${x}" cy="${y}" r="9" fill="${col}" stroke="${edge}" stroke-width="1"/>`;};
+    let g='';stacks.forEach(([x,y,n,white])=>{g+=white?one(x,y,n,'#f4f1ea',GREEN):one(x,y,n,GREEN,'#f4f1ea');});
+    return `<svg viewBox="0 0 140 120" xmlns="http://www.w3.org/2000/svg">${g}</svg>`;
+  }
+  function dice(){
+    const pipsAt={1:[[0,0]],2:[[-7,-7],[7,7]],3:[[-7,-7],[0,0],[7,7]],4:[[-7,-7],[7,-7],[-7,7],[7,7]],5:[[-7,-7],[7,-7],[0,0],[-7,7],[7,7]],6:[[-7,-7],[7,-7],[-7,0],[7,0],[-7,7],[7,7]]};
+    const die=(x,y,r,v)=>`<g transform="translate(${x} ${y}) rotate(${r})"><rect x="-13" y="-10" width="28" height="28" rx="6" fill="#8e1c22"/><rect x="-15" y="-14" width="28" height="28" rx="6" fill="#d3383f"/><rect x="-12" y="-11" width="10" height="5" rx="2" fill="#fff" opacity=".25"/>${pipsAt[v].map(([a,b])=>`<circle cx="${a-1}" cy="${b}" r="2.6" fill="#fff"/>`).join('')}</g>`;
+    return `<svg viewBox="0 0 90 60" xmlns="http://www.w3.org/2000/svg">${die(24,28,-14,5)}${die(62,32,22,3)}</svg>`;
+  }
+  // piles of green-backed cards, chip stacks, dice and a few face-up cards
   const LAYOUT=[
-    {fan:[['A','heart'],['A','spade'],['A','diamond'],['A','club']], x:1, y:44, w:104, rot:-14},
-    {fan:[['J','club'],['Q','heart'],['K','spade']], x:86, y:14, w:100, rot:12},
-    {one:['10','diamond'], x:88, y:46, w:92, rot:24},
-    {one:['2','club'], x:3, y:20, w:86, rot:-24},
-    {one:['K','diamond'], x:24, y:84, w:96, rot:-9},
-    {one:['Q','spade'], x:62, y:86, w:94, rot:17},
-    {one:['7','heart'], x:89, y:76, w:90, rot:31},
-    {fan:[['J','heart'],['10','spade']], x:3, y:78, w:92, rot:-6},
-    {one:['5','club'], x:44, y:90, w:86, rot:-22},
-    {one:['2','diamond'], x:80, y:93, w:84, rot:8}
+    {pile:4, x:2, y:16, w:92, rot:-18},
+    {chips:[[30,40,4],[78,30,3,1],[104,72,5]], x:84, y:12, w:140, rot:0},
+    {one:['A','heart'], x:3, y:44, w:96, rot:-10},
+    {dice:1, x:16, y:60, w:90, rot:0},
+    {pile:3, x:86, y:42, w:96, rot:16},
+    {chips:[[30,44,3,1],[64,64,6],[100,40,2]], x:1, y:74, w:130, rot:0},
+    {one:['K','diamond'], x:88, y:70, w:90, rot:-12},
+    {pile:2, x:26, y:86, w:90, rot:8},
+    {dice:1, x:60, y:90, w:80, rot:40},
+    {chips:[[40,50,4],[84,46,3,1]], x:70, y:84, w:110, rot:0}
   ];
   const table=document.getElementById('table');
   function lay(){
@@ -562,16 +582,18 @@
     LAYOUT.forEach((g,gi)=>{
       if(mobile&&(gi%2||g.y<14)) return;            // fewer cards on phones, none over the nav
       const scale=mobile?.62:1, w=g.w*scale;
-      const list=g.fan||[g.one];
+      if(g.chips||g.dice){const el=document.createElement('div');el.className='pc';el.style.width=(g.w*scale)+'px';el.style.left=g.x+'%';el.style.top=g.y+'%';el.style.transform=`rotate(${g.rot}deg)`;el.innerHTML=g.chips?chips(g.chips):dice();table.appendChild(el);return;}
+      const list=g.pile?Array.from({length:g.pile},()=>null):(g.fan||[g.one]);
       list.forEach((rs,k)=>{
         const el=document.createElement('div'); el.className='pc';
         const spread=(k-(list.length-1)/2);
         el.style.width=w+'px';
-        el.style.left=`calc(${g.x}% + ${spread*w*.42}px)`;
-        el.style.top=`calc(${g.y}% + ${Math.abs(spread)*8}px)`;
-        el.style.transform=`rotate(${g.rot+spread*11}deg)`;
+        const off=g.pile?k*3:spread*w*.42, tilt=g.pile?(k%2?4:-3):spread*11;
+        el.style.left=`calc(${g.x}% + ${off}px)`;
+        el.style.top=`calc(${g.y}% + ${g.pile?k*-3:Math.abs(spread)*8}px)`;
+        el.style.transform=`rotate(${g.rot+tilt}deg)`;
         el.style.transformOrigin='50% 110%';
-        el.innerHTML=card(rs[0],rs[1]);
+        el.innerHTML=rs?card(rs[0],rs[1]):back();
         table.appendChild(el);
       });
     });
