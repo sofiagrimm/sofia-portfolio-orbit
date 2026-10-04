@@ -300,7 +300,7 @@
       <h1>hi! write me something</h1>
       <p>A question about my research, something you're building, a book I should read, or just hello. I read everything.</p>
       <ul><li><a href="mailto:sofia.grimm@yale.edu">sofia.grimm@yale.edu</a></li>
-        <li><a href="https://www.linkedin.com/in/sofia-grimm/" target="_blank" rel="noopener noreferrer">linkedin</a> &nbsp;/&nbsp; <a href="https://github.com/sofiagrimm" target="_blank" rel="noopener noreferrer">github</a></li></ul>
+        <li><a href="https://www.linkedin.com/in/sofia-grimm/" target="_blank" rel="noopener noreferrer">linkedin</a> &nbsp;/&nbsp; <a href="https://github.com/sofiagrimm" data-gh>github</a></li></ul>
       <div class="sig">sofia</div><div class="foot">sofiagrimm.com</div></div>`;
     flat.innerHTML=words;
     document.querySelectorAll('.panel .clip').forEach(c=>{c.innerHTML=words;c.querySelectorAll('a').forEach(a=>a.tabIndex=-1);});
@@ -466,5 +466,6 @@
       (function loop(t){requestAnimationFrame(loop);mat.uniforms.time.value=t*.001;renderer.render(scene,camera);})(0);
     });
   </script>
+<script src="gh.js"></script>
 </body>
 </html>
