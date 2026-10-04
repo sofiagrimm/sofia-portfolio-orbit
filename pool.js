@@ -16,7 +16,8 @@
   #pool .lamp-old{background:radial-gradient(ellipse 60% 55% at 50% 45%,rgba(255,236,190,.16),transparent 70%),radial-gradient(ellipse 120% 100% at 50% 50%,transparent 55%,rgba(0,0,0,.45) 100%);transition:opacity 1.2s}
   #pool .lamp{position:absolute;inset:0;pointer-events:none;transition:opacity 1.2s;
     background:radial-gradient(ellipse 48% 44% at 50% 46%,rgba(255,250,232,.13),transparent 72%),
-      radial-gradient(ellipse 105% 92% at 50% 46%,transparent 40%,rgba(1,8,16,.82) 100%),
+      radial-gradient(ellipse 105% 92% at 50% 46%,transparent 40%,rgba(8,5,2,.84) 100%),
+      linear-gradient(rgba(255,170,90,.07),rgba(255,170,90,.07)),
       linear-gradient(180deg,rgba(6,16,48,.45),transparent 38%,transparent 70%,rgba(1,8,16,.35))}
   #pool .dof{position:absolute;inset:0;pointer-events:none;transition:opacity 1s;background:radial-gradient(ellipse 58% 54% at 50% 48%,transparent 62%,rgba(0,10,14,.35) 100%)}
   #pool .film{position:absolute;inset:-20%;pointer-events:none;opacity:.07;will-change:transform;animation:film .6s steps(4) infinite;transition:opacity 1s;
@@ -74,8 +75,8 @@
   document.documentElement.style.overflow = 'hidden';
   var meter = pool.querySelector('.meter'), banner = pool.querySelector('.banner'), world = pool.querySelector('.world'), svg = world.querySelector('svg'), prompt = pool.querySelector('.prompt'), flash = pool.querySelector('.flash');
 
-  var aimLine, ghost, W, H, land, SU, SV, R, END, balls = [], eight, cue, rack, trail = [], trailEls = [], dir, pull = 0, state = 'aim';
-  var RED = '#c8241d', BLUE = '#1f4fb5', CREAM = '#f3eee4', INK = '#141414', FELT = '#0f5d62', FELT2 = '#0a464b', WOOD = '#3b2216', WOOD2 = '#1d100a', GOLD = '#d9c28e';
+  var aimLine, ghost, W, H, land, SU, SV, R, END, balls = [], eight, shooter, cue, rack, trail = [], trailEls = [], dir, pull = 0, state = 'aim';
+  var RED = '#c8241d', BLUE = '#1f4fb5', CREAM = '#f3eee4', INK = '#141414', FELT = '#1b5a3c', FELT2 = '#134430', WOOD = '#3b2216', WOOD2 = '#1d100a', GOLD = '#d9c28e';
   var BALLS = ['#f2c12e', '#1f4fb5', '#c8241d', '#5b2a8c', '#f0761c', '#1d7a43', '#7a1d2a'];
   var LETTERS = ['s', 'o', 'f', 'i', 'a', 'g', 'r', 'i', 'm', 'm'];
   // travel runs along u: left-to-right on a wide screen, top-to-bottom on a tall one
@@ -120,9 +121,15 @@
     return c.toDataURL(); })();
   function shade(hex, k) { var n = parseInt(hex.slice(1), 16), r = n >> 16, g = n >> 8 & 255, b = n & 255, f = function (c) { return Math.round(k > 0 ? c + (255 - c) * k : c * (1 + k)); };
     return '#' + ((1 << 24) + (f(r) << 16) + (f(g) << 8) + f(b)).toString(16).slice(1); }
+  // light specks in the cloth (chalk dust and wear), drawn once
+  var FLECK = (function () { var c = document.createElement('canvas'); c.width = c.height = 160; var x = c.getContext('2d');
+    for (var i = 0; i < 70; i++) { x.fillStyle = 'rgba(190,235,205,' + (.15 + Math.random() * .35) + ')'; var r = Math.random() * 1.6 + .4; x.beginPath(); x.arc(Math.random() * 160, Math.random() * 160, r, 0, 7); x.fill(); }
+    return c.toDataURL(); })();
   function defs() {
     var d = el('defs', {});
-    d.innerHTML = '<pattern id="pSpeckPat" width="96" height="96" patternUnits="userSpaceOnUse"><image href="' + SPECK + '" width="96" height="96"/></pattern>' + '<filter id="pSpeck" x="0" y="0" width="100%" height="100%"><feTurbulence type="fractalNoise" baseFrequency="1.4" numOctaves="1" seed="3"/>' +
+    d.innerHTML = '<pattern id="pFleck" width="160" height="160" patternUnits="userSpaceOnUse"><image href="' + FLECK + '" width="160" height="160"/></pattern>' +
+      '<linearGradient id="rackWood" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#7a5434"/><stop offset=".5" stop-color="#4e331d"/><stop offset="1" stop-color="#6b4528"/></linearGradient>' +
+      '<pattern id="pSpeckPat" width="96" height="96" patternUnits="userSpaceOnUse"><image href="' + SPECK + '" width="96" height="96"/></pattern>' + '<filter id="pSpeck" x="0" y="0" width="100%" height="100%"><feTurbulence type="fractalNoise" baseFrequency="1.4" numOctaves="1" seed="3"/>' +
       '<feColorMatrix values="0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 -2.6 1.5"/><feComposite in2="SourceGraphic" operator="in"/></filter>' +
       '<linearGradient id="pWood" x1="0" y1="0" x2="' + (land ? 0 : 1) + '" y2="' + (land ? 1 : 0) + '"><stop offset="0" stop-color="#7d4a28"/><stop offset=".5" stop-color="' + WOOD + '"/><stop offset="1" stop-color="' + WOOD2 + '"/></linearGradient>' +
       BALLS.concat(['#151515', '#efe9dc']).map(function (c, k) { return '<radialGradient id="bc' + k + '" cx="38%" cy="32%" r="75%"><stop offset="0" stop-color="' + shade(c, .45) + '"/><stop offset=".5" stop-color="' + c + '"/><stop offset="1" stop-color="' + shade(c, -.6) + '"/></radialGradient>'; }).join('') +
@@ -133,23 +140,25 @@
       '<radialGradient id="pShine" cx="35%" cy="30%" r="60%"><stop offset="0" stop-color="#fff" stop-opacity=".55"/><stop offset=".4" stop-color="#fff" stop-opacity="0"/></radialGradient>';
   }
 
-  function makeBall(i, letter) {
-    // solids and stripes alternate through the classic colours; the 8 is black
-    var eightBall = i < 0, ci = eightBall ? 7 : i % 7, stripe = !eightBall && i % 2 === 1, g = el('g', {});
-    var sh = el('ellipse', { cx: R * .38, cy: R * .5, rx: R * 1.25, ry: R * 1.05, fill: 'url(#ballShadow)' }, g);
+  function makeBall(i, label, num, kind) {
+    // kind: 'eight', 'cue' or a numbered ball (1-7 solid, 9-15 striped, same colours as real sets)
+    var isEight = kind === 'eight', isCue = kind === 'cue', ci = isEight ? 7 : isCue ? 8 : (num - 1) % 8, stripe = !isEight && !isCue && num > 8, g = el('g', {});
+    var sh = el('ellipse', { cx: R * .62, cy: R * .82, rx: R * 1.5, ry: R * 1.02, fill: 'url(#ballShadow)', transform: 'rotate(28 ' + (R * .62) + ' ' + (R * .82) + ')' }, g);
     var body = el('g', {}, g), spin = el('g', {}, body);
     var cp = el('clipPath', { id: 'pc' + i }, svg.querySelector('defs')); el('circle', { r: R }, cp);
     if (stripe) { el('circle', { r: R, fill: 'url(#bc8)' }, spin); el('rect', { x: -R, y: -R * .5, width: R * 2, height: R, fill: 'url(#bc' + ci + ')', 'clip-path': 'url(#pc' + i + ')' }, spin); }
     else el('circle', { r: R, fill: 'url(#bc' + ci + ')' }, spin);
     var lab = el('g', {}, spin), lc = el('g', {}, lab);
-    el('circle', { r: R * .44, fill: '#f7f4ee' }, lc);
-    var t = el('text', { 'text-anchor': 'middle', y: R * .19, 'font-family': "'Inter','Helvetica Neue',Arial,sans-serif", 'font-weight': 700, 'font-size': R * .52, fill: '#111' }, lc); t.textContent = eightBall ? '8' : letter;
-    // lighting sits on top and doesn't spin: darker rim, soft key light, a sharp glint
+    if (isCue) { el('circle', { r: R * .09, fill: '#c8241d', opacity: .85 }, lc); }
+    else {
+      el('circle', { r: R * .44, fill: '#f7f4ee' }, lc);
+      var t = el('text', { 'text-anchor': 'middle', y: R * .19, 'font-family': "'Inter','Helvetica Neue',Arial,sans-serif", 'font-weight': 700, 'font-size': R * (label.length > 1 ? .42 : .52), fill: '#111' }, lc); t.textContent = label;
+    }
     el('circle', { r: R, fill: 'url(#ballRim)' }, body);
     el('ellipse', { cx: -R * .34, cy: -R * .4, rx: R * .42, ry: R * .3, fill: 'url(#ballKey)', transform: 'rotate(-28 ' + (-R * .34) + ' ' + (-R * .4) + ')', opacity: .75 }, body);
     el('circle', { cx: -R * .4, cy: -R * .46, r: R * .09, fill: '#fff', opacity: .95 }, body);
-    el('path', { d: 'M' + (R * .1) + ' ' + (R * .9) + ' A' + R * .95 + ' ' + R * .95 + ' 0 0 0 ' + (R * .86) + ' ' + (R * .3), fill: 'none', stroke: '#9fd8d6', 'stroke-width': R * .08, opacity: .35 }, body);
-    return { g: g, sh: sh, body: body, spin: spin, lab: lab, x: 0, y: 0, vx: 0, vy: 0, a: 0, ph: 0, hd: 0, lift: 0, eight: eightBall };
+    el('path', { d: 'M' + (R * .1) + ' ' + (R * .9) + ' A' + R * .95 + ' ' + R * .95 + ' 0 0 0 ' + (R * .86) + ' ' + (R * .3), fill: 'none', stroke: '#a9dcb8', 'stroke-width': R * .08, opacity: .3 }, body);
+    return { g: g, sh: sh, body: body, spin: spin, lab: lab, x: 0, y: 0, vx: 0, vy: 0, a: 0, ph: 0, hd: 0, lift: 0, eight: isEight };
   }
 
   function rectUV(u0, v0, du, dv, attrs) { var a = P(u0, v0), b = P(u0 + du, v0 + dv); attrs.x = Math.min(a.x, b.x); attrs.y = Math.min(a.y, b.y); attrs.width = Math.abs(b.x - a.x); attrs.height = Math.abs(b.y - a.y); return el('rect', attrs); }
@@ -159,7 +168,8 @@
     // so the real card table (the Projects page) shows through
     var rail = R * 2.1, cush = R * .45;
     rectUV(0, 0, END, SV, { fill: FELT });
-    rectUV(0, SV * .2, END, SV * .6, { fill: '#1d7d82', opacity: '.18' });
+    rectUV(0, 0, END, SV, { fill: 'url(#pFleck)', opacity: '.55' });
+    rectUV(0, SV * .2, END, SV * .6, { fill: '#2c7a52', opacity: '.16' });
     rectUV(0, 0, END, rail, { fill: 'url(#pWood)' }); rectUV(0, SV - rail, END, rail, { fill: 'url(#pWood)' });
     rectUV(0, 0, rail, SV, { fill: 'url(#pWood)' }); rectUV(END - rail, 0, rail, SV, { fill: 'url(#pWood)' });
     rectUV(rail, rail, END - 2 * rail, cush, { fill: FELT2 }); rectUV(rail, SV - rail - cush, END - 2 * rail, cush, { fill: FELT2 });
@@ -201,19 +211,22 @@
     svg.setAttribute('width', ww); svg.setAttribute('height', wh); svg.setAttribute('viewBox', '0 0 ' + ww + ' ' + wh); svg.innerHTML = '';
     defs(); drawTable(); props();
     var apexU = SU * .56, midV = SV * .5, gap = R * 2.02, pos = [];
-    [1, 2, 3, 4].forEach(function (n, r) { for (var k = 0; k < n; k++) pos.push(P(apexU + r * gap * .87, midV + (k - (n - 1) / 2) * gap)); });
-    var c1 = P(apexU - R * 1.7, midV), back = apexU + 3 * gap * .87 + R * 1.5, half = 1.5 * gap + R * 1.7, c2 = P(back, midV + half), c3 = P(back, midV - half);
+    [1, 2, 3, 4, 5].forEach(function (n, r) { for (var k = 0; k < n; k++) pos.push(P(apexU + r * gap * .87, midV + (k - (n - 1) / 2) * gap)); });
+    var c1 = P(apexU - R * 1.7, midV), back = apexU + 4 * gap * .87 + R * 1.5, half = 2 * gap + R * 1.7, c2 = P(back, midV + half), c3 = P(back, midV - half);
     rack = el('g', {});
     var tri = 'M' + c1.x + ' ' + c1.y + ' L' + c2.x + ' ' + c2.y + ' L' + c3.x + ' ' + c3.y + 'Z';
     el('path', { d: tri, fill: 'none', stroke: '#03262a', 'stroke-width': R * .9, 'stroke-linejoin': 'round', opacity: '.55', transform: 'translate(' + R * .25 + ' ' + R * .3 + ')' }, rack);
-    el('path', { d: tri, fill: 'none', stroke: INK, 'stroke-width': R * .75, 'stroke-linejoin': 'round' }, rack);
-    el('path', { d: tri, fill: 'none', stroke: '#6a5a48', 'stroke-width': R * .12, 'stroke-linejoin': 'round', opacity: '.5', transform: 'translate(' + (-R * .1) + ' ' + (-R * .12) + ')' }, rack);
+    el('path', { d: tri, fill: 'none', stroke: 'url(#rackWood)', 'stroke-width': R * .8, 'stroke-linejoin': 'round' }, rack);
+    el('path', { d: tri, fill: 'none', stroke: '#b08458', 'stroke-width': R * .1, 'stroke-linejoin': 'round', opacity: '.5', transform: 'translate(' + (-R * .1) + ' ' + (-R * .12) + ')' }, rack);
     var a0 = P(SU * .25 + R * 1.4, midV), a1 = P(apexU - R * 1.2, midV), aimLen = (apexU - R * 2.05) - SU * .25;
     aimLine = el('line', { x1: a0.x, y1: a0.y, x2: a1.x, y2: a1.y, stroke: CREAM, 'stroke-width': 2, 'stroke-dasharray': '2 9', 'stroke-linecap': 'round', opacity: .25 }); aimLine.dataset.len = aimLen;
     var gh = P(apexU - R * 2.05, midV); ghost = el('circle', { cx: gh.x, cy: gh.y, r: R, fill: 'none', stroke: CREAM, 'stroke-width': 1.5, 'stroke-dasharray': '4 5', opacity: .4 });
     trailEls = []; for (var t = 0; t < 10; t++) trailEls.push(el('circle', { r: R * (1 - t * .06), fill: INK, opacity: 0 }));
-    balls = LETTERS.map(function (l, i) { var b = makeBall(i, l); b.x = pos[i].x; b.y = pos[i].y; return b; });
-    eight = makeBall(-1); var e0 = P(SU * .25, midV); eight.x = e0.x; eight.y = e0.y; balls.push(eight);
+    // rack order (point first): 8 · s o · f i a · g r i m · m 4 13 6 15 — "sofia grimm" reads row by row
+    var RACK = [['8', 8, 'eight'], ['s', 1], ['o', 10], ['f', 3], ['i', 12], ['a', 5], ['g', 14], ['r', 7], ['i', 9], ['m', 2], ['m', 11], ['4', 4], ['13', 13], ['6', 6], ['15', 15]];
+    balls = RACK.map(function (r, i) { var b = makeBall(i, r[0], r[1], r[2]); b.x = pos[i].x; b.y = pos[i].y; return b; });
+    eight = balls[0];
+    shooter = makeBall(99, '', 0, 'cue'); var e0 = P(SU * .25, midV); shooter.x = e0.x; shooter.y = e0.y; balls.push(shooter);
     dir = land ? { x: 1, y: 0 } : { x: 0, y: 1 };
     cue = el('g', {}); var L = Math.max(W, H) * .7;
     el('rect', { x: -L, y: -R * .32 + R * .3, width: L, height: R * .64, fill: '#03262a', opacity: '.55', transform: 'translate(' + R * .2 + ' 0)' }, cue);
@@ -221,9 +234,9 @@
     el('rect', { x: -L, y: -R * .34, width: L * .35, height: R * .68, rx: R * .34, fill: '#7a4a2a' }, cue);
     el('rect', { x: -R * .9, y: -R * .26, width: R * .9, height: R * .52, fill: CREAM }, cue);
     el('rect', { x: -R * .25, y: -R * .26, width: R * .25, height: R * .52, rx: R * .1, fill: BLUE }, cue);
-    var pp = land ? { left: eight.x - W * .2, top: eight.y + R * 2.4 } : { left: W * .08, top: eight.y + R * 2.4 };
+    var pp = land ? { left: shooter.x - W * .2, top: shooter.y + R * 2.4 } : { left: W * .08, top: shooter.y + R * 2.4 };
     prompt.style.left = pp.left + 'px'; prompt.style.top = pp.top + 'px';
-    meter.style.left = (land ? eight.x - W * .27 : W * .9) + 'px'; meter.style.top = (land ? eight.y - H * .12 : eight.y - H * .05) + 'px';
+    meter.style.left = (land ? shooter.x - W * .27 : W * .9) + 'px'; meter.style.top = (land ? shooter.y - H * .12 : shooter.y - H * .05) + 'px';
     cam = { u: 0, shake: 0, z: 1 }; pageParked = false; setCamera(); draw();
   }
 
@@ -258,10 +271,10 @@
       t.setAttribute('cx', p.x); t.setAttribute('cy', p.y); t.setAttribute('opacity', Math.max(0, .22 - i * .022) * Math.min(1, p.s / (R * .5))); });
     var back = R + 6 + pull;
     if (aimLine && state === 'aim') { var k = pull / (Math.min(W, H) * .2); aimLine.setAttribute('opacity', .25 + k * .5); meter.querySelector('b').style.height = (k * 100) + '%'; }
-    if (cue) cue.setAttribute('transform', 'translate(' + (eight.x - dir.x * back) + ' ' + (eight.y - dir.y * back) + ') rotate(' + (Math.atan2(dir.y, dir.x) * 180 / Math.PI) + ')');
-    if (aimLine && state === 'aim') { var reach = Math.hypot(+aimLine.dataset.len || 0, 0); aimLine.setAttribute('x1', eight.x + dir.x * R * 1.4); aimLine.setAttribute('y1', eight.y + dir.y * R * 1.4);
-      aimLine.setAttribute('x2', eight.x + dir.x * reach); aimLine.setAttribute('y2', eight.y + dir.y * reach);
-      ghost.setAttribute('cx', eight.x + dir.x * (reach + R * .85)); ghost.setAttribute('cy', eight.y + dir.y * (reach + R * .85)); }
+    if (cue) cue.setAttribute('transform', 'translate(' + (shooter.x - dir.x * back) + ' ' + (shooter.y - dir.y * back) + ') rotate(' + (Math.atan2(dir.y, dir.x) * 180 / Math.PI) + ')');
+    if (aimLine && state === 'aim') { var reach = Math.hypot(+aimLine.dataset.len || 0, 0); aimLine.setAttribute('x1', shooter.x + dir.x * R * 1.4); aimLine.setAttribute('y1', shooter.y + dir.y * R * 1.4);
+      aimLine.setAttribute('x2', shooter.x + dir.x * reach); aimLine.setAttribute('y2', shooter.y + dir.y * reach);
+      ghost.setAttribute('cx', shooter.x + dir.x * (reach + R * .85)); ghost.setAttribute('cy', shooter.y + dir.y * (reach + R * .85)); }
   }
 
   var dragFrom = null, maxPull;
@@ -296,10 +309,10 @@
       var k = Math.min(1, (now - t0) / 110); pull = from * (1 - k) - R * .2 * k; draw();
       if (k < 1) return requestAnimationFrame(thrust);
       audio.cue();
-      for (var i = 0; i < 8; i++) { var a = Math.PI + (Math.random() - .5) * 1.6 + (land ? 0 : Math.PI / 2), d = R * (.6 + Math.random() * 1.4), c0 = { x: eight.x - dir.x * R, y: eight.y - dir.y * R };
+      for (var i = 0; i < 8; i++) { var a = Math.PI + (Math.random() - .5) * 1.6 + (land ? 0 : Math.PI / 2), d = R * (.6 + Math.random() * 1.4), c0 = { x: shooter.x - dir.x * R, y: shooter.y - dir.y * R };
         var pf = el('circle', { cx: c0.x, cy: c0.y, r: R * .12, fill: BLUE, opacity: .85 });
         pf.animate([{ transform: 'translate(0,0)', opacity: .85 }, { transform: 'translate(' + Math.cos(a) * d + 'px,' + Math.sin(a) * d + 'px)', opacity: 0 }], { duration: 600, easing: 'ease-out', fill: 'forwards' }); }
-      var sp = Math.min(W, H) * .05 * (.6 + power); eight.vx = dir.x * sp; eight.vy = dir.y * sp; state = 'break';
+      var sp = Math.min(W, H) * .05 * (.6 + power); shooter.vx = dir.x * sp; shooter.vy = dir.y * sp; state = 'break';
       cue.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 500, delay: 200, fill: 'forwards' });
       physics();
     })(t0);
@@ -360,7 +373,7 @@
     path = [b0, { u: SU * 1.6, v: wall }, { u: END - R * 2.8, v: SV * .6 }, { u: END + SU * .32, v: SV * .64 }, { u: END + SU * 1.5, v: SV * .7 }];
     legs = [{ d: 3000, e: 'out' }, { d: 4300, e: 'lin' }, { d: 1400, e: 'hop' }, { d: 2600, e: 'lin' }];
     legIdx = 0; legT0 = now;
-    var cand = balls.filter(function (b) { return b !== eight; }).sort(function (a, b) { return (land ? b.x - a.x : b.y - a.y); })[0];
+    var cand = balls.filter(function (b) { return b !== eight && b !== shooter; }).sort(function (a, b) { return (land ? b.x - a.x : b.y - a.y); })[0];
     pocketBall = cand; pocketBall.vx = pocketBall.vy = 0; pocketFrom = { x: cand.x, y: cand.y }; pocketT0 = now + 900;
     var pk = P(END / 2, SV - R * 2.1 * .4); pocketAt = { x: pk.x, y: pk.y };
   }
