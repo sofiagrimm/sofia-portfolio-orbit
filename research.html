@@ -97,6 +97,8 @@
 
     .e--cyan  {--stripe:linear-gradient(180deg,rgba(40,210,255,0.8),rgba(40,210,255,0.1));--border:rgba(60,220,255,0.36);--glow:rgba(40,200,255,0.07);--accent:rgba(100,225,255,0.88);}
     .e--blue  {--stripe:linear-gradient(180deg,rgba(80,140,255,0.8),rgba(80,140,255,0.1));--border:rgba(100,160,255,0.40);--glow:rgba(80,140,255,0.08);--accent:rgba(140,190,255,0.88);}
+    .e--violet{--stripe:linear-gradient(180deg,rgba(140,110,255,0.8),rgba(140,110,255,0.1));--border:rgba(150,125,255,0.40);--glow:rgba(130,100,255,0.08);--accent:rgba(185,170,255,0.88);}
+    .e--mint  {--stripe:linear-gradient(180deg,rgba(68,238,170,0.8),rgba(68,238,170,0.1));--border:rgba(80,235,175,0.38);--glow:rgba(68,238,170,0.07);--accent:rgba(130,245,200,0.88);}
     .e--purple{--stripe:linear-gradient(180deg,rgba(180,100,255,0.8),rgba(180,100,255,0.1));--border:rgba(190,120,255,0.40);--glow:rgba(160,80,255,0.08);--accent:rgba(210,165,255,0.88);}
     .e--green {--stripe:linear-gradient(180deg,rgba(40,220,140,0.8),rgba(40,220,140,0.1));--border:rgba(60,230,150,0.36);--glow:rgba(40,200,120,0.07);--accent:rgba(80,235,165,0.88);}
     .e--gold  {--stripe:linear-gradient(180deg,rgba(255,200,60,0.8),rgba(255,200,60,0.1));--border:rgba(255,215,90,0.36);--glow:rgba(240,180,40,0.08);--accent:rgba(255,220,100,0.90);}
@@ -224,6 +226,24 @@
         <div class="entry-body">Characterizing <strong style="color:rgba(220,234,255,0.8)">locus coeruleus axon degeneration</strong> in PPT1-deficient mice to investigate norepinephrine dysfunction in Parkinson’s disease. Confocal microscopy, IHC, perfusion protocols.</div>
       </div>
 
+      <div class="entry e--violet" data-pin="cushing" onclick="focusPin('cushing',this)">
+        <div class="entry-header">
+          <span class="entry-label">History of Medicine &middot; Yale</span>
+          <span class="entry-loc">New Haven, CT</span>
+        </div>
+        <div class="entry-title">Harvey Cushing Brain Tumor Registry</div>
+        <div class="entry-body">Archival research with Dr. Megann Licskai on Cushing&rsquo;s brain tumor registry. I&rsquo;ve transcribed all <strong style="color:rgba(220,234,255,0.8)">420 case files</strong> and am building a cross-referenced record of the patients behind them. An abstract from this work is headed to the American Association for the History of Medicine meeting in 2027.</div>
+      </div>
+
+      <div class="entry e--mint" data-pin="pcdd" onclick="focusPin('pcdd',this)">
+        <div class="entry-header">
+          <span class="entry-label">Biomedical Engineering &middot; Yale SEAS</span>
+          <span class="entry-loc">New Haven, CT</span>
+        </div>
+        <div class="entry-title">PCDD &mdash; Activated-Carbon Screening</div>
+        <div class="entry-body">Biomedical Engineering Innovation Fellow on a <strong style="color:rgba(220,234,255,0.8)">patient-controlled drug deactivation device</strong> under Dr. Dan Wiznia. I sourced a 14-carbon panel from five suppliers and wrote the characterization and adsorption-screening protocols for a study testing which carbon properties make deactivation irreversible.</div>
+      </div>
+
       <div class="section-label">Prior Research</div>
 
       <div class="entry e--gold" data-pin="fermilab" onclick="focusPin('fermilab',this)">
@@ -305,6 +325,8 @@
       msu:      { lat:42.7018, lng:-84.4822, label:'Proteomics · Michigan State',                 name:'Mass Spectrometry Lab',   sub:'East Lansing, MI', color:0xff6699, glowColor:'rgba(255,102,153,'},
       stanford: { lat:37.4275, lng:-122.1697,label:'Genetics · Stanford',                        name:'Genetics Research',       sub:'Palo Alto, CA',    color:0x5588ff, glowColor:'rgba(85,136,255,' },
       sevilla:  { lat:37.3891, lng:-5.9845,  label:'Medical Shadowing · Clínica Santa Isabel',   name:'Clínica Santa Isabel',   sub:'Sevilla, Spain',   color:0xff9944, glowColor:'rgba(255,153,68,' },
+      cushing:  { lat:41.3026, lng:-72.9346, label:'History of Medicine · Yale',                name:'Cushing Brain Tumor Registry', sub:'New Haven, CT', color:0x8c6eff, glowColor:'rgba(140,110,255,' },
+      pcdd:     { lat:41.3162, lng:-72.9226, label:'Biomedical Engineering · Yale SEAS',        name:'PCDD',                    sub:'New Haven, CT',    color:0x44eeaa, glowColor:'rgba(68,238,170,' },
       cambridge:{ lat:52.2053, lng:0.1218,   label:'STEM Research · CCIR',                       name:'Cambridge Centre',        sub:'Cambridge, UK',    color:0xcc88ff, glowColor:'rgba(204,136,255,' },
     };
 
