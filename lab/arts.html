@@ -63,6 +63,22 @@
     display:grid;place-items:center;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:#fff;transition:width .25s,height .25s,margin .25s,background .25s;will-change:transform}
   .follower.big{width:96px;height:96px;margin:-48px 0 0 -48px;background:rgba(255,255,255,.22)}
   .credit{position:relative;z-index:2;margin:-40px 0 30px;font-size:11px;color:rgba(42,34,25,.6);text-align:center;padding:0 20px}
+
+  /* ── gallery of framed paintings ── */
+  .gallery{position:relative;z-index:2;width:min(1100px,92vw);margin:10px 0 70px;text-align:center;color:var(--ink)}
+  .gallery h2{font-family:'Pinyon Script',cursive;font-weight:400;font-size:clamp(46px,6vw,72px);line-height:1}
+  .gal-sub{font-size:13px;letter-spacing:.14em;text-transform:uppercase;opacity:.65;margin-top:6px}
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:clamp(30px,5vw,70px) clamp(24px,4vw,60px);margin-top:36px;align-items:center;justify-items:center}
+  .framed{position:relative;width:100%;cursor:pointer;border:0;background:none;padding:0;transform-style:preserve-3d;transition:transform .5s cubic-bezier(.2,.8,.2,1);filter:drop-shadow(0 26px 30px rgba(70,40,0,.35))}
+  .framed:focus-visible{outline:3px solid #2a2219;outline-offset:8px}
+  .framed .pic{position:absolute;overflow:hidden;background:#222}
+  .framed .pic img{display:block;width:100%;height:100%;object-fit:fill}
+  .framed svg.frame{position:relative;display:block;width:100%;height:auto;pointer-events:none}
+  .framed .cap{display:block;margin-top:14px;font-family:'Cormorant Garamond',serif;font-style:italic;font-size:19px;color:var(--ink)}
+  .eye{position:absolute;background-repeat:no-repeat;pointer-events:none;-webkit-mask:radial-gradient(ellipse 50% 50% at 50% 50%,#000 45%,transparent 100%);mask:radial-gradient(ellipse 50% 50% at 50% 50%,#000 45%,transparent 100%)}
+  .skyglow{position:absolute;inset:0;pointer-events:none;mix-blend-mode:screen;opacity:.9;background:radial-gradient(circle at var(--gx,50%) var(--gy,30%),rgba(255,236,150,.5),rgba(255,220,120,.12) 12%,transparent 26%)}
+  .eyemark{position:absolute;width:14px;height:14px;margin:-7px 0 0 -7px;border-radius:50%;background:#ff3b6b;border:2px solid #fff;cursor:move;z-index:9}
+  @media (max-width:760px){.grid{grid-template-columns:1fr}}
   @media (max-width:760px){.links{display:none}.offer.a{left:6%;top:20%}.offer.b{right:6%;top:24%}.hero{cursor:auto}.follower{display:none}}
   @media (prefers-reduced-motion:reduce){.canvas,.offer{transition:none}.hero.sad.shake .canvas{animation:none}}
 </style>
@@ -91,6 +107,11 @@
   <span class="sig" id="sig"></span>
   <div class="follower" id="follower" aria-hidden="true"></div>
 </main>
+<section class="gallery" aria-labelledby="galTitle">
+  <h2 id="galTitle">the gallery</h2>
+  <p class="gal-sub">they're watching you. click one to bring it up top.</p>
+  <div class="grid" id="grid"></div>
+</section>
 <p class="credit">Paintings: public domain, via Wikimedia Commons.</p>
 
 <script>
@@ -118,6 +139,14 @@ ICON.chevalier=BOOK('#2a4a7a','Girl with a','Pearl Earring');
 ICON.poe=BOOK('#3a2a2a','The Oval','Portrait · Poe');
 ICON.poliziano=BOOK('#7a5a2a','Stanze','Poliziano · 1478');
 ICON.iliad=BOOK('#4a3a24','The Iliad','Book V');
+// where each sitter's eyes are, as fractions of the painting's width and height (x, y, eye width).
+// If an eye sits slightly off, open the page with ?eyes, drag the markers, and copy the numbers here.
+const EYES = {
+  0: [[.413,.272,.05],[.535,.267,.05]],      // Mona Lisa
+  1: [[.365,.395,.075],[.585,.375,.075]],    // Girl with a Pearl Earring
+  2: [],                                     // The Starry Night: the sky follows you instead
+  3: [[.487,.233,.012],[.511,.230,.012]]     // The Birth of Venus
+};
 const PAINTINGS = [
   { img: W('Mona_Lisa,_by_Leonardo_da_Vinci,_from_C2RMF_retouched.jpg'), title: 'Make her smile', sig: '– La Gioconda', label: 'Mona Lisa, Leonardo da Vinci',
     blurb: "Gioconda has been written about for five centuries. Bring her the critic who adored her, never the novel about a portrait that rots.",
@@ -145,7 +174,7 @@ const PAINTINGS = [
   function show(k,instant){
     const p=PAINTINGS[k];i=k;
     const set=()=>{canvas.style.backgroundImage=`url("${p.img}")`;canvas.setAttribute('aria-label',p.label);canvas.classList.remove('fade');};
-    if(instant||still)set();else{canvas.classList.add('fade');setTimeout(set,380);}
+    if(instant||still)set();else{canvas.classList.add('fade');setTimeout(()=>{set();heroEyes&&heroEyes();},380);}
     document.getElementById('title').textContent=p.title;document.getElementById('blurb').textContent=p.blurb;document.getElementById('sig').textContent=p.sig;mood.textContent='';
     // which side the good and bad offers sit on changes, so it's a little game
     const [L,Rr]=k%2?[p.good,p.bad]:[p.bad,p.good];
@@ -172,7 +201,119 @@ const PAINTINGS = [
     if(!still){canvas.style.transform=`translate(${-px*18}px,${-py*12}px) scale(1.02)`;
       A.style.transform=`translate(${px*26}px,${py*18}px)`;B.style.transform=`translate(${px*30}px,${py*22}px)`;}
     if(Math.abs(tx-fx)+Math.abs(ty-fy)>.5||Math.abs(gx-px)+Math.abs(gy-py)>.002)raf=requestAnimationFrame(loop);}
-  show(0,true);
+
+  // ── frames, drawn to fit each painting: gilded baroque, pink enamel, painted blue, red lace
+  const FRAMES=['gold','pink','blue','lace'];
+  function frameSVG(kind,pw,ph){
+    const t=Math.round(Math.min(pw,ph)*.2),W=pw+2*t,H=ph+2*t,id=kind+Math.random().toString(36).slice(2,7);
+    const hole=`M${t} ${t}h${pw}v${ph}h${-pw}z`,outer=`M0 0h${W}v${H}h${-W}z`;
+    const mids=[[W/2,t*.5,0],[W/2,H-t*.5,180],[t*.5,H/2,-90],[W-t*.5,H/2,90]],corners=[[t*.55,t*.55,0],[W-t*.55,t*.55,90],[W-t*.55,H-t*.55,180],[t*.55,H-t*.55,270]];
+    let defs='',body='';
+    if(kind==='gold'){
+      defs=`<linearGradient id="g${id}" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#f6dc8e"/><stop offset=".35" stop-color="#b8862e"/><stop offset=".55" stop-color="#f0d07c"/><stop offset=".8" stop-color="#8e6420"/><stop offset="1" stop-color="#d9b25a"/></linearGradient>
+        <pattern id="m${id}" width="9" height="9" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><path d="M0 0H9M0 0V9" stroke="#6e4c14" stroke-width=".8" opacity=".35"/></pattern>`;
+      const scroll=(x,y,r,s)=>`<g transform="translate(${x} ${y}) rotate(${r}) scale(${s})" fill="none" stroke="#6e4c14" stroke-width="3" stroke-linecap="round"><path d="M-60 10 C-40 -30 -10 -30 0 -6 C10 -30 40 -30 60 10" stroke="#fff3c0" stroke-width="7" opacity=".55"/><path d="M-60 10 C-40 -30 -10 -30 0 -6 C10 -30 40 -30 60 10"/><path d="M-24 0 C-24 -16 -8 -16 -8 -4 M24 0 C24 -16 8 -16 8 -4"/><path d="M-18 14 L0 -2 L18 14 Z" fill="#c99a3e" stroke="#6e4c14"/>${[-14,-7,0,7,14].map(a=>`<path d="M0 12 L${a} -2"/>`).join('')}</g>`;
+      body=`<path d="${outer}${hole}" fill-rule="evenodd" fill="url(#g${id})"/><path d="${outer}${hole}" fill-rule="evenodd" fill="url(#m${id})"/>
+        <rect x="${t*.18}" y="${t*.18}" width="${W-t*.36}" height="${H-t*.36}" fill="none" stroke="#6e4c14" stroke-width="3" opacity=".7"/>
+        <rect x="${t*.82}" y="${t*.82}" width="${W-t*1.64}" height="${H-t*1.64}" fill="none" stroke="#fff1bd" stroke-width="5" opacity=".6"/>
+        <rect x="${t-6}" y="${t-6}" width="${pw+12}" height="${ph+12}" fill="none" stroke="#5a3c0e" stroke-width="5"/>
+        ${mids.map(([x,y,r])=>scroll(x,y,r,t/55)).join('')}${corners.map(([x,y,r])=>scroll(x,y,r+45,t/62)).join('')}`;
+    } else if(kind==='pink'){
+      defs=`<linearGradient id="g${id}" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#d98d99"/><stop offset=".5" stop-color="#b9606f"/><stop offset="1" stop-color="#d4848f"/></linearGradient>`;
+      const swirl=[...Array(14)].map((_,k)=>{const side=k%4,f=(k*37%100)/100;const p=side===0?[t*.2+f*(W-t*.4),t*.5]:side===1?[W-t*.5,t*.2+f*(H-t*.4)]:side===2?[t*.2+f*(W-t*.4),H-t*.5]:[t*.5,t*.2+f*(H-t*.4)];
+        return `<path d="M${p[0]-t*.3} ${p[1]} q${t*.15} ${-t*.3} ${t*.3} 0 t${t*.3} 0" fill="none" stroke="#f3c6cf" stroke-width="${t*.05}" opacity=".55"/>`;}).join('');
+      const flower=(x,y,j)=>`<g transform="translate(${x} ${y})">${[0,72,144,216,288].map(a=>`<ellipse cx="0" cy="${-t*.13}" rx="${t*.07}" ry="${t*.12}" fill="#e9e27a" stroke="#c9b84a" stroke-width="1.2" transform="rotate(${a})"/>`).join('')}<circle r="${t*.07}" fill="${j}"/><circle cx="${-t*.02}" cy="${-t*.02}" r="${t*.025}" fill="#fff" opacity=".8"/></g>`;
+      const vine=`<path d="M${t*.25} ${t*.5} C${W*.25} ${t*.1} ${W*.3} ${t*.9} ${W*.5} ${t*.45} S${W*.75} ${t*.1} ${W-t*.25} ${t*.5}" fill="none" stroke="#e4e4ea" stroke-width="2.4"/>`;
+      body=`<path d="${outer}${hole}" fill-rule="evenodd" fill="url(#g${id})" stroke="#c9c9d2" stroke-width="5"/>${swirl}${vine}<g transform="rotate(180 ${W/2} ${H/2})">${vine}</g>
+        <rect x="${t-4}" y="${t-4}" width="${pw+8}" height="${ph+8}" rx="10" fill="none" stroke="#dcdce4" stroke-width="5"/>
+        ${[[W*.25,t*.5,'#8a3fb0'],[W*.72,t*.5,'#d6417a'],[t*.5,H*.35,'#d6417a'],[t*.5,H*.72,'#8a3fb0'],[W-t*.5,H*.3,'#8a3fb0'],[W-t*.5,H*.66,'#d6417a'],[W*.35,H-t*.5,'#8a3fb0'],[W*.78,H-t*.5,'#d6417a']].map(([x,y,j])=>flower(x,y,j)).join('')}`;
+    } else if(kind==='blue'){
+      defs=`<linearGradient id="g${id}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#b9c7d6"/><stop offset="1" stop-color="#8fa2b6"/></linearGradient>`;
+      const acanthus=(x,y,r)=>`<g transform="translate(${x} ${y}) rotate(${r}) scale(${t/58})" fill="#eef0e6" stroke="#7d8fa3" stroke-width="2"><path d="M-10 40 C-40 30 -46 -6 -20 -20 C-8 -26 6 -16 0 -6 C-6 4 -20 0 -16 -10 M10 40 C40 30 46 -6 20 -20" fill="none" stroke-width="7" stroke="#f3f1e6"/><path d="M-10 40 C-40 30 -46 -6 -20 -20 C-8 -26 6 -16 0 -6 C-6 4 -20 0 -16 -10" fill="none"/><path d="M10 40 C40 30 46 -6 20 -20 C8 -26 -6 -16 0 -6" fill="none"/></g>`;
+      const beads=[];const step=t*.16;
+      for(let x=t*.75;x<W-t*.75;x+=step)beads.push([x,t*.75],[x,H-t*.75]);for(let y=t*.75+step;y<H-t*.75;y+=step)beads.push([t*.75,y],[W-t*.75,y]);
+      body=`<path d="${outer}${hole}" fill-rule="evenodd" fill="url(#g${id})"/>
+        <rect x="${t*.12}" y="${t*.12}" width="${W-t*.24}" height="${H-t*.24}" fill="none" stroke="#f1eedf" stroke-width="${t*.06}" opacity=".8"/>
+        ${beads.map(([x,y])=>`<circle cx="${x}" cy="${y}" r="${t*.035}" fill="#f1eedf"/>`).join('')}
+        <rect x="${t-5}" y="${t-5}" width="${pw+10}" height="${ph+10}" fill="none" stroke="#f1eedf" stroke-width="6"/>
+        ${corners.map(([x,y,r])=>acanthus(x,y,r+45)).join('')}${[[t*.5,H*.32,-90],[t*.5,H*.68,-90],[W-t*.5,H*.32,90],[W-t*.5,H*.68,90]].map(([x,y,r])=>acanthus(x,y,r)).join('')}`;
+    } else {
+      defs=`<pattern id="n${id}" width="10" height="10" patternUnits="userSpaceOnUse"><path d="M0 0H10M0 0V10" stroke="#c0182b" stroke-width="1.2"/></pattern>`;
+      const heart=(x,y,s)=>`<g transform="translate(${x} ${y}) scale(${s})"><path d="M0 28 C-36 4 -30 -26 -10 -24 C-4 -24 0 -18 0 -14 C0 -18 4 -24 10 -24 C30 -26 36 4 0 28Z" fill="#fff" stroke="#c0182b" stroke-width="5"/><path d="M0 28 C-36 4 -30 -26 -10 -24 C-4 -24 0 -18 0 -14 C0 -18 4 -24 10 -24 C30 -26 36 4 0 28Z" fill="url(#n${id})"/><rect x="-5" y="-6" width="10" height="10" fill="#c0182b"/></g>`;
+      const waves=(len,vert)=>{let d='';const n=Math.max(2,Math.round(len/(t*2.2)));for(let k=0;k<=n*20;k++){const f=k/(n*20),off=Math.sin(f*n*Math.PI*2)*t*.32;d+=(k?' L':'M')+(vert?`${t/2+off} ${f*len}`:`${f*len} ${t/2+off}`);}return d;};
+      body=`<path d="${outer}${hole}" fill-rule="evenodd" fill="#fffaf6"/><path d="${outer}${hole}" fill-rule="evenodd" fill="url(#n${id})" opacity=".85"/>
+        <path d="${waves(W,false)}" fill="none" stroke="#c0182b" stroke-width="6"/><path d="${waves(W,false)}" transform="translate(0 ${H-t})" fill="none" stroke="#c0182b" stroke-width="6"/>
+        <path d="${waves(H,true)}" fill="none" stroke="#c0182b" stroke-width="6"/><path d="${waves(H,true)}" transform="translate(${W-t} 0)" fill="none" stroke="#c0182b" stroke-width="6"/>
+        <rect x="3" y="3" width="${W-6}" height="${H-6}" fill="none" stroke="#c0182b" stroke-width="5"/><rect x="${t-4}" y="${t-4}" width="${pw+8}" height="${ph+8}" fill="none" stroke="#c0182b" stroke-width="5"/>
+        ${[...corners,...mids].map(([x,y])=>heart(x,y,t/64)).join('')}`;
+    }
+    return {svg:`<svg class="frame" viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg"><defs>${defs}</defs>${body}</svg>`,t,W,H};
+  }
+
+  // ── tracking eyes: a soft-edged patch of the painting over each eye, nudged toward the cursor
+  const eyeSets=[];
+  function addEyes(host,url,rect,k){
+    host.querySelectorAll('.eye,.skyglow').forEach(e=>e.remove());
+    const list=EYES[k]||[];
+    if(!list.length){const g=document.createElement('div');g.className='skyglow';host.appendChild(g);eyeSets.push({host,glow:g});return;}
+    const set={host,eyes:[]};
+    list.forEach(([x,y,w])=>{const ew=w*rect.w,eh=ew*.62,cx=rect.x+x*rect.w,cy=rect.y+y*rect.h;
+      const e=document.createElement('div');e.className='eye';
+      Object.assign(e.style,{left:(cx-ew/2)+'px',top:(cy-eh/2)+'px',width:ew+'px',height:eh+'px',backgroundImage:`url("${url}")`,backgroundSize:`${rect.w}px ${rect.h}px`});
+      const bx=-(cx-ew/2-rect.x),by=-(cy-eh/2-rect.y);e.style.backgroundPosition=`${bx}px ${by}px`;
+      host.appendChild(e);set.eyes.push({e,bx,by,max:Math.max(1.2,ew*.07)});});
+    eyeSets.push(set);
+  }
+  let px0=innerWidth/2,py0=innerHeight/2,eyeRaf=0;
+  function lookAt(){eyeRaf=0;
+    eyeSets.forEach(s=>{if(!s.host.isConnected)return;
+      if(s.glow){const r=s.host.getBoundingClientRect();s.glow.style.setProperty('--gx',((px0-r.left)/r.width*100)+'%');s.glow.style.setProperty('--gy',((py0-r.top)/r.height*100)+'%');return;}
+      s.eyes.forEach(o=>{const r=o.e.getBoundingClientRect(),dx=px0-(r.left+r.width/2),dy=py0-(r.top+r.height/2),d=Math.hypot(dx,dy)||1,k=Math.min(1,d/260)*o.max;
+        o.e.style.backgroundPosition=`${o.bx+dx/d*k}px ${o.by+dy/d*k}px`;});});
+  }
+  addEventListener('pointermove',e=>{px0=e.clientX;py0=e.clientY;if(!eyeRaf)eyeRaf=requestAnimationFrame(lookAt);},{passive:true});
+
+  // ── build the 2 × 2 gallery
+  const grid=document.getElementById('grid');
+  PAINTINGS.forEach((p,k)=>{
+    const b=document.createElement('button');b.className='framed';b.type='button';b.setAttribute('aria-label',`Show ${p.label} at the top`);
+    b.innerHTML=`<div class="pic"><img alt="${p.label}" src="${p.img.replace('width=1600','width=900')}"></div><span class="cap">${p.label}</span>`;
+    grid.appendChild(b);
+    const img=b.querySelector('img');
+    const build=()=>{const a=img.naturalWidth/img.naturalHeight||.7,pw=1000,ph=Math.round(1000/a),f=frameSVG(FRAMES[k],pw,ph);
+      b.insertAdjacentHTML('afterbegin',f.svg);const pic=b.querySelector('.pic');
+      Object.assign(pic.style,{left:(f.t/f.W*100)+'%',top:(f.t/f.H*100)+'%',width:(pw/f.W*100)+'%',height:(ph/f.H*100)+'%'});
+      b.style.maxWidth=(a<1?420:520)+'px';
+      requestAnimationFrame(()=>{const r=pic.getBoundingClientRect();addEyes(pic,img.src,{x:0,y:0,w:r.width,h:r.height},k);});};
+    if(img.complete&&img.naturalWidth)build();else img.addEventListener('load',build,{once:true});
+    b.addEventListener('click',()=>{show(k);hero.scrollIntoView({behavior:'smooth',block:'start'});});
+  });
+  // the frames tilt very slightly toward you as you move
+  addEventListener('pointermove',e=>{grid.querySelectorAll('.framed').forEach(f=>{const r=f.getBoundingClientRect(),dx=(e.clientX-(r.left+r.width/2))/innerWidth,dy=(e.clientY-(r.top+r.height/2))/innerHeight;
+    f.style.transform=`perspective(1200px) rotateY(${(dx*8).toFixed(2)}deg) rotateX(${(-dy*6).toFixed(2)}deg)`;});},{passive:true});
+  addEventListener('resize',()=>{grid.querySelectorAll('.framed').forEach((b,k)=>{const pic=b.querySelector('.pic'),r=pic.getBoundingClientRect();addEyes(pic,b.querySelector('img').src,{x:0,y:0,w:r.width,h:r.height},k);});});
+
+  // ── the hero's eyes: work out where the painting actually sits under 'cover' cropping
+  function heroEyes(){
+    const p=PAINTINGS[i],im=new Image();im.onload=()=>{const c=canvas.getBoundingClientRect(),cs=getComputedStyle(canvas);
+      const s=Math.max(c.width/im.naturalWidth,c.height/im.naturalHeight),w=im.naturalWidth*s,h=im.naturalHeight*s;
+      const ox=(c.width-w)*.5,oy=(c.height-h)*.3;addEyes(canvas,p.img,{x:ox,y:oy,w,h},i);};im.src=p.img;
+  }
+  show(0,true);heroEyes();
+  // ── ?eyes: drag the pink dots onto each sitter's eyes, then copy the numbers into EYES above
+  if(/[?&]eyes\b/.test(location.search)){
+    const btn=document.createElement('button');btn.textContent='copy eye positions';btn.className='pill';
+    Object.assign(btn.style,{position:'fixed',left:'16px',bottom:'16px',zIndex:99,background:'#2a2219',color:'#fff',cursor:'pointer'});
+    btn.onclick=()=>{const t=JSON.stringify(EYES);navigator.clipboard&&navigator.clipboard.writeText(t);btn.textContent='copied: '+t.slice(0,60)+'…';};
+    document.body.appendChild(btn);
+    setTimeout(()=>{grid.querySelectorAll('.framed').forEach((b,k)=>{const pic=b.querySelector('.pic');b.style.cursor='default';
+      (EYES[k]||[]).forEach((ey,j)=>{const m=document.createElement('div');m.className='eyemark';m.style.left=(ey[0]*100)+'%';m.style.top=(ey[1]*100)+'%';pic.appendChild(m);
+        m.addEventListener('pointerdown',e=>{e.preventDefault();e.stopPropagation();m.setPointerCapture(e.pointerId);
+          const mv=ev=>{const r=pic.getBoundingClientRect();ey[0]=+((ev.clientX-r.left)/r.width).toFixed(3);ey[1]=+((ev.clientY-r.top)/r.height).toFixed(3);m.style.left=(ey[0]*100)+'%';m.style.top=(ey[1]*100)+'%';};
+          const up=()=>{m.removeEventListener('pointermove',mv);m.removeEventListener('pointerup',up);const r=pic.getBoundingClientRect();addEyes(pic,b.querySelector('img').src,{x:0,y:0,w:r.width,h:r.height},k);};
+          m.addEventListener('pointermove',mv);m.addEventListener('pointerup',up);});
+        m.addEventListener('click',e=>e.stopPropagation());});});},1500);
+  }
 })();
 </script>
 <script src="../gh.js"></script>
