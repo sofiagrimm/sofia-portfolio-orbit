@@ -560,6 +560,10 @@
       popupInner.classList.remove('dismissing');
       popupOverlay.classList.add('visible');
       setTimeout(()=>{popupLocked=false;},600);
+      // the cat stays up a good while, then the card turns over on its own; a click turns it sooner
+      clearTimeout(openPopup.auto);
+      openPopup.auto=setTimeout(()=>{if(popupOverlay.classList.contains('visible')&&!popupFlipper.classList.contains('flipped')){
+        popupFlipper.classList.add('flipped');popupInner.classList.add('bursting');burst.addEventListener('animationend',()=>{popupInner.classList.remove('bursting');},{once:true});}},5000);
     }
 
     function closePopup(){
@@ -576,7 +580,7 @@
 
     popupClose.addEventListener('click',closePopup);
     popupOverlay.addEventListener('click',(e)=>{if(e.target===popupOverlay)closePopup();});
-    popupFlipper.addEventListener('click',(e)=>{if(e.target.closest('.fr-link')||popupLocked)return;popupFlipper.classList.toggle('flipped');});
+    popupFlipper.addEventListener('click',(e)=>{if(e.target.closest('.fr-link')||popupLocked)return;clearTimeout(openPopup.auto);popupFlipper.classList.toggle('flipped');});
     document.addEventListener('keydown',(e)=>{if(e.key==='Escape')closePopup();});
 
     const grid=document.getElementById('memoryGrid');
