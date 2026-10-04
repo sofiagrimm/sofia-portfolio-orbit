@@ -622,17 +622,43 @@
 
   // more things on the table: the card case, a dealer button, a score pad and loose chips
   function deckBox(){
-    return `<svg viewBox="0 0 160 220" xmlns="http://www.w3.org/2000/svg">
-      <rect x="22" y="6" width="116" height="40" rx="4" fill="#f7f3ea" stroke="#d8d0bf" stroke-width="2" transform="rotate(-4 80 26)"/>
-      <rect x="28" y="2" width="116" height="40" rx="4" fill="${GREEN}" stroke="#e9f2e6" stroke-width="2" transform="rotate(5 86 22)"/>
-      <rect x="10" y="30" width="140" height="184" rx="8" fill="#1f4f3a"/>
-      <rect x="18" y="38" width="124" height="168" rx="5" fill="none" stroke="#c9a45a" stroke-width="2"/>
-      <rect x="24" y="44" width="112" height="156" rx="3" fill="none" stroke="#c9a45a" stroke-width=".8"/>
-      <path d="M10 30 h140 v18 q-70 14 -140 0z" fill="#174030"/>
-      <text x="80" y="104" text-anchor="middle" font-family="'DM Serif Display',Georgia,serif" font-size="20" fill="#e8d3a0">Sofia Grimm</text>
-      <text x="80" y="124" text-anchor="middle" font-family="Courier New,monospace" font-size="9" letter-spacing="2" fill="#c9a45a">PLAYING CARDS</text>
-      <path d="M80 140 L92 156 L80 172 L68 156Z" fill="none" stroke="#c9a45a" stroke-width="1.6"/><circle cx="80" cy="156" r="3" fill="#c9a45a"/>
-      <text x="80" y="192" text-anchor="middle" font-family="Courier New,monospace" font-size="8" letter-spacing="1.5" fill="#c9a45a">NEW HAVEN, CT</text></svg>`;
+    // a proper tuck box: portrait front, a little depth on the side, the top flap folded open
+    // and a thumb notch showing the card backs inside
+    return `<svg viewBox="0 0 170 240" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <pattern id="tbLat" width="10" height="10" patternUnits="userSpaceOnUse"><rect width="10" height="10" fill="${GREEN}"/><path d="M5 1 L9 5 L5 9 L1 5Z" fill="none" stroke="#e9f2e6" stroke-width=".7"/></pattern>
+        <clipPath id="tbFront"><path d="M12 40 H72 A12 12 0 0 0 96 40 H150 V232 H12Z"/></clipPath>
+      </defs>
+      <!-- open flap, folded back behind the box -->
+      <path d="M14 40 L24 10 Q26 4 32 4 H130 Q136 4 138 10 L150 40Z" fill="#e7e1d3" stroke="#cfc6b3" stroke-width="1.2"/>
+      <path d="M58 6 Q84 -2 108 6" fill="none" stroke="#cfc6b3" stroke-width="1.2"/>
+      <!-- cards inside, seen through the top -->
+      <path d="M16 40 H148 V48 H16Z" fill="#f7f3ea"/>${[0,1,2,3].map(i=>`<path d="M16 ${41+i*2} H148" stroke="#ddd6c6" stroke-width=".7"/>`).join('')}
+      <!-- side of the box -->
+      <path d="M150 40 L162 32 V224 L150 232Z" fill="#1b4634"/><path d="M150 40 L162 32" stroke="#2a5d46" stroke-width="1"/>
+      <!-- front panel -->
+      <g clip-path="url(#tbFront)">
+        <rect x="12" y="40" width="138" height="192" fill="#f7f3ea"/>
+        <rect x="20" y="48" width="122" height="176" rx="4" fill="url(#tbLat)"/>
+        <rect x="20" y="48" width="122" height="176" rx="4" fill="none" stroke="#f1f6ee" stroke-width="1.6"/>
+        <rect x="26" y="54" width="110" height="164" rx="2" fill="none" stroke="#c9a45a" stroke-width="1"/>
+        <!-- card backs peeking through the thumb notch -->
+        <rect x="70" y="38" width="28" height="16" fill="${GREEN}"/><path d="M74 44 L84 50 L94 44" fill="none" stroke="#e9f2e6" stroke-width=".8"/>
+      </g>
+      <path d="M12 40 H72 A12 12 0 0 0 96 40 H150 V232 H12Z" fill="none" stroke="#d8d0bf" stroke-width="1.4"/>
+      <!-- label -->
+      <ellipse cx="81" cy="134" rx="48" ry="40" fill="#f7f3ea" stroke="#c9a45a" stroke-width="2"/>
+      <ellipse cx="81" cy="134" rx="42" ry="34" fill="none" stroke="#c9a45a" stroke-width=".8"/>
+      <text x="81" y="128" text-anchor="middle" font-family="'DM Serif Display',Georgia,serif" font-size="17" fill="#1f4f3a">Sofia</text>
+      <text x="81" y="146" text-anchor="middle" font-family="'DM Serif Display',Georgia,serif" font-size="17" fill="#1f4f3a">Grimm</text>
+      <text x="81" y="160" text-anchor="middle" font-family="Courier New,monospace" font-size="5.6" letter-spacing="1.4" fill="#8a6a2c">PLAYING CARDS</text>
+      <path d="M81 96 l5 6 l-5 6 l-5 -6z M81 162 l5 6 l-5 6 l-5 -6z" fill="#c9a45a" transform="translate(0 -4)"/>
+      <path d="M81 186 l4 5 l-4 5 l-4 -5z" fill="#c9a45a" opacity="0"/>
+      <rect x="40" y="200" width="82" height="13" rx="2" fill="#f7f3ea"/>
+      <text x="81" y="209.5" text-anchor="middle" font-family="Courier New,monospace" font-size="6" letter-spacing="1.2" fill="#1f4f3a">NEW HAVEN, CT</text>
+      <!-- a soft sheen across the front -->
+      <path d="M12 40 L60 40 L12 120Z" fill="#fff" opacity=".08"/>
+    </svg>`;
   }
   function dealer(){
     return `<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><circle cx="50" cy="54" r="44" fill="#00000055"/><circle cx="50" cy="50" r="44" fill="#f7f4ec" stroke="#d4ccbb" stroke-width="2"/>
@@ -654,7 +680,7 @@
   // piles of green-backed cards, chip stacks, dice and a few face-up cards
   const LAYOUT=[
     {chips:[[30,40,4],[78,30,3,1],[104,72,5,2]], x:84, y:12, w:140, rot:0},
-    {prop:'box', x:50, y:6, w:96, rot:-10},
+    {prop:'box', x:50, y:5, w:92, rot:-8},
     {prop:'dealer', x:53, y:31, w:62, rot:0},
     {prop:'pad', x:75, y:25, w:118, rot:9},
     {chips:[[24,30,1,3]], x:41, y:30, w:56, rot:0},
