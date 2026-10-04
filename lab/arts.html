@@ -101,6 +101,7 @@
   .follower{display:none !important}
   .framed{margin:0}.cell{width:100%;display:flex;flex-direction:column;align-items:center}
 .framed .pic{transition:filter .5s}
+  .ptitle{font-family:'Pinyon Script',cursive;font-weight:400;font-size:clamp(38px,4vw,56px);line-height:1.1;color:var(--ink);margin-bottom:10px;text-align:center}
   .offers2{display:flex;justify-content:center;gap:12px;margin-top:12px;flex-wrap:wrap}
   .offers2 button{display:flex;align-items:center;gap:8px;padding:6px 14px 6px 8px;border-radius:999px;border:1px solid rgba(42,34,25,.25);background:rgba(255,255,255,.45);font:13px 'Inter',sans-serif;color:var(--ink);cursor:pointer;transition:background .2s,transform .2s}
   .offers2 button:hover,.offers2 button:focus-visible{background:rgba(255,255,255,.8);transform:translateY(-2px);outline:none}
@@ -433,7 +434,7 @@ const PAINTINGS = [
   // ── build the 2 × 2 gallery
   const grid=document.getElementById('grid');
   PAINTINGS.forEach((p,k)=>{
-    const cell=document.createElement('div');cell.className='cell';const b=document.createElement('figure');b.className='framed';cell.appendChild(b);
+    const cell=document.createElement('div');cell.className='cell';const ht=document.createElement('h3');ht.className='ptitle';ht.textContent=p.title;cell.appendChild(ht);const b=document.createElement('figure');b.className='framed';cell.appendChild(b);
     b.innerHTML=`<div class="pic"><img alt="${p.label}" src="${p.img.replace('width=1600','width=900')}"></div><span class="cap">${p.label}</span>`;
     grid.appendChild(cell);
     const img=b.querySelector('img');
