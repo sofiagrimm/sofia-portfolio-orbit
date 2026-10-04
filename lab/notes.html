@@ -116,9 +116,9 @@
   .clips svg{width:18px}
 
   /* rotating "sofia is a ___" line */
-  .is-a{display:flex;align-items:baseline;gap:.35em;margin:34px 0 0 6px;font-family:'Nanum Pen Script',cursive;font-size:clamp(30px,4vw,44px);color:#f1ecdc;line-height:1}
+  .is-a{display:flex;flex-wrap:nowrap;white-space:nowrap;align-items:baseline;gap:.35em;margin:34px 0 0 6px;font-family:'Nanum Pen Script',cursive;font-size:clamp(28px,4vw,44px);color:#f1ecdc;line-height:1}
   .is-a .art{display:inline-block;transition:opacity .25s}
-  .is-a .window{position:relative;display:inline-block;height:1.25em;overflow:hidden;vertical-align:bottom;min-width:7em}
+  .is-a .window{position:relative;display:inline-block;height:1.25em;overflow:hidden;vertical-align:bottom;min-width:6.2em;flex:0 0 auto}
   .is-a .word{position:absolute;left:0;top:0;white-space:nowrap;font-family:'DM Serif Display',Georgia,serif;font-style:italic;font-size:1.1em;color:#f3b6c8;
     transition:transform .55s cubic-bezier(.2,.8,.2,1),opacity .55s}
   .is-a .word.in{transform:translateX(0);opacity:1}
@@ -127,6 +127,17 @@
   .is-a .word::after{content:"";position:absolute;left:0;right:0;bottom:.05em;height:.08em;background:#f3b6c8;opacity:.45;border-radius:2px}
   .sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
   @media (prefers-reduced-motion:reduce){.is-a .word{transition:opacity .4s}.is-a .word.out,.is-a .word.next{transform:none}}
+
+  /* paper pieces (images), text laid over the writable area */
+  .paper{position:relative;container-type:inline-size;filter:drop-shadow(0 12px 18px rgba(0,0,0,.45))}
+  .paper img{display:block;width:100%;height:auto}
+  .paper .paper-text{position:absolute;margin:0}
+  .paper a{color:#24306b}
+  .paper-notebook{width:min(540px,100%);margin-top:30px;transform:rotate(1deg)}
+  .paper-notebook .paper-text{left:24%;right:5%;top:23.6%;font-family:'Courier Prime',monospace;font-size:clamp(12px,2.75cqw,15px);line-height:5.18cqw;color:#2b2620}
+  .paper-stack .paper-text{left:16%;right:16%;top:22%;font-family:'Nanum Pen Script',cursive;font-size:clamp(22px,12cqw,32px);line-height:1.05;color:#3b3415}
+  .paper-grid .paper-text{left:18%;right:8%;top:18%;font-family:'Nanum Pen Script',cursive;font-size:clamp(22px,12cqw,32px);line-height:1.05;color:#4a1f2c}
+  .paper-stack.s1{margin-top:0}
   footer{position:relative;z-index:10;padding-bottom:110px !important;}
   footer{text-align:center;padding:0 0 48px;color:#7f8fb8;font-size:13px}
   footer a{color:#c9d6ff}
@@ -163,30 +174,20 @@
   <span class="hi">hi! i'm</span><br>
   <h1>sofia grimm<span class="tape" aria-hidden="true">that's me</span></h1>
   <p class="is-a"><span aria-hidden="true">sofia is</span><span class="art" aria-hidden="true">a</span><span class="window" aria-hidden="true"><span class="word in">researcher</span></span><span class="sr-only">Sofia is a researcher, artist, writer, builder, archivist, editor, and consultant.</span></p>
-  <div class="notebook-wrap">
-    <div class="scrap-pink" aria-hidden="true"><span>new haven, october
-the light in the reading room
-is the best part of the day
-more soon, s.</span></div>
-    <div class="notebook">
-      <p>I study Molecular Biophysics &amp; Biochemistry and Ethics, Politics &amp; Economics at Yale. Most days I'm at a bench, in an archive, or somewhere in between. The work is all filed in the <a href="cards.html">card catalog</a>.</p>
-    </div>
-    <svg class="binder" viewBox="0 0 80 90" aria-hidden="true"><defs><linearGradient id="bc" x1="0" x2="1"><stop offset="0" stop-color="#e7b4cd"/><stop offset=".5" stop-color="#d48fb3"/><stop offset="1" stop-color="#b9739a"/></linearGradient></defs>
-<path d="M28 34 C22 10 30 2 40 2 C50 2 58 10 52 34" fill="none" stroke="url(#bc)" stroke-width="7" stroke-linecap="round"/><circle cx="40" cy="16" r="6" fill="none" stroke="#c07fa3" stroke-width="2"/>
-<path d="M8 40 L72 40 L66 82 Q40 90 14 82 Z" fill="url(#bc)"/><path d="M8 40 L72 40 L70 50 L10 50 Z" fill="#f0c6da"/></svg>
-    <svg class="chrome-star" viewBox="0 0 100 100" aria-hidden="true"><defs><linearGradient id="cs" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ffffff"/><stop offset=".35" stop-color="#b8bcc6"/><stop offset=".5" stop-color="#3c3f48"/><stop offset=".65" stop-color="#d6d9e0"/><stop offset="1" stop-color="#8b8f9a"/></linearGradient></defs>
-<path d="M50 4 Q56 34 62 38 Q70 40 96 40 Q74 54 70 60 Q70 70 80 96 Q58 80 50 78 Q42 80 20 96 Q30 70 30 60 Q26 54 4 40 Q30 40 38 38 Q44 34 50 4Z" fill="url(#cs)" stroke="#6d707a" stroke-width="1.5" stroke-linejoin="round"/></svg>
+  <div class="paper paper-notebook">
+    <img src="img/paper-notebook.png" alt="" width="647" height="673">
+    <p class="paper-text">I study Molecular Biophysics &amp; Biochemistry and Ethics, Politics &amp; Economics at Yale. Most days I'm at a bench, in an archive, or somewhere in between. The work is all filed in the <a href="cards.html">card catalog</a>.</p>
   </div>
 </section>
 
 <main class="board">
   <figure class="p1"><img src="img/bench.jpg" alt="Sofia pipetting at a lab bench in purple gloves"><figcaption>bench day</figcaption></figure>
   <figure class="p2"><img src="img/chalkboard.jpg" alt="A chalkboard covered in spectroscopy notes"><figcaption>after lecture</figcaption></figure>
-  <aside class="stack-note s1"><span class="clip"><svg viewBox="0 0 20 48" fill="none" stroke="#e7709a" stroke-width="2.6" stroke-linecap="round" aria-hidden="true"><path d="M6 14 V36 a4 4 0 0 0 8 0 V8 a6 6 0 0 0 -12 0 V38 a8 8 0 0 0 16 0 V16"/></svg></span><span class="tab" aria-hidden="true"><svg viewBox="0 0 24 24" width="14"><path d="M12 21 C5 15 2 11 4.5 7.5 C7 4.5 10.5 6 12 8.5 C13.5 6 17 4.5 19.5 7.5 C22 11 19 15 12 21Z" fill="#e05a8a"/></svg></span>currently: 420 case files, all transcribed</aside>
+  <aside class="paper paper-stack s1"><img src="img/paper-stack.png" alt="" width="513" height="562"><p class="paper-text">currently: 420 case files, all transcribed</p></aside>
   <figure class="p3"><img src="img/instrument.jpg" alt="Sofia at a computer beside a mass spectrometer"><figcaption>waiting on a run</figcaption></figure>
   <aside class="sticky s3">./research has a globe you can spin</aside>
   <figure class="p4"><img src="img/atrium.jpg" alt="Looking up at a glass atrium hung with flags"><figcaption>looking up</figcaption></figure>
-  <aside class="grid-wrap s2"><span class="clips" style="left:26px;top:-16px"><svg viewBox="0 0 20 48" fill="none" stroke="#b48ce0" stroke-width="2.6" stroke-linecap="round" aria-hidden="true"><path d="M6 14 V36 a4 4 0 0 0 8 0 V8 a6 6 0 0 0 -12 0 V38 a8 8 0 0 0 16 0 V16"/></svg><svg viewBox="0 0 20 48" fill="none" stroke="#e7709a" stroke-width="2.6" stroke-linecap="round" aria-hidden="true"><path d="M6 14 V36 a4 4 0 0 0 8 0 V8 a6 6 0 0 0 -12 0 V38 a8 8 0 0 0 16 0 V16"/></svg></span><div class="grid-note">say hi! <a href="mailto:sofia.grimm@yale.edu">email me</a></div></aside>
+  <aside class="paper paper-grid s2"><img src="img/paper-grid.png" alt="" width="385" height="407"><p class="paper-text">say hi! <a href="mailto:sofia.grimm@yale.edu">email me</a></p></aside>
   <aside class="sticky mobile-only" style="grid-column:1 / -1;transform:rotate(-1deg)">p.s. this looks better on a laptop</aside>
 </main>
 
