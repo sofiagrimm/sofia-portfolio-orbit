@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>skills &amp; works | Sofia Grimm</title>
+<meta name="robots" content="noindex">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cherry+Bomb+One&family=Reenie+Beanie&family=Inter:wght@300;400;600;800&family=DM+Serif+Display:ital@0;1&family=Courier+Prime&display=swap">
+<style>
+  :root{--paper:#efe8dc;--ink:#2b2724;--pink:#f3a1c4;--pink2:#e97fae;--grey:#8b8580;--frame:#a69d93}
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{overflow-x:clip}
+  body{background:var(--frame);font-family:'Inter',Helvetica,Arial,sans-serif;color:var(--ink);padding:0 0 60px}
+  header{display:flex;justify-content:space-between;align-items:baseline;gap:12px;flex-wrap:wrap;padding:22px clamp(18px,4vw,48px);color:#fbf6ee}
+  header a{color:#fbf6ee;text-decoration:none;font-size:13px;letter-spacing:.12em;text-transform:uppercase;opacity:.8}
+  header a:hover,header a:focus-visible,header a[aria-current]{opacity:1;text-decoration:underline;text-underline-offset:4px}
+  header .brand{font-family:'DM Serif Display',Georgia,serif;font-style:italic;font-size:26px;letter-spacing:0;text-transform:none;opacity:1}
+  header nav{display:flex;flex-wrap:wrap;gap:4px 16px}
+
+  /* every section is a sheet of paper, like slides laid out on a table */
+  .sheet{position:relative;width:min(1180px,94vw);margin:0 auto 26px;background:var(--paper);overflow:hidden;
+    box-shadow:0 18px 30px rgba(40,30,20,.25);padding:clamp(28px,4vw,56px)}
+  .sheet::before{content:"";position:absolute;inset:0;pointer-events:none;opacity:.35;mix-blend-mode:multiply;
+    background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='2'/%3E%3CfeColorMatrix values='0 0 0 0 .55  0 0 0 0 .5  0 0 0 0 .42  0 0 0 .5 0'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)'/%3E%3C/svg%3E")}
+  .pen{font-family:'Reenie Beanie',cursive;font-size:clamp(26px,3vw,40px);line-height:1;color:var(--ink)}
+  .bubble{font-family:'Cherry Bomb One',cursive;color:var(--pink);line-height:.82;letter-spacing:-.01em;
+    text-shadow:0 2px 0 #f7c0d8,0 6px 14px rgba(233,127,174,.25)}
+  .small{font-size:12px;color:#5b5550}
+  .tape{position:absolute;width:86px;height:24px;background:rgba(240,226,190,.75);box-shadow:0 1px 2px rgba(0,0,0,.1)}
+
+  /* ── cover ── */
+  .cover{min-height:min(720px,86vh);display:grid;place-items:center}
+  .cover .hi{position:absolute;left:clamp(24px,4vw,56px);top:clamp(24px,4vw,46px)}
+  .cover .guide{position:absolute;right:clamp(24px,5vw,90px);top:clamp(70px,9vw,100px);font-size:clamp(22px,2.4vw,32px);transform:rotate(-3deg)}
+  .cover .this{position:absolute;left:clamp(60px,12vw,190px);top:clamp(110px,14vw,170px);font-size:clamp(26px,3vw,40px);transform:rotate(-6deg);z-index:4}
+  .cover h1{position:relative;text-align:center;font-size:clamp(120px,20vw,290px);margin-top:4%}
+  .cover h1 span{display:block;position:relative;z-index:1}
+  .cover h1 .amp{font-size:.5em;color:var(--pink2);vertical-align:.35em}
+  .cover .me{position:absolute;z-index:2;left:56%;bottom:0;height:70%;transform:translateX(-50%);filter:drop-shadow(0 10px 18px rgba(0,0,0,.25));pointer-events:none}
+  .cover h1 .front{z-index:3}
+  .cover .role{position:absolute;left:clamp(24px,4vw,56px);bottom:clamp(20px,3vw,36px)}
+  .cover .by{position:absolute;right:clamp(24px,4vw,56px);bottom:clamp(20px,3vw,36px)}
+
+  /* ── story + skills ── */
+  .two{display:grid;grid-template-columns:1fr 1fr;gap:clamp(24px,4vw,60px);align-items:center}
+  .story p{font-size:14px;line-height:1.65;max-width:42ch}
+  .story p+p{margin-top:12px}
+  .story b{font-weight:600}
+  .doodle{display:flex;align-items:center;gap:14px;margin:26px 0}
+  .doodle .pol{background:#fff;padding:6px 6px 22px;box-shadow:0 6px 12px rgba(0,0,0,.18);transform:rotate(-4deg);width:110px}
+  .doodle .pol img{width:100%;aspect-ratio:1;object-fit:cover;filter:grayscale(1) contrast(1.1);display:block}
+  .doodle .pol:last-child{transform:rotate(5deg)}
+  .doodle svg{flex:1;height:60px}
+  .tags{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px}
+  .tags span{border:1.5px solid var(--ink);border-radius:999px;padding:5px 12px;font-size:12px;background:rgba(255,255,255,.35)}
+  .oval{display:inline-block;border:1.5px solid var(--ink);border-radius:50%;padding:8px 22px;font-size:12px;text-align:center;line-height:1.4}
+
+  .big{font-family:'Inter',sans-serif;font-weight:800;letter-spacing:-.04em;line-height:.9;color:#7d7772}
+  .big.l1{font-size:clamp(30px,4.6vw,58px);text-align:right;color:#9a948e}
+  .big.l2{font-size:clamp(40px,6.2vw,80px);text-align:right}
+  .chart{display:flex;align-items:flex-end;gap:12px;height:150px;margin:20px 0 6px;padding-left:10px;border-left:1.5px solid var(--ink);border-bottom:1.5px solid var(--ink)}
+  .chart i{display:block;width:34px;background:var(--pink);border-radius:4px 4px 0 0;position:relative}
+  .chart i b{position:absolute;top:-20px;left:50%;transform:translateX(-50%);font:600 11px 'Inter';color:var(--ink);white-space:nowrap}
+  .chart-labels{display:flex;gap:12px;padding-left:10px;font-size:10px;color:#5b5550}
+  .chart-labels span{width:34px;text-align:center}
+  .photos{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .photos img{width:100%;aspect-ratio:4/3;object-fit:cover;display:block;box-shadow:0 6px 12px rgba(0,0,0,.18)}
+
+  /* ── the board: swatches, type, tools, a phone ── */
+  .board{position:relative;min-height:700px}
+  .board h2{position:absolute;left:4%;top:33%;font-size:clamp(90px,13vw,170px);transform:rotate(-4deg);z-index:1}
+  .swatches{position:absolute;left:4%;top:7%;display:flex;gap:10px}
+  .swatches i{display:block;width:30px;height:30px;border-radius:50%;box-shadow:inset 0 0 0 1px rgba(0,0,0,.12)}
+  .swatches small{display:block;font-size:9px;color:#5b5550;margin-top:4px;text-align:center}
+  .type{position:absolute;left:4%;top:20%;display:grid;grid-template-columns:repeat(4,auto);gap:4px 18px;align-items:end}
+  .type b{font-size:34px;font-weight:400;line-height:1}
+  .type small{font-size:9px;color:#5b5550}
+  .phone{position:absolute;right:4%;top:7%;width:clamp(150px,15vw,200px);aspect-ratio:9/19;border-radius:28px;background:#111;padding:8px;box-shadow:0 20px 30px rgba(0,0,0,.3);transform:rotate(5deg);z-index:2}
+  .phone img{width:100%;height:100%;object-fit:cover;object-position:top;border-radius:21px;display:block}
+  .phone.two{right:19%;top:16%;transform:rotate(-6deg);z-index:1}
+  .tools{position:absolute;left:4%;bottom:5%;display:grid;grid-template-columns:repeat(2,minmax(0,220px));gap:14px 26px;z-index:2}
+  .tools div{font-size:12px;line-height:1.45}
+  .tools b{display:block;font-family:'Reenie Beanie',cursive;font-size:24px;font-weight:400;color:var(--pink2)}
+  .film{position:absolute;right:5%;bottom:4%;display:flex;gap:6px;background:#161616;padding:10px 8px;border-radius:4px;transform:rotate(-3deg);z-index:2}
+  .film img{width:72px;height:56px;object-fit:cover;filter:grayscale(1)}
+
+  /* ── works: taped cards ── */
+  .works h2{font-size:clamp(70px,10vw,130px);margin-bottom:10px}
+  .wgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:clamp(22px,3vw,40px);margin-top:10px}
+  .work{position:relative;background:#fbf8f2;padding:12px 12px 16px;box-shadow:0 10px 18px rgba(40,30,20,.2);text-decoration:none;color:inherit;transition:transform .25s}
+  .work:nth-child(odd){transform:rotate(-1.5deg)}.work:nth-child(even){transform:rotate(1.4deg)}
+  .work:hover,.work:focus-visible{transform:rotate(0) translateY(-6px);outline:none}
+  .work:focus-visible{box-shadow:0 0 0 3px var(--pink2),0 10px 18px rgba(40,30,20,.2)}
+  .work .tape{top:-10px;left:50%;margin-left:-43px;transform:rotate(-3deg)}
+  .work .art{aspect-ratio:4/3;background:#e9e2d6;overflow:hidden;display:grid;place-items:center}
+  .work .art img{width:100%;height:100%;object-fit:cover}
+  .work .art svg{width:80%;height:80%}
+  .work h3{font-family:'Reenie Beanie',cursive;font-weight:400;font-size:30px;margin-top:10px;line-height:1}
+  .work p{font-size:12px;line-height:1.5;color:#4c4743;margin-top:4px}
+  .work .kind{position:absolute;right:12px;top:18px;background:var(--pink);color:#fff;font:600 10px 'Inter';letter-spacing:.08em;text-transform:uppercase;padding:3px 8px;border-radius:999px}
+
+  /* ── wrap ── */
+  .wrapup{min-height:520px}
+  .wrapup .contact{position:absolute;left:clamp(28px,4vw,56px);top:clamp(28px,4vw,56px);display:grid;gap:10px;font-size:12px}
+  .wrapup .contact a{color:var(--ink);display:flex;gap:10px;align-items:center}
+  .wrapup .contact i{width:22px;height:16px;border:1.5px solid var(--ink);border-radius:3px;display:inline-block}
+  .wrapup .and{position:absolute;right:clamp(28px,4vw,56px);top:clamp(24px,4vw,46px);font-size:clamp(56px,8vw,104px);text-align:right}
+  .wrapup .wrapw{position:absolute;left:clamp(28px,4vw,56px);bottom:clamp(24px,4vw,46px);font-size:clamp(56px,8vw,104px)}
+  .env{position:absolute;left:50%;top:52%;width:min(440px,60%);aspect-ratio:1.45;transform:translate(-50%,-50%)}
+  .env .back{position:absolute;inset:0;background:var(--pink);clip-path:polygon(0 30%,50% 0,100% 30%,100% 100%,0 100%)}
+  .env .note{position:absolute;left:12%;right:12%;top:-6%;bottom:30%;background:#fffdf8;transform:rotate(-3deg);padding:16px 18px;box-shadow:0 6px 12px rgba(0,0,0,.15);
+    background-image:repeating-linear-gradient(transparent 0 25px,#cfd9e6 25px 26px);font-family:'Reenie Beanie',cursive;font-size:22px;line-height:26px}
+  .env .front{position:absolute;inset:auto 0 0 0;height:62%;background:#f6b5cf;clip-path:polygon(0 0,50% 48%,100% 0,100% 100%,0 100%)}
+  @media (max-width:860px){.two,.wgrid{grid-template-columns:1fr}.board{min-height:auto;display:flex;flex-direction:column;gap:20px}.board>*{position:relative !important;inset:auto !important;transform:none !important}
+    .board h2{order:-1}.cover .this,.cover .guide{display:none}.big.l1,.big.l2{text-align:left}}
+</style>
+</head>
+<body>
+<header>
+  <a class="brand" href="../index.html">Sofia Grimm</a>
+  <nav aria-label="Site"><a href="../index.html">Home</a><a href="../about.html">About</a><a href="../research.html">Research</a><a href="../projects.html">Projects</a><a href="skills.html" aria-current="page">Skills &amp; works</a><a href="cards.html">Cards</a><a href="notes.html">Notes</a><a href="sofia-is.html">Sofia is</a><a href="arts.html">Arts</a><a href="globe.html">Globe</a><a href="lace.html">Tilt</a><a href="../contact.html">Contact</a></nav>
+</header>
+
+<main>
+  <!-- cover -->
+  <section class="sheet cover" aria-labelledby="t1">
+    <p class="pen hi">Hi. since you're new here,</p>
+    <p class="pen guide">let me be ya tour guide</p>
+    <p class="pen this">this is</p>
+    <h1 class="bubble" id="t1"><span>skills</span><span class="front"><span class="amp" style="display:inline">&amp; </span>works</span></h1>
+    <img class="me" src="img/sw/sofia-cutout.webp" alt="Sofia pipetting at a lab bench">
+    <p class="small role">Molecular Biophysics &amp; Biochemistry · Ethics, Politics &amp; Economics</p>
+    <p class="small by">by Sofia Grimm</p>
+  </section>
+
+  <!-- story -->
+  <section class="sheet two" aria-label="How it started">
+    <div class="story">
+      <p>Grew up in Hong Kong, moved to the Chicago suburbs, and picked up Spanish and Chinese along the way.</p>
+      <div class="doodle" aria-hidden="true">
+        <div class="pol"><img src="img/chalkboard.jpg" alt=""></div>
+        <svg viewBox="0 0 200 60"><path d="M4 40 C30 10 50 55 80 30 S120 5 140 30 S170 50 196 20" fill="none" stroke="#2b2724" stroke-width="1.6" stroke-dasharray="5 5"/><path d="M188 14 L196 20 L187 26" fill="none" stroke="#2b2724" stroke-width="1.6"/></svg>
+        <div class="pol"><img src="img/bench.jpg" alt=""></div>
+      </div>
+      <p>Now at Yale, mostly at a bench, in an archive, or somewhere in between. Somewhere along the way it clicked: <b>the best science is also the best-told story.</b></p>
+    </div>
+    <div>
+      <span class="oval">Yale College<br>Class of 2029</span>
+      <div class="tags">
+        <span>wet-lab research</span><span>image-analysis pipelines</span><span>archival research</span><span>healthcare consulting</span>
+        <span>editing</span><span>science writing</span><span>web design</span><span>LEGO set design</span><span>Spanish</span><span>Chinese</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- not just -->
+  <section class="sheet" aria-label="What I bring">
+    <p class="big l1">it's not just pipetting,</p>
+    <p class="big l2">it's telling the story of the data.</p>
+    <div class="two" style="margin-top:30px">
+      <div>
+        <p class="pen" style="font-size:30px">where the hours go</p>
+        <div class="chart" role="img" aria-label="A rough sketch of how my week splits between lab, editing, consulting and making things">
+          <i style="height:88%"><b>lab</b></i><i style="height:56%"><b>edit</b></i><i style="height:48%"><b>consult</b></i><i style="height:66%"><b>make</b></i><i style="height:30%"><b>sleep?</b></i>
+        </div>
+        <p class="small" style="margin-top:8px">a very scientific estimate</p>
+        <p style="font-size:13px;line-height:1.6;margin-top:16px;max-width:44ch">How do you turn a microscope image, a hundred-year-old case file, or a client's spreadsheet into something people want to read? Clean data, a clear question, and a little bit of design.</p>
+      </div>
+      <div class="photos"><img src="img/instrument.jpg" alt="Lab instrument"><img src="img/chalkboard.jpg" alt="Chalkboard after a lecture"><img src="img/atrium.jpg" alt="Looking up in an atrium"><img src="img/bench.jpg" alt="At the bench"></div>
+    </div>
+  </section>
+
+  <!-- the board -->
+  <section class="sheet board" aria-labelledby="t2">
+    <div class="swatches" aria-label="Colours I use">
+      <div><i style="background:#6e1f22"></i><small>felt</small></div><div><i style="background:#2e7656"></i><small>baize</small></div>
+      <div><i style="background:#f3b6c8"></i><small>blush</small></div><div><i style="background:#24306b"></i><small>ink</small></div><div><i style="background:#e2c27e"></i><small>gilt</small></div>
+    </div>
+    <div class="type" aria-label="Typefaces I use">
+      <b style="font-family:'DM Serif Display',serif;font-style:italic">Aa</b><b style="font-family:'Courier Prime',monospace">Aa</b><b style="font-family:'Reenie Beanie',cursive">Aa</b><b style="font-family:'Inter',sans-serif;font-weight:800">Aa</b>
+      <small>DM Serif</small><small>Courier</small><small>handwriting</small><small>Inter</small>
+    </div>
+    <h2 class="bubble" id="t2">skills<br>&amp; works</h2>
+    <div class="phone"><img src="img/sw/phone-projects.jpg" alt="This website's card table on a phone"></div>
+    <div class="phone two"><img src="img/sw/phone-notes.jpg" alt="This website's notes page on a phone"></div>
+    <div class="tools">
+      <div><b>in the lab</b>neurodegeneration imaging pipelines, activated-carbon screening</div>
+      <div><b>in the archive</b>case-file research on the Harvey Cushing Brain Tumor Registry</div>
+      <div><b>on the page</b>print managing editor, short-take editor, staff science writer</div>
+      <div><b>on the screen</b>HTML, CSS, JavaScript, WebGL, and this whole site</div>
+    </div>
+    <div class="film" aria-hidden="true"><img src="img/bench.jpg" alt=""><img src="img/chalkboard.jpg" alt=""><img src="img/instrument.jpg" alt=""><img src="img/atrium.jpg" alt=""></div>
+  </section>
+
+  <!-- works -->
+  <section class="sheet works" aria-labelledby="t3">
+    <h2 class="bubble" id="t3">works</h2>
+    <p class="pen" style="font-size:30px">a few things I've made (click to look closer)</p>
+    <div class="wgrid">
+      <a class="work" href="../projects.html"><span class="tape"></span><span class="kind">web</span><div class="art"><img src="img/sw/desk-projects.jpg" alt="The card table page of this site"></div>
+        <h3>this website</h3><p>A card table, a night sky, a pool hall and a paper airplane, hand-built from scratch.</p></a>
+      <a class="work" href="arts.html"><span class="tape"></span><span class="kind">design</span><div class="art"><svg viewBox="140 180 320 260"><rect x="140" y="180" width="320" height="260" fill="#f2ddd6"/><path d="M160 270 L300 190 L440 270Z" fill="#6d7378"/><rect x="175" y="268" width="250" height="150" fill="#7b2a22"/>
+          <rect x="283" y="350" width="34" height="68" fill="#6b3f22"/><rect x="236" y="336" width="128" height="8" fill="#f6f3ec"/><path d="M228 336 L300 312 L372 336Z" fill="#f6f3ec"/>
+          <rect x="200" y="290" width="22" height="34" fill="#cfe1ea" stroke="#f6f3ec" stroke-width="3"/><rect x="378" y="290" width="22" height="34" fill="#cfe1ea" stroke="#f6f3ec" stroke-width="3"/><rect x="140" y="418" width="320" height="22" fill="#4f8a3c"/></svg></div>
+        <h3>A House Like Yours</h3><p>A 724-piece custom LEGO Architecture set. Creative and Performing Arts Award.</p></a>
+      <a class="work" href="../projects.html"><span class="tape"></span><span class="kind">code</span><div class="art"><img src="../img/cards/card-9-hearts.jpg" alt="The NeuroPrint card"></div>
+        <h3>NeuroPrint</h3><p>A hackathon tool using computer vision to follow Parkinson's motor symptoms at home.</p></a>
+      <a class="work" href="../research.html"><span class="tape"></span><span class="kind">lab</span><div class="art"><img src="img/instrument.jpg" alt="Lab instrument"></div>
+        <h3>the research</h3><p>Imaging pipelines for neurodegeneration, drug-deactivation screening, and archival work.</p></a>
+      <a class="work" href="../about.html"><span class="tape"></span><span class="kind">words</span><div class="art"><img src="img/chalkboard.jpg" alt="Chalkboard"></div>
+        <h3>the writing</h3><p>Editing a law journal's print issue and a global-health review, and writing science stories.</p></a>
+      <a class="work" href="arts.html"><span class="tape"></span><span class="kind">art</span><div class="art"><img src="img/frames/heart.webp" alt="A carved heart frame" style="object-fit:contain;background:#f3c7d0"></div>
+        <h3>learning from the greats</h3><p>Old masters re-imagined in 3D: their eyes follow you, and they react to what you offer.</p></a>
+    </div>
+  </section>
+
+  <!-- wrap -->
+  <section class="sheet wrapup" aria-labelledby="t4">
+    <div class="contact"><a href="../contact.html"><i></i> write me a letter</a><a href="https://www.linkedin.com/in/sofia-grimm/"><i></i> linkedin</a><a href="https://github.com/sofiagrimm" data-gh><i></i> github</a></div>
+    <p class="big and" id="t4">and<br>that's</p>
+    <div class="env" aria-hidden="true"><div class="back"></div><div class="note">thank you so much for taking the time to look through all of this. if you'd like to make something together, write whenever.</div><div class="front"></div></div>
+    <p class="big wrapw">a wrap.</p>
+  </section>
+</main>
+<script src="../gh.js"></script>
+<script src="../roulette.js"></script>
+</body>
+</html>
