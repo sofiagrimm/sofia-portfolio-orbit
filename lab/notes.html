@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>hi | Sofia Grimm</title>
+<meta name="robots" content="noindex">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Courier+Prime:wght@400;700&family=Nanum+Pen+Script&display=swap">
+<style>
+  :root{
+    --sky:#060d18;
+    --polaroid:#f3efe6;
+    --ink-light:#f1ecdc;
+    --ink:#24306b;
+    --sticky:#f2df72;
+    --sticky-pink:#f3b6c8;
+    --muted:#9fb0d8;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{background:var(--sky)}
+  body{
+    min-height:100vh;color:#dfe7ff;font-family:'Courier Prime',Courier,monospace;overflow-x:hidden;
+    background:
+      radial-gradient(1px 1px at 14% 22%,#fff8 50%,transparent 51%),
+      radial-gradient(1px 1px at 82% 12%,#fff6 50%,transparent 51%),
+      radial-gradient(1.5px 1.5px at 38% 70%,#fff5 50%,transparent 51%),
+      radial-gradient(1px 1px at 93% 52%,#fff7 50%,transparent 51%),
+      radial-gradient(1px 1px at 58% 92%,#fff5 50%,transparent 51%),
+      radial-gradient(1.5px 1.5px at 4% 83%,#fff4 50%,transparent 51%),
+      radial-gradient(ellipse at 20% -10%,#14264d 0%,transparent 55%),
+      var(--sky);
+    background-attachment:fixed;
+  }
+  header{max-width:1100px;margin:0 auto;padding:36px 28px 0;display:flex;justify-content:space-between;align-items:baseline;flex-wrap:wrap;gap:12px}
+  nav a{font-family:'Nanum Pen Script',cursive;font-size:26px;color:#c9d6ff;text-decoration:none;margin-right:18px}
+  nav a:hover,nav a:focus-visible{color:#fff;text-decoration:underline;text-underline-offset:4px}
+  .coords{font-size:12px;color:#7f8fb8}
+
+  .hello{max-width:1100px;margin:0 auto;padding:64px 28px 24px;position:relative}
+  .hello h1{
+    font-family:'Nanum Pen Script',cursive;font-weight:400;color:var(--ink-light);
+    font-size:clamp(72px,13vw,168px);line-height:.85;transform:rotate(-3deg);transform-origin:left bottom;
+  }
+  .hello h1 svg{width:.5em;height:.5em;vertical-align:.15em;margin-left:.1em}
+  .hello p{margin-top:28px;max-width:46ch;font-size:16px;line-height:1.65;color:var(--muted)}
+  .hello p a{color:#dfe7ff}
+
+  .board{max-width:1100px;margin:0 auto;padding:40px 28px 140px;display:grid;grid-template-columns:repeat(12,1fr);gap:28px;align-items:start}
+  figure{
+    position:relative;background:var(--polaroid);padding:12px 12px 52px;
+    box-shadow:0 18px 34px rgba(0,0,0,.5),0 2px 4px rgba(0,0,0,.35);
+  }
+  figure img{display:block;width:100%;aspect-ratio:1/1;object-fit:cover;filter:saturate(.9) contrast(1.02)}
+  figcaption{position:absolute;left:14px;right:14px;bottom:10px;font-family:'Nanum Pen Script',cursive;font-size:28px;line-height:1;color:var(--ink);text-align:center}
+  figure::before{ /* tape */
+    content:"";position:absolute;top:-12px;left:50%;width:96px;height:26px;margin-left:-48px;
+    background:rgba(236,226,198,.55);box-shadow:0 1px 2px rgba(0,0,0,.2);transform:rotate(-3deg);
+  }
+  .p1{grid-column:1 / span 4;grid-row:1;transform:rotate(-4deg)}
+  .p2{grid-column:6 / span 3;grid-row:1;transform:rotate(3deg);margin-top:70px}
+  .p3{grid-column:9 / span 4;grid-row:1;transform:rotate(-1.5deg);margin-top:10px}
+  .p4{grid-column:3 / span 4;grid-row:2;transform:rotate(2.5deg);margin-top:10px}
+
+  .sticky{
+    position:relative;padding:20px 18px 26px;background:var(--sticky);
+    font-family:'Nanum Pen Script',cursive;font-size:28px;line-height:1;color:#3b3415;
+    box-shadow:0 12px 22px rgba(0,0,0,.45);
+  }
+  .sticky a{color:inherit;}
+  .s1{grid-column:8 / span 3;grid-row:2;transform:rotate(-3deg);margin-top:20px}
+  .s2{grid-column:10 / span 3;grid-row:2;transform:rotate(4deg);background:var(--sticky-pink);color:#4a1f2c;margin-top:200px}
+  .s3{grid-column:1 / span 2;grid-row:2;transform:rotate(-6deg);margin-top:120px}
+
+  footer{text-align:center;padding:0 0 48px;color:#7f8fb8;font-size:13px}
+  footer a{color:#c9d6ff}
+
+  .mobile-only{display:none}
+  @media (max-width:760px){
+    .board{grid-template-columns:1fr 1fr;gap:28px 18px}
+    .p1,.p2,.p3,.p4,.s1,.s2,.s3{grid-column:auto;grid-row:auto;margin-top:0}
+    .p1,.p3{grid-column:1 / -1;width:78%;justify-self:center}
+    figcaption{font-size:24px}
+    .mobile-only{display:block}
+  }
+</style>
+</head>
+<body>
+<header>
+  <nav aria-label="Site">
+    <a href="../index.html">./home</a><a href="../about.html">./about</a><a href="../research.html">./research</a><a href="cards.html">./cards</a>
+  </nav>
+  <span class="coords">41.3083° N 72.9279° W</span>
+</header>
+
+<section class="hello">
+  <h1>hi! i'm sofia<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.5l2.6 6.3 6.8.5-5.2 4.4 1.6 6.6L12 16.8l-5.8 3.5 1.6-6.6-5.2-4.4 6.8-.5z" fill="none" stroke="#f1ecdc" stroke-width="1.4" stroke-linejoin="round"/></svg></h1>
+  <p>I study Molecular Biophysics &amp; Biochemistry and Ethics, Politics &amp; Economics at Yale. Most days I'm at a bench, in an archive, or somewhere in between. The work is all filed in the <a href="cards.html">card catalog</a>.</p>
+</section>
+
+<main class="board">
+  <figure class="p1"><img src="img/bench.jpg" alt="Sofia pipetting at a lab bench in purple gloves"><figcaption>bench day</figcaption></figure>
+  <figure class="p2"><img src="img/chalkboard.jpg" alt="A chalkboard covered in spectroscopy notes"><figcaption>after lecture</figcaption></figure>
+  <aside class="sticky s1">currently: 420 case files, all transcribed</aside>
+  <figure class="p3"><img src="img/instrument.jpg" alt="Sofia at a computer beside a mass spectrometer"><figcaption>waiting on a run</figcaption></figure>
+  <aside class="sticky s3">./research has a globe you can spin</aside>
+  <figure class="p4"><img src="img/atrium.jpg" alt="Looking up at a glass atrium hung with flags"><figcaption>looking up</figcaption></figure>
+  <aside class="sticky s2">say hi! <a href="mailto:sofia.grimm@yale.edu">email me</a></aside>
+  <aside class="sticky mobile-only" style="grid-column:1 / -1;transform:rotate(-1deg)">p.s. this looks better on a laptop</aside>
+</main>
+
+<footer>sofia.grimm@yale.edu &nbsp; <a href="https://www.linkedin.com/in/sofia-grimm/">linkedin</a></footer>
+</body>
+</html>

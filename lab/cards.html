@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>card catalog | Sofia Grimm</title>
+<meta name="robots" content="noindex">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Courier+Prime:ital,wght@0,400;0,700;1,400&family=Nanum+Pen+Script&display=swap">
+<style>
+  :root{
+    --sky:#060d18;
+    --paper:#ece2c6;
+    --paper-edge:#d9cba6;
+    --rule-red:#b3473b;
+    --rule-blue:rgba(70,110,170,.22);
+    --ink:#24306b;
+    --type:#2a2622;
+    --sticky:#f2df72;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{background:var(--sky)}
+  body{
+    min-height:100vh;color:#dfe7ff;
+    font-family:'Courier Prime',Courier,monospace;
+    background:
+      radial-gradient(1px 1px at 12% 18%,#fff8 50%,transparent 51%),
+      radial-gradient(1px 1px at 78% 9%,#fff6 50%,transparent 51%),
+      radial-gradient(1.5px 1.5px at 33% 64%,#fff5 50%,transparent 51%),
+      radial-gradient(1px 1px at 91% 47%,#fff7 50%,transparent 51%),
+      radial-gradient(1px 1px at 55% 88%,#fff5 50%,transparent 51%),
+      radial-gradient(1.5px 1.5px at 6% 79%,#fff4 50%,transparent 51%),
+      radial-gradient(1px 1px at 66% 31%,#fff6 50%,transparent 51%),
+      radial-gradient(ellipse at 70% -10%,#13254a 0%,transparent 60%),
+      var(--sky);
+    background-attachment:fixed;
+  }
+  .pen{font-family:'Nanum Pen Script',cursive;font-weight:400}
+
+  header{max-width:1100px;margin:0 auto;padding:36px 28px 0;display:flex;justify-content:space-between;align-items:baseline;flex-wrap:wrap;gap:12px}
+  nav a{font-family:'Nanum Pen Script',cursive;font-size:26px;color:#c9d6ff;text-decoration:none;margin-right:18px}
+  nav a:hover,nav a:focus-visible{color:#fff;text-decoration:underline;text-underline-offset:4px}
+  .coords{font-size:12px;color:#7f8fb8}
+
+  .intro{max-width:1100px;margin:0 auto;padding:48px 28px 8px}
+  .intro h1{font-family:'Nanum Pen Script',cursive;font-weight:400;font-size:clamp(56px,9vw,104px);line-height:.9;color:#f4f0e2;transform:rotate(-2deg);transform-origin:left}
+  .intro p{margin-top:18px;max-width:52ch;font-size:15px;line-height:1.6;color:#9fb0d8}
+
+  .drawer{max-width:1100px;margin:0 auto;padding:40px 28px 120px;display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:44px 36px}
+
+  .card{perspective:1200px;height:220px;cursor:pointer;outline:none;border:0;background:none;text-align:left;font:inherit;color:inherit}
+  .card:nth-child(4n+1){transform:rotate(-1.6deg)}
+  .card:nth-child(4n+2){transform:rotate(1.1deg) translateY(10px)}
+  .card:nth-child(4n+3){transform:rotate(-.6deg) translateY(-6px)}
+  .card:nth-child(4n){transform:rotate(2deg)}
+  .inner{position:relative;width:100%;height:100%;transform-style:preserve-3d;transition:transform .6s cubic-bezier(.2,.8,.2,1)}
+  .card[aria-expanded="true"] .inner{transform:rotateY(180deg)}
+  .card:focus-visible .face{box-shadow:0 0 0 3px #9cc0ff,0 14px 30px rgba(0,0,0,.5)}
+  .face{
+    position:absolute;inset:0;backface-visibility:hidden;border-radius:3px;
+    background:
+      repeating-linear-gradient(to bottom,transparent 0 21px,var(--rule-blue) 21px 22px) 0 58px/100% calc(100% - 58px) no-repeat,
+      linear-gradient(to bottom,transparent 0 46px,var(--rule-red) 46px 47.5px,transparent 47.5px),
+      radial-gradient(ellipse at 30% 20%,#f4ecd5 0%,var(--paper) 55%,var(--paper-edge) 100%);
+    color:var(--type);padding:14px 20px 18px;
+    box-shadow:0 1px 0 #fff5 inset,0 14px 30px rgba(0,0,0,.45),0 2px 4px rgba(0,0,0,.4);
+  }
+  .face::after{ /* punch hole */
+    content:"";position:absolute;left:50%;bottom:10px;width:14px;height:14px;margin-left:-7px;border-radius:50%;
+    background:var(--sky);box-shadow:inset 0 1px 2px rgba(0,0,0,.6);
+  }
+  .back{transform:rotateY(180deg)}
+  .call{display:flex;justify-content:space-between;font-size:13px;letter-spacing:.04em;color:#6b5f4c;height:32px;align-items:flex-end}
+  .title{margin-top:20px;font-size:19px;font-weight:700;line-height:1.15;color:var(--type)}
+  .where{font-size:13px;color:#6b5f4c;margin-top:2px}
+  .note{position:absolute;left:20px;right:20px;bottom:34px;font-family:'Nanum Pen Script',cursive;font-size:25px;line-height:1;color:var(--ink);transform:rotate(-1.5deg)}
+  .back .body{margin-top:18px;font-size:12.5px;line-height:22px;color:var(--type)}
+  .back .link{position:absolute;right:20px;bottom:28px;font-family:'Nanum Pen Script',cursive;font-size:22px;color:var(--ink)}
+
+  .sticky{
+    position:relative;align-self:center;justify-self:center;width:190px;padding:18px 16px 22px;background:var(--sticky);
+    font-family:'Nanum Pen Script',cursive;font-size:26px;line-height:1;color:#3b3415;
+    transform:rotate(3deg);box-shadow:0 10px 20px rgba(0,0,0,.4);
+  }
+  .sticky::before{content:"";position:absolute;top:-10px;left:50%;width:70px;height:22px;margin-left:-35px;background:rgba(255,255,255,.35);transform:rotate(-4deg)}
+
+  footer{text-align:center;padding:0 0 48px;color:#7f8fb8;font-size:13px}
+  footer a{color:#c9d6ff}
+
+  @media (max-width:640px){
+    .drawer{gap:36px;padding-top:28px}
+    .card{height:240px}
+  }
+  @media (prefers-reduced-motion:reduce){.inner{transition:none}}
+</style>
+</head>
+<body>
+<header>
+  <nav aria-label="Site">
+    <a href="../index.html">./home</a><a href="../about.html">./about</a><a href="../research.html">./research</a><a href="notes.html">./notes</a>
+  </nav>
+  <span class="coords">41.3083° N 72.9279° W</span>
+</header>
+
+<section class="intro">
+  <h1>the card catalog</h1>
+  <p>Everything I've worked on, filed the way a library would. Tap a card to turn it over.</p>
+</section>
+
+<main class="drawer" id="drawer"></main>
+
+<footer>sofia.grimm@yale.edu &nbsp; <a href="https://www.linkedin.com/in/sofia-grimm/">linkedin</a></footer>
+
+<script>
+// Call numbers use the real Library of Congress class for each subject.
+const cards = [
+  {call:"QP 360", year:"now", title:"Higley Lab", where:"Yale School of Medicine", note:"locus coeruleus, in mice",
+   body:"Studying how locus coeruleus axons degenerate in PPT1-deficient mice and what that means for norepinephrine in Parkinson's disease. Confocal microscopy, IHC, and perfusions."},
+  {call:"R 489", year:"now", title:"Harvey Cushing Brain Tumor Registry", where:"Yale, with Dr. Megann Licskai", note:"420 case files, all transcribed",
+   body:"Archival research on Cushing's brain tumor registry. I've transcribed every case file and am building a cross-referenced record of the patients behind them. An abstract is headed to the AAHM meeting in 2027."},
+  {call:"RS 199", year:"Mar 2026–now", title:"PCDD", where:"Yale SEAS, under Dr. Dan Wiznia", note:"14 carbons, 5 suppliers",
+   body:"Biomedical Engineering Innovation Fellow on a patient-controlled drug deactivation device. I sourced the carbon panel, wrote the characterization and screening protocols, and lead the HPLC work, validating against the DEA non-retrievable standard."},
+  {sticky:"the library two blocks away counts as much as Fermilab"},
+  {call:"QB 857", year:"2023", title:"Gravitational lens CNN", where:"Fermilab", note:"40,000 simulated lenses",
+   body:"Generated two 40,000-image benchmark datasets of double-source plane lenses and Einstein rings, then trained PyTorch CNNs to classify them. Presented at the AGU Annual Meeting 2023."},
+  {call:"QD 79", year:"Sun Lab", title:"SPME-CZE-MS/MS", where:"Michigan State", note:"30x more sample in",
+   body:"Established the first solid-phase microextraction CZE-MS/MS system for top-down proteomics of mass-limited samples. It resolved 0.05 mg/mL ubiquitin where the standard method saw nothing."},
+  {call:"QH 470", year:"Stan-X", title:"Enhancer trap line", where:"Stanford", note:"now living in Bloomington",
+   body:"Developed an enhancer-trapped Drosophila line on the LexA-LexAop system, now at the Bloomington Drosophila Stock Center. Screened 40 lines by GFP and mapped the insertion to CG11050 by inverse PCR."},
+  {call:"T 385", year:"Apr 2026", title:"NeuroPrint", where:"HackDartmouth XI", note:"3rd overall",
+   body:"A browser tool for tracking Parkinson's at home. MediaPipe tracks joints during movement tasks so raw video never leaves the device, and a dashboard shows clinicians change over time.", link:"https://devpost.com/software/neuroprint-cky41g"},
+  {call:"HG 6024", year:"Mar 2026", title:"Vantage", where:"YHack", note:"best solo hack",
+   body:"A trading terminal on live Polymarket data, with order-book charts, payoff curves, Kelly sizing, and a perp-hedge overlay. Built and shipped alone in one weekend.", link:"https://devpost.com/software/vantage-gnt2kb"},
+  {call:"HV 687", year:"Jan 2026–now", title:"Red Cross fleet model", where:"Yale Healthcare Consulting Collective", note:"how many bloodmobiles?",
+   body:"A Python model that turns regional donation targets into the minimum fleet each region needs, then compares it to current inventory, with a mileage-band overlay."},
+  {call:"HD 2901", year:"Feb 2026", title:"ASEAN expansion", where:"Global Strategy Consulting Group", note:"Singapore first",
+   body:"Compared ASEAN markets for the Nicol David Organization and recommended a Singapore hub with small pilots in Indonesia next."},
+  {call:"TA 1001", year:"2022–23", title:"Green vehicle routing", where:"CCIR, Cambridge", note:"spotlight scholar",
+   body:"A mixed-integer linear programming model in Julia for routing public transit within emissions and capacity limits."}
+];
+
+const drawer = document.getElementById('drawer');
+cards.forEach(c => {
+  if (c.sticky) {
+    const s = document.createElement('aside');
+    s.className = 'sticky'; s.textContent = c.sticky;
+    drawer.appendChild(s); return;
+  }
+  const b = document.createElement('div');
+  b.className = 'card'; b.tabIndex = 0; b.setAttribute('role','button'); b.setAttribute('aria-expanded','false');
+  b.setAttribute('aria-label', c.title + ', tap to turn over');
+  b.innerHTML = `
+    <div class="inner">
+      <div class="face front">
+        <div class="call"><span>${c.call}</span><span>${c.year}</span></div>
+        <div class="title">${c.title}</div>
+        <div class="where">${c.where}</div>
+        <div class="note">${c.note}</div>
+      </div>
+      <div class="face back">
+        <div class="call"><span>${c.call}</span><span>${c.year}</span></div>
+        <div class="body">${c.body}</div>
+        ${c.link ? `<a class="link" href="${c.link}" target="_blank" rel="noopener">see it</a>` : ''}
+      </div>
+    </div>`;
+  const flip = () => b.setAttribute('aria-expanded', b.getAttribute('aria-expanded') === 'true' ? 'false' : 'true');
+  b.addEventListener('click', e => { if (!e.target.closest('a')) flip(); });
+  b.addEventListener('keydown', e => { if (e.target === b && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); flip(); } });
+  drawer.appendChild(b);
+});
+</script>
+</body>
+</html>
