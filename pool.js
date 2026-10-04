@@ -371,13 +371,38 @@
     state = 'cruise'; audio.roll(true); audio.bass(true); pool.classList.remove('cine'); pool.querySelector('.shade').classList.add('gone');
     var wall = R * 2.1 + R * .45 + R, b0 = land ? { u: eight.x, v: eight.y } : { u: eight.y, v: eight.x };
     path = [b0, { u: SU * 1.6, v: wall }, { u: END - R * 2.8, v: SV * .6 }, { u: END + SU * .32, v: SV * .64 }, { u: END + SU * 1.5, v: SV * .7 }];
-    legs = [{ d: 3000, e: 'out' }, { d: 4300, e: 'lin' }, { d: 1400, e: 'hop' }, { d: 1500, e: 'lin' }];
+    legs = [{ d: 3000, e: 'out' }, { d: 4300, e: 'lin' }, { d: 1400, e: 'hop' }, { d: 5200, e: 'heart' }];
+    heart = null;
     legIdx = 0; legT0 = now;
     var cand = balls.filter(function (b) { return b !== eight && b !== shooter; }).sort(function (a, b) { return (land ? b.x - a.x : b.y - a.y); })[0];
     pocketBall = cand; pocketBall.vx = pocketBall.vy = 0; pocketFrom = { x: cand.x, y: cand.y }; pocketT0 = now + 900;
     var pk = P(END / 2, SV - R * 2.1 * .4); pocketAt = { x: pk.x, y: pk.y };
   }
-  var pocketBall = null, pocketFrom, pocketAt, pocketT0, pocketed = false;
+  var pocketBall = null, pocketFrom, pocketAt, pocketT0, pocketed = false, heart = null;
+  function buildHeart() {
+    // everything in world coordinates; the shape is laid out in screen terms so it's upright either way round
+    var view0 = P(END, 0), cx = view0.x + W * .5, cy = view0.y + H * .47, s = Math.min(W, H) * .62 / 34;
+    var start = { x: eight.x, y: eight.y }, tip = { x: cx, y: cy + 17 * s };
+    var pts = [], i, t;
+    // sweep in from the landing spot to the point of the heart
+    var c = { x: (start.x + tip.x) / 2 + W * .05, y: Math.max(start.y, tip.y) + H * .18 };
+    for (i = 0; i <= 40; i++) { t = i / 40; var u = 1 - t; pts.push({ x: u * u * start.x + 2 * u * t * c.x + t * t * tip.x, y: u * u * start.y + 2 * u * t * c.y + t * t * tip.y }); }
+    // round the heart: right lobe first, over the top dip, down the left lobe, back to the point
+    for (i = 1; i <= 200; i++) { t = Math.PI + i / 200 * Math.PI * 2; var hx = 16 * Math.pow(Math.sin(t), 3), hy = -(13 * Math.cos(t) - 5 * Math.cos(2 * t) - 2 * Math.cos(3 * t) - Math.cos(4 * t));
+      pts.push({ x: cx - hx * s, y: cy + hy * s }); }
+    // carry on through the point and away, up and off the right-hand side
+    var end = { x: view0.x + W * 1.35, y: view0.y - H * .15 }, c2 = { x: cx + W * .28, y: cy + 22 * s };
+    for (i = 1; i <= 50; i++) { t = i / 50; var u2 = 1 - t; pts.push({ x: u2 * u2 * tip.x + 2 * u2 * t * c2.x + t * t * end.x, y: u2 * u2 * tip.y + 2 * u2 * t * c2.y + t * t * end.y }); }
+    var len = [0]; for (i = 1; i < pts.length; i++) len.push(len[i - 1] + Math.hypot(pts[i].x - pts[i - 1].x, pts[i].y - pts[i - 1].y));
+    var line = el('path', { fill: 'none', stroke: '#f3e6cf', 'stroke-width': Math.max(2, R * .12), 'stroke-dasharray': (R * .55) + ' ' + (R * .45), 'stroke-linecap': 'round', opacity: '.75' });
+    svg.insertBefore(line, balls[0].g);
+    heart = { pts: pts, len: len, L: len[len.length - 1], line: line };
+  }
+  function heartAt(f) { // f: 0..1 along the whole path at an even pace
+    var d = f * heart.L, len = heart.len, i = 1; while (i < len.length - 1 && len[i] < d) i++;
+    var a = heart.pts[i - 1], b = heart.pts[i], k = (d - len[i - 1]) / Math.max(1e-6, len[i] - len[i - 1]);
+    return { x: a.x + (b.x - a.x) * k, y: a.y + (b.y - a.y) * k, i: i };
+  }
   function pocketStep(now) {
     if (!pocketBall || pocketed) return; var t = (now - pocketT0) / 2800; if (t < 0) return;
     var k = Math.min(1, t), e = 1 - Math.pow(1 - k, 2);
@@ -392,7 +417,17 @@
   function cruiseStep(now) {
     var leg = legs[legIdx], t = Math.min(1, (now - legT0) / leg.d), a = path[legIdx], b = path[legIdx + 1];
     var k = leg.e === 'out' ? 1 - Math.pow(1 - t, 1.5) : t;
-    var u = a.u + (b.u - a.u) * k, v = a.v + (b.v - a.v) * k, q = P(u, v), sp = Math.hypot(q.x - eight.x, q.y - eight.y);
+    var u = a.u + (b.u - a.u) * k, v = a.v + (b.v - a.v) * k, q = P(u, v);
+    if (leg.e === 'heart') {
+      if (!heart) buildHeart();
+      // ease in at the start, a steady glide round the heart, and a little lift of speed as it leaves
+      var f = Math.max(0, Math.min(1, t < .12 ? (t * t) / (2 * .12) : (t - .06) / .94 * (1 - .06) + .06));
+      var hp = heartAt(f); q = { x: hp.x, y: hp.y };
+      var dpts = heart.pts.slice(0, hp.i).concat([hp]), dd = '';
+      for (var j = 0; j < dpts.length; j += 2) dd += (j ? ' L' : 'M') + dpts[j].x.toFixed(1) + ' ' + dpts[j].y.toFixed(1);
+      heart.line.setAttribute('d', dd);
+    }
+    var sp = Math.hypot(q.x - eight.x, q.y - eight.y);
     trailSpeed = sp; eight.ph += sp / R; if (sp > .05) eight.hd = Math.atan2(q.y - eight.y, q.x - eight.x); eight.x = q.x; eight.y = q.y;
     eight.lift = leg.e === 'hop' && t < .82 ? Math.sin(Math.PI * t / .82) : 0;
     audio.level(sp * .012 * (eight.lift > .1 ? .15 : 1));
