@@ -31,7 +31,7 @@
     .nav-links .divider{color:rgba(100,130,200,0.2);font-size:13px;user-select:none;}
 
     .page{position:relative;z-index:10;max-width:680px;margin:0 auto;padding:104px 20px 80px;}
-    :root{--kraft:#e7dcc6;--kraft-2:#d9caad;--kraft-edge:#c4b190;--ink:#2b2620;--navy:#24306b;--wax:#6f1c27;--wax-hi:#a8414e;--wax-lo:#3f0c13}
+    :root{--kraft:#e7dcc6;--kraft-2:#d9caad;--kraft-edge:#c4b190;--ink:#2b2620;--navy:#24306b;--wax:#e7a0b2;--wax-hi:#fbe1e7;--wax-lo:#c97a8e}
 
     .lead{font-family:'Nanum Pen Script',cursive;font-size:32px;line-height:1;color:#f1ecdc;transform:rotate(-2deg);margin:0 0 6px 4px}
     .readout{display:flex;flex-wrap:wrap;gap:4px 14px;margin:0 0 14px 4px;font-family:'Courier Prime',monospace;font-size:11px;letter-spacing:.06em;color:rgba(200,215,255,.35)}
@@ -130,6 +130,13 @@
     .stamps.in{opacity:1;transform:rotate(4deg)}
     .return{position:absolute;left:6%;bottom:12%;font-family:'Courier Prime',monospace;font-size:11px;line-height:1.5;color:#6a5d47;opacity:.85}
 
+    .keepsakes{pointer-events:none;overflow:visible}
+    .ks-under{z-index:0}.ks-over{z-index:6}
+    .keepsakes svg{position:absolute;filter:drop-shadow(0 10px 14px rgba(0,0,0,.45))}
+    .ks-ace{width:22%;left:-15%;top:6%;transform:rotate(-14deg)}
+    .ks-flower{width:19%;right:-9%;top:-12%;transform:rotate(18deg)}
+    .emboss-front{position:absolute;left:32%;width:36%;bottom:5%}
+    @media (max-width:720px){.ks-ace{display:none}.ks-flower{width:17%;right:-3%;top:-9%}}
     .hint{font-family:'Nanum Pen Script',cursive;font-size:28px;color:#c9d6ff;text-align:center;margin-top:10px;opacity:0;transition:opacity .5s}
     .hint.on{opacity:1}
     .sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
@@ -194,6 +201,12 @@
     <p class="sr-only">A sealed letter from Sofia. Open it with the wax seal button, or email her directly at sofia.grimm@yale.edu.</p>
 
     <div class="stage" id="stage">
+      <div class="envpart keepsakes ks-under" aria-hidden="true">
+        <svg class="ks-ace" viewBox="0 0 250 350"><rect x="4" y="4" width="242" height="342" rx="14" fill="#f3ead9" stroke="#cdbf9f" stroke-width="2"/>
+          <circle cx="125" cy="175" r="70" fill="none" stroke="#9fb7a0" stroke-width="10" stroke-dasharray="3 9" opacity=".8"/><circle cx="125" cy="175" r="60" fill="none" stroke="#e7b3bd" stroke-width="5" stroke-dasharray="2 12" opacity=".8"/>
+          <path d="M125 210 C95 188 82 172 82 154 C82 140 93 130 106 130 C114 130 121 135 125 143 C129 135 136 130 144 130 C157 130 168 140 168 154 C168 172 155 188 125 210Z" fill="#d33f45"/>
+          <text x="28" y="50" font-family="'IM Fell English',Georgia,serif" font-size="34" fill="#c43a40" text-anchor="middle">A</text><path d="M28 78 C20 72 17 68 17 63 C17 59 20 57 23 57 C25 57 27 58 28 60 C29 58 31 57 33 57 C36 57 39 59 39 63 C39 68 36 72 28 78Z" fill="#d33f45"/></svg>
+      </div>
       <div class="envpart back"></div>
 
       <div class="letter" id="letter">
@@ -218,14 +231,24 @@
         </svg>
         <svg class="stamps" id="stamps" viewBox="0 0 120 70" aria-hidden="true">
           <defs><mask id="perf"><rect width="120" height="70" fill="#fff"/><g fill="#000" id="perfdots"></g></mask></defs>
-          <g mask="url(#perf)"><rect width="120" height="70" fill="#f6f1e6"/><rect x="8" y="8" width="44" height="54" fill="#2f4170"/><rect x="68" y="8" width="44" height="54" fill="#6f1c27"/>
+          <g mask="url(#perf)"><rect width="120" height="70" fill="#f6f1e6"/><rect x="8" y="8" width="44" height="54" fill="#c9545a"/><rect x="68" y="8" width="44" height="54" fill="#e58fa5"/>
             <circle cx="30" cy="31" r="11" fill="#e9e1cf"/><circle cx="90" cy="31" r="11" fill="#e9e1cf"/>
-            <text x="30" y="56" font-family="Courier New,monospace" font-size="8" fill="#fff" text-anchor="middle">3¢</text><text x="90" y="56" font-family="Courier New,monospace" font-size="8" fill="#fff" text-anchor="middle">3¢</text></g>
+            <text x="30" y="56" font-family="Courier New,monospace" font-size="8" fill="#fff" text-anchor="middle">2¢</text><text x="90" y="56" font-family="Courier New,monospace" font-size="8" fill="#fff" text-anchor="middle">2¢</text></g>
           <path d="M-6 22 q15 -8 30 0 t30 0 t30 0 t30 0 M-6 36 q15 -8 30 0 t30 0 t30 0 t30 0" fill="none" stroke="#2b2620" stroke-width="1.6" opacity=".5"/>
         </svg>
         <div class="return" aria-hidden="true">S. Grimm<br>New Haven, CT</div>
+        <svg class="emboss-front" viewBox="0 0 160 40" aria-hidden="true">
+          <g transform="translate(80 9)"><path d="M0 7 C-6 2 -8 -1 -8 -3.5 C-8 -6 -6 -7.5 -4 -7.5 C-2.2 -7.5 -.8 -6.5 0 -5 C.8 -6.5 2.2 -7.5 4 -7.5 C6 -7.5 8 -6 8 -3.5 C8 -1 6 2 0 7Z" fill="none" stroke="#fff" stroke-width="1.4" opacity=".6" transform="translate(.6 .6)"/>
+          <path d="M0 7 C-6 2 -8 -1 -8 -3.5 C-8 -6 -6 -7.5 -4 -7.5 C-2.2 -7.5 -.8 -6.5 0 -5 C.8 -6.5 2.2 -7.5 4 -7.5 C6 -7.5 8 -6 8 -3.5 C8 -1 6 2 0 7Z" fill="none" stroke="#d07f92" stroke-width="1.2"/></g>
+          <text x="80.6" y="33.6" text-anchor="middle" font-family="Pinyon Script,cursive" font-size="15" fill="#fff" opacity=".6">for you</text>
+          <text x="80" y="33" text-anchor="middle" font-family="Pinyon Script,cursive" font-size="15" fill="#c9667b">for you</text></svg>
       </div>
 
+      <div class="envpart keepsakes ks-over" aria-hidden="true">
+        <svg class="ks-flower" viewBox="0 0 100 100"><g transform="translate(50 50)">
+          <g fill="#f2b9c4" stroke="#d98ea0" stroke-width=".8" opacity=".95"><ellipse rx="13" ry="22" transform="rotate(0) translate(0 -20)"/><ellipse rx="13" ry="22" transform="rotate(72) translate(0 -20)"/><ellipse rx="13" ry="22" transform="rotate(144) translate(0 -20)"/><ellipse rx="13" ry="22" transform="rotate(216) translate(0 -20)"/><ellipse rx="13" ry="22" transform="rotate(288) translate(0 -20)"/></g>
+          <circle r="8" fill="#e7b85a"/><circle r="4" fill="#c98f3a"/><path d="M6 6 C20 26 26 40 22 48" stroke="#7d9a68" stroke-width="2" fill="none"/></g></svg>
+      </div>
       <div class="envpart flapwrap behind" id="flapwrap">
         <div class="flap" id="flap"><div class="face out"><div class="sheen" id="sheen"></div></div><div class="face in"></div></div>
       </div>
@@ -233,14 +256,14 @@
       <div class="envpart waxlayer" id="waxlayer">
         <svg id="waxsvg" viewBox="0 0 100 200" aria-hidden="true">
           <defs>
-            <radialGradient id="waxG" cx="38%" cy="32%" r="72%"><stop offset="0" stop-color="#a8414e"/><stop offset=".55" stop-color="#6f1c27"/><stop offset="1" stop-color="#3f0c13"/></radialGradient>
+            <radialGradient id="waxG" cx="38%" cy="32%" r="72%"><stop offset="0" stop-color="#fde6ec"/><stop offset=".5" stop-color="#f0b2c0"/><stop offset="1" stop-color="#d48699"/></radialGradient>
             <linearGradient id="brass" x1="0" x2="1"><stop offset="0" stop-color="#7d5f25"/><stop offset=".45" stop-color="#e3c477"/><stop offset="1" stop-color="#8f6d2c"/></linearGradient>
             <linearGradient id="wood" x1="0" x2="1"><stop offset="0" stop-color="#2e1f14"/><stop offset=".5" stop-color="#5b3e28"/><stop offset="1" stop-color="#2e1f14"/></linearGradient>
           </defs>
           <path id="puddle" d="M50 122 C65 120 79 128 81 142 C83 157 75 170 60 176 C45 181 27 177 21 163 C15 150 20 134 32 127 C37 124 43 122 50 122Z" fill="url(#waxG)" style="transform-box:fill-box;transform-origin:center;transform:scale(0)"/>
-          <g id="drips" fill="#7d2230"><ellipse cx="50" cy="96" rx="3.4" ry="4.4" opacity="0"/><ellipse cx="48" cy="96" rx="3" ry="4" opacity="0"/><ellipse cx="52" cy="96" rx="3" ry="4" opacity="0"/></g>
+          <g id="drips" fill="#ea9fb2"><ellipse cx="50" cy="96" rx="3.4" ry="4.4" opacity="0"/><ellipse cx="48" cy="96" rx="3" ry="4" opacity="0"/><ellipse cx="52" cy="96" rx="3" ry="4" opacity="0"/></g>
           <g id="stick" style="opacity:0">
-            <rect x="45" y="20" width="10" height="66" rx="3" fill="#6f1c27"/><rect x="47" y="22" width="2.5" height="60" rx="1" fill="#a8414e" opacity=".7"/>
+            <rect x="45" y="20" width="10" height="66" rx="3" fill="#ec9fb1"/><rect x="47" y="22" width="2.5" height="60" rx="1" fill="#fde3ea" opacity=".9"/>
             <path id="flame" d="M50 104 C44 96 47 88 50 80 C53 88 57 96 50 104Z" fill="#f5b942" opacity=".95" style="transform-box:fill-box;transform-origin:50% 100%"/>
             <path d="M50 101 C47 97 48 92 50 88 C52 92 53 97 50 101Z" fill="#fff3c4"/>
           </g>
@@ -260,18 +283,18 @@
             <clipPath id="rightHalf"><path d="M52 -10 L110 -10 L110 110 L47 110 L54 72 L44 55 L55 38 L46 20Z"/></clipPath>
             <g id="sealArt">
               <path d="M50 4 C62 3 66 10 76 12 C86 15 90 24 93 33 C97 42 94 50 97 60 C98 71 90 77 84 84 C77 92 68 93 58 96 C47 99 38 95 29 92 C19 88 12 82 7 72 C3 63 5 54 3 44 C3 33 9 25 16 17 C25 9 38 5 50 4Z" fill="url(#waxG)"/>
-              <circle cx="50" cy="51" r="32" fill="none" stroke="#3f0c13" stroke-width="2.4" opacity=".8"/>
-              <circle cx="50" cy="50" r="32" fill="none" stroke="#c2606c" stroke-width="1" opacity=".6"/>
-              <circle cx="50" cy="51" r="26" fill="#6a1a25"/>
-              <text x="50.8" y="61.6" text-anchor="middle" font-family="'DM Serif Display',Georgia,serif" font-size="27" fill="#a8414e" opacity=".7">SG</text>
-              <text x="50" y="61" text-anchor="middle" font-family="'DM Serif Display',Georgia,serif" font-size="27" fill="#3a0a10">SG</text>
-              <path d="M24 32 C30 22 40 18 50 18" fill="none" stroke="#e08a95" stroke-width="2.4" stroke-linecap="round" opacity=".55"/>
+              <circle cx="50" cy="51" r="32" fill="none" stroke="#c97a8e" stroke-width="2.4" opacity=".8"/>
+              <circle cx="50" cy="50" r="32" fill="none" stroke="#fde6eb" stroke-width="1.4" opacity=".85"/>
+              <circle cx="50" cy="51" r="26" fill="#eeadbc"/><path d="M30 44 C38 34 52 38 54 46 C56 54 66 56 70 48 M34 62 C42 66 50 58 58 64" fill="none" stroke="#fff" stroke-width="1.6" opacity=".35" stroke-linecap="round"/>
+              <text x="50.8" y="61.6" text-anchor="middle" font-family="'DM Serif Display',Georgia,serif" font-size="27" fill="#fde9ee" opacity=".9">SG</text>
+              <text x="50" y="61" text-anchor="middle" font-family="'DM Serif Display',Georgia,serif" font-size="27" fill="#c06a80">SG</text>
+              <path d="M24 32 C30 22 40 18 50 18" fill="none" stroke="#ffffff" stroke-width="2.4" stroke-linecap="round" opacity=".6"/>
             </g>
           </defs>
           <g class="halves">
             <g class="half h1"><g clip-path="url(#leftHalf)"><use href="#sealArt"/></g></g>
             <g class="half h2"><g clip-path="url(#rightHalf)"><use href="#sealArt"/></g></g>
-            <path class="crack" d="M52 0 L46 20 L55 38 L44 55 L54 72 L47 100" fill="none" stroke="#2a0509" stroke-width="1.6" stroke-linejoin="round"/>
+            <path class="crack" d="M52 0 L46 20 L55 38 L44 55 L54 72 L47 100" fill="none" stroke="#b8687c" stroke-width="1.6" stroke-linejoin="round"/>
             <rect class="shine" x="20" y="10" width="14" height="80" fill="#fff" opacity="0" transform="rotate(20 50 50)" style="mix-blend-mode:screen"/>
           </g>
         </svg>
