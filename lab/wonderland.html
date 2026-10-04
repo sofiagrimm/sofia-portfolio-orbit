@@ -96,6 +96,19 @@
   @keyframes bob{0%,100%{transform:translateY(0) rotate(-2deg)}50%{transform:translateY(-10px) rotate(3deg)}}
   #hall{position:absolute;inset:-30%;pointer-events:none;background:url(img/wonderland/hall.webp) center/cover;opacity:0;filter:saturate(.75) brightness(.8);will-change:transform,opacity;
     -webkit-mask:radial-gradient(closest-side,transparent 12%,rgba(0,0,0,.6) 45%,#000 80%);mask:radial-gradient(closest-side,transparent 12%,rgba(0,0,0,.6) 45%,#000 80%)}
+  /* the bottom of the hole: a clock face spiralling away, turning as you fall */
+  #spiral{position:absolute;left:50%;top:52%;width:30vmin;aspect-ratio:1;border-radius:50%;pointer-events:none;opacity:0;will-change:transform,opacity;
+    background:url(img/wonderland/spiral-clock.webp) 50% 49%/104% auto;
+    -webkit-mask:radial-gradient(closest-side,#000 62%,transparent 100%);mask:radial-gradient(closest-side,#000 62%,transparent 100%)}
+  /* a little portrait at the bottom that takes you back up */
+  #backup{position:fixed;right:clamp(14px,6vw,110px);top:15vh;z-index:34;width:min(150px,20vw);text-decoration:none;opacity:0;transform:translateY(-30px) rotate(4deg);
+    transition:opacity .7s .35s,transform .7s .35s;pointer-events:none}
+  #backup .pic{padding:8px}
+  #backup img{display:block;width:100%;height:auto}
+  #backup span{display:block;text-align:center;margin-top:6px;font-family:'IM Fell English',serif;font-style:italic;font-size:16px;color:var(--cream)}
+  body.landed #backup{opacity:1;transform:rotate(4deg);pointer-events:auto}
+  #backup:focus-visible{outline:none}#backup:focus-visible span,#backup:hover span{text-decoration:underline}
+  @media (max-width:760px){#backup{top:auto;bottom:34vh;right:4vw;width:22vw}}
   .thing img{display:block;width:100%;height:auto;filter:drop-shadow(0 10px 14px rgba(0,0,0,.45))}
   .medal{padding:9px;border-radius:50%;background:linear-gradient(135deg,#f3dc8e,#b8862e 35%,#f0d07c 55%,#8e6420 80%,#d9b25a);box-shadow:0 18px 30px rgba(0,0,0,.5)}
   .medal img{border-radius:50%;filter:none!important}
@@ -132,7 +145,7 @@
   <nav aria-label="Site"><a href="../index.html">Home</a><a href="../about.html">About</a><a href="../research.html">Research</a><a href="../projects.html">Projects</a><a href="skills.html">Languages</a><a href="wonderland.html" aria-current="page">Wonderland</a><a href="cards.html">Cards</a><a href="notes.html">Notes</a><a href="sofia-is.html">Sofia is</a><a href="arts.html">Arts</a><a href="globe.html">Globe</a><a href="lace.html">Tilt</a><a href="../contact.html">Contact</a></nav>
 </header>
 
-<div id="hole" aria-hidden="false"><div id="hall"></div></div>
+<div id="hole" aria-hidden="false"><div id="hall"></div><div id="spiral"></div></div>
 <div id="floor" aria-hidden="true"></div>
 <svg id="grin" viewBox="0 0 320 160" aria-hidden="true">
   <ellipse cx="96" cy="26" rx="26" ry="16" fill="#e7f07a" opacity=".9"/><ellipse cx="96" cy="26" rx="5" ry="14" fill="#0c1726"/>
@@ -155,6 +168,7 @@
 <div class="toast" id="toast" role="status"></div>
 
 <button id="queen" type="button" aria-label="The Queen of Hearts"><img src="img/wonderland/queen.webp" alt=""></button>
+<a id="backup" href="#top"><div class="pic"><img src="img/wonderland/keyhole-cards.webp" alt=""></div><span>back up to the door</span></a>
 <a id="invite" href="../contact.html"><img src="img/wonderland/invited-stub.webp" alt=""><span>write to me</span></a>
 
 <nav id="signpost" aria-label="Where to next"><div class="post"></div>
@@ -292,7 +306,7 @@
   // ── the door: the key slides over and turns, then you dive through the keyhole ──
   const door=document.getElementById('door'),wall=document.getElementById('wall'),burst=document.getElementById('burst'),
     keyhole=document.getElementById('keyhole'),follow=document.getElementById('follow'),hkey=document.getElementById('heartkey'),
-    hall=document.getElementById('hall'),aliceEl=document.getElementById('alice');
+    hall=document.getElementById('hall'),aliceEl=document.getElementById('alice'),spiral=document.getElementById('spiral');
   const cl=v=>Math.max(0,Math.min(1,v)),ease=v=>v<.5?2*v*v:1-Math.pow(-2*v+2,2)/2;
   function doorFrame(f,w,h){
     const p=cl(f/ENTRY),narrow=w<=760;
@@ -314,8 +328,13 @@
     aliceEl.style.opacity=cl((p-.7)/.2).toFixed(3);
     // the twisting hall the hole is cut through, turning as you fall
     hall.style.opacity=(.3*cl((p-.5)/.4)).toFixed(3);
+    // the clock at the bottom of the hole grows as you near it and keeps turning
+    const g=cl((f-ENTRY)/(DEPTH-ENTRY));
+    spiral.style.opacity=(cl((p-.7)/.3)*(.7+.3*g)).toFixed(3);
+    spiral.style.transform=`translate(-50%,-50%) scale(${(.7+g*g*2.4).toFixed(3)}) rotate(${(-f/18).toFixed(1)}deg)`;
     hall.style.transform=`rotate(${(f/70).toFixed(2)}deg) scale(${(1.05+.08*Math.sin(f/2200)).toFixed(3)})`;
   }
+  document.getElementById('backup').addEventListener('click',e=>{e.preventDefault();scrollTo({top:0,behavior:still?'auto':'smooth'});});
   hkey.addEventListener('click',()=>{scrollTo({top:Math.ceil(ENTRY/DEPTH*maxScroll())+2,behavior:still?'auto':'smooth'});});
   // the Queen: click her and the cards fly
   document.getElementById('queen').addEventListener('click',e=>{say('Off with their heads!');if(still)return;
