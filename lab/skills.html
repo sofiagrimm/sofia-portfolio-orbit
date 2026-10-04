@@ -3,126 +3,81 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>programming &amp; real languages | Sofia Grimm</title>
+<title>the languages I orbit | Sofia Grimm</title>
 <meta name="robots" content="noindex">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,300;1,400;1,500;1,600&family=Inter:wght@300;400;500;600&family=Reenie+Beanie&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;1,300;1,400;1,500&family=Inter:wght@300;400;500;600&family=Reenie+Beanie&display=swap">
 <style>
-  :root{--paper:#efe8dc;--ink:#2b2724;--pink:#f3a1c4;--pink2:#e97fae;--grey:#8b8580;--frame:#a69d93}
+  /* embroidery on black twill: gold thread, a stitched sun, planets hanging from their orbits like a mobile */
+  :root{--twill:#0e1120;--twill2:#151a2e;--gold:#d9a944;--gold2:#f2cf6b;--thread:#b8893a;--cream:#f4ead2;--dim:#9c96a8}
   *{box-sizing:border-box;margin:0;padding:0}
   html,body{overflow-x:clip}
-  body{background:var(--frame);font-family:'Inter',Helvetica,Arial,sans-serif;color:var(--ink);padding:0 0 60px}
-  header{display:flex;justify-content:space-between;align-items:baseline;gap:12px;flex-wrap:wrap;padding:22px clamp(18px,4vw,48px);color:#fbf6ee}
-  header a{color:#fbf6ee;text-decoration:none;font-size:13px;letter-spacing:.12em;text-transform:uppercase;opacity:.8}
-  header a:hover,header a:focus-visible,header a[aria-current]{opacity:1;text-decoration:underline;text-underline-offset:4px}
-  header .brand{font-family:'Inter',sans-serif;font-style:italic;font-size:26px;letter-spacing:0;text-transform:none;opacity:1}
+  body{min-height:100vh;color:var(--cream);font-family:'Inter',Helvetica,Arial,sans-serif;
+    background:
+      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.1' numOctaves='2'/%3E%3CfeColorMatrix values='0 0 0 0 .55 0 0 0 0 .55 0 0 0 0 .7 0 0 0 .09 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"),
+      repeating-linear-gradient(45deg,rgba(255,255,255,.018) 0 1px,transparent 1px 4px),
+      repeating-linear-gradient(-45deg,rgba(0,0,0,.25) 0 1px,transparent 1px 4px),
+      radial-gradient(ellipse 70% 55% at 38% 22%,#1b2140 0%,var(--twill) 70%);
+    background-color:var(--twill)}
+  header{position:relative;z-index:5;display:flex;justify-content:space-between;align-items:baseline;gap:12px;flex-wrap:wrap;padding:22px clamp(18px,4vw,48px)}
+  header a{color:var(--cream);text-decoration:none;font-size:13px;letter-spacing:.12em;text-transform:uppercase;opacity:.7}
+  header a:hover,header a:focus-visible,header a[aria-current]{opacity:1;text-decoration:underline;text-underline-offset:4px;text-decoration-color:var(--gold)}
+  header .brand{font-family:'Cormorant Garamond',Georgia,serif;font-weight:300;font-style:italic;font-size:26px;letter-spacing:.06em;text-transform:none;opacity:1}
   header nav{display:flex;flex-wrap:wrap;gap:4px 16px}
 
-  /* every section is a sheet of paper, like slides laid out on a table */
-  .sheet{position:relative;width:min(1180px,94vw);margin:0 auto 26px;background:var(--paper);overflow:hidden;
-    box-shadow:0 18px 30px rgba(40,30,20,.25);padding:clamp(28px,4vw,56px)}
-  .sheet::before{content:"";position:absolute;inset:0;pointer-events:none;opacity:.35;mix-blend-mode:multiply;
-    background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='2'/%3E%3CfeColorMatrix values='0 0 0 0 .55  0 0 0 0 .5  0 0 0 0 .42  0 0 0 .5 0'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)'/%3E%3C/svg%3E")}
-  .pen{font-family:'Reenie Beanie',cursive;font-size:clamp(26px,3vw,40px);line-height:1;color:var(--ink)}
-  .bubble{font-family:'Cormorant Garamond',Georgia,serif;font-style:italic;color:var(--pink);line-height:.82;letter-spacing:-.01em;
-    text-shadow:0 2px 0 #f7c0d8,0 6px 14px rgba(233,127,174,.25)}
-  .small{font-size:12px;color:#5b5550}
-  .tape{position:absolute;width:86px;height:24px;background:rgba(240,226,190,.75);box-shadow:0 1px 2px rgba(0,0,0,.1)}
+  main{display:grid;grid-template-columns:minmax(0,1.55fr) minmax(300px,1fr);gap:clamp(10px,3vw,40px);align-items:start;
+    width:min(1320px,100%);margin:0 auto;padding:0 clamp(16px,3.5vw,48px) 60px}
+  .sky{position:relative;grid-row:1 / span 2}
+  .sky svg{display:block;width:100%;height:auto;overflow:visible;touch-action:pan-y;cursor:grab;user-select:none}
+  .sky svg.dragging{cursor:grabbing}
+  .planet{cursor:pointer;outline:none}
+  .planet .ring-focus{fill:none;stroke:var(--gold2);stroke-width:3;stroke-dasharray:3 6;opacity:0;transition:opacity .2s}
+  .planet:focus-visible .ring-focus,.planet.on .ring-focus{opacity:1}
+  .name{font-family:'Reenie Beanie',cursive;fill:var(--gold2)}
+  .hint{position:absolute;left:4%;bottom:6%;font-family:'Reenie Beanie',cursive;font-size:24px;color:var(--gold);opacity:.85;transform:rotate(-4deg);pointer-events:none}
 
-  /* ── cover ── */
-  .cover{min-height:min(720px,86vh);display:grid;place-items:center}
-  .cover .hi{position:absolute;left:clamp(24px,4vw,56px);top:clamp(24px,4vw,46px)}
-  .cover .guide{position:absolute;right:clamp(24px,5vw,90px);top:clamp(70px,9vw,100px);font-size:clamp(22px,2.4vw,32px);transform:rotate(-3deg)}
-  .cover .this{position:absolute;left:clamp(60px,12vw,190px);top:clamp(110px,14vw,170px);font-size:clamp(26px,3vw,40px);transform:rotate(-6deg);z-index:4}
-  .cover h1{position:relative;text-align:center;font-size:clamp(64px,10.5vw,150px);margin-top:6%}
-  .cover h1 span{display:block;position:relative;z-index:1}
-  .cover h1 .amp{font-size:.5em;color:var(--pink2);vertical-align:.35em}
-  .cover .me{position:absolute;z-index:2;left:76%;bottom:0;height:66%;transform:translateX(-50%);filter:drop-shadow(0 10px 18px rgba(0,0,0,.25));pointer-events:none}
-  .cover h1 .front{z-index:3}
-  .cover .role{position:absolute;left:clamp(24px,4vw,56px);bottom:clamp(20px,3vw,36px)}
-  .cover .by{position:absolute;right:clamp(24px,4vw,56px);bottom:clamp(20px,3vw,36px)}
+  .intro{padding-top:clamp(10px,4vh,50px)}
+  .hi{font-family:'Reenie Beanie',cursive;font-size:clamp(36px,3.6vw,48px);color:var(--gold);line-height:1;transform:rotate(-2deg);transform-origin:left}
+  h1{font-family:'Cormorant Garamond',Georgia,serif;font-style:italic;font-weight:300;font-size:clamp(52px,6.6vw,100px);line-height:.88;letter-spacing:-.01em;margin:10px 0 18px;
+    color:var(--gold2);text-shadow:0 1px 0 #8a6420,0 0 28px rgba(242,207,107,.18)}
+  .intro p{font-size:15px;line-height:1.65;color:#d9d1bd;max-width:44ch}
+  .key{display:flex;gap:22px;margin-top:18px;font-family:'Reenie Beanie',cursive;font-size:22px;color:var(--cream)}
+  .key span{display:flex;align-items:center;gap:8px}
+  .key i{display:inline-block;width:14px;height:14px;border-radius:50%;border:1.5px dashed var(--gold)}
+  .key .code i{border-radius:3px}
 
-  /* ── story + skills ── */
-  .two{display:grid;grid-template-columns:1fr 1fr;gap:clamp(24px,4vw,60px);align-items:center}
-  .story p{font-size:14px;line-height:1.65;max-width:42ch}
-  .story p+p{margin-top:12px}
-  .story b{font-weight:600}
-  .doodle{display:flex;align-items:center;gap:14px;margin:26px 0}
-  .doodle .pol{background:#fff;padding:6px 6px 22px;box-shadow:0 6px 12px rgba(0,0,0,.18);transform:rotate(-4deg);width:110px}
-  .doodle .pol img{width:100%;aspect-ratio:1;object-fit:cover;filter:grayscale(1) contrast(1.1);display:block}
-  .doodle .pol:last-child{transform:rotate(5deg)}
-  .doodle svg{flex:1;height:60px}
-  .tags{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px}
-  .tags span{border:1.5px solid var(--ink);border-radius:999px;padding:5px 12px;font-size:12px;background:rgba(255,255,255,.35)}
-  .oval{display:inline-block;border:1.5px solid var(--ink);border-radius:50%;padding:8px 22px;font-size:12px;text-align:center;line-height:1.4}
+  /* the card is a sewn-on patch: gold satin edge, stitching just inside it */
+  .patch{position:relative;margin-top:28px;padding:26px 26px 24px;background:radial-gradient(120% 90% at 20% 0%,#1d2340,#121628);border-radius:22px;
+    box-shadow:0 0 0 3px #8a6420,0 0 0 6px var(--gold),0 0 0 8px #6b4c17,0 22px 40px rgba(0,0,0,.5)}
+  .patch::before{content:"";position:absolute;inset:9px;border:1.5px dashed rgba(242,207,107,.55);border-radius:15px;pointer-events:none}
+  .patch .kind{font-family:'Reenie Beanie',cursive;font-size:22px;color:var(--gold);line-height:1}
+  .patch h2{font-family:'Cormorant Garamond',Georgia,serif;font-style:italic;font-weight:400;font-size:clamp(40px,4vw,56px);line-height:.95;color:var(--cream);margin:4px 0 12px}
+  .patch .hello{display:inline-block;font-size:15px;color:var(--twill);background:var(--gold2);padding:6px 12px;border-radius:999px;margin-bottom:12px;font-weight:500}
+  .patch .hello.code{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:13px}
+  .patch p{font-size:15px;line-height:1.6;color:#d9d1bd;max-width:40ch}
+  .patch nav{display:flex;justify-content:space-between;margin-top:18px}
+  .patch button{font:500 13px 'Inter',sans-serif;color:var(--cream);background:transparent;border:1.5px solid rgba(242,207,107,.6);border-radius:999px;padding:7px 14px;cursor:pointer}
+  .patch button:hover,.patch button:focus-visible{background:var(--gold);color:var(--twill);border-color:var(--gold);outline:none}
+  .patch .swap{animation:swap .45s ease}
+  @keyframes swap{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
 
-  .big{font-family:'Inter',sans-serif;font-weight:800;letter-spacing:-.04em;line-height:.9;color:#7d7772}
-  .big.l1{font-size:clamp(30px,4.6vw,58px);text-align:right;color:#9a948e}
-  .big.l2{font-size:clamp(40px,6.2vw,80px);text-align:right}
-  .chart{display:flex;align-items:flex-end;gap:12px;height:150px;margin:20px 0 6px;padding-left:10px;border-left:1.5px solid var(--ink);border-bottom:1.5px solid var(--ink)}
-  .chart i{display:block;width:34px;background:var(--pink);border-radius:4px 4px 0 0;position:relative}
-  .chart i b{position:absolute;top:-20px;left:50%;transform:translateX(-50%);font:600 11px 'Inter';color:var(--ink);white-space:nowrap}
-  .chart-labels{display:flex;gap:12px;padding-left:10px;font-size:10px;color:#5b5550}
-  .chart-labels span{width:34px;text-align:center}
-  .hellos{list-style:none;margin-top:14px;display:grid;gap:10px}
-  .hellos li{display:flex;align-items:baseline;gap:14px;border-bottom:1px dashed rgba(43,39,36,.25);padding-bottom:8px}
-  .hellos b{font-family:'Cormorant Garamond',Georgia,serif;font-style:italic;font-weight:400;font-size:34px;color:var(--pink2)}
-  .hellos code{font:15px 'Inter',monospace;background:#fbf8f2;padding:4px 8px;border-radius:4px;box-shadow:0 2px 4px rgba(0,0,0,.08)}
-  .hellos small{margin-left:auto;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:#7d7772}
-  .photos{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-  .photos img{width:100%;aspect-ratio:4/3;object-fit:cover;display:block;box-shadow:0 6px 12px rgba(0,0,0,.18)}
+  .quote{grid-column:1 / -1;max-width:760px;margin:30px auto 0;text-align:center;font-family:'Cormorant Garamond',Georgia,serif;font-style:italic;font-size:clamp(22px,2.4vw,30px);line-height:1.35;color:var(--cream)}
+  .quote::before,.quote::after{content:"";display:block;width:180px;height:0;border-top:2px dashed var(--thread);margin:18px auto}
+  .bye{grid-column:1 / -1;display:flex;justify-content:center;gap:26px;flex-wrap:wrap;margin-top:14px;font-family:'Reenie Beanie',cursive;font-size:26px}
+  .bye a{color:var(--gold2);text-decoration:none;border-bottom:1.5px dashed var(--thread)}
+  .bye a:hover,.bye a:focus-visible{color:var(--cream);outline:none}
+  .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
 
-  /* ── the board: swatches, type, tools, a phone ── */
-  .board{position:relative;min-height:700px}
-  .board h2{position:absolute;left:4%;top:33%;font-size:clamp(90px,13vw,170px);transform:rotate(-4deg);z-index:1}
-  .swatches{position:absolute;left:4%;top:7%;display:flex;gap:10px}
-  .swatches i{display:block;width:30px;height:30px;border-radius:50%;box-shadow:inset 0 0 0 1px rgba(0,0,0,.12)}
-  .swatches small{display:block;font-size:9px;color:#5b5550;margin-top:4px;text-align:center}
-  .type{position:absolute;left:4%;top:20%;display:grid;grid-template-columns:repeat(3,auto);gap:4px 18px;align-items:end}
-  .type b{font-size:34px;font-weight:400;line-height:1}
-  .type small{font-size:9px;color:#5b5550}
-  .phone{position:absolute;right:4%;top:7%;width:clamp(150px,15vw,200px);aspect-ratio:9/19;border-radius:28px;background:#111;padding:8px;box-shadow:0 20px 30px rgba(0,0,0,.3);transform:rotate(5deg);z-index:2}
-  .phone img{width:100%;height:100%;object-fit:cover;object-position:top;border-radius:21px;display:block}
-  .phone.two{right:19%;top:16%;transform:rotate(-6deg);z-index:1}
-  .tools{position:absolute;left:4%;bottom:5%;display:grid;grid-template-columns:repeat(2,minmax(0,220px));gap:14px 26px;z-index:2}
-  .tools div{font-size:12px;line-height:1.45}
-  .tools b{display:block;font-family:'Reenie Beanie',cursive;font-size:24px;font-weight:400;color:var(--pink2)}
-  .film{position:absolute;right:5%;bottom:4%;display:flex;gap:6px;background:#161616;padding:10px 8px;border-radius:4px;transform:rotate(-3deg);z-index:2}
-  .film img{width:72px;height:56px;object-fit:cover;filter:grayscale(1)}
-
-  /* ── works: taped cards ── */
-  .works h2{font-size:clamp(70px,10vw,130px);margin-bottom:10px}
-  .wgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:clamp(22px,3vw,40px);margin-top:10px}
-  .work{position:relative;background:#fbf8f2;padding:12px 12px 16px;box-shadow:0 10px 18px rgba(40,30,20,.2);text-decoration:none;color:inherit;transition:transform .25s}
-  .work:nth-child(odd){transform:rotate(-1.5deg)}.work:nth-child(even){transform:rotate(1.4deg)}
-  .work:hover,.work:focus-visible{transform:rotate(0) translateY(-6px);outline:none}
-  .work:focus-visible{box-shadow:0 0 0 3px var(--pink2),0 10px 18px rgba(40,30,20,.2)}
-  .work .tape{top:-10px;left:50%;margin-left:-43px;transform:rotate(-3deg)}
-  .work .art{aspect-ratio:4/3;background:#e9e2d6;overflow:hidden;display:grid;place-items:center}
-  .work .art img{width:100%;height:100%;object-fit:cover}
-  .work .art svg{width:80%;height:80%}
-  .work h3{font-family:'Reenie Beanie',cursive;font-weight:400;font-size:30px;margin-top:10px;line-height:1}
-  .work p{font-size:12px;line-height:1.5;color:#4c4743;margin-top:4px}
-  .work .kind{position:absolute;right:12px;top:18px;background:var(--pink);color:#fff;font:600 10px 'Inter';letter-spacing:.08em;text-transform:uppercase;padding:3px 8px;border-radius:999px}
-
-  /* ── wrap ── */
-  .wrapup{min-height:520px}
-  .wrapup .contact{position:absolute;left:clamp(28px,4vw,56px);top:clamp(28px,4vw,56px);display:grid;gap:10px;font-size:12px}
-  .wrapup .contact a{color:var(--ink);display:flex;gap:10px;align-items:center}
-  .wrapup .contact i{width:22px;height:16px;border:1.5px solid var(--ink);border-radius:3px;display:inline-block}
-  .wrapup .and{position:absolute;right:clamp(28px,4vw,56px);top:clamp(24px,4vw,46px);font-size:clamp(56px,8vw,104px);text-align:right}
-  .wrapup .wrapw{position:absolute;left:clamp(28px,4vw,56px);bottom:clamp(24px,4vw,46px);font-size:clamp(56px,8vw,104px)}
-  .env{position:absolute;left:50%;top:52%;width:min(440px,60%);aspect-ratio:1.45;transform:translate(-50%,-50%)}
-  .env .back{position:absolute;inset:0;background:var(--pink);clip-path:polygon(0 30%,50% 0,100% 30%,100% 100%,0 100%)}
-  .env .note{position:absolute;left:12%;right:12%;top:-6%;bottom:30%;background:#fffdf8;transform:rotate(-3deg);padding:16px 18px;box-shadow:0 6px 12px rgba(0,0,0,.15);
-    background-image:repeating-linear-gradient(transparent 0 25px,#cfd9e6 25px 26px);font-family:'Reenie Beanie',cursive;font-size:22px;line-height:26px}
-  .env .front{position:absolute;inset:auto 0 0 0;height:62%;background:#f6b5cf;clip-path:polygon(0 0,50% 48%,100% 0,100% 100%,0 100%)}
-  @media (max-width:860px){.two,.wgrid{grid-template-columns:1fr}.board{min-height:auto;display:flex;flex-direction:column;gap:20px}.board>*{position:relative !important;inset:auto !important;transform:none !important}
-    .board h2{order:-1}.cover .this,.cover .guide{display:none}.big.l1,.big.l2{text-align:left}}
-  /* the logo keeps its original look: light, spaced, italic Cormorant Garamond */
-  .nav-name,header .brand,.site>a:first-child{font-family:'Cormorant Garamond',Georgia,serif !important;font-weight:300 !important;font-style:italic !important;letter-spacing:.06em !important}
-  .bubble{font-weight:600 !important}
+  @media (max-width:900px){
+    main{grid-template-columns:1fr}
+    .sky{grid-row:auto;order:2}
+    .intro{order:1}
+    .side{order:3}
+    .quote,.bye{order:4}
+    .hint{font-size:20px}
+  }
+  @media (prefers-reduced-motion:reduce){.patch .swap{animation:none}}
 </style>
 </head>
 <body>
@@ -132,95 +87,249 @@
 </header>
 
 <main>
-  <!-- cover -->
-  <section class="sheet cover" aria-labelledby="t1">
-    <p class="pen hi">Hi. since you're new here,</p>
-    <p class="pen guide">let me be ya tour guide</p>
-    <p class="pen this">I speak</p>
-    <h1 class="bubble" id="t1"><span>programming</span><span class="front"><span class="amp" style="display:inline">&amp; </span>real languages</span></h1>
-    <img class="me" src="img/sw/sofia-cutout.webp" alt="Sofia pipetting at a lab bench">
-    <p class="small role">Molecular Biophysics &amp; Biochemistry · Ethics, Politics &amp; Economics</p>
-    <p class="small by">by Sofia Grimm</p>
+  <section class="intro" aria-labelledby="t">
+    <p class="hi">hi! since you're new here,</p>
+    <h1 id="t">the languages I orbit</h1>
+    <p>Grew up in Hong Kong, moved to the Chicago suburbs, and picked up Spanish and Chinese along the way. Lately, a few languages computers understand too.</p>
+    <div class="key" aria-hidden="true"><span><i></i>ones I speak</span><span class="code"><i></i>ones I code in</span></div>
   </section>
 
-  <!-- story -->
-  <section class="sheet two" aria-label="How it started">
-    <div class="story">
-      <p>Grew up in Hong Kong, moved to the Chicago suburbs, and picked up Spanish and Chinese along the way. Lately, a few languages computers understand too.</p>
-      <div class="doodle" aria-hidden="true">
-        <div class="pol"><img src="img/chalkboard.jpg" alt=""></div>
-        <svg viewBox="0 0 200 60"><path d="M4 40 C30 10 50 55 80 30 S120 5 140 30 S170 50 196 20" fill="none" stroke="#2b2724" stroke-width="1.6" stroke-dasharray="5 5"/><path d="M188 14 L196 20 L187 26" fill="none" stroke="#2b2724" stroke-width="1.6"/></svg>
-        <div class="pol"><img src="img/bench.jpg" alt=""></div>
-      </div>
-      <p>A language is just a way of being understood, whether it's a grandmother in Spanish, a friend in Chinese, or a browser in JavaScript. <b>Every one of them rewards the same thing: paying attention.</b></p>
-    </div>
-    <div>
-      <span class="oval">Yale College<br>Class of 2029</span>
-      <div class="tags" aria-label="Languages I speak">
-        <span>English</span><span>Español</span><span>中文</span>
-      </div>
-      <div class="tags" aria-label="Languages I write code in" style="margin-top:10px">
-        <span>HTML</span><span>CSS</span><span>JavaScript</span><span>GLSL shaders</span>
-      </div>
-    </div>
-  </section>
+  <div class="sky">
+    <svg id="mobile" viewBox="0 0 1000 1180" role="group" aria-label="A solar system mobile. Each hanging planet is a language; choose one to read about it."></svg>
+    <p class="hint" aria-hidden="true">drag to spin, tap a planet</p>
+  </div>
 
-  <!-- not just -->
-  <section class="sheet" aria-label="What I bring">
-    <p class="big l1">it's not just syntax,</p>
-    <p class="big l2">it's being understood.</p>
-    <div class="two" style="margin-top:30px">
-      <div>
-        <p class="pen" style="font-size:30px">how I say hello</p>
-        <ul class="hellos">
-          <li><b>hello</b><small>English</small></li>
-          <li><b>hola</b><small>Español</small></li>
-          <li><b>你好</b><small>中文</small></li>
-          <li><code>&lt;h1&gt;hello&lt;/h1&gt;</code><small>HTML</small></li>
-          <li><code>h1 { color: #f3a1c4 }</code><small>CSS</small></li>
-          <li><code>console.log("hello")</code><small>JavaScript</small></li>
-        </ul>
-      </div>
-      <div class="photos"><img src="img/instrument.jpg" alt="Lab instrument"><img src="img/chalkboard.jpg" alt="Chalkboard after a lecture"><img src="img/atrium.jpg" alt="Looking up in an atrium"><img src="img/bench.jpg" alt="At the bench"></div>
-    </div>
-  </section>
+  <aside class="side">
+    <section class="patch" id="card" aria-live="polite"></section>
+  </aside>
 
-  <!-- the board -->
-  <section class="sheet board" aria-labelledby="t2">
-    <div class="swatches" aria-label="Colours I use">
-      <div><i style="background:#6e1f22"></i><small>felt</small></div><div><i style="background:#2e7656"></i><small>baize</small></div>
-      <div><i style="background:#f3b6c8"></i><small>blush</small></div><div><i style="background:#24306b"></i><small>ink</small></div><div><i style="background:#e2c27e"></i><small>gilt</small></div>
-    </div>
-    <div class="type" aria-label="Typefaces I use">
-      <b style="font-family:'Cormorant Garamond',Georgia,serif;font-style:italic;color:#f3a1c4">Aa</b><b style="font-family:'Inter',sans-serif;font-weight:800">Aa</b><b style="font-family:'Reenie Beanie',cursive">Aa</b>
-      <small>Cormorant</small><small>Inter</small><small>Reenie Beanie</small>
-    </div>
-    <h2 class="bubble" id="t2">code<br>&amp; words</h2>
-    <div class="phone"><img src="img/sw/phone-projects.jpg" alt="This website's card table on a phone"></div>
-    <div class="phone two"><img src="img/sw/phone-notes.jpg" alt="This website's notes page on a phone"></div>
-    <div class="tools">
-      <div><b>HTML</b>the bones of every page here</div>
-      <div><b>CSS</b>the felt, the night sky, the paper, the lamp light</div>
-      <div><b>JavaScript</b>the pool break, the chips, the roulette, the paper airplane</div>
-      <div><b>GLSL</b>the shaders that let old masters' eyes follow you</div>
-    </div>
-    <div class="film" aria-hidden="true"><img src="img/bench.jpg" alt=""><img src="img/chalkboard.jpg" alt=""><img src="img/instrument.jpg" alt=""><img src="img/atrium.jpg" alt=""></div>
-  </section>
+  <p class="quote">A language is just a way of being understood, whether it's a grandmother in Spanish, a friend in Chinese, or a browser in JavaScript. Every one of them rewards the same thing: paying attention.</p>
+  <div class="bye"><a href="../contact.html">write me a letter</a><a href="https://www.linkedin.com/in/sofia-grimm/">linkedin</a><a href="https://github.com/sofiagrimm" data-gh>github</a></div>
 
-  <!-- where the works went -->
-  <section class="sheet works" aria-labelledby="t3">
-    <h2 class="bubble" id="t3">the works?</h2>
-    <p class="pen" style="font-size:32px">they fell down the rabbit hole. <a href="wonderland.html" style="color:var(--pink2)">follow them &rarr;</a></p>
-  </section>
-
-  <!-- wrap -->
-  <section class="sheet wrapup" aria-labelledby="t4">
-    <div class="contact"><a href="../contact.html"><i></i> write me a letter</a><a href="https://www.linkedin.com/in/sofia-grimm/"><i></i> linkedin</a><a href="https://github.com/sofiagrimm" data-gh><i></i> github</a></div>
-    <p class="big and" id="t4">and<br>that's</p>
-    <div class="env" aria-hidden="true"><div class="back"></div><div class="note">thank you so much for taking the time to look through all of this. if you'd like to make something together, write whenever.</div><div class="front"></div></div>
-    <p class="big wrapw">a wrap.</p>
-  </section>
+  <ul class="sr" id="list"></ul>
 </main>
+
+<script>
+(() => {
+  const still = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const NS = 'http://www.w3.org/2000/svg';
+  const svg = document.getElementById('mobile');
+  const el = (t, a = {}, p) => { const e = document.createElementNS(NS, t); for (const k in a) e.setAttribute(k, a[k]); if (p) p.appendChild(e); return e; };
+
+  // the planets: one per language. r is size, len is how far it hangs below its orbit
+  const LANGS = [
+    {id:'en',  name:'English',    kind:'spoken', r:83, len:360, look:'swirl',   colors:['#24438f','#3462c4','#5f93e0','#e9eef7','#1d3878','#8db5ee'],
+     hello:'hello', note:'The one this whole site is written in, from the Chicago suburbs to New Haven.'},
+    {id:'es',  name:'Español',    kind:'spoken', r:65, len:470, look:'bands',   colors:['#9d1f27','#c0352a','#7d1820','#d9573b','#b02a26'],
+     hello:'hola', note:'Fluent. A grandmother in Spanish, and the clinic in Sevilla where I shadowed doctors.'},
+    {id:'zh',  name:'中文',        kind:'spoken', r:73, len:300, look:'bands',   colors:['#2f8f7a','#57b39a','#1f6b5c','#9fd6c0','#c9a24a','#3c9e86'],
+     hello:'你好', note:'Fluent. A friend in Chinese, and the sound of Hong Kong, where I grew up.'},
+    {id:'html',name:'HTML',       kind:'code',   r:49, len:240, look:'bands',   colors:['#9a5a2c','#c27a3c','#6e3d1d','#e0a463','#b0682f'],
+     hello:'<h1>hello</h1>', note:'The bones of every page here.'},
+    {id:'css', name:'CSS',        kind:'code',   r:57, len:520, look:'speckle', colors:['#3aa6d9','#7cc7ea','#2a7fb8','#b8e2f4','#5bb6e2'],
+     hello:'h1 { color: #f3a1c4 }', note:'The felt, the night sky, the paper, the lamp light. And the thread on this page.'},
+    {id:'js',  name:'JavaScript', kind:'code',   r:62, len:330, look:'bands',   colors:['#e7c27a','#f3dca0','#c99a4e','#fff0c8','#b9853f','#dcb066'],
+     hello:'console.log("hello")', note:'The pool break, the chips, the roulette, the paper airplane, and this mobile turning.'},
+    {id:'glsl',name:'GLSL',       kind:'code',   r:55, len:600, look:'bands',   colors:['#e7b86a','#f6d79a','#c98d45','#fbe7bf','#d8a257'], ringed:true,
+     hello:'gl_FragColor = vec4(1.0);', note:"The shaders that let old masters' eyes follow you around the Arts page."},
+  ];
+  // little things that hang between the planets
+  const CHARMS = [{kind:'moon', len:200}, {kind:'star', len:140}, {kind:'star', len:280}, {kind:'moon', len:420}, {kind:'star', len:170}];
+
+  // ── satin-stitch textures: rows of short slanted stitches in thread colours, shaded like a sphere ──
+  let seed = 7; const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
+  function jitter(hex, amt) {
+    const n = parseInt(hex.slice(1), 16), f = 1 + (rnd() - .5) * amt;
+    const c = [(n >> 16) & 255, (n >> 8) & 255, n & 255].map(v => Math.max(0, Math.min(255, Math.round(v * f))));
+    return `rgb(${c[0]},${c[1]},${c[2]})`;
+  }
+  function texture(L) {
+    const S = 256, c = document.createElement('canvas'); c.width = c.height = S; const x = c.getContext('2d');
+    x.save(); x.beginPath(); x.arc(S / 2, S / 2, S / 2 - 2, 0, Math.PI * 2); x.clip();
+    x.fillStyle = L.colors[0]; x.fillRect(0, 0, S, S);
+    const nb = L.colors.length, ph = rnd() * 10;
+    for (let y = -4; y < S + 6; y += 2.6) {
+      for (let px = -14; px < S + 6; px += 4 + rnd() * 3) {
+        let ci;
+        if (L.look === 'swirl') { const v = Math.sin(px * .028 + Math.sin(y * .045 + ph) * 2.2) + Math.cos(y * .035 - px * .012 + ph); ci = Math.floor((v + 2) / 4 * nb * 1.6) % nb; }
+        else if (L.look === 'speckle') ci = rnd() < .55 ? 0 : 1 + Math.floor(rnd() * (nb - 1));
+        else { const band = y / S * (nb * 1.6) + Math.sin(px * .03 + ph) * .7 + Math.sin(y * .2) * .2; ci = ((Math.floor(band) % nb) + nb) % nb; }
+        x.strokeStyle = jitter(L.colors[ci], .22); x.lineWidth = 2.3; x.lineCap = 'round';
+        const len = 7 + rnd() * 7, a = -.32 + (rnd() - .5) * .12;
+        x.beginPath(); x.moveTo(px, y); x.lineTo(px + Math.cos(a) * len, y + Math.sin(a) * len); x.stroke();
+      }
+    }
+    let g = x.createRadialGradient(S * .34, S * .3, 4, S * .34, S * .3, S * .62);
+    g.addColorStop(0, 'rgba(255,255,240,.38)'); g.addColorStop(1, 'rgba(255,255,240,0)'); x.fillStyle = g; x.fillRect(0, 0, S, S);
+    g = x.createRadialGradient(S * .42, S * .4, S * .3, S * .5, S * .5, S * .52);
+    g.addColorStop(0, 'rgba(5,6,15,0)'); g.addColorStop(1, 'rgba(5,6,15,.5)'); x.fillStyle = g; x.fillRect(0, 0, S, S);
+    x.restore();
+    return c.toDataURL();
+  }
+
+  // ── the scene ──
+  const CX = 500, CY = 300, TILT = -9 * Math.PI / 180;
+  const RINGS = [
+    {rx: 430, ry: 118, speed: 1, beads: 30, moons: [0.6, 3.4], stars: [1.9, 4.6, 5.6], w: 2.2},
+    {rx: 300, ry: 80,  speed: 1.5, beads: 20, moons: [2.4], stars: [0.9, 4.1], w: 1.7},
+    {rx: 175, ry: 46,  speed: 2.2, beads: 12, moons: [], stars: [2.9], w: 1.4},
+  ];
+  const tilt = (x, y) => { const dx = x - CX, dy = y - CY; return [CX + dx * Math.cos(TILT) - dy * Math.sin(TILT), CY + dx * Math.sin(TILT) + dy * Math.cos(TILT)]; };
+  const onRing = (R, a) => tilt(CX + R.rx * Math.cos(a), CY + R.ry * Math.sin(a));
+
+  const defs = el('defs', {}, svg);
+  const sg = el('radialGradient', {id: 'core'}, defs);
+  [['0', '#ffffff'], ['.35', '#fff6cf'], ['.7', '#f6cf4a'], ['1', '#f6cf4a', '0']].forEach(([o, c, op]) => el('stop', {offset: o, 'stop-color': c, 'stop-opacity': op ?? 1}, sg));
+  const glow = el('radialGradient', {id: 'glow'}, defs);
+  [['0', '#f6cf4a', '.45'], ['1', '#f6cf4a', '0']].forEach(([o, c, op]) => el('stop', {offset: o, 'stop-color': c, 'stop-opacity': op}, glow));
+
+  // background stitches: tiny crosses of thread scattered on the cloth
+  const bg = el('g', {opacity: .7}, svg);
+  for (let k = 0; k < 60; k++) {
+    const x = rnd() * 1000, y = 60 + rnd() * 1040, s = 2 + rnd() * 3;
+    el('path', {d: `M${x - s} ${y}H${x + s}M${x} ${y - s}V${y + s}`, stroke: rnd() < .7 ? '#8f7a52' : '#c9b48a', 'stroke-width': .9, opacity: .3 + rnd() * .5}, bg);
+  }
+
+  const back = el('g', {}, svg), sun = el('g', {}, svg), front = el('g', {}, svg);
+
+  // the sun: hundreds of straight stitches radiating from a white-hot core
+  el('circle', {cx: CX, cy: CY - 40, r: 190, fill: 'url(#glow)'}, sun);
+  const rays = el('g', {}, sun);
+  for (let k = 0; k < 150; k++) {
+    const a = rnd() * Math.PI * 2, r0 = 14 + rnd() * 18, r1 = 50 + Math.pow(rnd(), 1.6) * (k % 9 === 0 ? 200 : 120);
+    const cols = ['#f6cf4a', '#f2b632', '#fff1a8', '#e99a2a', '#ffe27a'];
+    el('line', {x1: CX + Math.cos(a) * r0, y1: CY - 40 + Math.sin(a) * r0 * .9, x2: CX + Math.cos(a) * r1, y2: CY - 40 + Math.sin(a) * r1 * .9,
+      stroke: cols[k % cols.length], 'stroke-width': .7 + rnd() * 1.1, 'stroke-linecap': 'round', opacity: .55 + rnd() * .45}, rays);
+  }
+  el('ellipse', {cx: CX, cy: CY - 40, rx: 34, ry: 30, fill: 'url(#core)'}, sun);
+  el('ellipse', {cx: CX, cy: CY - 40, rx: 11, ry: 9, fill: '#fff'}, sun);
+
+  // one layer per ring half (back behind the sun, front ahead of it), rebuilt every frame
+  const ringBack = RINGS.map(() => el('g', {}, back)), ringFront = RINGS.map(() => el('g', {}, front));
+  const hangBack = el('g', {}, back), hangFront = el('g', {}, front);
+  RINGS.forEach((R, i) => {
+    const d = (from, to) => { let s = ''; for (let k = 0; k <= 60; k++) { const a = from + (to - from) * k / 60, [x, y] = onRing(R, a); s += (k ? 'L' : 'M') + x.toFixed(1) + ' ' + y.toFixed(1); } return s; };
+    const st = {fill: 'none', stroke: '#c8902f', 'stroke-width': R.w, 'stroke-dasharray': '7 4', 'stroke-linecap': 'round'};
+    el('path', Object.assign({d: d(Math.PI, 2 * Math.PI)}, st), ringBack[i]);
+    el('path', Object.assign({d: d(0, Math.PI)}, st), ringFront[i]);
+    el('path', Object.assign({d: d(0, Math.PI)}, st, {stroke: '#7a4f17', 'stroke-dasharray': '2 9', 'stroke-dashoffset': 3, 'stroke-width': R.w * .6}), ringFront[i]);
+    R.layer = {back: el('g', {}, ringBack[i]), front: el('g', {}, ringFront[i])};
+  });
+
+  function moonPath(x, y, s) { return `M${x + s * .3} ${y - s}A${s} ${s} 0 1 0 ${x + s * .3} ${y + s}A${s * .78} ${s * .78} 0 1 1 ${x + s * .3} ${y - s}Z`; }
+  function starPath(x, y, s) { return `M${x} ${y - s}L${x + s * .22} ${y - s * .22}L${x + s} ${y}L${x + s * .22} ${y + s * .22}L${x} ${y + s}L${x - s * .22} ${y + s * .22}L${x - s} ${y}L${x - s * .22} ${y - s * .22}Z`; }
+
+  // hanging things: languages and charms share the big ring, spaced evenly
+  const items = [];
+  LANGS.forEach((L, k) => items.push({L}));
+  CHARMS.forEach((C, k) => items.splice(1 + k * 2, 0, {C}));
+  items.forEach((it, k) => {
+    it.a0 = k / items.length * Math.PI * 2;
+    it.phase = rnd() * 6; it.sw = .6 + rnd() * .5;
+    const g = el('g', {});
+    it.g = g;
+    it.thread = el('path', {fill: 'none', stroke: '#b8893a', 'stroke-width': 1.3, 'stroke-dasharray': '5 3'}, g);
+    it.beads = el('g', {fill: '#d9a944'}, g);
+    if (it.L) {
+      const L = it.L, body = el('g', {class: 'planet', tabindex: 0, role: 'button', 'aria-label': `${L.name}, a language I ${L.kind === 'spoken' ? 'speak' : 'code in'}`, 'data-id': L.id}, g);
+      it.body = body;
+      if (L.ringed) it.ringBack = el('path', {fill: 'none', stroke: '#e3b45a', 'stroke-width': 5, 'stroke-dasharray': '4 2'}, body);
+      el('circle', {r: L.r + 3, fill: '#05060c', opacity: .5, cy: 4}, body);
+      el('image', {href: texture(L), x: -L.r, y: -L.r, width: L.r * 2, height: L.r * 2}, body);
+      el('circle', {r: L.r, fill: 'none', stroke: '#d9a944', 'stroke-width': 2, 'stroke-dasharray': '3 2.5', opacity: .9}, body);
+      if (L.ringed) it.ringFront = el('path', {fill: 'none', stroke: '#f2cf6b', 'stroke-width': 5, 'stroke-dasharray': '4 2'}, body);
+      el('circle', {r: L.r + 9, class: 'ring-focus'}, body);
+      it.shade = el('circle', {r: L.r + 1, fill: '#070912', opacity: 0, 'pointer-events': 'none'}, body);
+      const t = el('text', {class: 'name', y: L.r + 38, 'text-anchor': 'middle', 'font-size': 38}, body); t.textContent = L.name;
+      if (L.kind === 'code') { /* a little square bead marks the coding ones */ el('rect', {x: -4, y: -L.r - 14, width: 8, height: 8, fill: '#f2cf6b', transform: 'rotate(45)'}, body); }
+      body.addEventListener('click', () => choose(L.id));
+      body.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); choose(L.id); } });
+      body.addEventListener('focus', () => { if (!dragging) choose(L.id, true); });
+    } else {
+      it.body = el('path', {d: it.C.kind === 'moon' ? moonPath(0, 0, 13) : starPath(0, 0, 14), fill: it.C.kind === 'moon' ? '#e7c56b' : '#f2cf6b', stroke: '#8a6420', 'stroke-width': 1}, g);
+    }
+  });
+
+  // ── turning ──
+  let rot = 0, vel = still ? 0 : .0016, target = null, dragging = false, last = performance.now();
+  const BIG = RINGS[0];
+  function frame(now) {
+    const dt = Math.min(50, now - last) / 16.7; last = now;
+    if (target != null) {
+      let d = target - rot; d = Math.atan2(Math.sin(d), Math.cos(d));
+      rot += d * .07 * dt; if (Math.abs(d) < .002) { rot = target; target = null; vel = 0; }
+    } else if (!dragging) {
+      rot += vel * dt; if (!still) vel += (.0016 - vel) * .02 * dt;
+    }
+    // beads, moons and stars ride every ring at its own pace
+    RINGS.forEach((R, i) => {
+      const a0 = rot * R.speed, b = R.layer.back, f = R.layer.front; b.innerHTML = ''; f.innerHTML = '';
+      for (let k = 0; k < R.beads; k++) { const a = a0 + k / R.beads * Math.PI * 2, [x, y] = onRing(R, a); el('circle', {cx: x, cy: y, r: k % 3 ? 2.4 : 4, fill: k % 3 ? '#c8902f' : '#e9b94f'}, Math.sin(a) > 0 ? f : b); }
+      R.moons.forEach(m => { const a = a0 + m, [x, y] = onRing(R, a); el('path', {d: moonPath(x, y - 10, 10), fill: '#e7c56b'}, Math.sin(a) > 0 ? f : b); });
+      R.stars.forEach(m => { const a = a0 + m, [x, y] = onRing(R, a); el('path', {d: starPath(x, y - 12, 9), fill: '#f2cf6b'}, Math.sin(a) > 0 ? f : b); });
+    });
+    // the hanging things: front ones larger and brighter, back ones smaller, dimmer, and behind the sun
+    const t = now / 1000, order = [];
+    items.forEach(it => {
+      const a = it.a0 + rot, depth = Math.sin(a), s = .74 + .26 * (depth + 1) / 2;
+      const [ax, ay] = onRing(BIG, a);
+      const len = (it.L ? it.L.len : it.C.len) * (.86 + .14 * (depth + 1) / 2);
+      const swing = still ? 0 : Math.sin(t * it.sw + it.phase) * .035, bx = ax + Math.sin(swing) * len, by = ay + Math.cos(swing) * len;
+      it.thread.setAttribute('d', `M${ax.toFixed(1)} ${ay.toFixed(1)}L${bx.toFixed(1)} ${by.toFixed(1)}`);
+      it.beads.innerHTML = '';
+      for (let k = 1; k <= 3; k++) { const q = k / 4.2; el('circle', {cx: ax + (bx - ax) * q * .55, cy: ay + (by - ay) * q * .55, r: 2.6}, it.beads); }
+      it.body.setAttribute('transform', `translate(${bx.toFixed(1)} ${by.toFixed(1)}) scale(${s.toFixed(3)})`);
+      if (it.shade) it.shade.setAttribute('opacity', (.5 * (1 - (depth + 1) / 2)).toFixed(3));
+      if (it.L && it.L.ringed) {
+        const r = it.L.r, rx = r * 1.75, ry = r * .38;
+        const arc = (from, to) => { let d = ''; for (let k = 0; k <= 30; k++) { const q = from + (to - from) * k / 30, x = Math.cos(q) * rx, y = Math.sin(q) * ry, c = Math.cos(-.32), sn = Math.sin(-.32); d += (k ? 'L' : 'M') + (x * c - y * sn).toFixed(1) + ' ' + (x * sn + y * c).toFixed(1); } return d; };
+        it.ringBack.setAttribute('d', arc(Math.PI, 2 * Math.PI)); it.ringFront.setAttribute('d', arc(0, Math.PI));
+      }
+      order.push([depth, it]);
+    });
+    order.sort((p, q) => p[0] - q[0]).forEach(([d, it]) => (d < 0 ? hangBack : hangFront).appendChild(it.g));
+    requestAnimationFrame(frame);
+  }
+
+  // ── choosing a planet brings it round to the front and opens its patch ──
+  const card = document.getElementById('card');
+  let current = null;
+  function choose(id, quiet) {
+    const k = items.findIndex(it => it.L && it.L.id === id), it = items[k], L = it.L;
+    target = Math.PI / 2 - it.a0;
+    current = id;
+    items.forEach(o => o.body.classList && o.body.classList.toggle('on', o === it));
+    const code = L.kind === 'code';
+    card.innerHTML = `<div class="swap"><p class="kind">${code ? 'one I code in' : 'one I speak'}</p><h2>${L.name}</h2>
+      <span class="hello${code ? ' code' : ''}" lang="${L.id === 'es' ? 'es' : L.id === 'zh' ? 'zh' : 'en'}"></span><p>${L.note}</p>
+      <nav><button type="button" data-step="-1">&larr; previous</button><button type="button" data-step="1">next &rarr;</button></nav></div>`;
+    card.querySelector('.hello').textContent = L.hello;
+    card.querySelectorAll('[data-step]').forEach(b => b.addEventListener('click', () => {
+      const i = LANGS.findIndex(l => l.id === current), n = LANGS[(i + +b.dataset.step + LANGS.length) % LANGS.length];
+      choose(n.id); items.find(o => o.L && o.L.id === n.id).body.focus({preventScroll: true});
+    }));
+  }
+
+  // ── drag to spin ──
+  let down = null;
+  svg.addEventListener('pointerdown', e => { down = {x: e.clientX, r: rot, t: performance.now(), moved: false}; });
+  addEventListener('pointermove', e => {
+    if (!down) return;
+    const dx = e.clientX - down.x;
+    if (!down.moved && Math.abs(dx) > 5) { down.moved = true; dragging = true; target = null; svg.classList.add('dragging'); svg.setPointerCapture?.(e.pointerId); }
+    if (down.moved) { const w = svg.getBoundingClientRect().width; const nr = down.r - dx / w * 4; vel = nr - rot; rot = nr; }
+  });
+  addEventListener('pointerup', () => { if (down && down.moved) { setTimeout(() => (dragging = false), 0); svg.classList.remove('dragging'); vel = Math.max(-.05, Math.min(.05, vel)); } down = null; });
+  svg.addEventListener('click', e => { if (dragging) e.stopPropagation(); }, true);
+
+  // screen readers get the plain list as well
+  const list = document.getElementById('list');
+  LANGS.forEach(L => { const li = document.createElement('li'); li.textContent = `${L.name} (${L.kind === 'spoken' ? 'spoken' : 'code'}): ${L.note}`; list.appendChild(li); });
+
+  choose('en');
+  requestAnimationFrame(frame);
+})();
+</script>
 <script src="../gh.js"></script>
 </body>
 </html>
