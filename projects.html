@@ -305,7 +305,7 @@
       {rank:"3", suit:"diamond", label:"PCDD", scene:"lab", img:"img/cards/card-3-diamonds.jpg"},
       {rank:"5", suit:"spade",   label:"Vantage", scene:"laptop", img:"img/cards/card-5-spades.jpg"},
       {rank:"4", suit:"heart",   label:"Red Cross fleet", scene:"car", img:"img/cards/card-4-hearts.jpg"},
-      {rank:"6", suit:"club",    label:"ASEAN expansion", scene:"islands", img:"img/cards/card-6-clubs.jpg"},
+      {rank:"5", suit:"club",    label:"ASEAN expansion", scene:"islands", img:"img/cards/card-5-clubs.jpg"},
       {rank:"7", suit:"spade",   label:"Fermilab lenses", scene:"telescope", img:"img/cards/card-7-spades.jpg"},
       {rank:"8", suit:"diamond", label:"green routing", scene:"bus", img:"img/cards/card-8-diamonds.jpg"},
       {rank:"JOKER", suit:null,  label:"this website", scene:"joker", img:"img/cards/card-joker.jpg"},
@@ -441,7 +441,7 @@
       // drawn illustration if we have one; otherwise the code-drawn scene
       const art=h.img?`<image href="${h.img}" x="4" y="4" width="242" height="342" preserveAspectRatio="xMidYMid slice" clip-path="url(#clip${f})"/>`:SCENES[h.scene]();
       const jokerSide=(h.img&&h.rank==='JOKER')?['J','O','K','E','R'].map((c,i)=>`<text x="30" y="${66+i*32}" font-family="'DM Serif Display',Georgia,serif" font-size="28" fill="${INK}" text-anchor="middle">${c}</text>`).join(''):'';
-      return `<svg viewBox="0 0 250 350" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">${defs}${paper}${art}${jokerSide}${corners}${label}</svg>`;
+      return `<svg viewBox="0 0 250 350" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">${defs}${paper}${art}${h.img?'':jokerSide+corners}${label}</svg>`;
     }
 
     // Winding road with little cars, for the back of the Red Cross card.
@@ -597,7 +597,7 @@
   </script>
 <script>
 // Hand-inked, watercolor playing cards scattered like a table. Purely decorative.
-// Skips the combos already used for projects (3♦ 5♠ 4♥ 6♣ 7♠ 8♦ 9♥ and the Joker).
+// Skips the combos already used for projects (3♦ 5♠ 4♥ 5♣ 7♠ 8♦ 9♥ and the Joker).
 (function(){
   const SUIT={
     heart:"M50 90 C20 68 5 52 5 33 C5 18 16 8 30 8 C40 8 46 14 50 23 C54 14 60 8 70 8 C84 8 95 18 95 33 C95 52 80 68 50 90Z",
@@ -862,7 +862,7 @@
   }
 
   // A border of real-looking printed cards piled down the left edge and along the bottom.
-  // Avoids the card values used for projects (3♦ 5♠ 4♥ 6♣ 7♠ 8♦ 9♥) and on the table (A♥ K♦).
+  // Avoids the card values used for projects (3♦ 5♠ 4♥ 5♣ 7♠ 8♦ 9♥) and on the table (A♥ K♦).
   const PIP={L:78,C:125,R:172};
   const PIPS={2:[['C',78],['C',272]],3:[['C',78],['C',175],['C',272]],4:[['L',78],['R',78],['L',272],['R',272]],
     5:[['L',78],['R',78],['C',175],['L',272],['R',272]],6:[['L',78],['R',78],['L',175],['R',175],['L',272],['R',272]],
@@ -889,7 +889,7 @@
       <rect x="3" y="3" width="244" height="344" rx="14" fill="url(#sh${f})" stroke="#cfcac0" stroke-width="2"/>
       ${corner}<g transform="rotate(180 125 175)">${corner}</g>${mid}</svg>`;
   }
-  const BORDER_CARDS=[['5','club'],['8','heart'],['9','spade'],['10','heart'],['J','spade'],['9','club'],['6','spade'],['J','heart'],['10','club'],['8','spade'],['7','club'],['3','heart'],['2','heart'],['Q','heart'],['8','club'],['2','spade'],['10','spade'],['K','club'],['4','spade'],['6','heart'],['Q','diamond'],['7','diamond'],['5','heart'],['10','diamond']];
+  const BORDER_CARDS=[['6','club'],['8','heart'],['9','spade'],['10','heart'],['J','spade'],['9','club'],['6','spade'],['J','heart'],['10','club'],['8','spade'],['7','club'],['3','heart'],['2','heart'],['Q','heart'],['8','club'],['2','spade'],['10','spade'],['K','club'],['4','spade'],['6','heart'],['Q','diamond'],['7','diamond'],['5','heart'],['10','diamond']];
   const frame=document.getElementById('cardframe');
   function rnd(seed){let x=Math.sin(seed*99.13)*43758.5453;return x-Math.floor(x);}
   function buildFrame(){
