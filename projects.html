@@ -166,80 +166,147 @@
       { tag:"Hackathon · MedTech", date:"April 2026", title:"NeuroPrint", body:"A browser-based tool for tracking Parkinson's at home, built at HackDartmouth. Patients do movement tasks like sit-to-stand, standing balance, gait turns, and shoulder range of motion while MediaPipe tracks their joints in the browser, so raw video never leaves the device. A FastAPI and SQLite backend saves each session, and a React dashboard shows clinicians how a patient's movement changes over time against age-matched references. We placed 3rd overall, won AirPods, and got a fast-track interview with Adaptional, a YC-backed startup.", link:"https://devpost.com/software/neuroprint-cky41g?ref_content=my-projects-tab&ref_feature=my_projects", linkLabel:"View on Devpost →" }
     ];
 
-    // Hand-painted playing cards. Suits are drawn as SVG paths, not text characters,
-    // so phones never swap them for emoji.
+    // Line-art cat playing cards, after the two of spades Sofia drew.
+    // Each project is a different card; the number of pips in each scene matches the rank.
+    // Suits are SVG paths (not text) so phones never turn them into emoji.
     const HAND = [
-      {rank:"A", suit:"heart",   label:"PCDD"},
-      {rank:"A", suit:"spade",   label:"Vantage"},
-      {rank:"A", suit:"diamond", label:"Red Cross fleet"},
-      {rank:"K", suit:"club",    label:"ASEAN expansion"},
-      {rank:"A", suit:"club",    label:"Fermilab lenses"},
-      {rank:"Q", suit:"diamond", label:"Green routing"},
-      {rank:"JOKER", suit:null,  label:"this website"},
-      {rank:"K", suit:"heart",   label:"NeuroPrint"}
+      {rank:"3", suit:"diamond", label:"PCDD", scene:"lab"},
+      {rank:"5", suit:"spade",   label:"Vantage", scene:"laptop"},
+      {rank:"4", suit:"heart",   label:"Red Cross fleet", scene:"car"},
+      {rank:"6", suit:"club",    label:"ASEAN expansion", scene:"islands"},
+      {rank:"7", suit:"spade",   label:"Fermilab lenses", scene:"telescope"},
+      {rank:"8", suit:"diamond", label:"green routing", scene:"bus"},
+      {rank:"JOKER", suit:null,  label:"this website", scene:"joker"},
+      {rank:"9", suit:"heart",   label:"NeuroPrint", scene:"stretch"}
     ];
     const SUIT_PATH = {
       heart:"M50 90 C20 68 5 52 5 33 C5 18 16 8 30 8 C40 8 46 14 50 23 C54 14 60 8 70 8 C84 8 95 18 95 33 C95 52 80 68 50 90Z",
-      diamond:"M50 3 L86 50 L50 97 L14 50Z",
+      diamond:"M50 3 L84 50 L50 97 L16 50Z",
       spade:"M50 4 C64 25 93 40 93 61 C93 75 81 83 68 81 C62 80 57 77 54 72 C55 81 59 89 67 95 L33 95 C41 89 45 81 46 72 C43 77 38 80 32 81 C19 83 7 75 7 61 C7 40 36 25 50 4Z",
-      club:"M50 12 a17 17 0 1 1 -0.1 0Z M28 42 a17 17 0 1 1 -0.1 0Z M72 42 a17 17 0 1 1 -0.1 0Z M46 58 C46 76 42 86 33 95 L67 95 C58 86 54 76 54 58Z"
+      club:"M50 10 a18 18 0 1 1 -0.1 0Z M27 41 a18 18 0 1 1 -0.1 0Z M73 41 a18 18 0 1 1 -0.1 0Z M45 58 C45 76 41 86 32 95 L68 95 C59 86 55 76 55 58Z"
     };
-    const RED="#c9524b", INKC="#1f1d1c";
-    function suitColor(s){return (s==='heart'||s==='diamond')?RED:INKC;}
-    function pip(s,x,y,size,extra){
+    const INK="#1c1a19", RED="#c8413b";
+    const isRed=s=>s==='heart'||s==='diamond';
+    const pipC=s=>isRed(s)?RED:INK;
+    function pip(s,x,y,size,rot){
       const k=size/100;
-      return `<path d="${SUIT_PATH[s]}" fill="${suitColor(s)}" transform="translate(${x-size/2} ${y-size/2}) scale(${k})" ${extra||''}/>`;
+      return `<path d="${SUIT_PATH[s]}" fill="${pipC(s)}" transform="translate(${x} ${y}) rotate(${rot||0}) translate(${-size/2} ${-size/2}) scale(${k})"/>`;
     }
-    // Old printed card: worn off-white stock, crisp ink, faded edges.
+    const L=`fill="none" stroke="${INK}" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"`;
+    const W=`fill="#fbf8f1" stroke="${INK}" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"`;
+
+    // A sitting cat, drawn around (0,0) = middle of its chest. arm: [x,y] paw position, or null.
+    function cat(x,y,s,o){
+      o=o||{};
+      const flip=o.flip?-1:1;
+      // arm targets are given in card coordinates; convert to the cat's own coordinates
+      if(o.arm) o.arm=[((o.arm[0]-x)/(s*flip)).toFixed(1)*1,((o.arm[1]-y)/s).toFixed(1)*1];
+      const head=`<path d="M-24 -40 C-26 -56 -20 -64 -15 -66 L-18 -82 L-5 -71 C-2 -72 2 -72 5 -71 L18 -82 L15 -66 C20 -64 26 -56 24 -40 C22 -28 11 -24 0 -24 C-11 -24 -22 -28 -24 -40Z" ${W}/>`;
+      const spotHead=o.spots?`<path d="M5 -71 L18 -82 L15 -66 C18 -63 21 -58 22 -54 C14 -56 8 -62 5 -71Z" fill="${INK}"/>`:'';
+      const face=`<ellipse cx="-9" cy="-46" rx="2.2" ry="3.2" fill="${INK}"/><ellipse cx="9" cy="-46" rx="2.2" ry="3.2" fill="${INK}"/>
+        <path d="M-1.8 -39.5 L1.8 -39.5 L0 -37.5Z" fill="${INK}"/><path d="M-4.5 -35.5 Q-2.2 -33 0 -35.5 Q2.2 -33 4.5 -35.5" ${L} stroke-width="1.5"/>
+        <path d="M-14 -40 L-26 -42 M-14 -37 L-25 -35 M14 -40 L26 -42 M14 -37 L25 -35" ${L} stroke-width="1"/>`;
+      const body=`<path d="M-17 -26 C-27 -12 -28 14 -22 30 L22 30 C28 14 27 -12 17 -26" ${W}/>
+        <path d="M22 26 C44 26 48 4 36 -2" ${L}/>
+        <path d="M-14 30 q0 -8 6 -8 q6 0 6 8 M2 30 q0 -8 6 -8 q6 0 6 8" ${L} stroke-width="1.8"/>`;
+      const spotBody=o.spots?`<ellipse cx="-8" cy="6" rx="5" ry="6" fill="${INK}"/>`:'';
+      const bow=o.bow?`<path d="M0 -24 l-8 -5 l0 10z M0 -24 l8 -5 l0 10z" ${W} stroke-width="1.6"/><circle cx="0" cy="-24" r="2" fill="${INK}"/>`:'';
+      const arm=o.arm?`<path d="M12 -18 C${(12+o.arm[0])/2+4} ${(-18+o.arm[1])/2+6} ${o.arm[0]-4} ${o.arm[1]+6} ${o.arm[0]} ${o.arm[1]}" ${L} stroke-width="5.5"/>
+        <path d="M12 -18 C${(12+o.arm[0])/2+4} ${(-18+o.arm[1])/2+6} ${o.arm[0]-4} ${o.arm[1]+6} ${o.arm[0]} ${o.arm[1]}" fill="none" stroke="#fbf8f1" stroke-width="1.6" stroke-linecap="round"/>
+        <circle cx="${o.arm[0]}" cy="${o.arm[1]}" r="4.2" ${W} stroke-width="1.8"/>`:'';
+      const extra=o.extra||'';
+      return `<g transform="translate(${x} ${y}) scale(${s*flip} ${s})">${body}${spotBody}${head}${spotHead}${face}${bow}${extra}${arm}</g>`;
+    }
+
+    const SCENES = {
+      // 3 of diamonds: a cat dropping carbon "crystals" into a flask
+      lab:()=>`
+        <path d="M60 266 L196 266" ${L}/>
+        <path d="M146 196 L146 222 L124 260 Q121 266 128 266 L186 266 Q193 266 190 260 L168 222 L168 196" ${W}/>
+        <path d="M142 196 L172 196" ${L}/><path d="M131 248 L183 248" ${L} stroke-width="1.4" stroke-dasharray="3 4"/>
+        ${pip('diamond',157,254,20)}
+        ${pip('diamond',157,176,20)}
+        ${pip('diamond',157,140,20,12)}
+        <path d="M118 128 L152 162" ${L} stroke-width="3"/><path d="M114 124 l-6 -6" ${L} stroke-width="7"/>
+        ${cat(92,206,1,{arm:[118,128],bow:true})}`,
+      // 5 of spades: a cat watching a chart of spades climb out of a laptop
+      laptop:()=>`
+        <path d="M92 222 L176 222 L190 252 L78 252Z" ${W}/><rect x="98" y="166" width="72" height="56" rx="4" ${W}/>
+        <path d="M104 210 L118 198 L130 204 L146 186 L162 176" ${L} stroke-width="1.6"/>
+        ${pip('spade',120,148,18)}${pip('spade',140,126,18)}${pip('spade',160,104,18)}${pip('spade',180,82,18)}${pip('spade',200,60,18)}
+        <path d="M104 156 C130 140 170 100 196 62" ${L} stroke-width="1.2" stroke-dasharray="2 5"/>
+        ${cat(70,226,.9,{spots:true,arm:[96,196]})}`,
+      // 4 of hearts: a cat driving a little bloodmobile
+      car:()=>`
+        <path d="M58 236 L58 214 Q58 206 66 205 L88 202 L102 176 Q105 170 112 170 L170 170 Q180 170 184 178 L196 202 Q202 204 202 212 L202 236 Q202 242 196 242 L64 242 Q58 242 58 236Z" ${W}/>
+        <circle cx="90" cy="244" r="14" ${W}/><circle cx="90" cy="244" r="4" fill="${INK}"/><circle cx="172" cy="244" r="14" ${W}/><circle cx="172" cy="244" r="4" fill="${INK}"/>
+        <path d="M140 176 L140 202 L188 202 L178 180 Q176 176 170 176Z" ${W}/>
+        <g clip-path="url(#win)">${cat(162,226,.62,{bow:true})}</g>
+        <path d="M40 222 q-6 -6 0 -12 q-6 -8 4 -12" ${L} stroke-width="1.6"/>
+        ${pip('heart',108,222,22)}${pip('heart',38,184,16,-12)}${pip('heart',60,150,14,8)}${pip('heart',40,118,12,-6)}`,
+      // 6 of clubs: club "trees" on islands, a cat planting a flag in Singapore
+      islands:()=>`
+        <path d="M44 250 Q70 222 104 230 Q134 236 148 250Z" ${W}/>
+        <path d="M150 210 Q172 194 202 206 L206 214 L146 214Z" ${W}/>
+        <path d="M40 274 q10 -6 20 0 t20 0 t20 0 t20 0 t20 0 t20 0 t20 0 t20 0" ${L} stroke-width="1.6"/>
+        <path d="M40 286 q10 -6 20 0 t20 0 t20 0 t20 0 t20 0 t20 0 t20 0" ${L} stroke-width="1.6"/>
+        ${pip('club',62,212,24)}${pip('club',90,196,28)}${pip('club',164,180,22)}${pip('club',190,186,18)}
+        <path d="M124 228 L124 168" ${L}/><path d="M124 168 L148 176 L124 184" ${W}/>
+        ${pip('club',80,106,22,-10)}${pip('club',176,112,20,14)}
+        ${cat(116,214,.62,{arm:[124,186],spots:true})}`,
+      // 7 of spades: a cat at a telescope, spades for stars
+      telescope:()=>`
+        <path d="M150 268 L170 214 L190 268 M170 214 L170 268" ${L}/>
+        <g transform="rotate(-38 170 210)"><rect x="132" y="200" width="78" height="20" rx="3" ${W}/><rect x="122" y="203" width="12" height="14" rx="2" ${W}/><path d="M150 200 L150 220 M190 200 L190 220" ${L} stroke-width="1.4"/></g>
+        ${pip('spade',58,74,16)}${pip('spade',96,58,14,10)}${pip('spade',138,70,18)}${pip('spade',188,58,16,-8)}${pip('spade',210,104,14)}${pip('spade',112,104,12,-12)}${pip('spade',162,112,14,6)}
+        ${cat(98,236,.95,{bow:true,arm:[134,200]})}`,
+      // 8 of diamonds: a cat on a little bus, diamonds for stops along the route
+      bus:()=>{
+        const stops=[[56,74],[96,92],[146,78],[194,100],[176,148],[124,140],[76,152],[58,196]];
+        return `<path d="M56 74 C70 96 82 92 96 92 C118 92 130 72 146 78 C170 86 184 90 194 100 C206 116 196 140 176 148 C160 154 140 138 124 140 C104 142 92 156 76 152 C62 150 52 170 58 196" ${L} stroke-width="1.4" stroke-dasharray="3 5"/>
+          ${stops.map(([x,y],i)=>pip('diamond',x,y,16,i%2?8:-8)).join('')}
+          <rect x="76" y="206" width="124" height="52" rx="10" ${W}/>
+          <rect x="88" y="214" width="26" height="20" rx="3" ${W}/><rect x="120" y="214" width="26" height="20" rx="3" ${W}/><rect x="152" y="214" width="26" height="20" rx="3" ${W}/>
+          <circle cx="104" cy="260" r="10" ${W}/><circle cx="176" cy="260" r="10" ${W}/><circle cx="104" cy="260" r="3" fill="${INK}"/><circle cx="176" cy="260" r="3" fill="${INK}"/>
+          <rect x="182" y="214" width="12" height="24" rx="2" ${W}/>
+          <g clip-path="url(#busw)">${cat(133,250,.55,{spots:true})}</g>`;
+      },
+      // Joker: a cat in a ruff juggling three little planets
+      joker:()=>`
+        ${['J','O','K','E','R'].map((c,i)=>`<text x="30" y="${66+i*32}" font-family="'DM Serif Display',Georgia,serif" font-size="28" fill="${INK}" text-anchor="middle">${c}</text>`).join('')}
+        <path d="M100 96 C118 52 168 52 186 96" ${L} stroke-width="1.2" stroke-dasharray="2 5"/>
+        <circle cx="104" cy="98" r="10" ${W}/><circle cx="143" cy="58" r="10" ${W}/><ellipse cx="143" cy="58" rx="18" ry="5" ${L} stroke-width="1.6" transform="rotate(-14 143 58)"/><circle cx="184" cy="98" r="10" fill="${INK}"/>
+        ${cat(143,214,1.05,{arm:[176,106],extra:`<path d="M-20 -26 l6 -6 l6 6 l6 -6 l6 6 l6 -6 l6 6 l6 -6 l6 6 l-6 7 l-6 -4 l-6 4 l-6 -4 l-6 4 l-6 -4 l-6 4z" ${W} stroke-width="1.6"/><path d="M-8 -70 L-16 -96 L0 -84 L16 -96 L8 -70" ${W} stroke-width="1.8"/><circle cx="-16" cy="-97" r="3" fill="${INK}"/><circle cx="16" cy="-97" r="3" fill="${INK}"/>`})}
+`,
+      // 9 of hearts: a cat doing a stretch while tracking dots follow its joints
+      stretch:()=>{
+        const trail=[[60,110],[72,92],[88,80],[106,72],[124,70],[142,72],[160,80],[176,92],[188,110]];
+        return `<path d="M60 110 C80 72 168 60 188 110" ${L} stroke-width="1.2" stroke-dasharray="2 5"/>
+          ${trail.map(([x,y])=>pip('heart',x,y,15)).join('')}
+          <rect x="176" y="196" width="24" height="40" rx="4" ${W}/><circle cx="188" cy="208" r="5" ${L} stroke-width="1.6"/><path d="M188 236 L180 266 M188 236 L196 266" ${L} stroke-width="1.6"/>
+          <path d="M60 270 L206 270" ${L}/>
+          ${cat(112,238,1,{arm:[146,150],bow:true,extra:`<circle cx="12" cy="-18" r="3.4" fill="none" stroke="${RED}" stroke-width="1.4"/><circle cx="-12" cy="-18" r="3.4" fill="none" stroke="${RED}" stroke-width="1.4"/><circle cx="-14" cy="24" r="3.4" fill="none" stroke="${RED}" stroke-width="1.4"/>`})}`;
+      }
+    };
+
     function makeCardBackSVG(idx){
       const h=HAND[idx]||HAND[0], f=idx+Math.random().toString(36).slice(2,6);
       const defs=`<defs>
-        <radialGradient id="age${f}" cx="45%" cy="40%" r="80%"><stop offset="0" stop-color="#f7f3ea"/><stop offset=".65" stop-color="#efe9dc"/><stop offset="1" stop-color="#ddd3bf"/></radialGradient>
-        <filter id="spk${f}" x="0" y="0" width="100%" height="100%"><feTurbulence type="fractalNoise" baseFrequency=".9" numOctaves="2" seed="${idx+3}" result="n"/>
-          <feColorMatrix in="n" type="matrix" values="0 0 0 0 .35  0 0 0 0 .3  0 0 0 0 .22  0 0 0 -2.2 1.35"/><feComposite in2="SourceGraphic" operator="in"/></filter>
-        <filter id="blot${f}" x="-20%" y="-20%" width="140%" height="140%"><feTurbulence type="fractalNoise" baseFrequency=".012" numOctaves="2" seed="${idx+11}"/><feColorMatrix type="matrix" values="0 0 0 0 .55  0 0 0 0 .48  0 0 0 0 .36  0 0 0 -1.4 .6"/><feComposite in2="SourceGraphic" operator="in"/></filter>
-        <filter id="wear${f}"><feTurbulence type="fractalNoise" baseFrequency=".6" numOctaves="1" seed="${idx+5}"/><feDisplacementMap in="SourceGraphic" scale="1.4"/></filter>
-        <clipPath id="clip${f}"><rect x="5" y="5" width="240" height="340" rx="15"/></clipPath>
-        <pattern id="robe${f}" width="14" height="14" patternUnits="userSpaceOnUse"><rect width="14" height="14" fill="#e8c46a"/><rect width="7" height="14" fill="${RED}"/><circle cx="10.5" cy="7" r="1.6" fill="${INKC}"/></pattern>
+        <filter id="tex${f}" x="0" y="0" width="100%" height="100%"><feTurbulence type="fractalNoise" baseFrequency=".75" numOctaves="2" seed="${idx+3}" result="n"/>
+          <feColorMatrix in="n" type="matrix" values="0 0 0 0 .55  0 0 0 0 .5  0 0 0 0 .42  0 0 0 -2 1.25"/><feComposite in2="SourceGraphic" operator="in"/></filter>
+        <clipPath id="clip${f}"><rect x="4" y="4" width="242" height="342" rx="10"/></clipPath>
+        <clipPath id="win"><path d="M140 176 L140 202 L188 202 L178 180 Q176 176 170 176Z"/></clipPath>
+        <clipPath id="busw"><rect x="120" y="214" width="26" height="20" rx="3"/></clipPath>
       </defs>`;
-      const stock=`<g clip-path="url(#clip${f})"><rect x="5" y="5" width="240" height="340" fill="url(#age${f})"/>
-        <rect x="5" y="5" width="240" height="340" fill="#fff" filter="url(#blot${f})" opacity=".6"/>
-        <rect x="5" y="5" width="240" height="340" fill="#fff" filter="url(#spk${f})" opacity=".18"/></g>
-        <rect x="5.5" y="5.5" width="239" height="339" rx="15" fill="none" stroke="#bfb39b" stroke-width="1.2" opacity=".8"/>`;
-      let face='';
-      const serif="'IM Fell English',Georgia,serif";
-      if(h.rank==='JOKER'){
-        face=`${'JOKER'.split('').map((ch,i)=>`<text x="28" y="${58+i*34}" font-family="${serif}" font-size="30" fill="${INKC}" text-anchor="middle">${ch}</text>`).join('')}
-          <path d="M140 108 L151 136 L181 138 L158 157 L166 186 L140 170 L114 186 L122 157 L99 138 L129 136Z" fill="${RED}"/>`;
-      } else {
-        const c=suitColor(h.suit);
-        const corner=`<text x="28" y="48" font-family="${serif}" font-size="32" fill="${c}" text-anchor="middle">${h.rank}</text>${pip(h.suit,28,68,20)}`;
-        let mid='';
-        if(h.rank==='A'){
-          mid=pip(h.suit,125,168,44);
-        } else {
-          // court card: framed panel with the suit and a patterned robe, like an old K or Q
-          mid=`<g filter="url(#wear${f})">
-            <rect x="56" y="44" width="138" height="262" fill="#f4efe4" stroke="${INKC}" stroke-width="1.6"/>
-            <path d="M56 175 L194 175" stroke="${INKC}" stroke-width="1" opacity=".55"/>
-            ${pip(h.suit,84,80,36)}
-            <path d="M118 62 l7 -12 l7 12 l7 -12 l7 12 v9 h-28z" fill="#e8c46a" stroke="${INKC}" stroke-width="1.2"/>
-            <circle cx="132" cy="84" r="12" fill="#f2dcc4" stroke="${INKC}" stroke-width="1.2"/>
-            <path d="M110 100 Q132 92 154 100 L164 170 L100 170Z" fill="url(#robe${f})" stroke="${INKC}" stroke-width="1.2"/>
-            <path d="M123 100 L132 128 L141 100" fill="#2f4a8a" stroke="${INKC}" stroke-width="1"/>
-            <g transform="rotate(180 125 175)">
-              <path d="M118 62 l7 -12 l7 12 l7 -12 l7 12 v9 h-28z" fill="#e8c46a" stroke="${INKC}" stroke-width="1.2"/>
-              <circle cx="132" cy="84" r="12" fill="#f2dcc4" stroke="${INKC}" stroke-width="1.2"/>
-              <path d="M110 100 Q132 92 154 100 L164 170 L100 170Z" fill="url(#robe${f})" stroke="${INKC}" stroke-width="1.2"/>
-              <path d="M123 100 L132 128 L141 100" fill="#2f4a8a" stroke="${INKC}" stroke-width="1"/>
-              ${pip(h.suit,84,80,36)}
-            </g>
-            </g></g>`;
-        }
-        face=`${corner}<g transform="rotate(180 125 175)">${corner}</g>${mid}`;
+      const paper=`<g clip-path="url(#clip${f})"><rect x="4" y="4" width="242" height="342" fill="#f6f2e8"/><rect x="4" y="4" width="242" height="342" fill="#fff" filter="url(#tex${f})" opacity=".22"/></g>
+        <rect x="4.5" y="4.5" width="241" height="341" rx="10" fill="none" stroke="#d6cdb9" stroke-width="1"/>`;
+      let corners='';
+      if(h.suit){
+        const c=`<text x="27" y="44" font-family="'DM Serif Display',Georgia,serif" font-size="30" fill="${pipC(h.suit)}" text-anchor="middle">${h.rank}</text>${pip(h.suit,27,62,17)}`;
+        corners=c+`<g transform="rotate(180 125 175)">${c}</g>`;
       }
-      const label=`<text x="125" y="${h.rank==='A'?262:328}" font-family="'Nanum Pen Script',cursive" font-size="27" fill="#24306b" text-anchor="middle" opacity=".9" transform="rotate(-3 125 ${h.rank==='A'?262:328})">${h.label}</text>`;
-      return `<svg viewBox="0 0 250 350" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">${defs}${stock}${face}${label}</svg>`;
+      const label=`<text x="125" y="324" font-family="'Nanum Pen Script',cursive" font-size="22" fill="#6a6560" text-anchor="middle">${h.label}</text>`;
+      return `<svg viewBox="0 0 250 350" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">${defs}${paper}${corners}${SCENES[h.scene]()}${label}</svg>`;
     }
 
     function makeFrontHTML(p){
