@@ -273,14 +273,36 @@
     s1=Math.max(1,a.t-innerHeight*.5); s2=Math.max(s1+1,b.t+b.h-innerHeight*.55);
   }
   const bez=(q,t)=>{const u=1-t;return{x:u*u*u*q[0].x+3*u*u*t*q[1].x+3*u*t*t*q[2].x+t*t*t*q[3].x,y:u*u*u*q[0].y+3*u*u*t*q[1].y+3*u*t*t*q[2].y+t*t*t*q[3].y};};
+  // one loop-the-loop early in the first leg, like a dashed doodle
+  function pt(k,t){
+    const q=bez(P[k],t);
+    if(k===0){const s=(t-.16)/.2;if(s>0&&s<1){const r=Math.min(70,innerWidth*.06),th=s*Math.PI*2;
+      q.x+=Math.sin(th)*r;q.y-=(1-Math.cos(th))*r;}}
+    return q;
+  }
   function at(p){ // p from 0 to 2 across both segments
     const k=Math.min(1,Math.floor(p)),t=Math.min(1,Math.max(0,p-k));
-    const a=bez(P[k],t),b=bez(P[k],Math.min(1,t+.01)),c=t>=.99?bez(P[k],t-.01):null;
+    const a=pt(k,t),b=pt(k,Math.min(1,t+.01)),c=t>=.99?pt(k,t-.01):null;
     const ang=c?Math.atan2(a.y-c.y,a.x-c.x):Math.atan2(b.y-a.y,b.x-a.x);
     return{x:a.x,y:a.y,ang};
   }
   function progress(){const y=scrollY;return y<=s1?y/s1:1+Math.min(1,(y-s1)/(s2-s1));}
+  const NSs='http://www.w3.org/2000/svg';
+  const trailSvg=document.createElementNS(NSs,'svg');trailSvg.setAttribute('aria-hidden','true');
+  trailSvg.style.cssText='position:absolute;left:0;top:0;z-index:14;pointer-events:none;overflow:visible';
+  const trail=document.createElementNS(NSs,'path');trail.setAttribute('fill','none');trail.setAttribute('stroke','#fff4dc');trail.setAttribute('stroke-width','2.6');
+  trail.setAttribute('stroke-dasharray','12 10');trail.setAttribute('stroke-linecap','round');trail.setAttribute('opacity','.85');
+  trailSvg.appendChild(trail);document.body.appendChild(trailSvg);
+  function drawTrail(p){
+    trailSvg.setAttribute('width',document.documentElement.scrollWidth);trailSvg.setAttribute('height',document.documentElement.scrollHeight);
+    const steps=Math.max(2,Math.round(p*180));let d='';
+    for(let i=0;i<=steps;i++){const pp=p*i/steps,k=Math.min(1,Math.floor(pp)),t=Math.min(1,pp-k),q=pt(k,t);
+      // the trail comes off the plane's tail, so offset to the plane's centre
+      d+=(i?' L':'M')+(q.x+W*.42).toFixed(1)+' '+(q.y+Hh*.62).toFixed(1);}
+    trail.setAttribute('d',p>0.01?d:'');
+  }
   function place(p){
+    drawTrail(Math.max(0,p-.02));
     const q=at(p);
     // ease the nose between its resting tilt and the direction of travel so it doesn't snap at the start
     const lean=Math.min(1,p*6), rest=-6*Math.PI/180;
