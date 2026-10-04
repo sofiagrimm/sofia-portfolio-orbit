@@ -42,7 +42,8 @@
   .offer{position:absolute;z-index:3;width:clamp(120px,12vw,160px);aspect-ratio:1;border-radius:20px;background:var(--glass);border:1px solid var(--edge);
     backdrop-filter:blur(12px) saturate(1.2);-webkit-backdrop-filter:blur(12px) saturate(1.2);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;
     font-size:13px;color:#fff;text-shadow:0 1px 6px rgba(0,0,0,.4);box-shadow:0 18px 36px rgba(0,0,0,.25);transition:background .3s,border-color .3s,scale .3s;will-change:transform}
-  .offer svg{width:62%;height:auto;filter:drop-shadow(0 8px 10px rgba(0,0,0,.35))}
+  .offer span{display:block;padding:0 10px;text-align:center;line-height:1.25;font-size:12px}
+  .offer svg{width:58%;height:auto;filter:drop-shadow(0 8px 10px rgba(0,0,0,.35))}
   .offer:hover,.offer:focus-visible{background:rgba(255,255,255,.26);border-color:rgba(255,255,255,.7);scale:1.05;outline:none}
   .offer.a{left:12%;top:28%}.offer.b{right:9%;top:36%}
 
@@ -107,19 +108,33 @@ const ICON = {
   shell:`<svg viewBox="0 0 110 90"><path d="M55 80 C20 76 8 46 18 28 C28 12 82 12 92 28 C102 46 90 76 55 80Z" fill="#f4c9b8"/>${[-40,-24,-8,8,24,40].map(a=>`<path d="M55 78 L${55+Math.sin(a*Math.PI/180)*44} ${78-Math.cos(a*Math.PI/180)*60}" stroke="#d99a86" stroke-width="2.2"/>`).join('')}<path d="M44 80 h22 v6 h-22z" fill="#e9b3a1"/></svg>`,
   wind:`<svg viewBox="0 0 110 80"><path d="M10 30 H70 C86 30 86 10 72 12 M10 46 H88 C104 46 104 66 90 64 M18 60 H52" stroke="#e9f3f8" stroke-width="5" fill="none" stroke-linecap="round"/></svg>`
 };
+// little book, letter and scroll drawings for the offers
+const BOOK=(c,t,sub)=>`<svg viewBox="0 0 110 120"><rect x="22" y="14" width="68" height="94" rx="4" fill="#000" opacity=".25" transform="translate(4 5)"/><rect x="22" y="14" width="68" height="94" rx="4" fill="${c}"/><rect x="22" y="14" width="10" height="94" fill="#000" opacity=".22"/><rect x="40" y="34" width="42" height="1.4" fill="#f3e3b8" opacity=".8"/><rect x="40" y="70" width="42" height="1.4" fill="#f3e3b8" opacity=".8"/><text x="61" y="52" text-anchor="middle" font-family="Cormorant Garamond,Georgia,serif" font-style="italic" font-size="11" fill="#f6e7c2">${t}</text><text x="61" y="64" text-anchor="middle" font-family="Cormorant Garamond,Georgia,serif" font-size="8" fill="#f6e7c2" opacity=".85">${sub}</text><rect x="86" y="18" width="4" height="86" fill="#efe6d2"/></svg>`;
+ICON.letter=`<svg viewBox="0 0 120 100"><rect x="14" y="24" width="92" height="60" rx="4" fill="#000" opacity=".25" transform="translate(4 5)"/><rect x="14" y="24" width="92" height="60" rx="4" fill="#efe4cc"/><path d="M14 26 L60 58 L106 26" fill="none" stroke="#b9a37a" stroke-width="2"/><path d="M30 70 q8 -6 16 0 t16 0" stroke="#4a3a6a" stroke-width="1.6" fill="none"/><circle cx="88" cy="66" r="7" fill="#a33a2a"/><text x="88" y="69" text-anchor="middle" font-family="Georgia,serif" font-size="8" fill="#f3d9c8">V</text></svg>`;
+ICON.scroll=`<svg viewBox="0 0 120 100"><rect x="26" y="20" width="68" height="62" fill="#000" opacity=".25" transform="translate(4 5)"/><rect x="26" y="20" width="68" height="62" fill="#efe1c0"/><rect x="18" y="14" width="84" height="10" rx="5" fill="#c9a76a"/><rect x="18" y="78" width="84" height="10" rx="5" fill="#c9a76a"/>${[34,42,50,58,66].map(y=>`<path d="M36 ${y} H84" stroke="#8a7350" stroke-width="1.2" opacity=".7"/>`).join('')}</svg>`;
+ICON.pater=BOOK('#5a2e2a','The Renaissance','Pater · 1873');
+ICON.dorian=BOOK('#2c2c34','Dorian Gray','Wilde · 1890');
+ICON.chevalier=BOOK('#2a4a7a','Girl with a','Pearl Earring');
+ICON.poe=BOOK('#3a2a2a','The Oval','Portrait · Poe');
+ICON.poliziano=BOOK('#7a5a2a','Stanze','Poliziano · 1478');
+ICON.iliad=BOOK('#4a3a24','The Iliad','Book V');
 const PAINTINGS = [
   { img: W('Mona_Lisa,_by_Leonardo_da_Vinci,_from_C2RMF_retouched.jpg'), title: 'Make her smile', sig: '– La Gioconda', label: 'Mona Lisa, Leonardo da Vinci',
-    blurb: "Gioconda is a true Italian. She'll melt for a proper tiramisu, but never, ever snap her pasta.",
-    good: { name: 'Perfect tiramisu', icon: 'tiramisu', mood: 'There it is. The smile.' }, bad: { name: 'Broken pasta', icon: 'pasta', mood: 'You did not just break the spaghetti.' } },
+    blurb: "Gioconda has been written about for five centuries. Bring her the critic who adored her, never the novel about a portrait that rots.",
+    good: { name: 'Pater, The Renaissance', icon: 'pater', mood: 'Pater called her older than the rocks around her. She liked that.' },
+    bad:  { name: 'The Picture of Dorian Gray', icon: 'dorian', mood: 'A portrait that ages for its sitter? She has been sitting since 1503.' } },
   { img: W('Johannes_Vermeer_(1632-1675)_-_The_Girl_With_The_Pearl_Earring_(1665).jpg'), title: 'Catch her eye', sig: '– het meisje', label: 'Girl with a Pearl Earring, Johannes Vermeer',
-    blurb: 'She turned around for a reason. Offer her something luminous, and keep the spills away from the silk.',
-    good: { name: 'A single pearl', icon: 'pearl', mood: 'She glances back, just for you.' }, bad: { name: 'Spilled milk', icon: 'milk', mood: 'Not on the turban.' } },
+    blurb: 'Nobody knows who she was. Hand her the novel that gave her a name, and keep Poe and his painter far away.',
+    good: { name: 'Chevalier, Girl with a Pearl Earring', icon: 'chevalier', mood: 'Tracy Chevalier called her Griet. She turns to look.' },
+    bad:  { name: 'Poe, The Oval Portrait', icon: 'poe', mood: "Poe's painter paints his wife until there's nothing left of her. She'd rather not." } },
   { img: W('Van_Gogh_-_Starry_Night_-_Google_Art_Project.jpg'), title: 'Keep him up all night', sig: '– Vincent', label: 'The Starry Night, Vincent van Gogh',
-    blurb: 'Vincent wants the sky to swirl until morning. Hand him a telescope; hide the streetlights.',
-    good: { name: 'A telescope', icon: 'telescope', mood: 'The stars spin a little faster.' }, bad: { name: 'Streetlights', icon: 'lamp', mood: 'Too bright. The sky goes flat.' } },
+    blurb: 'Vincent wrote to his brother that the stars made him dream. Give him his letters; spare him the lecture hall.',
+    good: { name: 'Letters to Theo', icon: 'letter', mood: '"The sight of the stars makes me dream," he wrote. The sky turns a little faster.' },
+    bad:  { name: "Whitman's learn'd astronomer", icon: 'scroll', mood: 'Charts and columns of figures? Like Whitman, he slips outside to look up in silence.' } },
   { img: W('Sandro_Botticelli_-_La_nascita_di_Venere_-_Google_Art_Project_-_edited.jpg'), title: 'Make her blush', sig: '– Venere', label: 'The Birth of Venus, Sandro Botticelli',
-    blurb: 'Venus just arrived on a seashell. Bring her another one, and spare her the cold sea wind.',
-    good: { name: 'A seashell', icon: 'shell', mood: 'A little pink in her cheeks.' }, bad: { name: 'A cold breeze', icon: 'wind', mood: 'Brr. She pulls her hair closer.' } }
+    blurb: 'Botticelli likely painted her from a Florentine poem. Read her those verses, and skip the part of Homer where she gets hurt.',
+    good: { name: 'Poliziano, Stanze', icon: 'poliziano', mood: 'The poem that put her on the shell. A little pink in her cheeks.' },
+    bad:  { name: 'The Iliad, Book V', icon: 'iliad', mood: 'Diomedes wounds her hand and she flees the field. Too soon.' } }
 ];
 
 (function(){
