@@ -3,10 +3,10 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>hi | Sofia Grimm</title>
+<title>hi, i'm sofia | Sofia Grimm</title>
 <meta name="robots" content="noindex">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Courier+Prime:wght@400;700&family=Nanum+Pen+Script&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Courier+Prime:wght@400;700&family=DM+Serif+Display:ital@1&family=Nanum+Pen+Script&display=swap">
 <style>
   :root{
     --sky:#060d18;
@@ -16,6 +16,8 @@
     --sticky:#f2df72;
     --sticky-pink:#f3b6c8;
     --muted:#9fb0d8;
+    --sticker:#f3b6c8;
+    --sticker-ink:#16101f;
   }
   *{box-sizing:border-box;margin:0;padding:0}
   html{background:var(--sky)}
@@ -38,12 +40,25 @@
   .coords{font-size:12px;color:#7f8fb8}
 
   .hello{max-width:1100px;margin:0 auto;padding:64px 28px 24px;position:relative}
-  .hello h1{
+  .hello .hi{
     font-family:'Nanum Pen Script',cursive;font-weight:400;color:var(--ink-light);
-    font-size:clamp(72px,13vw,168px);line-height:.85;transform:rotate(-3deg);transform-origin:left bottom;
+    font-size:clamp(48px,7vw,84px);line-height:1;transform:rotate(-4deg);transform-origin:left bottom;display:inline-block;
   }
-  .hello h1 svg{width:.5em;height:.5em;vertical-align:.15em;margin-left:.1em}
-  .hello p{margin-top:28px;max-width:46ch;font-size:16px;line-height:1.65;color:var(--muted)}
+  .hello h1{
+    position:relative;display:inline-block;margin-top:6px;padding:0 .12em;
+    font-family:'DM Serif Display',Georgia,serif;font-style:italic;font-weight:400;
+    font-size:clamp(76px,14vw,184px);line-height:.95;letter-spacing:-.01em;
+    color:var(--sticker-ink);text-shadow:0.045em 0.000em 0 var(--sticker),0.043em 0.012em 0 var(--sticker),0.039em 0.022em 0 var(--sticker),0.032em 0.032em 0 var(--sticker),0.023em 0.039em 0 var(--sticker),0.012em 0.043em 0 var(--sticker),0.000em 0.045em 0 var(--sticker),-0.012em 0.043em 0 var(--sticker),-0.022em 0.039em 0 var(--sticker),-0.032em 0.032em 0 var(--sticker),-0.039em 0.022em 0 var(--sticker),-0.043em 0.012em 0 var(--sticker),-0.045em 0.000em 0 var(--sticker),-0.043em -0.012em 0 var(--sticker),-0.039em -0.022em 0 var(--sticker),-0.032em -0.032em 0 var(--sticker),-0.023em -0.039em 0 var(--sticker),-0.012em -0.043em 0 var(--sticker),-0.000em -0.045em 0 var(--sticker),0.012em -0.043em 0 var(--sticker),0.023em -0.039em 0 var(--sticker),0.032em -0.032em 0 var(--sticker),0.039em -0.023em 0 var(--sticker),0.043em -0.012em 0 var(--sticker),0.090em 0.000em 0 var(--sticker),0.088em 0.018em 0 var(--sticker),0.083em 0.034em 0 var(--sticker),0.075em 0.050em 0 var(--sticker),0.064em 0.064em 0 var(--sticker),0.050em 0.075em 0 var(--sticker),0.034em 0.083em 0 var(--sticker),0.018em 0.088em 0 var(--sticker),0.000em 0.090em 0 var(--sticker),-0.018em 0.088em 0 var(--sticker),-0.034em 0.083em 0 var(--sticker),-0.050em 0.075em 0 var(--sticker),-0.064em 0.064em 0 var(--sticker),-0.075em 0.050em 0 var(--sticker),-0.083em 0.034em 0 var(--sticker),-0.088em 0.018em 0 var(--sticker),-0.090em 0.000em 0 var(--sticker),-0.088em -0.018em 0 var(--sticker),-0.083em -0.034em 0 var(--sticker),-0.075em -0.050em 0 var(--sticker),-0.064em -0.064em 0 var(--sticker),-0.050em -0.075em 0 var(--sticker),-0.034em -0.083em 0 var(--sticker),-0.018em -0.088em 0 var(--sticker),-0.000em -0.090em 0 var(--sticker),0.018em -0.088em 0 var(--sticker),0.034em -0.083em 0 var(--sticker),0.050em -0.075em 0 var(--sticker),0.064em -0.064em 0 var(--sticker),0.075em -0.050em 0 var(--sticker),0.083em -0.034em 0 var(--sticker),0.088em -0.018em 0 var(--sticker),0.06em 0.10em 0.12em rgba(0,0,0,.55);
+    transform:rotate(-2deg);
+  }
+  .hello h1 .tape{
+    position:absolute;right:8%;bottom:-.08em;padding:.18em .9em .12em;
+    font-family:'Nanum Pen Script',cursive;font-style:normal;font-size:clamp(20px,2.4vw,30px);line-height:1;
+    color:#6b5420;text-shadow:none;letter-spacing:0;
+    background:rgba(232,214,160,.82);box-shadow:0 1px 2px rgba(0,0,0,.25);transform:rotate(-5deg);
+  }
+  .hello .star{width:clamp(28px,4vw,48px);height:auto;vertical-align:top;margin-left:6px;transform:rotate(12deg)}
+  .hello p{margin-top:52px;max-width:46ch;font-size:16px;line-height:1.65;color:var(--muted)}
   .hello p a{color:#dfe7ff}
 
   .board{max-width:1100px;margin:0 auto;padding:40px 28px 140px;display:grid;grid-template-columns:repeat(12,1fr);gap:28px;align-items:start}
@@ -94,7 +109,8 @@
 </header>
 
 <section class="hello">
-  <h1>hi! i'm sofia<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.5l2.6 6.3 6.8.5-5.2 4.4 1.6 6.6L12 16.8l-5.8 3.5 1.6-6.6-5.2-4.4 6.8-.5z" fill="none" stroke="#f1ecdc" stroke-width="1.4" stroke-linejoin="round"/></svg></h1>
+  <span class="hi">hi! i'm</span><svg class="star" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.5l2.6 6.3 6.8.5-5.2 4.4 1.6 6.6L12 16.8l-5.8 3.5 1.6-6.6-5.2-4.4 6.8-.5z" fill="none" stroke="#f1ecdc" stroke-width="1.4" stroke-linejoin="round"/></svg><br>
+  <h1>sofia grimm<span class="tape" aria-hidden="true">that's me</span></h1>
   <p>I study Molecular Biophysics &amp; Biochemistry and Ethics, Politics &amp; Economics at Yale. Most days I'm at a bench, in an archive, or somewhere in between. The work is all filed in the <a href="cards.html">card catalog</a>.</p>
 </section>
 
