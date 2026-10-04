@@ -253,13 +253,7 @@
       </button>
       <p class="deck-label">shuffle?</p>
     </div>
-    <div class="memory-grid" id="memoryGrid"><svg class="feltprint" viewBox="0 0 1440 560" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
-      <defs><path id="arcText" d="M30 560 A690 486 0 0 1 1410 560"/></defs>
-      <path d="M0 560 A720 520 0 0 1 1440 560 L1380 560 A660 470 0 0 0 60 560Z" fill="#4f1316"/>
-      <path d="M0 560 A720 520 0 0 1 1440 560" fill="none" stroke="#d6b36a" stroke-width="3"/>
-      <path d="M60 560 A660 470 0 0 1 1380 560" fill="none" stroke="#d6b36a" stroke-width="2"/>
-      <text font-family="'DM Serif Display',Georgia,serif" font-size="30" letter-spacing="14" fill="#e8c784"><textPath href="#arcText" startOffset="50%" text-anchor="middle">PICK A CARD, ANY CARD!</textPath></text>
-    </svg></div>
+    <div class="memory-grid" id="memoryGrid"></div>
   </main>
   <div class="coords">41.3083&deg; N &nbsp; 72.9279&deg; W</div>
   <div id="cardPopupOverlay">
@@ -737,7 +731,7 @@
       });
     });
   }
-  addEventListener('load',lay); addEventListener('resize',()=>{clearTimeout(lay.t);lay.t=setTimeout(lay,150);});
+
   // A border of real-looking printed cards piled down the left edge and along the bottom.
   // Avoids the card values used for projects (3♦ 5♠ 4♥ 6♣ 7♠ 8♦ 9♥) and on the table (A♥ K♦).
   const PIP={L:78,C:125,R:172};
@@ -784,7 +778,80 @@
     if(vh-rowTop>=h*.28) for(let x=w*.15;x<vw;x+=w*1.32){place(x,rowTop+rnd(i+3)*h*.05,(rnd(i+11)-.5)*12);}
   }
   const pb=document.querySelector('.poster-base');if(pb)pb.innerHTML=card('A','club');
-  addEventListener('load',buildFrame); buildFrame(); addEventListener('resize',()=>{clearTimeout(buildFrame.t);buildFrame.t=setTimeout(buildFrame,150);});
+  // ── the printed arch: fitted around the hand, and nothing else on the table may touch it
+  const NSA='http://www.w3.org/2000/svg';
+  const arch=document.createElementNS(NSA,'svg');arch.id='arch';arch.setAttribute('aria-hidden','true');
+  arch.style.cssText='position:absolute;left:0;top:0;width:100%;z-index:1;pointer-events:none;overflow:visible';
+  document.body.insertBefore(arch,document.body.firstChild);
+  let A=null;
+  const docBox=el=>{const r=el.getBoundingClientRect();return{l:r.left+scrollX,t:r.top+scrollY,r:r.right+scrollX,b:r.bottom+scrollY};};
+  function fitArch(){
+    const scenes=[...document.querySelectorAll('#memoryGrid .card-scene')];
+    if(!scenes.length||innerWidth<760){arch.innerHTML='';A=null;return;}
+    const W=document.documentElement.clientWidth,cx=W/2,th=Math.max(36,Math.min(56,W*.036));
+    // real corners of each tilted card in the hand
+    const corners=[];
+    scenes.forEach(sc=>{
+      const rot=getComputedStyle(sc).rotate,ang=(parseFloat(rot)||0)*Math.PI/180;
+      const prev=sc.style.rotate;sc.style.rotate='0deg';const r=docBox(sc);sc.style.rotate=prev;
+      const ox=(r.l+r.r)/2,oy=r.t+(r.b-r.t)*1.2;
+      [[r.l,r.t],[r.r,r.t],[r.l,r.b],[r.r,r.b]].forEach(([x,y])=>{const dx=x-ox,dy=y-oy;
+        corners.push([ox+dx*Math.cos(ang)-dy*Math.sin(ang),oy+dx*Math.sin(ang)+dy*Math.cos(ang)]);});
+    });
+    // the arch runs between the things at the top of the table and the hand
+    const tops=[document.querySelector('.deck'),document.querySelector('.poster-card'),...document.querySelectorAll('#table .pc')]
+      .filter(el=>el&&el.offsetParent!==null).map(docBox);
+    const fanTop=Math.min(...corners.map(c=>c[1])),fanBottom=Math.max(...corners.map(c=>c[1]));
+    const topItems=tops.filter(b=>b.b<fanTop);
+    const topLimit=Math.max(70,...topItems.map(b=>b.b))+14;
+    const outTop=Math.min(topLimit,fanTop-th-28),inTop=outTop+th;
+    const aOut=W/2,aIn=aOut-th;
+    // lowest the arch's feet can sit while every card corner stays inside the inner curve
+    let base=fanBottom+30;
+    for(let pass=0;pass<4;pass++){
+      corners.forEach(([x,y])=>{if(y>=base)return;const dx=(x-cx)/(aIn-14);if(Math.abs(dx)>=1){base=Math.min(base,y-2);return;}
+        const k=Math.sqrt(1-dx*dx);const lim=(y-14-k*inTop)/(1-k);if(lim<base)base=Math.max(inTop+60,lim);});
+    }
+    const bIn=base-inTop,bOut=base-outTop;
+    A={cx,base,aIn,bIn,aOut,bOut};
+    arch.setAttribute('height',document.documentElement.scrollHeight);
+    const tA=aIn+th*.3,tB=bIn+th*.3,fs=th*.56;
+    arch.innerHTML=`<defs><path id="arcText" d="M${cx-tA} ${base} A${tA} ${tB} 0 0 1 ${cx+tA} ${base}"/></defs>
+      <path d="M${cx-aOut} ${base} A${aOut} ${bOut} 0 0 1 ${cx+aOut} ${base} L${cx+aIn} ${base} A${aIn} ${bIn} 0 0 0 ${cx-aIn} ${base}Z" fill="#4f1316"/>
+      <path d="M${cx-aOut} ${base} A${aOut} ${bOut} 0 0 1 ${cx+aOut} ${base}" fill="none" stroke="#d6b36a" stroke-width="3"/>
+      <path d="M${cx-aIn} ${base} A${aIn} ${bIn} 0 0 1 ${cx+aIn} ${base}" fill="none" stroke="#d6b36a" stroke-width="2"/>
+      <text font-family="'DM Serif Display',Georgia,serif" font-size="${fs}" letter-spacing="${fs*.45}" fill="#e8c784"><textPath href="#arcText" startOffset="50%" text-anchor="middle">PICK A CARD, ANY CARD!</textPath></text>`;
+  }
+  function inBand(x,y){
+    if(!A||y>A.base)return false;const dx=x-A.cx,dy=A.base-y;
+    return (dx/A.aOut)**2+(dy/A.bOut)**2<=1&&(dx/A.aIn)**2+(dy/A.bIn)**2>=1;
+  }
+  function touchesBand(el,pad=8){
+    const b=docBox(el);for(let i=0;i<=8;i++)for(let j=0;j<=8;j++){
+      const x=b.l-pad+(b.r-b.l+2*pad)*i/8,y=b.t-pad+(b.b-b.t+2*pad)*j/8;if(inBand(x,y))return true;}return false;
+  }
+  // anything loose on the table that would sit on the arch is pushed outward clear of it, or left off;
+  // anything that would end up under the hand is left off too
+  function overlapsHand(el){
+    const b=docBox(el);return [...document.querySelectorAll('#memoryGrid .card-scene')].some(sc=>{const c=docBox(sc);
+      return !(b.r<c.l+16||b.l>c.r-16||b.b<c.t+16||b.t>c.b-16);});
+  }
+  function clearArch(){
+    if(!A)return;
+    document.querySelectorAll('#table .pc, #cardframe .fc').forEach(el=>{
+      el.style.translate='';
+      if(el.closest('#table')&&overlapsHand(el)){el.style.display='none';return;}
+      if(!touchesBand(el))return;
+      const b=docBox(el),mx=(b.l+b.r)/2-A.cx,my=A.base-(b.t+b.b)/2,len=Math.hypot(mx,my)||1,ux=mx/len,uy=-my/len;
+      let ok=false;
+      for(let k=1;k<=8&&!ok;k++){el.style.translate=`${ux*k*26}px ${uy*k*26}px`;ok=!touchesBand(el);}
+      const nb=docBox(el);
+      if(!ok||nb.r>document.documentElement.clientWidth+40||nb.l<-60||nb.t<60||(el.closest('#table')&&overlapsHand(el)))el.style.display='none';
+    });
+  }
+  function layoutTable(){lay();buildFrame();fitArch();clearArch();}
+  addEventListener('load',layoutTable);layoutTable();
+  addEventListener('resize',()=>{clearTimeout(layoutTable.t);layoutTable.t=setTimeout(layoutTable,150);});
 
 })();
 </script>
