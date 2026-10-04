@@ -956,7 +956,12 @@
       if(overlapsHand(el)||touchesBand(el)||overlapsAny(el,'#table .pc',4)||overlapsAny(el,'#cardframe .fc',6)||docBox(el).b>floor+6)el.remove();else placed++;
     }
   }
-  function layoutTable(){lay();buildFrame();fitArch();clearArch();fillEmpty();wireChips();}
+  function layoutTable(){
+    // measure the table where it really sits, even while the opening is sliding it into view
+    const de=document.documentElement,pm=de.classList.contains('pool-moving');if(pm)de.classList.remove('pool-moving');
+    lay();buildFrame();fitArch();clearArch();fillEmpty();wireChips();
+    if(pm)de.classList.add('pool-moving');
+  }
   addEventListener('load',layoutTable);layoutTable();
   addEventListener('resize',()=>{clearTimeout(layoutTable.t);layoutTable.t=setTimeout(layoutTable,150);});
 
