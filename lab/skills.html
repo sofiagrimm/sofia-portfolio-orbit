@@ -97,6 +97,7 @@
     .hint{position:static;display:block;text-align:center;margin:-6px 0 4px;font-size:22px;transform:none}
   }
   @media (prefers-reduced-motion:reduce){.patch .swap,.rays,.core,.glint,.patch .hello::after{animation:none}}
+  .intro .hi{white-space:normal !important;max-width:100%}
 </style>
 </head>
 <body>
@@ -108,9 +109,8 @@
 
 <main>
   <section class="intro" aria-labelledby="t">
-    <h1 id="t"><span lang="en">hello,</span> <span lang="es">hola,</span> <span lang="zh">你好</span> <span lang="la">viator</span></h1>
-    <p class="hi">since you're new here, let me take you through</p>
-    <p class="hi orbit">my orbit of languages!</p>
+    <h1 id="t">my orbit of languages</h1>
+    <p class="hi">since you're new here, let me show you around!</p>
     <p>Grew up in Hong Kong, moved to the Chicago suburbs, and picked up Spanish and Chinese along the way. Lately, a few languages computers understand too.</p>
     <div class="key" aria-hidden="true"><span><svg viewBox="0 0 18 18"><circle cx="9" cy="9" r="7" fill="#3462c4" stroke="#d9a944" stroke-width="1.4" stroke-dasharray="2 1.6"/></svg>ones I speak</span><span class="code"><svg viewBox="0 0 18 18"><circle cx="9" cy="11" r="6" fill="#c99a4e" stroke="#d9a944" stroke-width="1.4" stroke-dasharray="2 1.6"/><rect x="6.6" y="0.6" width="4.8" height="4.8" fill="#f2cf6b" transform="rotate(45 9 3)"/></svg>ones I code in</span></div>
   </section>
@@ -331,11 +331,11 @@
   // the planets: one per language. r is size, len is how far it hangs below its orbit
   const LANGS = [
     {id:'en',  name:'English',    kind:'spoken', r:83, len:380, look:'swirl',   colors:['#24438f','#3462c4','#5f93e0','#e9eef7','#1d3878','#8db5ee'],
-     hello:'hello', note:'The one this whole site is written in, from the Chicago suburbs to New Haven.'},
+     hello:'', note:'The one this whole site is written in, from the Chicago suburbs to New Haven.'},
     {id:'es',  name:'Español',    kind:'spoken', r:65, len:470, look:'bands',   colors:['#9d1f27','#c0352a','#7d1820','#d9573b','#b02a26'],
-     hello:'hola', note:'Fluent. A grandmother in Spanish, and the clinic in Sevilla where I shadowed doctors.'},
+     hello:'', note:'Fluent. A grandmother in Spanish, and the clinic in Sevilla where I shadowed doctors.'},
     {id:'zh',  name:'中文',        kind:'spoken', r:73, len:330, look:'bands',   colors:['#2f8f7a','#57b39a','#1f6b5c','#9fd6c0','#c9a24a','#3c9e86'],
-     hello:'你好', note:'Fluent. A friend in Chinese, and the sound of Hong Kong, where I grew up.'},
+     hello:'', note:'Fluent. A friend in Chinese, and the sound of Hong Kong, where I grew up.'},
     {id:'html',name:'HTML',       kind:'code',   r:49, len:200, look:'bands',   colors:['#9a5a2c','#c27a3c','#6e3d1d','#e0a463','#b0682f'],
      hello:'<h1>hello</h1>', note:'The bones of every page here.'},
     {id:'css', name:'CSS',        kind:'code',   r:57, len:560, look:'speckle', colors:['#3aa6d9','#7cc7ea','#2a7fb8','#b8e2f4','#5bb6e2'],
@@ -557,7 +557,7 @@
     card.innerHTML = `<div class="swap"><p class="kind">${code ? '<svg viewBox="0 0 18 18"><circle cx="9" cy="11" r="6" fill="#c99a4e" stroke="#d9a944" stroke-width="1.4" stroke-dasharray="2 1.6"/><rect x="6.6" y="0.6" width="4.8" height="4.8" fill="#f2cf6b" transform="rotate(45 9 3)"/></svg> one I code in' : '<svg viewBox="0 0 18 18"><circle cx="9" cy="9" r="7" fill="#3462c4" stroke="#d9a944" stroke-width="1.4" stroke-dasharray="2 1.6"/></svg> one I speak'}</p><h2>${L.name}</h2>
       <span class="hello${code ? ' code' : ''}" lang="${L.id === 'es' ? 'es' : L.id === 'zh' ? 'zh' : 'en'}"></span><p>${L.note}</p>
       <nav><button type="button" data-step="-1">&larr; previous</button><button type="button" data-step="1">next &rarr;</button></nav></div>`;
-    const hb = card.querySelector('.hello'); clearInterval(window.__say);
+    const hb = card.querySelector('.hello'); clearInterval(window.__say); hb.style.display = L.hello ? '' : 'none';
     if (still || quiet) hb.textContent = L.hello;
     else { const chars = [...L.hello]; let n = 0; hb.textContent = ''; hb.setAttribute('aria-label', L.hello); window.__say = setInterval(() => { hb.textContent = chars.slice(0, ++n).join(''); if (n >= chars.length) clearInterval(window.__say); }, Math.max(28, 420 / chars.length)); }
     card.querySelectorAll('[data-step]').forEach(b => b.addEventListener('click', () => {
