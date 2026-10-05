@@ -99,11 +99,12 @@
   @media (prefers-reduced-motion:reduce){.patch .swap,.rays,.core,.glint,.patch .hello::after{animation:none}}
   .intro .hi{white-space:normal !important;max-width:100%}
   /* heading: the site's pink sticker; the intro line written in chalk, like the notes on the Notes page */
-  .intro #t{font-size:clamp(48px,5.4vw,82px) !important;margin:0 0 18px !important;padding:0 .1em}
+  .intro #t{font-family:'DM Serif Display',Georgia,serif !important;font-style:italic !important;font-weight:400 !important;font-size:clamp(48px,5.4vw,82px) !important;margin:0 0 18px !important;
+    color:var(--gold2) !important;text-shadow:0 1px 0 #8a6420,0 0 28px rgba(242,207,107,.18) !important}
   .intro p:not(.hi){font-family:'Reenie Beanie',cursive !important;font-size:clamp(26px,2.2vw,32px) !important;line-height:1.15 !important;color:#f1ecdc !important;max-width:24ch !important;transform:rotate(-1.5deg)}
 </style>
 </head>
-<body data-stickers="#t" data-own-sky>
+<body data-own-sky>
 <canvas id="night" aria-hidden="true"></canvas>
 <header>
   <a class="brand" href="../index.html">Sofia Grimm</a>
