@@ -13,13 +13,10 @@
   :root{--twill:#0e1120;--twill2:#151a2e;--gold:#d9a944;--gold2:#f2cf6b;--thread:#b8893a;--cream:#f4ead2;--dim:#9c96a8}
   *{box-sizing:border-box;margin:0;padding:0}
   html,body{overflow-x:clip}
-  body{min-height:100vh;color:var(--cream);font-family:'Inter',Helvetica,Arial,sans-serif;
-    background:
-      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.1' numOctaves='2'/%3E%3CfeColorMatrix values='0 0 0 0 .55 0 0 0 0 .55 0 0 0 0 .7 0 0 0 .09 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"),
-      repeating-linear-gradient(45deg,rgba(255,255,255,.018) 0 1px,transparent 1px 4px),
-      repeating-linear-gradient(-45deg,rgba(0,0,0,.25) 0 1px,transparent 1px 4px),
-      radial-gradient(ellipse 70% 55% at 38% 22%,#1b2140 0%,var(--twill) 70%);
-    background-color:var(--twill)}
+  body{min-height:100vh;color:var(--cream);font-family:'Inter',Helvetica,Arial,sans-serif;background:#060a1e}
+  /* the sky behind the mobile: a milky way, a star atlas you can light up, constellations that draw themselves */
+  #night{position:fixed;inset:0;width:100%;height:100%;z-index:0;display:block}
+  header,main{position:relative;z-index:1}
   header{position:relative;z-index:5;display:flex;justify-content:space-between;align-items:baseline;gap:12px;flex-wrap:wrap;padding:22px clamp(18px,4vw,48px)}
   header a{color:var(--cream);text-decoration:none;font-size:13px;letter-spacing:.12em;text-transform:uppercase;opacity:.7}
   header a:hover,header a:focus-visible,header a[aria-current]{opacity:1;text-decoration:underline;text-underline-offset:4px;text-decoration-color:var(--gold)}
@@ -38,7 +35,7 @@
   .hint{position:absolute;left:4%;bottom:6%;font-family:'Reenie Beanie',cursive;font-size:24px;color:var(--gold);opacity:.85;transform:rotate(-4deg);pointer-events:none}
 
   .intro{padding-top:clamp(10px,4vh,50px)}
-  .hi{font-family:'Reenie Beanie',cursive;font-size:clamp(36px,3.6vw,48px);color:var(--gold);line-height:1;transform:rotate(-2deg);transform-origin:left}
+  .intro .hi{font-family:'Reenie Beanie',cursive;font-size:clamp(36px,3.6vw,48px);color:var(--gold);line-height:1;transform:rotate(-2deg);transform-origin:left}
   h1{font-family:'Cormorant Garamond',Georgia,serif;font-style:italic;font-weight:300;font-size:clamp(52px,6.6vw,100px);line-height:.88;letter-spacing:-.01em;margin:10px 0 18px;
     color:var(--gold2);text-shadow:0 1px 0 #8a6420,0 0 28px rgba(242,207,107,.18)}
   .intro p{font-size:15px;line-height:1.65;color:#d9d1bd;max-width:44ch}
@@ -81,6 +78,7 @@
 </style>
 </head>
 <body>
+<canvas id="night" aria-hidden="true"></canvas>
 <header>
   <a class="brand" href="../index.html">Sofia Grimm</a>
   <nav aria-label="Site"><a href="../index.html">Home</a><a href="../about.html">About</a><a href="../research.html">Research</a><a href="../projects.html">Projects</a><a href="skills.html" aria-current="page">Languages</a><a href="wonderland.html">Wonderland</a><a href="flipbook.html">Flip Book</a><a href="cards.html">Cards</a><a href="notes.html">Notes</a><a href="sofia-is.html">Sofia is</a><a href="arts.html">Arts</a><a href="globe.html">Globe</a><a href="lace.html">Tilt</a><a href="../contact.html">Contact</a></nav>
@@ -96,7 +94,7 @@
 
   <div class="sky">
     <svg id="mobile" viewBox="0 0 1000 1180" role="group" aria-label="A solar system mobile. Each hanging planet is a language; choose one to read about it."></svg>
-    <p class="hint" aria-hidden="true">drag to spin, tap a planet</p>
+    <p class="hint" aria-hidden="true">drag to spin, tap a planet, tap the sky to make a star</p>
   </div>
 
   <aside class="side">
@@ -109,6 +107,187 @@
   <ul class="sr" id="list"></ul>
 </main>
 
+<script>
+// ── the night sky: painted once into layers, then twinkled, lit and shot through as you move ──
+(() => {
+  const cv = document.getElementById('night'), ctx = cv.getContext('2d');
+  const still = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  let W, H, DPR, M = 40, base, chart, lamp, tw = [], cons = [], made = [], shots = [];
+  let mx = -9999, my = -9999, px = 0, py = 0, tpx = 0, tpy = 0, raf = 0, nextShot = 0;
+  let seed = 11; const r = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
+  const gauss = () => (r() + r() + r() + r() - 2) / 2;
+  const mk = (w, h) => { const c = document.createElement('canvas'); c.width = w; c.height = h; return c; };
+  // where the milky way runs: a gentle S from top to bottom, a little right of centre
+  const band = t => [W * (.12 + .7 * t + .07 * Math.sin(t * 5 + .4)) + M, -M + t * (H + 2 * M) + M];
+  const CONS = [ // a few southern constellations, as in an old atlas
+    {name: 'Crux', at: [.12, .2], pts: [[0, -30], [0, 30], [-22, 2], [20, -2]], lines: [[0, 1], [2, 3]]},
+    {name: 'Centaurus', at: [.3, .1], pts: [[-50, 20], [-20, 0], [10, 8], [40, -10], [30, -40], [70, 20]], lines: [[0, 1], [1, 2], [2, 3], [3, 4], [2, 5]]},
+    {name: 'Carina', at: [.86, .2], pts: [[-60, 10], [-25, -12], [10, -6], [45, 18], [70, 0]], lines: [[0, 1], [1, 2], [2, 3], [3, 4]]},
+    {name: 'Phoenix', at: [.78, .8], pts: [[0, -36], [-30, 0], [30, 4], [0, 34], [-12, 6], [12, 8]], lines: [[0, 4], [0, 5], [4, 1], [5, 2], [4, 3], [5, 3]]},
+    {name: 'Hydrus', at: [.42, .7], pts: [[-40, -20], [0, 10], [36, -16], [10, 40]], lines: [[0, 1], [1, 2], [1, 3]]},
+    {name: 'Pavo', at: [.1, .62], pts: [[0, 0], [-26, 20], [24, 18], [-6, 42], [30, -20], [-34, -14]], lines: [[0, 1], [0, 2], [1, 3], [0, 4], [0, 5]]},
+    {name: 'Grus', at: [.22, .9], pts: [[0, -40], [8, -10], [14, 18], [-20, 6], [40, 4], [20, 44]], lines: [[0, 1], [1, 2], [2, 5], [1, 3], [1, 4]]},
+    {name: 'Toucan', at: [.6, .9], pts: [[-30, 0], [0, -10], [26, 6], [8, 30]], lines: [[0, 1], [1, 2], [2, 3], [3, 1]]},
+  ];
+  const NAMES = ['CENTAURUS', 'CARINA', 'OCTANS', 'HYDRUS', 'TOUCAN', 'PHOENIX', 'GRUS', 'PAVO', 'ARA', 'MUSCA', 'VOLANS', 'DORADO', 'PICTOR', 'ERIDANUS', 'LUPUS', 'INDUS', 'MENSA', 'CHAMÆLEON'];
+
+  function star(c, x, y, rad, col, a) {
+    c.globalAlpha = a; c.fillStyle = col; c.beginPath(); c.arc(x, y, rad, 0, 7); c.fill();
+  }
+  function spikes(c, x, y, len, col, a) { // the four-point flare of a bright star
+    c.save(); c.globalAlpha = a; c.strokeStyle = col; c.lineCap = 'round';
+    for (const [dx, dy, w] of [[1, 0, 1.1], [0, 1, 1.1], [.7, .7, .5], [.7, -.7, .5]]) {
+      const g = c.createLinearGradient(x - dx * len, y - dy * len, x + dx * len, y + dy * len);
+      g.addColorStop(0, 'rgba(255,255,255,0)'); g.addColorStop(.5, col); g.addColorStop(1, 'rgba(255,255,255,0)');
+      c.strokeStyle = g; c.lineWidth = w; c.beginPath(); c.moveTo(x - dx * len * (w < 1 ? .5 : 1), y - dy * len * (w < 1 ? .5 : 1)); c.lineTo(x + dx * len * (w < 1 ? .5 : 1), y + dy * len * (w < 1 ? .5 : 1)); c.stroke();
+    }
+    const g = c.createRadialGradient(x, y, 0, x, y, len * .35); g.addColorStop(0, col); g.addColorStop(1, 'rgba(255,255,255,0)');
+    c.fillStyle = g; c.beginPath(); c.arc(x, y, len * .35, 0, 7); c.fill(); c.restore();
+  }
+
+  function build() {
+    W = innerWidth; H = innerHeight; DPR = Math.min(devicePixelRatio || 1, 1.5); seed = 11;
+    cv.width = W * DPR; cv.height = H * DPR;
+    const BW = W + 2 * M, BH = H + 2 * M;
+    base = mk(BW * DPR, BH * DPR); const b = base.getContext('2d'); b.scale(DPR, DPR);
+    // deep blue night, a little lighter where the galaxy runs
+    let g = b.createLinearGradient(0, 0, 0, BH); g.addColorStop(0, '#0b1740'); g.addColorStop(.55, '#08112f'); g.addColorStop(1, '#050a1f');
+    b.fillStyle = g; b.fillRect(0, 0, BW, BH);
+    // the milky way: hundreds of soft clouds along the band, then darker dust lanes through it
+    b.globalCompositeOperation = 'lighter';
+    for (let k = 0; k < 360; k++) {
+      const t = r(), [cx, cy] = band(t), off = gauss() * W * .17, rad = 70 + r() * 220;
+      const col = r() < .18 ? '140,115,220' : r() < .55 ? '95,125,215' : '150,170,235';
+      const gg = b.createRadialGradient(cx + off, cy, 0, cx + off, cy, rad); gg.addColorStop(0, `rgba(${col},${.005 + r() * .008})`); gg.addColorStop(1, `rgba(${col},0)`);
+      b.fillStyle = gg; b.beginPath(); b.arc(cx + off, cy, rad, 0, 7); b.fill();
+    }
+    b.globalCompositeOperation = 'source-over';
+    for (let k = 0; k < 120; k++) {
+      const t = r(), [cx, cy] = band(t), off = gauss() * W * .05 + W * .02, rad = 20 + r() * 70;
+      const gg = b.createRadialGradient(cx + off, cy, 0, cx + off, cy, rad); gg.addColorStop(0, 'rgba(4,7,22,.07)'); gg.addColorStop(1, 'rgba(4,7,22,0)');
+      b.fillStyle = gg; b.beginPath(); b.arc(cx + off, cy, rad, 0, 7); b.fill();
+    }
+    // stars: thousands of points, crowding into the band
+    const n = Math.round(BW * BH / 520);
+    tw = [];
+    for (let k = 0; k < n; k++) {
+      let x = r() * BW, y = r() * BH;
+      if (r() < .45) { const [cx, cy] = band(y / BH); x = cx + gauss() * W * .16; }
+      const m = r(), rad = m < .9 ? .35 + r() * .55 : m < .985 ? .9 + r() * .6 : 1.5 + r() * .8;
+      const col = r() < .7 ? '#ffffff' : r() < .6 ? '#bcd3ff' : '#ffe2b0';
+      if (rad > 1.2 && r() < .6) tw.push({x, y, rad, col, ph: r() * 7, sp: .6 + r() * 1.8});
+      else star(b, x, y, rad, col, .45 + r() * .55);
+    }
+    // a handful of brilliant ones with flares
+    for (let k = 0; k < 9; k++) { const x = r() * BW, y = r() * BH; spikes(b, x, y, 12 + r() * 16, ['#ffffff', '#cfe0ff', '#ffd9b8'][k % 3], .9); }
+    b.globalAlpha = 1;
+    // constellations: their stars are always there; their lines appear when you come close
+    cons = CONS.map(C => ({...C, x: C.at[0] * W + M, y: C.at[1] * H + M, a: 0}));
+    cons.forEach(C => C.pts.forEach(([dx, dy]) => { spikes(b, C.x + dx, C.y + dy, 7, '#fff4dc', .8); star(b, C.x + dx, C.y + dy, 1.6, '#fff', 1); }));
+
+    // the atlas layer: hour lines from a pole, circles of declination, names spaced out like old engraving
+    chart = mk(BW * DPR, BH * DPR); const c = chart.getContext('2d'); c.scale(DPR, DPR);
+    const PX = BW * .5, PY = BH * .62, RMAX = Math.hypot(BW, BH);
+    c.strokeStyle = '#e8eef9'; c.fillStyle = '#e8eef9'; c.lineWidth = .8;
+    for (let h = 0; h < 24; h++) { const a = h / 24 * Math.PI * 2; c.beginPath(); c.moveTo(PX + Math.cos(a) * 40, PY + Math.sin(a) * 40); c.lineTo(PX + Math.cos(a) * RMAX, PY + Math.sin(a) * RMAX); c.stroke(); }
+    const step = Math.min(W, H) * .17;
+    for (let k = 1; k < 9; k++) { c.beginPath(); c.arc(PX, PY, k * step, 0, 7); c.stroke(); }
+    c.font = "italic 13px 'Cormorant Garamond', Georgia, serif"; c.textAlign = 'center';
+    for (let k = 1; k < 6; k++) c.fillText(`${90 - k * 10}°`, PX + 10, PY - k * step - 4);
+    c.font = "12px 'Cormorant Garamond', Georgia, serif";
+    for (let h = 0; h < 24; h++) {
+      const a = h / 24 * Math.PI * 2, rr = Math.min(BW, BH) * .47;
+      c.save(); c.translate(PX + Math.cos(a) * rr, PY + Math.sin(a) * rr); c.rotate(a + Math.PI / 2); c.fillText(`${h}ʰ`, 0, 0); c.restore();
+    }
+    c.setLineDash([2, 4]); c.lineWidth = .7;
+    for (let k = 0; k < 10; k++) { c.beginPath(); let x = r() * BW, y = r() * BH; c.moveTo(x, y); for (let j = 0; j < 4; j++) { x += (r() - .5) * 220; y += (r() - .5) * 160; c.lineTo(x, y); } c.stroke(); }
+    c.setLineDash([]);
+    c.font = "500 11px 'Inter', sans-serif";
+    NAMES.forEach((nm, k) => {
+      const a = (k / NAMES.length) * Math.PI * 2 + .2, rr = step * (1.4 + (k % 4) * .9);
+      c.save(); c.translate(PX + Math.cos(a) * rr, PY + Math.sin(a) * rr); c.rotate(a + Math.PI / 2);
+      c.fillText(nm.split('').join('\u2009'), 0, 0); c.restore();
+    });
+    lamp = mk(1, 1);
+    draw(performance.now());
+  }
+
+  function draw(now) {
+    const t = now / 1000;
+    px += (tpx - px) * .06; py += (tpy - py) * .06;
+    ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+    const ox = -M + px, oy = -M + py;
+    ctx.drawImage(base, ox, oy, W + 2 * M, H + 2 * M);
+    // the atlas, faint everywhere
+    ctx.globalAlpha = .07; ctx.drawImage(chart, ox, oy, W + 2 * M, H + 2 * M); ctx.globalAlpha = 1;
+    // …and bright inside the circle of light around the pointer
+    if (mx > -999) {
+      const R = Math.min(260, Math.max(170, W * .16)), S = Math.ceil(R * 2 * DPR);
+      if (lamp.width !== S) { lamp.width = lamp.height = S; }
+      const l = lamp.getContext('2d'); l.setTransform(1, 0, 0, 1, 0, 0); l.clearRect(0, 0, S, S); l.globalCompositeOperation = 'source-over';
+      l.drawImage(chart, (mx - R - ox) * DPR, (my - R - oy) * DPR, S, S, 0, 0, S, S);
+      l.globalCompositeOperation = 'destination-in';
+      const g = l.createRadialGradient(S / 2, S / 2, 0, S / 2, S / 2, S / 2); g.addColorStop(0, 'rgba(0,0,0,.75)'); g.addColorStop(.6, 'rgba(0,0,0,.35)'); g.addColorStop(1, 'rgba(0,0,0,0)');
+      l.fillStyle = g; l.fillRect(0, 0, S, S);
+      ctx.drawImage(lamp, mx - R, my - R, R * 2, R * 2);
+      const gl = ctx.createRadialGradient(mx, my, 0, mx, my, R); gl.addColorStop(0, 'rgba(120,150,255,.06)'); gl.addColorStop(1, 'rgba(120,150,255,0)');
+      ctx.fillStyle = gl; ctx.fillRect(mx - R, my - R, R * 2, R * 2);
+    }
+    // twinkling stars
+    for (const s of tw) { const a = still ? .8 : .45 + .55 * Math.abs(Math.sin(t * s.sp + s.ph)); star(ctx, s.x + ox, s.y + oy, s.rad, s.col, a); }
+    ctx.globalAlpha = 1;
+    // constellations draw their lines when the pointer comes near, and name themselves
+    ctx.font = "italic 18px 'Cormorant Garamond', Georgia, serif"; ctx.textAlign = 'center';
+    for (const C of cons) {
+      const x = C.x + ox, y = C.y + oy, near = Math.hypot(mx - x, my - y) < 170;
+      C.a += ((near ? 1 : 0) - C.a) * .08;
+      if (C.a < .02) continue;
+      ctx.globalAlpha = C.a * .85; ctx.strokeStyle = '#f2cf6b'; ctx.lineWidth = 1.2; ctx.setLineDash([3, 4]);
+      ctx.beginPath(); C.lines.forEach(([i, j]) => { ctx.moveTo(x + C.pts[i][0], y + C.pts[i][1]); ctx.lineTo(x + C.pts[j][0], y + C.pts[j][1]); }); ctx.stroke(); ctx.setLineDash([]);
+      ctx.fillStyle = '#f4ead2'; ctx.fillText(C.name, x, y + 64);
+    }
+    ctx.globalAlpha = 1;
+    // stars people made by tapping
+    for (const s of made) {
+      const age = t - s.t, grow = Math.min(1, age * 2.5), tw2 = still ? 1 : .75 + .25 * Math.sin(t * 2 + s.ph);
+      spikes(ctx, s.x + ox, s.y + oy, s.len * grow * tw2, s.col, .95);
+      if (age < 1.2) { ctx.globalAlpha = 1 - age / 1.2; ctx.strokeStyle = s.col; ctx.lineWidth = 1; ctx.beginPath(); ctx.arc(s.x + ox, s.y + oy, age * 60, 0, 7); ctx.stroke(); ctx.globalAlpha = 1; }
+    }
+    // shooting stars
+    if (!still && now > nextShot) { shots.push({x: r() * W * .8 + W * .2, y: r() * H * .4, vx: -(6 + r() * 4), vy: 3 + r() * 2, life: 1}); nextShot = now + 5000 + r() * 7000; }
+    shots = shots.filter(s => s.life > 0);
+    for (const s of shots) {
+      s.x += s.vx; s.y += s.vy; s.life -= .018;
+      const g = ctx.createLinearGradient(s.x, s.y, s.x - s.vx * 14, s.y - s.vy * 14); g.addColorStop(0, `rgba(255,255,255,${s.life})`); g.addColorStop(1, 'rgba(255,255,255,0)');
+      ctx.strokeStyle = g; ctx.lineWidth = 1.6; ctx.beginPath(); ctx.moveTo(s.x, s.y); ctx.lineTo(s.x - s.vx * 14, s.y - s.vy * 14); ctx.stroke();
+    }
+  }
+  function loop(now) { draw(now); raf = still ? 0 : requestAnimationFrame(loop); }
+
+  addEventListener('pointermove', e => {
+    mx = e.clientX; my = e.clientY;
+    tpx = (e.clientX / W - .5) * -M * .8; tpy = (e.clientY / H - .5) * -M * .8;
+    if (still) draw(performance.now());
+  }, {passive: true});
+  document.addEventListener('pointerleave', () => { mx = my = -9999; if (still) draw(performance.now()); });
+  // tap the empty sky to leave a star there (and send one shooting off)
+  document.addEventListener('click', e => {
+    if (e.target.closest('a,button,input,textarea,.planet,.patch,header,.intro p,h1,.quote')) return;
+    if (document.getElementById('mobile').classList.contains('dragging') || window.__mobileDragged) return;
+    const ox = -M + px, oy = -M + py;
+    made.push({x: e.clientX - ox, y: e.clientY - oy, t: performance.now() / 1000, len: 10 + Math.random() * 10, ph: Math.random() * 7, col: ['#ffffff', '#ffe9b0', '#cfe0ff', '#ffc9de'][made.length % 4]});
+    if (made.length > 40) made.shift();
+    if (!still) shots.push({x: e.clientX, y: e.clientY, vx: -(5 + Math.random() * 3), vy: 2 + Math.random() * 2, life: .9});
+    if (still) draw(performance.now());
+  });
+  let rt; addEventListener('resize', () => { clearTimeout(rt); rt = setTimeout(build, 150); });
+  document.addEventListener('visibilitychange', () => { if (document.hidden) { cancelAnimationFrame(raf); raf = 0; } else if (!still && !raf) raf = requestAnimationFrame(loop); });
+  build();
+  if (!still) raf = requestAnimationFrame(loop);
+  // the atlas lettering uses the page fonts; redraw once they've arrived
+  document.fonts && document.fonts.ready.then(build);
+})();
+</script>
 <script>
 (() => {
   const still = matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -134,7 +313,12 @@
      hello:'gl_FragColor = vec4(1.0);', note:"The shaders that let old masters' eyes follow you around the Arts page."},
   ];
   // little things that hang between the planets
-  const CHARMS = [{kind:'moon', len:200}, {kind:'star', len:140}, {kind:'star', len:280}, {kind:'moon', len:420}, {kind:'star', len:170}];
+  const CHARMS = [{kind:'moon', len:200}, {kind:'star', len:120}, {kind:'star', len:280}, {kind:'moon', len:430}, {kind:'star', len:170}, {kind:'star', len:360}, {kind:'moon', len:140}];
+  // and smaller ones that hang from the two inner orbits
+  const INNER = [
+    {ring:1, kind:'star', len:110}, {ring:1, kind:'moon', len:70}, {ring:1, kind:'star', len:170}, {ring:1, kind:'moon', len:130}, {ring:1, kind:'star', len:60}, {ring:1, kind:'star', len:140},
+    {ring:2, kind:'star', len:60}, {ring:2, kind:'moon', len:95}, {ring:2, kind:'star', len:45}, {ring:2, kind:'star', len:80},
+  ];
 
   // ── satin-stitch textures: rows of short slanted stitches in thread colours, shaded like a sphere ──
   let seed = 7; const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
@@ -206,7 +390,9 @@
 
   // one layer per ring half (back behind the sun, front ahead of it), rebuilt every frame
   const ringBack = RINGS.map(() => el('g', {}, back)), ringFront = RINGS.map(() => el('g', {}, front));
+  const swagBack = el('g', {}, back), swagFront = el('g', {}, front);
   const hangBack = el('g', {}, back), hangFront = el('g', {}, front);
+  const SW = {fill: 'none', stroke: '#d9a944', 'stroke-width': 3.2, 'stroke-linecap': 'round', 'stroke-dasharray': '0 7'};
   RINGS.forEach((R, i) => {
     const d = (from, to) => { let s = ''; for (let k = 0; k <= 60; k++) { const a = from + (to - from) * k / 60, [x, y] = onRing(R, a); s += (k ? 'L' : 'M') + x.toFixed(1) + ' ' + y.toFixed(1); } return s; };
     const st = {fill: 'none', stroke: '#c8902f', 'stroke-width': R.w, 'stroke-dasharray': '7 4', 'stroke-linecap': 'round'};
@@ -227,8 +413,10 @@
   const items = [];
   LANGS.forEach((L, k) => items.push({L}));
   CHARMS.forEach((C, k) => items.splice(1 + k * 2, 0, {C}));
+  const outer = items.length;
+  items.forEach((it, k) => { it.a0 = k / outer * Math.PI * 2; it.ring = 0; });
+  [1, 2].forEach(r => { const mine = INNER.filter(c => c.ring === r); mine.forEach((C, k) => items.push({C, ring: r, a0: k / mine.length * Math.PI * 2 + r})); });
   items.forEach((it, k) => {
-    it.a0 = k / items.length * Math.PI * 2;
     it.phase = rnd() * 6; it.sw = .6 + rnd() * .5;
     const g = el('g', {});
     it.g = g;
@@ -251,7 +439,10 @@
       body.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); choose(L.id); } });
       body.addEventListener('focus', () => { if (!dragging) choose(L.id, true); });
     } else {
-      it.body = el('path', {d: it.C.kind === 'moon' ? moonPath(0, 0, 13) : starPath(0, 0, 14), fill: it.C.kind === 'moon' ? '#e7c56b' : '#f2cf6b', stroke: '#8a6420', 'stroke-width': 1}, g);
+      const sz = it.ring ? 9 : 14;
+      it.body = el('g', {}, g);
+      if (it.C.kind === 'star') el('circle', {r: sz * 1.4, fill: 'url(#glow)', opacity: .5}, it.body);
+      el('path', {d: it.C.kind === 'moon' ? moonPath(0, 0, sz * .95) : starPath(0, 0, sz), fill: it.C.kind === 'moon' ? '#e7c56b' : '#f2cf6b', stroke: '#8a6420', 'stroke-width': 1}, it.body);
     }
   });
 
@@ -280,8 +471,8 @@
     // the hanging things: front ones larger and brighter, back ones smaller, dimmer, and behind the sun
     const t = now / 1000, order = [];
     items.forEach(it => {
-      const a = it.a0 + rot, depth = Math.sin(a), s = .74 + .26 * (depth + 1) / 2;
-      const [ax, ay] = onRing(BIG, a);
+      const R = RINGS[it.ring || 0], a = it.a0 + rot * R.speed, depth = Math.sin(a), s = .74 + .26 * (depth + 1) / 2;
+      const [ax, ay] = onRing(R, a); it.ax = ax; it.ay = ay; it.depth = depth;
       const len = (it.L ? it.L.len : it.C.len) * (.86 + .14 * (depth + 1) / 2);
       const swing = still ? 0 : Math.sin(t * it.sw + it.phase) * .035, bx = ax + Math.sin(swing) * len, by = ay + Math.cos(swing) * len;
       it.thread.setAttribute('d', `M${ax.toFixed(1)} ${ay.toFixed(1)}L${bx.toFixed(1)} ${by.toFixed(1)}`);
@@ -295,6 +486,15 @@
       }
       order.push([depth, it]);
     });
+    // chains hang between every other pair of neighbours on the big ring, sagging under their own weight
+    for (let k = 0; k < outer; k += 1) {
+      if (k % 2) continue;
+      const A = items[k], B = items[(k + 1) % outer];
+      if (!A.swag) A.swag = el('path', SW);
+      const mx = (A.ax + B.ax) / 2, my = (A.ay + B.ay) / 2, md = (A.depth + B.depth) / 2;
+      A.swag.setAttribute('d', `M${A.ax.toFixed(1)} ${A.ay.toFixed(1)}Q${mx.toFixed(1)} ${(my + 70 + 30 * md).toFixed(1)} ${B.ax.toFixed(1)} ${B.ay.toFixed(1)}`);
+      const side = md < 0 ? swagBack : swagFront; if (A.swag.parentNode !== side) side.appendChild(A.swag);
+    }
     order.sort((p, q) => p[0] - q[0]);
     const key = order.map(([d, it]) => (d < 0 ? 'b' : 'f') + items.indexOf(it)).join();
     if (key !== lastKey) { order.forEach(([d, it]) => (d < 0 ? hangBack : hangFront).appendChild(it.g)); lastKey = key; }
@@ -329,7 +529,7 @@
     if (!down.moved && Math.abs(dx) > 5) { down.moved = true; dragging = true; target = null; svg.classList.add('dragging'); svg.setPointerCapture?.(e.pointerId); }
     if (down.moved) { const w = svg.getBoundingClientRect().width; const nr = down.r - dx / w * 4; vel = nr - rot; rot = nr; }
   });
-  addEventListener('pointerup', () => { if (down && down.moved) { setTimeout(() => (dragging = false), 0); svg.classList.remove('dragging'); vel = Math.max(-.05, Math.min(.05, vel)); } down = null; });
+  addEventListener('pointerup', () => { window.__mobileDragged = !!(down && down.moved); setTimeout(() => (window.__mobileDragged = false), 30); if (down && down.moved) { setTimeout(() => (dragging = false), 0); svg.classList.remove('dragging'); vel = Math.max(-.05, Math.min(.05, vel)); } down = null; });
   svg.addEventListener('click', e => { if (dragging) e.stopPropagation(); }, true);
 
   // screen readers get the plain list as well
