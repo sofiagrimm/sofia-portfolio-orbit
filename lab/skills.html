@@ -41,21 +41,24 @@
   .intro p{font-size:15px;line-height:1.65;color:#d9d1bd;max-width:44ch}
   .key{display:flex;gap:22px;margin-top:18px;font-family:'Reenie Beanie',cursive;font-size:22px;color:var(--cream)}
   .key span{display:flex;align-items:center;gap:8px}
-  .key i{display:inline-block;width:14px;height:14px;border-radius:50%;border:1.5px dashed var(--gold)}
-  .key .code i{border-radius:3px}
+  .key svg{width:18px;height:18px;flex:none}
 
-  /* the card is a sewn-on patch: gold satin edge, stitching just inside it */
-  .patch{position:relative;margin-top:28px;padding:26px 26px 24px;background:radial-gradient(120% 90% at 20% 0%,#1d2340,#121628);border-radius:22px;
-    box-shadow:0 0 0 3px #8a6420,0 0 0 6px var(--gold),0 0 0 8px #6b4c17,0 22px 40px rgba(0,0,0,.5)}
-  .patch::before{content:"";position:absolute;inset:9px;border:1.5px dashed rgba(242,207,107,.55);border-radius:15px;pointer-events:none}
-  .patch .kind{font-family:'Reenie Beanie',cursive;font-size:22px;color:var(--gold);line-height:1}
-  .patch h2{font-family:'Cormorant Garamond',Georgia,serif;font-style:italic;font-weight:400;font-size:clamp(40px,4vw,56px);line-height:.95;color:var(--cream);margin:4px 0 12px}
-  .patch .hello{display:inline-block;font-size:15px;color:var(--twill);background:var(--gold2);padding:6px 12px;border-radius:999px;margin-bottom:12px;font-weight:500}
-  .patch .hello.code{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:13px}
-  .patch p{font-size:15px;line-height:1.6;color:#d9d1bd;max-width:40ch}
-  .patch nav{display:flex;justify-content:space-between;margin-top:18px}
-  .patch button{font:500 13px 'Inter',sans-serif;color:var(--cream);background:transparent;border:1.5px solid rgba(242,207,107,.6);border-radius:999px;padding:7px 14px;cursor:pointer}
-  .patch button:hover,.patch button:focus-visible{background:var(--gold);color:var(--twill);border-color:var(--gold);outline:none}
+  /* the patch is the same midnight cloth as the sky, edged in gold thread like the orbits */
+  .patch{position:relative;margin-top:28px;padding:30px 30px 26px;border-radius:26px;
+    background:radial-gradient(130% 100% at 15% 0%,rgba(30,40,86,.82),rgba(8,13,38,.86));-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);
+    box-shadow:0 0 0 1.5px rgba(242,207,107,.75),0 0 0 6px rgba(8,13,38,.6),0 0 0 7px rgba(242,207,107,.28),0 24px 48px rgba(0,0,0,.5)}
+  .patch::before{content:"";position:absolute;inset:10px;border:1.5px dashed rgba(242,207,107,.5);border-radius:18px;pointer-events:none}
+  .patch .kind{font-family:'Reenie Beanie',cursive;font-size:24px;color:var(--gold);line-height:1;display:flex;align-items:center;gap:8px}
+  .patch .kind svg{width:16px;height:16px}
+  .patch h2{font-family:'Cormorant Garamond',Georgia,serif;font-style:italic;font-weight:400;font-size:clamp(44px,4.4vw,62px);line-height:.95;color:var(--cream);margin:6px 0 14px}
+  /* hello is sewn in gold, not printed on a sticker */
+  .patch .hello{display:inline-block;font-family:'Cormorant Garamond',Georgia,serif;font-style:italic;font-size:30px;line-height:1.1;color:var(--gold2);padding:0 2px 6px;margin-bottom:14px;
+    border-bottom:1.5px dashed var(--thread);min-height:1.2em}
+  .patch .hello.code{font-family:ui-monospace,Menlo,Consolas,monospace;font-style:normal;font-size:16px;padding-top:6px}
+  .patch p{font-size:15px;line-height:1.65;color:#d9d1bd;max-width:40ch}
+  .patch nav{display:flex;justify-content:space-between;margin-top:20px}
+  .patch button{font-family:'Reenie Beanie',cursive;font-size:24px;line-height:1;color:var(--gold2);background:transparent;border:0;border-bottom:1.5px dashed transparent;padding:2px 2px 4px;cursor:pointer}
+  .patch button:hover,.patch button:focus-visible{border-bottom-color:var(--gold2);color:var(--cream);outline:none}
   .patch .swap{animation:swap .45s ease}
   @keyframes swap{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
 
@@ -75,6 +78,9 @@
   .planet.on .name{filter:drop-shadow(0 0 6px rgba(242,207,107,.7))}
   .patch .hello::after{content:"";display:inline-block;width:1px;height:1em;margin-left:2px;vertical-align:-2px;background:currentColor;animation:caret 1s steps(1) infinite}
   @keyframes caret{50%{opacity:0}}
+  #tether{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:2;overflow:visible}
+  #tether path{fill:none;stroke:#e3b45a;stroke-width:1.6;stroke-dasharray:6 4;stroke-linecap:round;opacity:.85;filter:drop-shadow(0 0 3px rgba(242,207,107,.45))}
+  @media (max-width:900px){#tether{display:none}}
   .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
 
   @media (max-width:900px){
@@ -100,7 +106,7 @@
     <p class="hi">hi! since you're new here,</p>
     <h1 id="t">the languages I orbit</h1>
     <p>Grew up in Hong Kong, moved to the Chicago suburbs, and picked up Spanish and Chinese along the way. Lately, a few languages computers understand too.</p>
-    <div class="key" aria-hidden="true"><span><i></i>ones I speak</span><span class="code"><i></i>ones I code in</span></div>
+    <div class="key" aria-hidden="true"><span><svg viewBox="0 0 18 18"><circle cx="9" cy="9" r="7" fill="#3462c4" stroke="#d9a944" stroke-width="1.4" stroke-dasharray="2 1.6"/></svg>ones I speak</span><span class="code"><svg viewBox="0 0 18 18"><circle cx="9" cy="11" r="6" fill="#c99a4e" stroke="#d9a944" stroke-width="1.4" stroke-dasharray="2 1.6"/><rect x="6.6" y="0.6" width="4.8" height="4.8" fill="#f2cf6b" transform="rotate(45 9 3)"/></svg>ones I code in</span></div>
   </section>
 
   <div class="sky">
@@ -108,6 +114,7 @@
     <p class="hint" aria-hidden="true">drag to spin, tap a planet, tap the sky to make a star</p>
   </div>
 
+  <svg id="tether" aria-hidden="true"><path/></svg>
   <aside class="side">
     <section class="patch" id="card" aria-live="polite"></section>
   </aside>
@@ -214,7 +221,7 @@
     c.setLineDash([2, 4]); c.lineWidth = .7;
     for (let k = 0; k < 10; k++) { c.beginPath(); let x = r() * BW, y = r() * BH; c.moveTo(x, y); for (let j = 0; j < 4; j++) { x += (r() - .5) * 220; y += (r() - .5) * 160; c.lineTo(x, y); } c.stroke(); }
     c.setLineDash([]);
-    c.font = "500 11px 'Inter', sans-serif";
+    c.font = "500 13px 'Cormorant Garamond', Georgia, serif";
     NAMES.forEach((nm, k) => {
       const a = (k / NAMES.length) * Math.PI * 2 + .2, rr = step * (1.4 + (k % 4) * .9);
       c.save(); c.translate(PX + Math.cos(a) * rr, PY + Math.sin(a) * rr); c.rotate(a + Math.PI / 2);
@@ -521,11 +528,19 @@
     order.sort((p, q) => p[0] - q[0]);
     const key = order.map(([d, it]) => (d < 0 ? 'b' : 'f') + items.indexOf(it)).join();
     if (key !== lastKey) { order.forEach(([d, it]) => (d < 0 ? hangBack : hangFront).appendChild(it.g)); lastKey = key; }
+    // the tether: from the chosen planet's edge to the patch's stitched corner, sagging a little
+    const sel = items.find(o => o.L && o.L.id === current), tp = tether.firstChild;
+    if (sel && innerWidth > 900) {
+      const a = sel.body.querySelector('image').getBoundingClientRect(), c = card.getBoundingClientRect();
+      const x1 = a.right - 2, y1 = a.top + a.height / 2, x2 = c.left + 14, y2 = c.top + 40;
+      const sag = Math.max(30, Math.abs(x2 - x1) * .18);
+      tp.setAttribute('d', `M${x1.toFixed(1)} ${y1.toFixed(1)}C${(x1 + (x2 - x1) * .35).toFixed(1)} ${(Math.max(y1, y2) + sag).toFixed(1)} ${(x1 + (x2 - x1) * .7).toFixed(1)} ${(Math.max(y1, y2) + sag * .6).toFixed(1)} ${x2.toFixed(1)} ${y2.toFixed(1)}`);
+    } else tp.removeAttribute('d');
     if (visible) requestAnimationFrame(frame); else running = false;
   }
 
   // ── choosing a planet brings it round to the front and opens its patch ──
-  const card = document.getElementById('card');
+  const card = document.getElementById('card'), tether = document.getElementById('tether');
   let current = null;
   function choose(id, quiet) {
     const k = items.findIndex(it => it.L && it.L.id === id), it = items[k], L = it.L;
@@ -533,7 +548,7 @@
     current = id;
     items.forEach(o => o.body.classList && o.body.classList.toggle('on', o === it));
     const code = L.kind === 'code';
-    card.innerHTML = `<div class="swap"><p class="kind">${code ? 'one I code in' : 'one I speak'}</p><h2>${L.name}</h2>
+    card.innerHTML = `<div class="swap"><p class="kind">${code ? '<svg viewBox="0 0 18 18"><circle cx="9" cy="11" r="6" fill="#c99a4e" stroke="#d9a944" stroke-width="1.4" stroke-dasharray="2 1.6"/><rect x="6.6" y="0.6" width="4.8" height="4.8" fill="#f2cf6b" transform="rotate(45 9 3)"/></svg> one I code in' : '<svg viewBox="0 0 18 18"><circle cx="9" cy="9" r="7" fill="#3462c4" stroke="#d9a944" stroke-width="1.4" stroke-dasharray="2 1.6"/></svg> one I speak'}</p><h2>${L.name}</h2>
       <span class="hello${code ? ' code' : ''}" lang="${L.id === 'es' ? 'es' : L.id === 'zh' ? 'zh' : 'en'}"></span><p>${L.note}</p>
       <nav><button type="button" data-step="-1">&larr; previous</button><button type="button" data-step="1">next &rarr;</button></nav></div>`;
     const hb = card.querySelector('.hello'); clearInterval(window.__say);
