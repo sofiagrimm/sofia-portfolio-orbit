@@ -24,20 +24,21 @@
     background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23n)'/%3E%3C/svg%3E")}
   @keyframes film{0%{transform:translate(0,0)}25%{transform:translate(-3%,2%)}50%{transform:translate(2%,-3%)}75%{transform:translate(-2%,-1%)}100%{transform:translate(1%,3%)}}
   #pool .flash{position:absolute;inset:0;pointer-events:none;background:#fff8e6;opacity:0}
-  #pool .prompt{position:absolute;font:300 clamp(11px,1vw,13px)/1.7 'Inter','Helvetica Neue',Arial,sans-serif;letter-spacing:.28em;text-transform:uppercase;color:rgba(243,238,228,.75);pointer-events:none;transition:opacity .4s;z-index:2}
-  #pool .prompt b{font-family:'Inter',sans-serif;font-style:italic;font-weight:400;display:block;font-size:1.6em;color:#f3eee4;margin-bottom:10px;text-shadow:0 0 24px rgba(160,230,230,.25);text-transform:none;letter-spacing:.01em}
-  #pool .banner{position:absolute;left:50%;top:clamp(18px,4vh,36px);transform:translateX(-50%);color:rgba(243,238,228,.72);font:300 clamp(10px,.9vw,12px) 'Inter','Helvetica Neue',Arial,sans-serif;letter-spacing:.55em;text-transform:uppercase;white-space:nowrap;transition:opacity .5s,transform .5s;z-index:4;text-shadow:0 1px 8px rgba(0,0,0,.6)}
-  #pool .banner span{color:#9fd8d6}
+  #pool .prompt{position:absolute;font:400 clamp(22px,2vw,28px)/1.05 'Reenie Beanie',cursive;color:#f1ecdc;pointer-events:none;transition:opacity .4s;z-index:2;transform:rotate(-2deg)}
+  #pool .prompt b{font-family:'Reenie Beanie',cursive;font-weight:400;display:block;font-size:1.9em;color:#fff4c9;margin-bottom:6px;text-shadow:0 0 18px rgba(255,236,170,.35)}
+  #pool .banner{position:absolute;left:clamp(18px,3.4vw,48px);top:clamp(64px,10vh,96px);font:italic 400 clamp(30px,3.4vw,52px)/1 'DM Serif Display',Georgia,serif;color:#16101f;
+    text-shadow:0.045em 0 0 #f3b6c8,0.039em 0.022em 0 #f3b6c8,0.022em 0.039em 0 #f3b6c8,0 0.045em 0 #f3b6c8,-0.022em 0.039em 0 #f3b6c8,-0.039em 0.022em 0 #f3b6c8,-0.045em 0 0 #f3b6c8,-0.039em -0.022em 0 #f3b6c8,-0.022em -0.039em 0 #f3b6c8,0 -0.045em 0 #f3b6c8,0.022em -0.039em 0 #f3b6c8,0.039em -0.022em 0 #f3b6c8,0 .09em .12em rgba(0,0,0,.35);white-space:nowrap;transform:rotate(-3deg);transition:opacity .5s,transform .5s;z-index:4;padding:0 .12em}
+  #pool .banner span{position:absolute;right:-.4em;bottom:-.62em;font:400 .5em/1 'Reenie Beanie',cursive;color:#6b5420;text-shadow:none;background:rgba(232,214,160,.86);padding:.18em .8em .1em;box-shadow:0 1px 2px rgba(0,0,0,.25);transform:rotate(-5deg)}
   #pool .motes{position:absolute;inset:0;pointer-events:none;transition:opacity 1.2s}
   #pool .motes i{position:absolute;width:3px;height:3px;border-radius:50%;background:#fff6dc;opacity:.0;animation:mote var(--d) linear var(--dl) infinite}
   @keyframes mote{0%{transform:translate(0,0);opacity:0}15%{opacity:.5}85%{opacity:.35}100%{transform:translate(var(--mx),var(--my));opacity:0}}
   #pool .meter{position:absolute;width:12px;height:clamp(90px,16vh,140px);border:2px solid #f1e6cf;border-radius:8px;overflow:hidden;opacity:0;transition:opacity .2s;background:rgba(18,48,32,.5)}
   #pool .meter b{position:absolute;left:0;right:0;bottom:0;height:0;background:linear-gradient(0deg,#f3d38a,#cf4a3c)}
   #pool .meter small{position:absolute;top:100%;left:50%;transform:translateX(-50%);margin-top:6px;font:12px 'Reenie Beanie',cursive;color:#f1e6cf;white-space:nowrap}
-  #pool .tag{position:absolute;font:300 clamp(12px,1.1vw,14px) 'Inter','Helvetica Neue',Arial,sans-serif;letter-spacing:.4em;text-transform:uppercase;color:#f3eee4;pointer-events:none;text-shadow:0 0 18px rgba(159,216,214,.5)}
-  #pool .skip{position:absolute;right:clamp(18px,3vw,36px);bottom:clamp(18px,3vw,36px);font:13px 'Inter',Courier,monospace;color:#f6ecd6;background:rgba(20,40,25,.45);border:1px solid rgba(246,236,214,.5);border-radius:999px;padding:6px 14px;cursor:pointer;z-index:5}
+  #pool .tag{position:absolute;font:400 clamp(24px,2.2vw,32px) 'Reenie Beanie',cursive;color:#f3eee4;pointer-events:none;text-shadow:0 0 18px rgba(159,216,214,.5)}
+  #pool .skip{position:absolute;right:clamp(18px,3vw,36px);bottom:clamp(18px,3vw,36px);font:400 22px/1 'Reenie Beanie',cursive;color:#f6ecd6;background:rgba(20,40,25,.45);border:1px solid rgba(246,236,214,.5);border-radius:999px;padding:5px 14px 3px;cursor:pointer;z-index:5}
   #pool .skip:hover,#pool .skip:focus-visible{background:rgba(20,40,25,.7);outline:none}
-  #pool .snd{position:absolute;right:clamp(18px,3vw,36px);bottom:calc(clamp(18px,3vw,36px) + 38px);font:13px 'Inter',Courier,monospace;color:#f6ecd6;background:rgba(20,40,25,.45);border:1px solid rgba(246,236,214,.5);border-radius:999px;padding:6px 14px;cursor:pointer;z-index:5}
+  #pool .snd{position:absolute;right:clamp(18px,3vw,36px);bottom:calc(clamp(18px,3vw,36px) + 38px);font:400 22px/1 'Reenie Beanie',cursive;color:#f6ecd6;background:rgba(20,40,25,.45);border:1px solid rgba(246,236,214,.5);border-radius:999px;padding:5px 14px 3px;cursor:pointer;z-index:5}
   #pool .shade{position:absolute;left:50%;top:0;width:min(46vw,560px);transform:translate(-50%,-42%);pointer-events:none;z-index:1;transform-origin:50% -200px;animation:sway 6s ease-in-out infinite alternate;transition:top 1.4s cubic-bezier(.6,0,.3,1),opacity 1s}
   #pool .shade.gone{top:-40vh;opacity:0}
   @keyframes sway{from{rotate:-1.6deg}to{rotate:1.6deg}}
@@ -46,8 +47,8 @@
   #pool .bar{position:absolute;left:0;right:0;height:0;background:#0b0b0c;z-index:3;transition:height .35s cubic-bezier(.3,0,.2,1)}
   #pool .bar.t{top:0}#pool .bar.b{bottom:0}
   #pool.cine .bar{height:9vh}
-  #pool .stamp{position:absolute;left:50%;top:46%;z-index:4;pointer-events:none;font:200 clamp(56px,9vw,130px)/1 'Inter','Helvetica Neue',Arial,sans-serif;letter-spacing:.45em;text-indent:.45em;color:#f3eee4;
-    text-shadow:0 0 40px rgba(159,216,214,.55);opacity:0;transform:translate(-50%,-50%) rotate(0deg) scale(1.6)}
+  #pool .stamp{position:absolute;left:50%;top:46%;z-index:4;pointer-events:none;font:italic 400 clamp(56px,9vw,130px)/1 'DM Serif Display',Georgia,serif;color:#16101f;
+    text-shadow:0.045em 0 0 #f3b6c8,0.039em 0.022em 0 #f3b6c8,0.022em 0.039em 0 #f3b6c8,0 0.045em 0 #f3b6c8,-0.022em 0.039em 0 #f3b6c8,-0.039em 0.022em 0 #f3b6c8,-0.045em 0 0 #f3b6c8,-0.039em -0.022em 0 #f3b6c8,-0.022em -0.039em 0 #f3b6c8,0 -0.045em 0 #f3b6c8,0.022em -0.039em 0 #f3b6c8,0.039em -0.022em 0 #f3b6c8,0 .09em .12em rgba(0,0,0,.35);opacity:0;transform:translate(-50%,-50%) rotate(0deg) scale(1.6)}
   #pool .pdie{cursor:pointer}
 
   `;
@@ -64,7 +65,7 @@
   var pool = document.createElement('div'); pool.id = 'pool'; pool.tabIndex = 0;
   pool.setAttribute('role', 'dialog'); pool.setAttribute('aria-label', 'Opening: break the rack to get to the card table');
   pool.innerHTML = '<div class="world"><svg></svg></div><div class="dof"></div><div class="lamp"></div><div class="film"></div><div class="flash"></div>' +
-    '<p class="prompt"><b>break the rack.</b>drag back to aim &amp; pull<br>then let go</p><div class="banner">sofia grimm\u2019s <span>pool hall</span> &amp; card room</div>' +
+    '<p class="prompt"><b>break the rack.</b>drag back to aim &amp; pull<br>then let go</p><div class="banner">sofia\u2019s pool hall<span>&amp; card room</span></div>' +
     '<div class="motes">' + Array.from({ length: 8 }, function (_, i) { return '<i style="left:' + (20 + Math.random() * 60) + '%;top:' + (15 + Math.random() * 60) + '%;--d:' + (8 + Math.random() * 8) + 's;--dl:-' + (Math.random() * 10) + 's;--mx:' + ((Math.random() - .5) * 120) + 'px;--my:' + (-40 - Math.random() * 80) + 'px"></i>'; }).join('') + '</div>' +
     '<div class="meter"><b></b><small>power</small></div><button class="skip" type="button">skip</button><button class="snd" type="button" aria-pressed="true">sound: on</button>' +
     '<div class="bar t"></div><div class="bar b"></div><div class="stamp" aria-hidden="true">BREAK</div>' +

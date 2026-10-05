@@ -21,13 +21,13 @@
   #roulette{transform:none !important}
   #roulette:hover,#roulette:focus-visible{outline:none;filter:drop-shadow(-14px -6px 30px rgba(0,0,0,.6)) drop-shadow(0 0 16px rgba(255,214,140,.45))}
   #roulette svg{width:100%;height:100%;display:block;overflow:visible;transform:perspective(900px) rotateX(28deg) rotateZ(-8deg);transform-origin:50% 60%}
-  #roulette .hint{position:absolute;left:4%;top:-6%;font:300 12px/1.4 'Inter','Helvetica Neue',Arial,sans-serif;letter-spacing:.3em;text-transform:uppercase;color:rgba(255,236,214,.85);
+  #roulette .hint{position:absolute;left:4%;top:-6%;font:400 26px/1 'Reenie Beanie',cursive;letter-spacing:0;text-transform:none;color:rgba(255,236,214,.85);
     white-space:nowrap;text-shadow:none;background:rgba(24,12,10,.6);padding:4px 10px;border-radius:999px;transform:rotate(-8deg);pointer-events:none;transition:opacity .3s}
   #rouletteResult{position:fixed;right:clamp(16px,3vw,40px);bottom:clamp(170px,17vw,260px);z-index:41;background:#0f0f12;color:#f3eee4;border:1px solid #c9a45a;
-    padding:12px 18px;font:300 13px/1.5 'Inter','Helvetica Neue',Arial,sans-serif;letter-spacing:.2em;text-transform:uppercase;box-shadow:0 14px 30px rgba(0,0,0,.5);opacity:0;transform:translateY(10px);
+    padding:12px 18px;font:400 22px/1.15 'Reenie Beanie',cursive;letter-spacing:0;text-transform:none;box-shadow:0 14px 30px rgba(0,0,0,.5);opacity:0;transform:translateY(10px);
     transition:opacity .3s,transform .3s;pointer-events:none}
   #rouletteResult.on{opacity:1;transform:none}
-  #rouletteResult b{display:block;font:400 30px/1 'Bodoni Moda',Georgia,serif,Georgia,serif;letter-spacing:.02em;text-transform:none;margin-bottom:4px}
+  #rouletteResult b{display:block;font:italic 400 32px/1 'DM Serif Display',Georgia,serif;letter-spacing:.02em;text-transform:none;margin-bottom:4px}
   @media (max-width:760px){#roulette{width:220px;right:-80px;bottom:-80px}#rouletteResult{bottom:160px}}
   `;
   var st = document.createElement('style'); st.textContent = css; document.head.appendChild(st);
