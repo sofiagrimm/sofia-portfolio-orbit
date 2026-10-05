@@ -176,7 +176,7 @@ cards.forEach(c => {
 });
 </script>
   <script type="module">
-    import('https://unpkg.com/three@0.161.0/build/three.module.js').then(THREE=>{
+    import('../vendor/three.module.min.js').then(THREE=>{
       const renderer=new THREE.WebGLRenderer({antialias:false,alpha:false,powerPreference:'low-power'});
       renderer.setPixelRatio(Math.min(window.devicePixelRatio,1.25));
       renderer.setSize(window.innerWidth,window.innerHeight);

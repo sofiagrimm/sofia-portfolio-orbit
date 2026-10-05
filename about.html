@@ -7,7 +7,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,300;1,400;1,500;1,600&family=Inter:wght@300;400;500;600&family=Reenie+Beanie&display=swap">
-  <link rel="modulepreload" href="https://unpkg.com/three@0.161.0/build/three.module.js" crossorigin>
+  <link rel="modulepreload" href="./vendor/three.module.min.js" crossorigin>
   <style>
     *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
     html,body{width:100%;min-height:100%;background:#060d18;font-family:'Inter',sans-serif;color:#e9f0ff;}
@@ -717,7 +717,7 @@
 
   <!-- Stars background -->
   <script type="module">
-    import('https://unpkg.com/three@0.161.0/build/three.module.js').then(THREE=>{
+    import('./vendor/three.module.min.js').then(THREE=>{
       const renderer=new THREE.WebGLRenderer({antialias:false,alpha:false,powerPreference:'low-power'});
       renderer.setPixelRatio(Math.min(window.devicePixelRatio,1.25));
       renderer.setSize(window.innerWidth,window.innerHeight);

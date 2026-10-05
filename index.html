@@ -7,7 +7,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,300;1,400;1,500;1,600&family=Inter:wght@300;400;500;600&family=Reenie+Beanie&display=swap">
-  <link rel="modulepreload" href="https://unpkg.com/three@0.161.0/build/three.module.js" crossorigin>
+  <link rel="modulepreload" href="./vendor/three.module.min.js" crossorigin>
   <style>
     *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
     html,body{width:100%;height:100%;overflow:hidden}
@@ -222,6 +222,13 @@
   /* the logo keeps its original look: light, spaced, italic Cormorant Garamond */
   .nav-name,header .brand,.site>a:first-child{font-family:'Cormorant Garamond',Georgia,serif !important;font-weight:300 !important;font-style:italic !important;letter-spacing:.06em !important}
 </style>
+<style>
+  .planet-keys{display:flex;flex-wrap:wrap;justify-content:center;align-items:center;gap:6px 6px;margin-top:16px;pointer-events:auto}
+  .planet-keys span{font-size:11px;letter-spacing:.08em;color:rgba(190,205,240,.7);margin-right:2px}
+  .planet-keys button{font:400 11px 'Inter',sans-serif;letter-spacing:.04em;color:rgba(220,230,255,.88);background:rgba(120,150,230,.10);border:1px solid rgba(150,175,240,.28);border-radius:999px;padding:5px 10px;cursor:pointer}
+  .planet-keys button:hover,.planet-keys button:focus-visible{background:rgba(150,175,240,.25);color:#fff;outline:none;box-shadow:0 0 0 2px rgba(170,195,255,.55)}
+  .contact-bar a,.coords,.tagline{color:rgba(190,205,240,.78) !important}
+</style>
 </head>
 <body>
   <div class="nebula"></div>
@@ -251,6 +258,11 @@
       <h1 class="card-title">welcome to<br><em>sofia's world!</em></h1>
       <div class="card-rule"></div>
       <div class="card-sub">universe of things i care about</div>
+      <!-- the planets are only clickable in the 3D scene; this row says so, and is the way in for keyboards and screen readers -->
+      <div class="planet-keys" aria-label="Open a project">
+        <span>tap a planet, or</span>
+        <button type="button" data-p="0">Higley Lab</button><button type="button" data-p="1">Fermilab</button><button type="button" data-p="2">YHCC</button><button type="button" data-p="3">PCDD</button><button type="button" data-p="4">Sun Lab</button>
+      </div>
     </div>
   </div>
   <div class="coords">41.3083&deg; N &nbsp; 72.9279&deg; W</div>
@@ -313,7 +325,7 @@
 
   <script>
   (function(){
-    import('https://unpkg.com/three@0.161.0/build/three.module.js').then(function(THREE){
+    import('./vendor/three.module.min.js').then(function(THREE){
 
       var renderer = new THREE.WebGLRenderer({antialias:true,alpha:false});
       renderer.setPixelRatio(Math.min(window.devicePixelRatio,1.5));
@@ -491,9 +503,14 @@
         }
       });
 
+      var opener=null;
       renderer.domElement.addEventListener('click',function(e){
         var idx=getPlanetUnder(e);
         if(idx<0) return;
+        openPlanet(idx);
+      });
+      document.querySelectorAll('.planet-keys button').forEach(function(b){b.addEventListener('click',function(){opener=b;openPlanet(+b.dataset.p);});});
+      function openPlanet(idx){
         var info=PLANET_INFO[idx];
         var hex=info.accentHex;
         popupAccent.style.background=hex;
@@ -502,9 +519,10 @@
         popupTitle.textContent=info.title;
         popupBody.innerHTML=info.body;
         overlay.classList.add('visible');
-      });
+        popupClose.focus();
+      }
 
-      function closePopup(){overlay.classList.remove('visible');}
+      function closePopup(){if(!overlay.classList.contains('visible'))return;overlay.classList.remove('visible');if(opener){opener.focus();opener=null;}}
       popupClose.addEventListener('click',closePopup);
       overlay.addEventListener('click',function(e){if(e.target===overlay)closePopup();});
       document.addEventListener('keydown',function(e){if(e.key==='Escape')closePopup();});
