@@ -177,8 +177,18 @@
   header,main,section,footer{position:relative;z-index:10}
   html,body{overflow-x:clip}
 </style>
+<style>
+  /* daytime: the light writing that sat on the night sky turns to ink so it reads against blue */
+  body[data-sky="day"] header nav a{color:#1d2f66}
+  body[data-sky="day"] header nav a[aria-current],body[data-sky="day"] header nav a:hover,body[data-sky="day"] header nav a:focus-visible{color:#0b1740}
+  body[data-sky="day"] .coords{color:#2c4a80}
+  body[data-sky="day"] .wow{color:#16255a;text-shadow:0 0 14px rgba(255,255,255,.65)}
+  body[data-sky="day"] .hello .hi{color:#16255a;text-shadow:0 0 16px rgba(255,255,255,.6)}
+  body[data-sky="day"] footer{color:#2c4a80}
+  body[data-sky="day"] footer a{color:#1d2f66}
+</style>
 </head>
-<body data-sky-clear=".4,560">
+<body data-sky-clear=".4,560" data-sky="day">
 <header>
   <nav aria-label="Site">
     <a href="../index.html">./home</a><a href="../about.html">./about</a><a href="../research.html">./research</a><a href="../projects.html">./projects</a><a href="cards.html">./cards</a><a href="notes.html" aria-current="page">./notes</a><a href="skills.html">./languages</a><a href="wonderland.html">./wonderland</a><a href="flipbook.html">./flipbook</a><a href="sofia-is.html">./sofia-is</a><a href="arts.html">./arts</a><a href="globe.html">./globe</a><a href="lace.html">./tilt</a><a href="../contact.html">./contact</a>

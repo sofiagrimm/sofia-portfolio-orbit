@@ -1,14 +1,24 @@
-// Painted night sky: deep blue gradient, soft clouds, colored twinkling stars, grass on the horizon.
+// Painted sky: gradient, soft clouds, twinkling stars, grass on the horizon.
 // Drop <script src="sky.js" defer></script> into any page. Content should sit at z-index 10 or above.
+// <body data-sky="day"> or data-sky="sunset"> changes the time of day; the default is night.
 (function () {
+  var MODE = (document.body.dataset.sky || 'night');
+  var LOOKS = {
+    night: { html: '#0b1633', sky: 'radial-gradient(ellipse 70% 45% at 65% 38%, rgba(120,150,230,.16) 0%, transparent 70%),radial-gradient(ellipse 60% 40% at 20% 70%, rgba(60,140,170,.14) 0%, transparent 70%),linear-gradient(180deg,#0a1530 0%,#10224a 30%,#163566 58%,#1b4a6e 82%,#205468 100%)',
+      cloud: ['#9fb4ec', .55, '#4e68b8', .35], grass: ['#145040', '#0f3f33', '#0b2f27'], sun: null },
+    // dusk: indigo at the top melting through violet and rose to a low gold sun; the hill goes dark against it
+    sunset: { html: '#2a2350', sky: 'radial-gradient(ellipse 55% 38% at 72% 92%, rgba(255,214,140,.85) 0%, rgba(255,170,110,.35) 35%, transparent 70%),linear-gradient(180deg,#1c1f4a 0%,#3d3170 22%,#7a4a86 42%,#c25f80 62%,#ee8a6a 78%,#f7b874 90%,#fbd48c 100%)',
+      cloud: ['#ffc6a8', .75, '#b8577a', .55], grass: ['#3a2042', '#2b1633', '#1d0f24'], sun: { x: 72, y: 93, r: 'clamp(90px,12vw,170px)', c: 'radial-gradient(circle,#fff6d8 0%,#ffe08a 42%,rgba(255,190,110,.0) 72%)' } },
+    // a clear afternoon: deep blue overhead fading to pale at the horizon, white clouds, a high sun
+    day: { html: '#7fbbe8', sky: 'radial-gradient(ellipse 40% 35% at 82% 12%, rgba(255,250,225,.75) 0%, rgba(255,250,225,.0) 70%),linear-gradient(180deg,#3d8ad6 0%,#5ea6e6 30%,#8cc3f0 60%,#c4e2f8 85%,#e6f3fc 100%)',
+      cloud: ['#ffffff', .95, '#dbe8f6', .85], grass: ['#7cc56a', '#5eae55', '#4a9446'], sun: { x: 84, y: 12, r: 'clamp(70px,8vw,120px)', c: 'radial-gradient(circle,#fffef4 0%,#fff3b8 38%,rgba(255,244,190,0) 70%)' } },
+  };
+  var LOOK = LOOKS[MODE] || LOOKS.night;
   var css = `
-    html{background:#0b1633}
+    html{background:${LOOK.html}}
     body{background:transparent !important}
-    .sky-gradient{position:fixed;inset:0;z-index:0;pointer-events:none;
-      background:
-        radial-gradient(ellipse 70% 45% at 65% 38%, rgba(120,150,230,.16) 0%, transparent 70%),
-        radial-gradient(ellipse 60% 40% at 20% 70%, rgba(60,140,170,.14) 0%, transparent 70%),
-        linear-gradient(180deg,#0a1530 0%,#10224a 30%,#163566 58%,#1b4a6e 82%,#205468 100%)}
+    .sky-gradient{position:fixed;inset:0;z-index:0;pointer-events:none;background:${LOOK.sky}}
+    .sky-sun{position:fixed;z-index:0;pointer-events:none;border-radius:50%;transform:translate(-50%,-50%)}
     #skyStars{position:fixed;inset:0;width:100%;height:100%;z-index:1;pointer-events:none;will-change:contents}
     .sky-clouds{position:fixed;inset:0;z-index:2;pointer-events:none;width:100%;height:100%}
     .sky-grass{position:fixed;left:0;right:0;bottom:0;height:clamp(70px,11vh,120px);z-index:3;pointer-events:none;width:100%}
@@ -25,7 +35,7 @@
     <defs>
       <filter id="cloudSoft" x="-20%" y="-50%" width="140%" height="200%"><feGaussianBlur stdDeviation="9"/></filter>
       <linearGradient id="cloudFill" x1="0" y1="0" x2="0" y2="1">
-        <stop offset="0" stop-color="#9fb4ec" stop-opacity=".55"/><stop offset="1" stop-color="#4e68b8" stop-opacity=".35"/>
+        <stop offset="0" stop-color="${LOOK.cloud[0]}" stop-opacity="${LOOK.cloud[1]}"/><stop offset="1" stop-color="${LOOK.cloud[2]}" stop-opacity="${LOOK.cloud[3]}"/>
       </linearGradient>
     </defs>
     <g filter="url(#cloudSoft)" fill="url(#cloudFill)">
@@ -54,9 +64,9 @@
     return d + ' L1440 120 Z';
   }
   grass.innerHTML =
-    '<path d="' + tufts(52, 34, 46, 7) + '" fill="#145040"/>' +
-    '<path d="' + tufts(72, 28, 30, 21) + '" fill="#0f3f33"/>' +
-    '<path d="' + tufts(94, 20, 22, 42) + '" fill="#0b2f27"/>';
+    '<path d="' + tufts(52, 34, 46, 7) + '" fill="' + LOOK.grass[0] + '"/>' +
+    '<path d="' + tufts(72, 28, 30, 21) + '" fill="' + LOOK.grass[1] + '"/>' +
+    '<path d="' + tufts(94, 20, 22, 42) + '" fill="' + LOOK.grass[2] + '"/>';
 
   var first = document.body.firstChild;
   // the soft clouds are a blurred drawing; turn them into a picture once so the blur isn't redone every frame
@@ -64,7 +74,12 @@
   var cloudImg = document.createElement('img'); cloudImg.className = 'sky-clouds'; cloudImg.alt = ''; cloudImg.setAttribute('aria-hidden', 'true');
   cloudImg.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(new XMLSerializer().serializeToString(clouds));
   cloudImg.style.objectFit = 'cover';
-  [g, c, cloudImg, grass].forEach(function (el) { document.body.insertBefore(el, first); });
+  var layers = [g, c, cloudImg, grass];
+  if (LOOK.sun) { var sun = document.createElement('div'); sun.className = 'sky-sun'; sun.setAttribute('aria-hidden', 'true');
+    sun.style.cssText = 'left:' + LOOK.sun.x + '%;top:' + LOOK.sun.y + '%;width:' + LOOK.sun.r + ';height:' + LOOK.sun.r + ';background:' + LOOK.sun.c; layers.splice(1, 0, sun); }
+  layers.forEach(function (el) { document.body.insertBefore(el, first); });
+  // daytime has no stars to draw
+  if (MODE === 'day') { c.remove(); return; }
 
   // ── The real sky over New Haven, looking north, running ~240x faster than real time.
   //    Stars are placed from their actual right ascension / declination, so the
@@ -134,8 +149,11 @@
     if (!still) { requestAnimationFrame(draw); if (now - lastDraw < 32 || document.hidden) return; lastDraw = now; }
     var L = lst(t0 + (now - p0) * SPEED);
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0); ctx.clearRect(0, 0, W, Hh);
-    for (var i = 0; i < field.length; i++) { var f = field[i], p = project(f.ra, f.dec, L); if (!p || p.x < -10 || p.x > W + 10) continue;
-      dot(p.x, p.y, Math.max(0.45, (6.4 - f.m) * 0.38), f.c, twinkle(now, f) * 0.85, false); }
+    var dusk = MODE === 'sunset';
+    for (var i = 0; i < field.length; i++) { var f = field[i]; if (dusk && f.m > 4.6) continue; var p = project(f.ra, f.dec, L); if (!p || p.x < -10 || p.x > W + 10) continue;
+      var fade = dusk ? Math.max(0, Math.min(1, (0.62 - p.y / Hh) * 2.4)) : 1; if (!fade) continue;
+      dot(p.x, p.y, Math.max(0.45, (6.4 - f.m) * 0.38), dusk ? '#fff3e6' : f.c, twinkle(now, f) * 0.85 * fade, false); }
+    if (dusk) { ctx.globalAlpha = 1; if (still) setTimeout(function () { draw(performance.now()); }, 60000); return; }
     pleiades.forEach(function (s, i) { var p = project(s[0], s[1], L); if (p) dot(p.x, p.y, 0.9, '#dfe9ff', 0.6 + 0.4 * Math.abs(Math.sin(now * 0.002 + i)), false); });
     ctx.font = '11px "Inter", Courier, monospace';
     C.forEach(function (k) {
