@@ -319,9 +319,15 @@
 </style>
 <style>/* readable contrast (WCAG AA) */
 nav .nav-links a{color:rgba(43,39,36,.82) !important}.big.l1{color:#7f7973 !important}.ghead .note{color:#c4578a !important}
+  /* night look */
+  html,body.night{background:#0b1633 !important}
+  body.night::before{display:none}
+  body.night .sky-grass{display:none}
+  body.night .page-title{font-size:clamp(46px,5.4vw,78px) !important;width:auto !important;max-width:none !important}
+  body.night .page-eyebrow,body.night .globe-label,body.night .section-label,body.night .hello-line{color:var(--ink-light) !important}
 </style>
 </head>
-<body>
+<body data-stickers=".page-title">
   <div class="nebula"></div>
   <nav>
     <a class="nav-name" href="../index.html">Sofia Grimm</a>
@@ -1046,6 +1052,7 @@ nav .nav-links a{color:rgba(43,39,36,.82) !important}.big.l1{color:#7f7973 !impo
   (function(){const p=document.querySelector('.left-panel');const go=d=>p.scrollBy({left:d*280,behavior:'smooth'});
     document.getElementById('stripL').onclick=()=>go(-1);document.getElementById('stripR').onclick=()=>go(1);})();
 </script>
+<script src="../night.js"></script>
 <script src="../nav.js" defer></script>
 </body>
 </html>

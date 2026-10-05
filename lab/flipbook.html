@@ -113,6 +113,11 @@
   /* the logo keeps its original look: light, spaced, italic Bodoni Moda */
   .nav-name,header .brand,.site>a:first-child{font-family:'Bodoni Moda',Georgia,serif !important;font-weight:300 !important;font-style:italic !important;letter-spacing:.06em !important}
   .fld .noimg{display:grid;place-items:center;width:56px;height:56px;border:1.5px dashed #d79ab0;border-radius:6px;font:11px Inter,sans-serif;color:#a35c78}
+  /* night look */
+  body.night{background:#0b1633 !important}
+  body.night main,body.night .bar{position:relative;z-index:10}
+  body.night .bar button{background:rgba(251,248,242,.92) !important;color:#2b2724 !important}
+  body.night .count,body.night .count span{color:var(--ink-light) !important}
 </style>
 
 </head>
@@ -535,6 +540,7 @@
 })();
 
 </script>
+<script src="../night.js"></script>
 <script src="../nav.js" defer></script>
 </body>
 </html>

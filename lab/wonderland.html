@@ -143,31 +143,7 @@
   /* the logo keeps its original look: light, spaced, italic Bodoni Moda */
   .nav-name,header .brand,.site>a:first-child{font-family:'Bodoni Moda',Georgia,serif !important;font-weight:300 !important;font-style:italic !important;letter-spacing:.06em !important}
 
-  /* ── the paper scrapbook look of the newer pages (Languages, Flip Book, Arts, Globe) ── */
-  :root{--paper:#efe8dc;--ink:#2b2724;--pink:#f3a1c4;--pink2:#e97fae;--sage:#a9b99a}
-  body{background:var(--paper) !important;color:var(--ink) !important}
-  header{background:linear-gradient(rgba(239,232,220,.95),rgba(239,232,220,0)) !important}
-  header a{color:var(--ink) !important}
-  /* the hole: rings of torn paper going down, deepening from cream to dusty rose */
-  #hole{background:radial-gradient(ellipse 26% 24% at 50% 52%,#6e3f4a 0%,#9c6573 18%,#c99aa5 38%,#e2c3c6 60%,#efe8dc 88%) !important}
-  #hall{filter:sepia(.55) hue-rotate(-25deg) saturate(1.3) contrast(1.08) brightness(.97) !important}
-  #hole::after{content:"";position:absolute;inset:0;pointer-events:none;opacity:.14;mix-blend-mode:multiply;
-    background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='2'/%3E%3CfeColorMatrix values='0 0 0 0 .55  0 0 0 0 .5  0 0 0 0 .42  0 0 0 .5 0'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)'/%3E%3C/svg%3E")}
-  #hole .ring{border-color:rgba(251,246,238,.75) !important;border-style:solid !important;box-shadow:0 0 0 1px rgba(233,127,174,.35),0 10px 22px rgba(110,63,74,.25),inset 0 0 30px rgba(110,63,74,.18) !important}
-  #wall{background:radial-gradient(ellipse 45% 55% at 50% 58%,#e9cfd3 0%,#efe2da 45%,#efe8dc 80%) !important}
-  #wall::after{content:"";position:absolute;inset:0;opacity:.3;mix-blend-mode:multiply;background:inherit}
-  #follow{filter:invert(1) sepia(1) saturate(3) hue-rotate(290deg) brightness(.7)}
-  /* words */
-  .title h1{color:var(--pink2) !important;text-shadow:0 2px 0 #f7c0d8,0 8px 24px rgba(233,127,174,.25) !important}
-  .title p,.title .scroll,.hint{font-family:'Reenie Beanie',cursive !important;letter-spacing:0 !important;text-transform:none !important;color:var(--ink) !important}
-  .title p{font-size:clamp(24px,2.4vw,32px) !important;font-style:normal !important}
-  .title .scroll{font-size:22px !important;opacity:.75}
-  .hint{font-size:22px !important;color:var(--pink2) !important}
-  .quote{font-family:'Reenie Beanie',cursive !important;font-style:normal !important;color:var(--ink) !important;font-size:38px !important;text-shadow:0 0 8px var(--paper),0 0 16px var(--paper) !important}
-  .quote small{font-family:'Inter',sans-serif !important;color:var(--pink2) !important;opacity:1 !important}
-  .meter{color:#7d7772 !important;font-family:'Inter',sans-serif !important;font-weight:600 !important}
-  .meter b{font-family:'Inter',sans-serif !important;font-weight:800 !important;letter-spacing:-.04em;color:#9a948e !important}
-  .toast{color:var(--pink2) !important;text-shadow:0 0 10px var(--paper),0 0 20px var(--paper) !important}
+  /* the works: taped paper cards */
   /* the works: taped paper cards with an outlined tag, like the Globe and Languages pages */
   .work .frame{background:#fbf8f2 !important;padding:0 !important;border-radius:2px !important;box-shadow:0 14px 24px rgba(60,40,30,.22) !important;position:relative}
   .work .frame::before{content:"";position:absolute;top:-12px;left:50%;width:84px;height:24px;margin-left:-42px;background:rgba(240,226,190,.85);box-shadow:0 1px 2px rgba(0,0,0,.1);transform:rotate(-3deg);z-index:2}
@@ -177,13 +153,30 @@
   .work p{font-family:'Inter',sans-serif !important;color:#4c4743 !important}
   .work .go{font-family:'Reenie Beanie',cursive !important;font-size:22px !important;letter-spacing:0 !important;text-transform:none !important;color:var(--pink2) !important}
   .work:hover .frame,.work:focus-visible .frame{box-shadow:0 0 0 2px var(--pink2),0 14px 24px rgba(60,40,30,.22) !important}
-  /* signpost and the little cards at the bottom */
-  #signpost a{font-family:'Reenie Beanie',cursive !important;font-size:26px !important}
-  #signpost .smallcaps{font-family:'Reenie Beanie',cursive !important}
-  #backup span,#invite span{font-family:'Reenie Beanie',cursive !important;letter-spacing:0 !important;text-transform:none !important;font-size:22px !important;color:var(--ink) !important}
+
+  /* ── the Notes / Sofia-is look: falling through the night sky ── */
+  body.night{--pink:#f3a1c4;--pink2:#e97fae}
+  body.night .sky-grass{display:none}
+  #hole{background:radial-gradient(ellipse 28% 26% at 50% 52%,#03060d 0%,rgba(7,13,26,.92) 22%,rgba(11,22,51,.55) 48%,rgba(11,22,51,0) 80%) !important;z-index:4}
+  #hole .ring{border-color:rgba(241,236,220,.55) !important;border-style:solid !important;box-shadow:0 0 0 1px rgba(243,182,200,.35),0 0 26px rgba(201,214,255,.18),inset 0 0 26px rgba(201,214,255,.1) !important}
+  #hall{filter:saturate(.6) hue-rotate(195deg) brightness(.55) contrast(1.1) !important}
+  #wall{background:none !important}
+  .title{z-index:30}
+  .title h1{font-size:clamp(48px,7vw,104px) !important}
+  .title p,.title .scroll,.hint{font-family:'Reenie Beanie',cursive !important;letter-spacing:0 !important;text-transform:none !important;color:var(--ink-light) !important}
+  .title p{font-size:clamp(26px,2.6vw,34px) !important;font-style:normal !important;margin-top:18px !important}
+  .title .scroll{font-size:24px !important;opacity:.8}
+  .hint{font-size:24px !important;color:var(--sticker) !important}
+  .quote{font-family:'Reenie Beanie',cursive !important;font-style:normal !important;color:var(--ink-light) !important;font-size:40px !important;text-shadow:0 2px 12px rgba(0,0,0,.6) !important}
+  .quote small{font-family:'Inter',sans-serif !important;color:var(--sticker) !important;opacity:1 !important}
+  .meter{color:#9fb0d8 !important;font-family:'Reenie Beanie',cursive !important;font-size:22px !important}
+  .meter b{font-family:'DM Serif Display',serif !important;font-style:italic;font-weight:400 !important;color:var(--sticker) !important;font-size:40px !important}
+  .toast{font-family:'Reenie Beanie',cursive !important;font-style:normal !important;color:var(--sticker) !important}
+  #signpost a,#signpost .smallcaps{font-family:'Reenie Beanie',cursive !important;font-size:26px !important}
+  #backup span,#invite span{font-family:'Reenie Beanie',cursive !important;letter-spacing:0 !important;text-transform:none !important;font-size:24px !important;color:var(--ink-light) !important}
 </style>
 </head>
-<body>
+<body data-stickers=".title h1">
 <header>
   <a class="brand" href="../index.html">Sofia Grimm</a>
   <nav aria-label="Site"><a href="../index.html">Home</a><a href="../about.html">About</a><a href="../research.html">Research</a><a href="../projects.html">Projects</a><a href="skills.html">Languages</a><a href="wonderland.html" aria-current="page">Wonderland</a><a href="flipbook.html">Flip Book</a><a href="cards.html">Cards</a><a href="notes.html">Notes</a><a href="sofia-is.html">Sofia is</a><a href="arts.html">Arts</a><a href="globe.html">Globe</a><a href="lace.html">Tilt</a><a href="../contact.html">Contact</a></nav>
@@ -418,6 +411,7 @@
 })();
 </script>
 <script src="../gh.js"></script>
+<script src="../night.js"></script>
 <script src="../nav.js" defer></script>
 </body>
 </html>

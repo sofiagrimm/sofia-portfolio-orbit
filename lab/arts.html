@@ -114,9 +114,21 @@
 </style>
 <style>/* readable contrast (WCAG AA) */
 .credit{color:#4f3f1c !important}
+  /* night look */
+  body.night{background:#0b1633 !important}
+  body.night .sketch{display:none}
+  body.night .heartbox,body.night .gallery,body.night .credit{position:relative;z-index:10}
+  body.night .heart-copy p{color:var(--ink-light) !important}
+  body.night .heart-copy .note{color:var(--sticker) !important}
+  body.night .gallery h2,body.night .ptitle{color:var(--ink-light) !important}
+  body.night .gal-sub{color:var(--sky-ink) !important;opacity:.85}
+  body.night .framed .cap,body.night .mood2{color:var(--ink-light) !important}
+  body.night .mood2{color:var(--sticker) !important}
+  body.night .offers2 button{background:rgba(251,248,242,.92) !important}
+  body.night .credit{color:#9fb0d8 !important}
 </style>
 </head>
-<body>
+<body data-stickers=".heart-copy h1">
 <div class="sketch" aria-hidden="true"></div>
 <header class="site">
   <a href="../index.html" style="opacity:1;font-family:'Reenie Beanie',cursive;font-size:26px;text-transform:none;letter-spacing:0">Sofia Grimm</a>
@@ -504,6 +516,7 @@ const PAINTINGS = [
 })();
 </script>
 <script src="../gh.js"></script>
+<script src="../night.js"></script>
 <script src="../nav.js" defer></script>
 </body>
 </html>

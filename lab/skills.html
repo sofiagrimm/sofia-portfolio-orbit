@@ -112,6 +112,12 @@
   }
   .patch .hello::after{content:"";display:inline-block;width:1px;height:.8em;margin-left:2px;vertical-align:-1px;background:currentColor;animation:caret 1s steps(1) infinite}
   @media (prefers-reduced-motion:reduce){.patch .swap,.rays,.core,.glint,.patch .hello::after{animation:none}}
+  /* night look */
+  body.night{background:#0b1633 !important}
+  body.night main{position:relative;z-index:10}
+  body.night .sheet{box-shadow:0 22px 40px rgba(0,0,0,.45)}
+  body.night .sheet:nth-child(odd){transform:rotate(-.6deg)}body.night .sheet:nth-child(even){transform:rotate(.5deg)}
+  body.night header{position:relative;z-index:30}
 </style>
 </head>
 <body>
@@ -581,6 +587,7 @@
 </script>
 <script src="../sky.js"></script>
 <script src="../gh.js"></script>
+<script src="../night.js"></script>
 <script src="../nav.js" defer></script>
 </body>
 </html>
