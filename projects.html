@@ -6,7 +6,7 @@
   <title>Projects | Sofia Grimm</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,300;1,400;1,500;1,600&family=Inter:wght@300;400;500;600&family=Reenie+Beanie&display=swap">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..700;1,6..96,400..700&family=Inter:wght@300;400;500;600&family=Reenie+Beanie&display=swap">
   <style>
     *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
     html,body{width:100%;min-height:100%;background:#060d18;font-family:'Inter',sans-serif;color:#e9f0ff;overflow-x:hidden;}
@@ -16,7 +16,7 @@
     /* ── NAV ── */
     /* the pool table (z 500) used to sit over the menu, leaving no way off this page */
     nav{position:fixed;top:0;left:0;right:0;z-index:520;display:flex;align-items:center;justify-content:space-between;padding:0 48px;height:68px;}
-    .nav-name{font-family:'Cormorant Garamond',Georgia,serif;font-style:italic;font-size:28px;font-weight:300;font-style:italic;letter-spacing:.06em;color:rgba(220,232,255,.9);text-decoration:none;white-space:nowrap;}
+    .nav-name{font-family:'Bodoni Moda',Georgia,serif;font-style:italic;font-size:28px;font-weight:300;font-style:italic;letter-spacing:.06em;color:rgba(220,232,255,.9);text-decoration:none;white-space:nowrap;}
     .nav-links{display:flex;align-items:center;gap:4px;}
     .nav-links a{font-size:13px;font-weight:400;letter-spacing:.13em;text-transform:uppercase;color:rgba(160,190,255,.5);text-decoration:none;padding:7px 16px;border-radius:4px;transition:color .25s,background .25s;}
     .nav-links a:hover,.nav-links a.active{color:rgba(220,235,255,.9);background:rgba(100,140,255,.08);}
@@ -25,7 +25,7 @@
     /* ── PAGE ── */
     .page{position:relative;z-index:10;max-width:960px;margin:0 auto;padding:110px 32px 100px;}
     .page-eyebrow{font-size:11px;letter-spacing:.22em;text-transform:uppercase;color:rgba(160,185,255,.45);margin-bottom:20px;}
-    .page-title{font-family:'Cormorant Garamond',Georgia,serif;font-style:italic;font-size:54px;font-weight:300;line-height:1.08;color:#eef3ff;margin-bottom:14px;}
+    .page-title{font-family:'Bodoni Moda',Georgia,serif;font-style:italic;font-size:54px;font-weight:300;line-height:1.08;color:#eef3ff;margin-bottom:14px;}
     .page-title em{font-style:italic;color:rgba(190,210,255,.85);}
     .page-subtitle{font-size:13px;font-weight:300;color:rgba(160,190,255,.40);letter-spacing:.06em;margin-bottom:36px;}
     .rule{width:48px;height:1px;background:linear-gradient(90deg,rgba(140,170,255,.4),transparent);margin-bottom:44px;}
@@ -264,8 +264,8 @@
     /* thirteen tabs: tighter on laptops so the menu stays on one line */
   @media (max-width:1700px){.nav-links a{padding:6px 8px !important;font-size:12px !important;letter-spacing:.07em !important}}
   @media (max-width:1380px){.nav-links a{padding:5px 5px !important;font-size:11px !important;letter-spacing:.04em !important}.nav-links .divider{display:none !important}}
-  /* the logo keeps its original look: light, spaced, italic Cormorant Garamond */
-  .nav-name,header .brand,.site>a:first-child{font-family:'Cormorant Garamond',Georgia,serif !important;font-weight:300 !important;font-style:italic !important;letter-spacing:.06em !important}
+  /* the logo keeps its original look: light, spaced, italic Bodoni Moda */
+  .nav-name,header .brand,.site>a:first-child{font-family:'Bodoni Moda',Georgia,serif !important;font-weight:300 !important;font-style:italic !important;letter-spacing:.06em !important}
 </style>
 </head>
 <body data-menu="compact">
@@ -456,7 +456,7 @@
       },
       // Joker: a cat in a ruff juggling three little planets
       joker:()=>`
-        ${['J','O','K','E','R'].map((c,i)=>`<text x="30" y="${66+i*32}" font-family="'Cormorant Garamond',Georgia,serif,Georgia,serif" font-size="28" fill="${INK}" text-anchor="middle">${c}</text>`).join('')}
+        ${['J','O','K','E','R'].map((c,i)=>`<text x="30" y="${66+i*32}" font-family="'Bodoni Moda',Georgia,serif,Georgia,serif" font-size="28" fill="${INK}" text-anchor="middle">${c}</text>`).join('')}
         <path d="M100 96 C118 52 168 52 186 96" ${L} stroke-width="1.2" stroke-dasharray="2 5"/>
         <circle cx="104" cy="98" r="10" ${W}/><circle cx="143" cy="58" r="10" ${W}/><ellipse cx="143" cy="58" rx="18" ry="5" ${L} stroke-width="1.6" transform="rotate(-14 143 58)"/><circle cx="184" cy="98" r="10" fill="${INK}"/>
         ${cat(143,214,1.05,{arm:[176,106],extra:`<path d="M-20 -26 l6 -6 l6 6 l6 -6 l6 6 l6 -6 l6 6 l6 -6 l6 6 l-6 7 l-6 -4 l-6 4 l-6 -4 l-6 4 l-6 -4 l-6 4z" ${W} stroke-width="1.6"/><path d="M-8 -70 L-16 -96 L0 -84 L16 -96 L8 -70" ${W} stroke-width="1.8"/><circle cx="-16" cy="-97" r="3" fill="${INK}"/><circle cx="16" cy="-97" r="3" fill="${INK}"/>`})}
@@ -485,13 +485,13 @@
         <rect x="4.5" y="4.5" width="241" height="341" rx="10" fill="none" stroke="#d6cdb9" stroke-width="1"/>`;
       let corners='';
       if(h.suit){
-        const c=`<text x="27" y="44" font-family="'Cormorant Garamond',Georgia,serif,Georgia,serif" font-size="30" fill="${pipC(h.suit)}" text-anchor="middle">${h.rank}</text>${pip(h.suit,27,62,17)}`;
+        const c=`<text x="27" y="44" font-family="'Bodoni Moda',Georgia,serif,Georgia,serif" font-size="30" fill="${pipC(h.suit)}" text-anchor="middle">${h.rank}</text>${pip(h.suit,27,62,17)}`;
         corners=c+`<g transform="rotate(180 125 175)">${c}</g>`;
       }
       const label=`<text x="125" y="324" font-family="'Reenie Beanie',cursive" font-size="22" fill="#6a6560" text-anchor="middle">${h.label}</text>`;
       // drawn illustration if we have one; otherwise the code-drawn scene
       const art=h.img?`<image href="${h.img}" x="4" y="4" width="242" height="342" preserveAspectRatio="xMidYMid slice" clip-path="url(#clip${f})"/>`:SCENES[h.scene]();
-      const jokerSide=(h.img&&h.rank==='JOKER')?['J','O','K','E','R'].map((c,i)=>`<text x="30" y="${66+i*32}" font-family="'Cormorant Garamond',Georgia,serif,Georgia,serif" font-size="28" fill="${INK}" text-anchor="middle">${c}</text>`).join(''):'';
+      const jokerSide=(h.img&&h.rank==='JOKER')?['J','O','K','E','R'].map((c,i)=>`<text x="30" y="${66+i*32}" font-family="'Bodoni Moda',Georgia,serif,Georgia,serif" font-size="28" fill="${INK}" text-anchor="middle">${c}</text>`).join(''):'';
       return `<svg viewBox="0 0 250 350" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">${defs}${paper}${art}${h.img?'':jokerSide+corners}${label}</svg>`;
     }
 
@@ -694,7 +694,7 @@
   function card(rank,suit){
     const f='t'+(uid++), c=col(suit);
     const paint=(x,y,size,op)=>{const k=size/100;return `<g transform="translate(${x-size/2} ${y-size/2}) scale(${k})"><path d="${SUIT[suit]}" fill="${c}" opacity="${op||.82}" filter="url(#wc${f})"/><path d="${SUIT[suit]}" fill="none" stroke="${c}" stroke-width="${1.3/k}" opacity=".45" filter="url(#wc${f})"/></g>`;};
-    const corner=`<text x="30" y="50" font-family="'Cormorant Garamond',Georgia,serif,Georgia,serif" font-size="34" fill="${c}" text-anchor="middle">${rank}</text>${paint(30,72,22,.9)}`;
+    const corner=`<text x="30" y="50" font-family="'Bodoni Moda',Georgia,serif,Georgia,serif" font-size="34" fill="${c}" text-anchor="middle">${rank}</text>${paint(30,72,22,.9)}`;
     let mid='';
     if(rank==='A') mid=paint(125,170,120);
     else if(['K','Q','J'].includes(rank)) mid=court(rank,suit,c,f);
@@ -961,7 +961,7 @@
   function printed(rank,suit){
     const c=(suit==='heart'||suit==='diamond')?'#c62d33':'#141414', f='p'+(uid++);
     const pip=(x,y,sz,flip)=>{const k=sz/100;return `<path d="${SUIT[suit]}" fill="${c}" transform="translate(${x} ${y}) rotate(${flip?180:0}) translate(${-sz/2} ${-sz/2}) scale(${k})"/>`;};
-    const corner=`<text x="24" y="44" font-family="'Cormorant Garamond',Georgia,serif,Georgia,serif" font-size="30" font-weight="700" fill="${c}" text-anchor="middle">${rank}</text>${pip(24,64,20)}`;
+    const corner=`<text x="24" y="44" font-family="'Bodoni Moda',Georgia,serif,Georgia,serif" font-size="30" font-weight="700" fill="${c}" text-anchor="middle">${rank}</text>${pip(24,64,20)}`;
     let mid='';
     if(PIPS[rank]) mid=PIPS[rank].map(([col,y])=>pip(PIP[col],y,40,y>175)).join('');
     else { // court card: framed panel with a bold patterned figure, mirrored

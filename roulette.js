@@ -27,7 +27,7 @@
     padding:12px 18px;font:300 13px/1.5 'Inter','Helvetica Neue',Arial,sans-serif;letter-spacing:.2em;text-transform:uppercase;box-shadow:0 14px 30px rgba(0,0,0,.5);opacity:0;transform:translateY(10px);
     transition:opacity .3s,transform .3s;pointer-events:none}
   #rouletteResult.on{opacity:1;transform:none}
-  #rouletteResult b{display:block;font:400 30px/1 'Cormorant Garamond',Georgia,serif,Georgia,serif;letter-spacing:.02em;text-transform:none;margin-bottom:4px}
+  #rouletteResult b{display:block;font:400 30px/1 'Bodoni Moda',Georgia,serif,Georgia,serif;letter-spacing:.02em;text-transform:none;margin-bottom:4px}
   @media (max-width:760px){#roulette{width:220px;right:-80px;bottom:-80px}#rouletteResult{bottom:160px}}
   `;
   var st = document.createElement('style'); st.textContent = css; document.head.appendChild(st);
