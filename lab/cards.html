@@ -6,7 +6,7 @@
 <title>card catalog | Sofia Grimm</title>
 <meta name="robots" content="noindex">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..700;1,6..96,400..700&family=Inter:wght@300;400;500;600&family=Reenie+Beanie&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..700;1,6..96,400..700&family=DM+Serif+Display:ital@0;1&family=Inter:wght@300;400;500;600&family=Reenie+Beanie&display=swap">
 <style>
   :root{
     --sky:#060d18;
@@ -38,39 +38,36 @@
   .intro h1{font-family:'Reenie Beanie',cursive;font-weight:400;font-size:clamp(56px,9vw,104px);line-height:.9;color:#f4f0e2;transform:rotate(-2deg);transform-origin:left}
   .intro p{margin-top:18px;max-width:52ch;font-size:15px;line-height:1.6;color:#9fb0d8}
 
-  .drawer{max-width:1100px;margin:0 auto;padding:40px 28px 120px;display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:44px 36px}
-
-  .card{perspective:1200px;height:220px;cursor:pointer;outline:none;border:0;background:none;text-align:left;font:inherit;color:inherit}
-  .card:nth-child(4n+1){transform:rotate(-1.6deg)}
-  .card:nth-child(4n+2){transform:rotate(1.1deg) translateY(10px)}
-  .card:nth-child(4n+3){transform:rotate(-.6deg) translateY(-6px)}
-  .card:nth-child(4n){transform:rotate(2deg)}
-  .inner{position:relative;width:100%;height:100%;transform-style:preserve-3d;transition:transform .6s cubic-bezier(.2,.8,.2,1)}
+  /* the catalog is a spread of playing cards: each project has its own card, the hand-drawn kind from the card table */
+  .drawer{position:relative;max-width:1140px;margin:0 auto;padding:46px 28px 140px;display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:34px 26px;justify-items:center}
+  .card{position:relative;width:min(220px,100%);aspect-ratio:5/7;perspective:1300px;cursor:pointer;outline:none;border:0;background:none;text-align:left;font:inherit;color:inherit;
+    transform:translate(var(--dx,0),var(--dy,0)) rotate(var(--r,0deg));transition:transform .35s cubic-bezier(.2,.8,.2,1),z-index 0s .35s;z-index:1}
+  .card:hover,.card:has(.turn:focus-visible),.card[aria-expanded="true"]{transform:translate(var(--dx,0),calc(var(--dy,0px) - 14px)) rotate(calc(var(--r,0deg) * .3)) scale(1.06);z-index:5;transition:transform .35s cubic-bezier(.2,.8,.2,1),z-index 0s}
+  .inner{position:relative;width:100%;height:100%;transform-style:preserve-3d;transition:transform .7s cubic-bezier(.2,.8,.2,1)}
   .card[aria-expanded="true"] .inner{transform:rotateY(180deg)}
-  .card:focus-visible .face{box-shadow:0 0 0 3px #9cc0ff,0 14px 30px rgba(0,0,0,.5)}
-  .face{
-    position:absolute;inset:0;backface-visibility:hidden;border-radius:3px;
-    background:
-      repeating-linear-gradient(to bottom,transparent 0 21px,var(--rule-blue) 21px 22px) 0 58px/100% calc(100% - 58px) no-repeat,
-      linear-gradient(to bottom,transparent 0 46px,var(--rule-red) 46px 47.5px,transparent 47.5px),
-      radial-gradient(ellipse at 30% 20%,#f4ecd5 0%,var(--paper) 55%,var(--paper-edge) 100%);
-    color:var(--type);padding:14px 20px 18px;
-    box-shadow:0 1px 0 #fff5 inset,0 14px 30px rgba(0,0,0,.45),0 2px 4px rgba(0,0,0,.4);
-  }
-  .face::after{ /* punch hole */
-    content:"";position:absolute;left:50%;bottom:10px;width:14px;height:14px;margin-left:-7px;border-radius:50%;
-    background:var(--sky);box-shadow:inset 0 1px 2px rgba(0,0,0,.6);
-  }
-  .back{transform:rotateY(180deg)}
-  .call{display:flex;justify-content:space-between;font-size:13px;letter-spacing:.04em;color:#6b5f4c;height:32px;align-items:flex-end}
-  .title{margin-top:20px;font-size:19px;font-weight:700;line-height:1.15;color:var(--type)}
-  .where{font-size:13px;color:#6b5f4c;margin-top:2px}
-  .note{position:absolute;left:20px;right:20px;bottom:34px;font-family:'Reenie Beanie',cursive;font-size:25px;line-height:1;color:var(--ink);transform:rotate(-1.5deg)}
-  .back .body{margin-top:18px;font-size:12.5px;line-height:22px;color:var(--type)}
-  .back .link{position:absolute;right:20px;bottom:28px;font-family:'Reenie Beanie',cursive;font-size:22px;color:var(--ink)}
+  .face{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;border-radius:6.5%/4.6%;overflow:hidden;
+    box-shadow:0 18px 30px rgba(0,0,0,.45),0 2px 4px rgba(0,0,0,.35)}
+  .front img{display:block;width:100%;height:100%;object-fit:cover}
+  /* the project's name, written on in pen over a swipe of highlighter, like the hand on the table */
+  .front .hl{position:absolute;left:9%;bottom:8.5%;max-width:66%;font-family:'Reenie Beanie',cursive;font-size:clamp(18px,1.7vw,23px);line-height:1;color:#24306b;padding:1px 7px 0;transform:rotate(-6deg);transform-origin:left;
+    background:linear-gradient(100deg,transparent 2%,var(--hl,#a8cdf5) 4% 96%,transparent 98%);mix-blend-mode:multiply}
+  .back{transform:rotateY(180deg);background:radial-gradient(ellipse at 30% 20%,#fdfaf3 0%,#f5efe2 70%,#e6ddca 100%);color:#2a2622;padding:10% 11% 9%;display:flex;flex-direction:column}
+  .back::before{content:"";position:absolute;inset:4.5%;border:1.5px solid rgba(56,52,47,.55);border-radius:4%/3%;pointer-events:none}
+  .back .idx{position:absolute;left:6%;top:4%;font-family:'DM Serif Display',Georgia,serif;font-size:clamp(20px,1.9vw,26px);line-height:1;text-align:center;color:var(--suit,#262838)}
+  .back .idx.b{left:auto;top:auto;right:6%;bottom:4%;transform:rotate(180deg)}
+  .back .idx svg{display:block;width:.7em;height:.7em;margin:2px auto 0}
+  .call{display:flex;justify-content:space-between;gap:8px;padding:0 10%;font-size:11px;letter-spacing:.04em;color:#7a6e5a}
+  .back .title{margin-top:10px;font-family:'DM Serif Display',Georgia,serif;font-style:italic;font-size:clamp(19px,1.8vw,23px);line-height:1.05;color:#24306b}
+  .back .where{font-size:11.5px;color:#7a6e5a;margin-top:3px}
+  .back .body{margin-top:8px;font-size:11.6px;line-height:1.45;color:#2a2622;overflow:hidden;flex:1}
+  .back .note{font-family:'Reenie Beanie',cursive;font-size:20px;line-height:1;color:#c2456b;transform:rotate(-2deg);margin-top:4px}
+  .back .link{position:absolute;right:13%;bottom:9%;font-family:'Reenie Beanie',cursive;font-size:21px;color:#24306b;z-index:3}
 
+  /* a loose heap of the rest of the deck spilling in from the edges, like the card table */
+  .spill{position:absolute;inset:0;z-index:0;pointer-events:none;overflow:hidden}
+  .spill img{position:absolute;width:var(--w);border-radius:7%/5%;box-shadow:0 12px 22px rgba(0,0,0,.4);transform:rotate(var(--r))}
   .sticky{
-    position:relative;align-self:center;justify-self:center;width:190px;padding:18px 16px 22px;background:var(--sticky);
+    position:relative;z-index:2;align-self:center;justify-self:center;width:190px;padding:18px 16px 22px;background:var(--sticky);
     font-family:'Reenie Beanie',cursive;font-size:26px;line-height:1;color:#3b3415;
     transform:rotate(3deg);box-shadow:0 10px 20px rgba(0,0,0,.4);
   }
@@ -80,8 +77,9 @@
   footer a{color:#c9d6ff}
 
   @media (max-width:640px){
-    .drawer{gap:36px;padding-top:28px}
-    .card{height:240px}
+    .drawer{grid-template-columns:repeat(2,1fr);gap:22px 14px;padding:28px 16px 120px}
+    .front .hl{font-size:17px}
+    .back{padding:11% 10% 8%}.back .body{font-size:10.5px;line-height:1.35}.back .title{font-size:17px}
   }
   @media (prefers-reduced-motion:reduce){.inner{transition:none}}
     canvas{display:block;position:fixed;inset:0;z-index:0}
@@ -109,7 +107,7 @@
 
 <section class="intro">
   <h1>the card catalog</h1>
-  <p>Everything I've worked on, filed the way a library would. Tap a card to turn it over.</p>
+  <p>Everything I've worked on, one card each. Tap a card to turn it over.</p>
 </section>
 
 <main class="drawer" id="drawer"></main>
@@ -119,31 +117,36 @@
 <script>
 // Call numbers use the real Library of Congress class for each subject.
 const cards = [
-  {call:"QP 360", year:"now", title:"Higley Lab", where:"Yale School of Medicine", note:"locus coeruleus, in mice",
+  {call:"QP 360", year:"now", title:"Higley Lab", rank:"K", suit:"spade", hl:"#f5b8cf", img:"../img/table/cKspade.webp", where:"Yale School of Medicine", note:"locus coeruleus, in mice",
    body:"Studying how locus coeruleus axons degenerate in PPT1-deficient mice and what that means for norepinephrine in Parkinson's disease. Confocal microscopy, IHC, and perfusions."},
-  {call:"R 489", year:"now", title:"Harvey Cushing Brain Tumor Registry", where:"Yale, with Dr. Megann Licskai", note:"420 case files, all transcribed",
+  {call:"R 489", year:"now", title:"Harvey Cushing Brain Tumor Registry", short:"Cushing registry", rank:"J", suit:"club", hl:"#f6e27a", img:"../img/table/cJclub.webp", where:"Yale, with Dr. Megann Licskai", note:"420 case files, all transcribed",
    body:"Archival research on Cushing's brain tumor registry. I've transcribed every case file and am building a cross-referenced record of the patients behind them. An abstract is headed to the AAHM meeting in 2027."},
-  {call:"RS 199", year:"Mar 2026–now", title:"PCDD", where:"Yale SEAS, under Dr. Dan Wiznia", note:"14 carbons, 5 suppliers",
+  {call:"RS 199", year:"Mar 2026–now", title:"PCDD", rank:"3", suit:"diamond", hl:"#a8cdf5", img:"../img/cards/card-3-diamonds.webp", where:"Yale SEAS, under Dr. Dan Wiznia", note:"14 carbons, 5 suppliers",
    body:"Biomedical Engineering Innovation Fellow on a patient-controlled drug deactivation device. I sourced the carbon panel, wrote the characterization and screening protocols, and lead the HPLC work, validating against the DEA non-retrievable standard."},
   {sticky:"the library two blocks away counts as much as Fermilab"},
-  {call:"QB 857", year:"2023", title:"Gravitational lens CNN", where:"Fermilab", note:"40,000 simulated lenses",
+  {call:"QB 857", year:"2023", title:"Gravitational lens CNN", short:"lens CNN", rank:"7", suit:"spade", hl:"#f6e27a", img:"../img/cards/card-7-spades.webp", where:"Fermilab", note:"40,000 simulated lenses",
    body:"Generated two 40,000-image benchmark datasets of double-source plane lenses and Einstein rings, then trained PyTorch CNNs to classify them. Presented at the AGU Annual Meeting 2023."},
-  {call:"QD 79", year:"Sun Lab", title:"SPME-CZE-MS/MS", where:"Michigan State", note:"30x more sample in",
+  {call:"QD 79", year:"Sun Lab", title:"SPME-CZE-MS/MS", short:"SPME", rank:"10", suit:"diamond", hl:"#a8cdf5", img:"../img/table/cTdiamond.webp", where:"Michigan State", note:"30x more sample in",
    body:"Established the first solid-phase microextraction CZE-MS/MS system for top-down proteomics of mass-limited samples. It resolved 0.05 mg/mL ubiquitin where the standard method saw nothing."},
-  {call:"QH 470", year:"Stan-X", title:"Enhancer trap line", where:"Stanford", note:"now living in Bloomington",
+  {call:"QH 470", year:"Stan-X", title:"Enhancer trap line", short:"enhancer trap", rank:"2", suit:"club", hl:"#f5b8cf", img:"../img/table/c2club.webp", where:"Stanford", note:"now living in Bloomington",
    body:"Developed an enhancer-trapped Drosophila line on the LexA-LexAop system, now at the Bloomington Drosophila Stock Center. Screened 40 lines by GFP and mapped the insertion to CG11050 by inverse PCR."},
-  {call:"T 385", year:"Apr 2026", title:"NeuroPrint", where:"HackDartmouth XI", note:"3rd overall",
+  {call:"T 385", year:"Apr 2026", title:"NeuroPrint", rank:"9", suit:"heart", hl:"#a8cdf5", img:"../img/cards/card-9-hearts.webp", where:"HackDartmouth XI", note:"3rd overall",
    body:"A browser tool for tracking Parkinson's at home. MediaPipe tracks joints during movement tasks so raw video never leaves the device, and a dashboard shows clinicians change over time.", link:"https://devpost.com/software/neuroprint-cky41g"},
-  {call:"HG 6024", year:"Mar 2026", title:"Vantage", where:"YHack", note:"best solo hack",
+  {call:"HG 6024", year:"Mar 2026", title:"Vantage", rank:"5", suit:"spade", hl:"#f5b8cf", img:"../img/cards/card-5-spades.webp", where:"YHack", note:"best solo hack",
    body:"A trading terminal on live Polymarket data, with order-book charts, payoff curves, Kelly sizing, and a perp-hedge overlay. Built and shipped alone in one weekend.", link:"https://devpost.com/software/vantage-gnt2kb"},
-  {call:"HV 687", year:"Jan 2026–now", title:"Red Cross fleet model", where:"Yale Healthcare Consulting Collective", note:"how many bloodmobiles?",
+  {call:"HV 687", year:"Jan 2026–now", title:"Red Cross fleet model", short:"Red Cross fleet", rank:"4", suit:"heart", hl:"#f6e27a", img:"../img/cards/card-4-hearts.webp", where:"Yale Healthcare Consulting Collective", note:"how many bloodmobiles?",
    body:"A Python model that turns regional donation targets into the minimum fleet each region needs, then compares it to current inventory, with a mileage-band overlay."},
-  {call:"HD 2901", year:"Feb 2026", title:"ASEAN expansion", where:"Global Strategy Consulting Group", note:"Singapore first",
+  {call:"HD 2901", year:"Feb 2026", title:"ASEAN expansion", short:"ASEAN", rank:"6", suit:"club", hl:"#a8cdf5", img:"../img/cards/card-6-clubs.webp", where:"Global Strategy Consulting Group", note:"Singapore first",
    body:"Compared ASEAN markets for the Nicol David Organization and recommended a Singapore hub with small pilots in Indonesia next."},
-  {call:"TA 1001", year:"2022–23", title:"Green vehicle routing", where:"CCIR, Cambridge", note:"spotlight scholar",
+  {call:"TA 1001", year:"2022–23", title:"Green vehicle routing", short:"green routing", rank:"8", suit:"diamond", hl:"#f5b8cf", img:"../img/cards/card-8-diamonds.webp", where:"CCIR, Cambridge", note:"spotlight scholar",
    body:"A mixed-integer linear programming model in Julia for routing public transit within emissions and capacity limits."}
 ];
 
+const SUITS = {
+  heart:"M50 90 C20 68 5 52 5 33 C5 18 16 8 30 8 C40 8 46 14 50 23 C54 14 60 8 70 8 C84 8 95 18 95 33 C95 52 80 68 50 90Z",
+  diamond:"M50 3 L86 50 L50 97 L14 50Z",
+  spade:"M50 4 C64 25 93 40 93 61 C93 75 81 83 68 81 C62 80 57 77 54 72 C55 81 59 89 67 95 L33 95 C41 89 45 81 46 72 C43 77 38 80 32 81 C19 83 7 75 7 61 C7 40 36 25 50 4Z",
+  club:"M50 12 a17 17 0 1 1 -0.1 0Z M28 42 a17 17 0 1 1 -0.1 0Z M72 42 a17 17 0 1 1 -0.1 0Z M46 58 C46 76 42 86 33 95 L67 95 C58 86 54 76 54 58Z"};
 const drawer = document.getElementById('drawer');
 cards.forEach(c => {
   if (c.sticky) {
@@ -152,23 +155,28 @@ cards.forEach(c => {
     drawer.appendChild(s); return;
   }
   const b = document.createElement('div');
-  // the whole card turns over, but through a real button laid over it, so the "see it" link inside isn't a control within a control
   b.className = 'card'; b.setAttribute('aria-expanded','false');
+  // every card lands a little crooked, as if dealt by hand
+  const k = drawer.children.length, rr = n => { const x = Math.sin((k + 1) * 99.13 + n) * 43758.5453; return x - Math.floor(x); };
+  b.style.setProperty('--r', ((rr(1) - .5) * 12).toFixed(1) + 'deg'); b.style.setProperty('--dx', ((rr(2) - .5) * 16).toFixed(0) + 'px'); b.style.setProperty('--dy', ((rr(3) - .5) * 18).toFixed(0) + 'px');
+  const red = c.suit === 'heart' || c.suit === 'diamond';
+  b.style.setProperty('--suit', red ? '#c62d33' : '#262838'); b.style.setProperty('--hl', c.hl);
+  const pipSvg = `<svg viewBox="0 0 100 100" aria-hidden="true"><path fill="currentColor" d="${SUITS[c.suit]}"/></svg>`;
+  const idx = cls => `<span class="idx ${cls}">${c.rank}${pipSvg}</span>`;
   b.innerHTML = `
     <div class="inner">
-      <div class="face front">
+      <div class="face front"><img src="${c.img}" alt="" decoding="async" draggable="false"><span class="hl">${c.short || c.title}</span></div>
+      <div class="face back">
+        ${idx('t')}${idx('b')}
         <div class="call"><span>${c.call}</span><span>${c.year}</span></div>
         <div class="title">${c.title}</div>
         <div class="where">${c.where}</div>
-        <div class="note">${c.note}</div>
-      </div>
-      <div class="face back">
-        <div class="call"><span>${c.call}</span><span>${c.year}</span></div>
         <div class="body">${c.body}</div>
+        <div class="note">${c.note}</div>
         ${c.link ? `<a class="link" href="${c.link}" target="_blank" rel="noopener">see it</a>` : ''}
       </div>
     </div>
-    <button type="button" class="turn" aria-expanded="false" aria-label="${c.title}, turn over"></button>`;
+    <button type="button" class="turn" aria-expanded="false" aria-label="${c.title}, ${c.rank} of ${c.suit}s, turn over"></button>`;
   const tb = b.querySelector('.turn');
   const flip = () => { const v = b.getAttribute('aria-expanded') === 'true' ? 'false' : 'true'; b.setAttribute('aria-expanded', v); tb.setAttribute('aria-expanded', v); };
   tb.addEventListener('click', flip);
@@ -197,7 +205,30 @@ cards.forEach(c => {
       scene.add(new THREE.Points(geo,mat));
       (function(){let last=-1e9;const still=matchMedia('(prefers-reduced-motion: reduce)').matches;function loop(t){if(!still)requestAnimationFrame(loop);if(document.hidden||t-last<32)return;last=t;mat.uniforms.time.value=t*.001;renderer.render(scene,camera);}requestAnimationFrame(loop);})();
     });
-  </script>
+  
+// the rest of the deck: a spill of hand-drawn cards down the left edge and along the bottom,
+// skipping every card a project already uses
+(function(){
+  const used = new Set(cards.filter(c => c.rank).map(c => c.rank + c.suit));
+  const all = []; ['heart','spade','diamond','club'].forEach(su => ['A','2','3','4','5','6','7','8','9','10','J','Q','K'].forEach(r => { if (!used.has(r + su)) all.push([r, su]); }));
+  const spill = document.createElement('div'); spill.className = 'spill'; spill.setAttribute('aria-hidden', 'true');
+  document.body.style.position = 'relative'; document.body.prepend(spill);
+  const rnd = n => { const x = Math.sin(n * 91.7) * 43758.5453; return x - Math.floor(x); };
+  function lay() {
+    spill.innerHTML = '';
+    const vw = innerWidth, H = document.documentElement.scrollHeight;
+    if (vw < 900) return;
+    const w = Math.min(150, vw * .1); let n = 0;
+    const put = (x, y) => { const [r, su] = all[n % all.length]; const im = new Image(); im.src = `../img/table/c${r === '10' ? 'T' : r}${su}.webp`; im.alt = ''; im.loading = 'lazy';
+      im.style.cssText = `left:${x}px;top:${y}px;--w:${w}px;--r:${((rnd(n + 7) - .5) * 70).toFixed(1)}deg`; spill.appendChild(im); n++; };
+    const room = (vw - Math.min(1140, vw)) / 2;   // the margin beside the spread
+    for (let y = 120; y < H - 200; y += w * 1.05) { put(-w * .55 + rnd(n) * Math.max(10, room - w * .2), y + rnd(n + 3) * 40); if (rnd(n + 5) > .45) put(-w * .7 + rnd(n + 9) * room * .5, y + w * .5); }
+    for (let y = 160; y < H - 260; y += w * 1.25) put(vw - w * .45 - rnd(n) * Math.max(10, room - w * .3), y + rnd(n + 2) * 50);
+    for (let x = -w * .3; x < vw; x += w * .7) put(x, H - w * .9 - rnd(n + 4) * w * .5);
+  }
+  addEventListener('load', lay); let t; addEventListener('resize', () => { clearTimeout(t); t = setTimeout(lay, 200); });
+})();
+</script>
 <script src="../gh.js"></script>
 <script src="../nav.js" defer></script>
 </body>
