@@ -64,6 +64,17 @@
   .bye{grid-column:1 / -1;display:flex;justify-content:center;gap:26px;flex-wrap:wrap;margin-top:14px;font-family:'Reenie Beanie',cursive;font-size:26px}
   .bye a{color:var(--gold2);text-decoration:none;border-bottom:1.5px dashed var(--thread)}
   .bye a:hover,.bye a:focus-visible{color:var(--cream);outline:none}
+  .rays{transform-box:fill-box;transform-origin:center;animation:turn 90s linear infinite}
+  .core{transform-box:fill-box;transform-origin:center;animation:breathe 4s ease-in-out infinite}
+  .glint{animation:glint 3.2s ease-in-out infinite}
+  @keyframes turn{to{transform:rotate(360deg)}}
+  @keyframes breathe{50%{transform:scale(1.18);opacity:.85}}
+  @keyframes glint{0%,100%{opacity:.75}45%{opacity:1;filter:drop-shadow(0 0 6px #fff1b0)}55%{opacity:1}}
+  .planet image{transition:filter .25s}
+  .planet:hover image,.planet:focus-visible image,.planet.on image{filter:brightness(1.12) saturate(1.1)}
+  .planet.on .name{filter:drop-shadow(0 0 6px rgba(242,207,107,.7))}
+  .patch .hello::after{content:"";display:inline-block;width:1px;height:1em;margin-left:2px;vertical-align:-2px;background:currentColor;animation:caret 1s steps(1) infinite}
+  @keyframes caret{50%{opacity:0}}
   .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
 
   @media (max-width:900px){
@@ -72,9 +83,9 @@
     .intro{order:1}
     .side{order:3}
     .quote,.bye{order:4}
-    .hint{font-size:20px}
+    .hint{position:static;display:block;text-align:center;margin:-6px 0 4px;font-size:22px;transform:none}
   }
-  @media (prefers-reduced-motion:reduce){.patch .swap{animation:none}}
+  @media (prefers-reduced-motion:reduce){.patch .swap,.rays,.core,.glint,.patch .hello::after{animation:none}}
 </style>
 </head>
 <body>
@@ -155,8 +166,9 @@
     b.fillStyle = g; b.fillRect(0, 0, BW, BH);
     // the milky way: hundreds of soft clouds along the band, then darker dust lanes through it
     b.globalCompositeOperation = 'lighter';
-    for (let k = 0; k < 360; k++) {
-      const t = r(), [cx, cy] = band(t), off = gauss() * W * .17, rad = 70 + r() * 220;
+    const bk = Math.max(.4, Math.min(1, W / 1300)); // narrow screens get a proportionally smaller, fainter galaxy
+    for (let k = 0; k < 360 * bk; k++) {
+      const t = r(), [cx, cy] = band(t), off = gauss() * W * .17, rad = (70 + r() * 220) * bk;
       const col = r() < .18 ? '140,115,220' : r() < .55 ? '95,125,215' : '150,170,235';
       const gg = b.createRadialGradient(cx + off, cy, 0, cx + off, cy, rad); gg.addColorStop(0, `rgba(${col},${.005 + r() * .008})`); gg.addColorStop(1, `rgba(${col},0)`);
       b.fillStyle = gg; b.beginPath(); b.arc(cx + off, cy, rad, 0, 7); b.fill();
@@ -175,7 +187,7 @@
       if (r() < .45) { const [cx, cy] = band(y / BH); x = cx + gauss() * W * .16; }
       const m = r(), rad = m < .9 ? .35 + r() * .55 : m < .985 ? .9 + r() * .6 : 1.5 + r() * .8;
       const col = r() < .7 ? '#ffffff' : r() < .6 ? '#bcd3ff' : '#ffe2b0';
-      if (rad > 1.2 && r() < .6) tw.push({x, y, rad, col, ph: r() * 7, sp: .6 + r() * 1.8});
+      if ((rad > 1.2 && r() < .8) || (rad > .7 && r() < .22)) tw.push({x, y, rad: rad * 1.15, col, ph: r() * 7, sp: .7 + r() * 2.6, flare: r() < .09, fsp: .25 + r() * .5});
       else star(b, x, y, rad, col, .45 + r() * .55);
     }
     // a handful of brilliant ones with flares
@@ -234,7 +246,15 @@
       ctx.fillStyle = gl; ctx.fillRect(mx - R, my - R, R * 2, R * 2);
     }
     // twinkling stars
-    for (const s of tw) { const a = still ? .8 : .45 + .55 * Math.abs(Math.sin(t * s.sp + s.ph)); star(ctx, s.x + ox, s.y + oy, s.rad, s.col, a); }
+    for (const s of tw) {
+      const v = still ? .7 : (Math.sin(t * s.sp + s.ph) * .6 + Math.sin(t * s.sp * 2.3 + s.ph * 1.7) * .4) * .5 + .5;
+      const x = s.x + ox, y = s.y + oy;
+      star(ctx, x, y, s.rad * (.7 + .55 * v), v > .82 ? '#ffffff' : s.col, .25 + .75 * v * v);
+      if (s.flare && !still) {
+        const f = Math.pow(Math.max(0, Math.sin(t * s.fsp + s.ph)), 14);
+        if (f > .03) spikes(ctx, x, y, 5 + 22 * f, s.col, f);
+      }
+    }
     ctx.globalAlpha = 1;
     // constellations draw their lines when the pointer comes near, and name themselves
     ctx.font = "italic 18px 'Cormorant Garamond', Georgia, serif"; ctx.textAlign = 'center';
@@ -378,14 +398,14 @@
 
   // the sun: hundreds of straight stitches radiating from a white-hot core
   el('circle', {cx: CX, cy: CY - 40, r: 190, fill: 'url(#glow)'}, sun);
-  const rays = el('g', {}, sun);
+  const rays = el('g', {class: 'rays'}, sun);
   for (let k = 0; k < 150; k++) {
     const a = rnd() * Math.PI * 2, r0 = 14 + rnd() * 18, r1 = 50 + Math.pow(rnd(), 1.6) * (k % 9 === 0 ? 200 : 120);
     const cols = ['#f6cf4a', '#f2b632', '#fff1a8', '#e99a2a', '#ffe27a'];
     el('line', {x1: CX + Math.cos(a) * r0, y1: CY - 40 + Math.sin(a) * r0 * .9, x2: CX + Math.cos(a) * r1, y2: CY - 40 + Math.sin(a) * r1 * .9,
       stroke: cols[k % cols.length], 'stroke-width': .7 + rnd() * 1.1, 'stroke-linecap': 'round', opacity: .55 + rnd() * .45}, rays);
   }
-  el('ellipse', {cx: CX, cy: CY - 40, rx: 34, ry: 30, fill: 'url(#core)'}, sun);
+  el('ellipse', {cx: CX, cy: CY - 40, rx: 34, ry: 30, fill: 'url(#core)', class: 'core'}, sun);
   el('ellipse', {cx: CX, cy: CY - 40, rx: 11, ry: 9, fill: '#fff'}, sun);
 
   // one layer per ring half (back behind the sun, front ahead of it), rebuilt every frame
@@ -442,7 +462,7 @@
       const sz = it.ring ? 9 : 14;
       it.body = el('g', {}, g);
       if (it.C.kind === 'star') el('circle', {r: sz * 1.4, fill: 'url(#glow)', opacity: .5}, it.body);
-      el('path', {d: it.C.kind === 'moon' ? moonPath(0, 0, sz * .95) : starPath(0, 0, sz), fill: it.C.kind === 'moon' ? '#e7c56b' : '#f2cf6b', stroke: '#8a6420', 'stroke-width': 1}, it.body);
+      el('path', {class: it.C.kind === 'star' ? 'glint' : '', style: `animation-delay:${(rnd() * 4).toFixed(2)}s`, d: it.C.kind === 'moon' ? moonPath(0, 0, sz * .95) : starPath(0, 0, sz), fill: it.C.kind === 'moon' ? '#e7c56b' : '#f2cf6b', stroke: '#8a6420', 'stroke-width': 1}, it.body);
     }
   });
 
@@ -450,6 +470,8 @@
   let rot = 0, vel = still ? 0 : .0016, target = null, dragging = false, last = performance.now(), lastKey = '', visible = true, running = true;
   new IntersectionObserver(es => { visible = es[0].isIntersecting; if (visible && !running) { running = true; last = performance.now(); requestAnimationFrame(frame); } }).observe(svg);
   const BIG = RINGS[0];
+  const T0 = performance.now() + 250;
+  items.forEach((it, k) => { it.delay = (it.L ? 0 : 300) + k * 70; });
   function frame(now) {
     const dt = Math.min(50, now - last) / 16.7; last = now;
     if (target != null) {
@@ -473,7 +495,8 @@
     items.forEach(it => {
       const R = RINGS[it.ring || 0], a = it.a0 + rot * R.speed, depth = Math.sin(a), s = .74 + .26 * (depth + 1) / 2;
       const [ax, ay] = onRing(R, a); it.ax = ax; it.ay = ay; it.depth = depth;
-      const len = (it.L ? it.L.len : it.C.len) * (.86 + .14 * (depth + 1) / 2);
+      const dq = still ? 1 : Math.min(1, Math.max(0, (now - T0 - (it.delay || 0)) / 1400)), drop = dq === 1 ? 1 : 1 + 2.2 * Math.pow(dq - 1, 3) + 1.2 * Math.pow(dq - 1, 2);
+      const len = (it.L ? it.L.len : it.C.len) * (.86 + .14 * (depth + 1) / 2) * Math.max(.02, drop);
       const swing = still ? 0 : Math.sin(t * it.sw + it.phase) * .035, bx = ax + Math.sin(swing) * len, by = ay + Math.cos(swing) * len;
       it.thread.setAttribute('d', `M${ax.toFixed(1)} ${ay.toFixed(1)}L${bx.toFixed(1)} ${by.toFixed(1)}`);
       it.bead.forEach((c, k) => { const q = (k + 1) / 4.2 * .55; c.setAttribute('cx', (ax + (bx - ax) * q).toFixed(1)); c.setAttribute('cy', (ay + (by - ay) * q).toFixed(1)); });
@@ -513,7 +536,9 @@
     card.innerHTML = `<div class="swap"><p class="kind">${code ? 'one I code in' : 'one I speak'}</p><h2>${L.name}</h2>
       <span class="hello${code ? ' code' : ''}" lang="${L.id === 'es' ? 'es' : L.id === 'zh' ? 'zh' : 'en'}"></span><p>${L.note}</p>
       <nav><button type="button" data-step="-1">&larr; previous</button><button type="button" data-step="1">next &rarr;</button></nav></div>`;
-    card.querySelector('.hello').textContent = L.hello;
+    const hb = card.querySelector('.hello'); clearInterval(window.__say);
+    if (still || quiet) hb.textContent = L.hello;
+    else { const chars = [...L.hello]; let n = 0; hb.textContent = ''; hb.setAttribute('aria-label', L.hello); window.__say = setInterval(() => { hb.textContent = chars.slice(0, ++n).join(''); if (n >= chars.length) clearInterval(window.__say); }, Math.max(28, 420 / chars.length)); }
     card.querySelectorAll('[data-step]').forEach(b => b.addEventListener('click', () => {
       const i = LANGS.findIndex(l => l.id === current), n = LANGS[(i + +b.dataset.step + LANGS.length) % LANGS.length];
       choose(n.id); items.find(o => o.L && o.L.id === n.id).body.focus({preventScroll: true});
