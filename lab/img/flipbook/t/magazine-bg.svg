@@ -1,9 +1,0 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="735" height="500" viewBox="0 0 735 500"><defs><filter id="paper"><feTurbulence type="fractalNoise" baseFrequency=".9" numOctaves="2" seed="3"/><feColorMatrix values="0 0 0 0 .5  0 0 0 0 .46  0 0 0 0 .42  0 0 0 .18 0"/><feComposite in2="SourceGraphic" operator="in"/></filter>
-<filter id="crumple"><feTurbulence type="fractalNoise" baseFrequency=".012 .02" numOctaves="4" seed="8" result="n"/><feDiffuseLighting in="n" surfaceScale="3.2" lighting-color="#fff"><feDistantLight azimuth="235" elevation="58"/></feDiffuseLighting><feComposite in2="SourceGraphic" operator="in"/></filter>
-<linearGradient id="gut" x1="0" x2="1"><stop offset="0" stop-color="#000" stop-opacity="0"/><stop offset=".5" stop-color="#000" stop-opacity=".16"/><stop offset="1" stop-color="#000" stop-opacity="0"/></linearGradient>
-<filter id="sh" x="-10%" y="-10%" width="120%" height="130%"><feDropShadow dx="0" dy="8" stdDeviation="9" flood-opacity=".18"/></filter></defs>
-<rect width="735" height="500" fill="#ffffff"/>
-<g filter="url(#sh)"><path d="M50 22 L368 30 L368 478 L54 470 Z" fill="#fbfaf8"/><path d="M368 30 L690 18 L694 468 L368 478 Z" fill="#fdfcfa"/></g>
-<rect x="340" y="26" width="56" height="454" fill="url(#gut)"/>
-<path d="M50 22 L368 30 L368 478 L54 470 Z M368 30 L690 18 L694 468 L368 478 Z" fill="#000" filter="url(#paper)" opacity=".35"/>
-</svg>
