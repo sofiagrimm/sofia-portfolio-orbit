@@ -7,12 +7,21 @@
 <meta name="robots" content="noindex">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..700;1,6..96,400..700&family=DM+Serif+Display:ital@1&family=Inter:wght@300;400;500;600&family=Reenie+Beanie&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..700;1,6..96,400..700&family=Inter:wght@300;400;500;600&family=Reenie+Beanie&display=swap">
 <style>
   /* embroidery on black twill: gold thread, a stitched sun, planets hanging from their orbits like a mobile */
-  :root{--sticker:#f3b6c8;--sticker-ink:#16101f;--twill:#0e1120;--twill2:#151a2e;--gold:#d9a944;--gold2:#f2cf6b;--thread:#b8893a;--cream:#f4ead2;--dim:#9c96a8}
+  :root{--pinkthread:#f3a1c4;--twill:#0e1120;--twill2:#151a2e;--gold:#d9a944;--gold2:#f2cf6b;--thread:#b8893a;--cream:#f4ead2;--dim:#9c96a8}
   *{box-sizing:border-box;margin:0;padding:0}
   html,body{overflow-x:clip}
+  body{min-height:100vh;color:var(--cream);font-family:'Inter',Helvetica,Arial,sans-serif;background:#060a1e}
+  /* the sky behind the mobile: a milky way, a star atlas you can light up, constellations that draw themselves */
+  #night{position:fixed;inset:0;width:100%;height:100%;z-index:0;display:block}
+  header,main{position:relative;z-index:1}
+  header{position:relative;z-index:5;display:flex;justify-content:space-between;align-items:baseline;gap:12px;flex-wrap:wrap;padding:22px clamp(18px,4vw,48px)}
+  header a{color:var(--cream);text-decoration:none;font-family:'Reenie Beanie',cursive;font-size:25px;letter-spacing:0;opacity:.78}
+  header a:hover,header a:focus-visible,header a[aria-current]{opacity:1;text-decoration:underline;text-underline-offset:4px;text-decoration-color:var(--gold)}
+  header .brand{font-family:'Bodoni Moda',Georgia,serif;font-weight:300;font-style:italic;font-size:26px;letter-spacing:.06em;text-transform:none;opacity:1}
+  header nav{display:flex;flex-wrap:wrap;gap:4px 16px}
 
   main{display:grid;grid-template-columns:minmax(0,1.55fr) minmax(300px,1fr);gap:clamp(10px,3vw,40px);align-items:start;
     width:min(1320px,100%);margin:0 auto;padding:0 clamp(16px,3.5vw,48px) 60px}
@@ -20,73 +29,49 @@
   .sky svg{display:block;width:100%;height:auto;overflow:visible;touch-action:pan-y;cursor:grab;user-select:none}
   .sky svg.dragging{cursor:grabbing}
   .planet{cursor:pointer;outline:none}
-  .planet .ring-focus{fill:none;stroke:var(--gold2);stroke-width:3;stroke-dasharray:3 6;opacity:0;transition:opacity .2s}
+  .planet .ring-focus{fill:none;stroke:var(--pinkthread);stroke-width:3;stroke-dasharray:3 6;opacity:0;transition:opacity .2s}
   .planet:focus-visible .ring-focus,.planet.on .ring-focus{opacity:1}
   .name{font-family:'Reenie Beanie',cursive;fill:var(--gold2)}
   .hint{position:absolute;left:4%;bottom:6%;font-family:'Reenie Beanie',cursive;font-size:24px;color:var(--gold);opacity:.85;transform:rotate(-4deg);pointer-events:none}
 
   .intro{padding-top:clamp(10px,4vh,50px)}
+  .intro .hi + .hi{margin-top:2px}
+  .intro .hi:not(.orbit){font-size:clamp(26px,2.3vw,34px) !important;white-space:nowrap}
+  @media (max-width:520px){.intro .hi:not(.orbit){white-space:normal}}
+  .intro .orbit{font-size:clamp(42px,4.2vw,58px) !important;color:var(--gold2) !important;margin-bottom:16px;transform:rotate(-2deg)}
+  .intro .hi{font-family:'Reenie Beanie',cursive;font-size:clamp(36px,3.6vw,48px);color:var(--gold);line-height:1;transform:rotate(-2deg);transform-origin:left}
+  h1{font-family:'Bodoni Moda',Georgia,serif;font-style:italic;font-weight:300;font-size:clamp(46px,5.6vw,86px);line-height:.95;letter-spacing:-.01em;margin:0 0 14px;
+    color:var(--gold2);text-shadow:0 1px 0 #8a6420,0 0 28px rgba(242,207,107,.18)}
+  .intro p{font-size:15px;line-height:1.65;color:#d9d1bd;max-width:44ch}
   .key{display:flex;gap:22px;margin-top:18px;font-family:'Reenie Beanie',cursive;font-size:22px;color:var(--cream)}
   .key span{display:flex;align-items:center;gap:8px}
   .key svg{width:18px;height:18px;flex:none}
 
+  /* the patch is the same midnight cloth as the sky, edged in gold thread like the orbits */
+  .patch{position:relative;margin-top:28px;padding:30px 30px 26px;border-radius:26px;
+    background:radial-gradient(130% 100% at 15% 0%,rgba(30,40,86,.82),rgba(8,13,38,.86));-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);
+    box-shadow:0 0 0 1.5px rgba(242,207,107,.75),0 0 0 6px rgba(8,13,38,.6),0 0 0 7px rgba(242,207,107,.28),0 24px 48px rgba(0,0,0,.5)}
+  .patch::before{content:"";position:absolute;inset:10px;border:1.5px dashed rgba(243,161,196,.6);border-radius:18px;pointer-events:none}
+  .patch .kind{font-family:'Reenie Beanie',cursive;font-size:24px;color:var(--gold);line-height:1;display:flex;align-items:center;gap:8px}
+  .patch .kind svg{width:16px;height:16px}
+  .patch h2{font-family:'Bodoni Moda',Georgia,serif;font-style:italic;font-weight:400;font-size:clamp(44px,4.4vw,62px);line-height:.95;color:var(--cream);margin:6px 0 14px}
+  /* hello is sewn in gold, not printed on a sticker */
+  .patch .hello{display:inline-block;font-family:'Bodoni Moda',Georgia,serif;font-style:italic;font-size:30px;line-height:1.1;color:var(--gold2);padding:0 2px 6px;margin-bottom:14px;
+    border-bottom:1.5px dashed var(--pinkthread);min-height:1.2em}
+  .patch .hello.code{font-family:ui-monospace,Menlo,Consolas,monospace;font-style:normal;font-size:16px;padding-top:6px}
+  .patch p{font-size:15px;line-height:1.65;color:#d9d1bd;max-width:40ch}
+  .patch nav{display:flex;justify-content:space-between;margin-top:20px}
+  .patch button{font-family:'Reenie Beanie',cursive;font-size:24px;line-height:1;color:var(--gold2);background:transparent;border:0;border-bottom:1.5px dashed transparent;padding:2px 2px 4px;cursor:pointer}
+  .patch button:hover,.patch button:focus-visible{border-bottom-color:var(--pinkthread);color:var(--cream);outline:none}
   .patch .swap{animation:swap .45s ease}
   @keyframes swap{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
 
-
-  /* ── shared with Notes: same header, sky, sticker title, paper and sticky notes ── */
-  body{min-height:100vh;color:#dfe7ff;font-family:'Inter',Helvetica,Arial,sans-serif;overflow-x:hidden}
-  #night{position:fixed;inset:0;width:100%;height:100%;z-index:4;display:block;pointer-events:none}
-  header,main,footer{position:relative;z-index:10}
-  header{max-width:1320px;margin:0 auto;padding:36px clamp(18px,3.5vw,48px) 0;display:flex;justify-content:space-between;align-items:baseline;flex-wrap:wrap;gap:12px}
-  header nav{display:flex;flex-wrap:wrap;gap:2px 18px}
-  header nav a{font-family:'Reenie Beanie',cursive;font-size:26px;color:#c9d6ff;text-decoration:none}
-  header nav a[aria-current],header nav a:hover,header nav a:focus-visible{color:#fff;text-decoration:underline;text-underline-offset:4px}
-  .coords{font-size:12px;color:#9fb0d8}
-
-  .intro{padding-top:clamp(20px,5vh,60px)}
-  h1{position:relative;display:inline-block;padding:0 .12em;margin:0 0 6px;font-family:'DM Serif Display',Georgia,serif;font-style:italic;font-weight:400;
-    font-size:clamp(50px,5.6vw,92px);line-height:1;letter-spacing:-.01em;color:#16101f;text-shadow:0.045em 0.000em 0 var(--sticker),0.043em 0.012em 0 var(--sticker),0.039em 0.022em 0 var(--sticker),0.032em 0.032em 0 var(--sticker),0.023em 0.039em 0 var(--sticker),0.012em 0.043em 0 var(--sticker),0.000em 0.045em 0 var(--sticker),-0.012em 0.043em 0 var(--sticker),-0.022em 0.039em 0 var(--sticker),-0.032em 0.032em 0 var(--sticker),-0.039em 0.022em 0 var(--sticker),-0.043em 0.012em 0 var(--sticker),-0.045em 0.000em 0 var(--sticker),-0.043em -0.012em 0 var(--sticker),-0.039em -0.022em 0 var(--sticker),-0.032em -0.032em 0 var(--sticker),-0.023em -0.039em 0 var(--sticker),-0.012em -0.043em 0 var(--sticker),-0.000em -0.045em 0 var(--sticker),0.012em -0.043em 0 var(--sticker),0.023em -0.039em 0 var(--sticker),0.032em -0.032em 0 var(--sticker),0.039em -0.023em 0 var(--sticker),0.043em -0.012em 0 var(--sticker),0.090em 0.000em 0 var(--sticker),0.088em 0.018em 0 var(--sticker),0.083em 0.034em 0 var(--sticker),0.075em 0.050em 0 var(--sticker),0.064em 0.064em 0 var(--sticker),0.050em 0.075em 0 var(--sticker),0.034em 0.083em 0 var(--sticker),0.018em 0.088em 0 var(--sticker),0.000em 0.090em 0 var(--sticker),-0.018em 0.088em 0 var(--sticker),-0.034em 0.083em 0 var(--sticker),-0.050em 0.075em 0 var(--sticker),-0.064em 0.064em 0 var(--sticker),-0.075em 0.050em 0 var(--sticker),-0.083em 0.034em 0 var(--sticker),-0.088em 0.018em 0 var(--sticker),-0.090em 0.000em 0 var(--sticker),-0.088em -0.018em 0 var(--sticker),-0.083em -0.034em 0 var(--sticker),-0.075em -0.050em 0 var(--sticker),-0.064em -0.064em 0 var(--sticker),-0.050em -0.075em 0 var(--sticker),-0.034em -0.083em 0 var(--sticker),-0.018em -0.088em 0 var(--sticker),-0.000em -0.090em 0 var(--sticker),0.018em -0.088em 0 var(--sticker),0.034em -0.083em 0 var(--sticker),0.050em -0.075em 0 var(--sticker),0.064em -0.064em 0 var(--sticker),0.075em -0.050em 0 var(--sticker),0.083em -0.034em 0 var(--sticker),0.088em -0.018em 0 var(--sticker),0.06em 0.10em 0.12em rgba(0,0,0,.55);transform:rotate(-2deg)}
-  .intro .hi{font-family:'Reenie Beanie',cursive;color:#f1ecdc;line-height:1;transform-origin:left bottom;margin-top:14px;font-size:clamp(22px,1.95vw,30px);white-space:nowrap;transform:rotate(-1.5deg)}
-  @media (max-width:520px){.intro .hi{white-space:normal}}
-  .intro .orbit{font-size:clamp(46px,4.6vw,66px);color:#fff4c9;text-shadow:0 0 18px rgba(255,236,170,.35);transform:rotate(-4deg);margin:2px 0 6px}
-  .key{display:flex;gap:22px;margin-top:22px;font-family:'Reenie Beanie',cursive;font-size:24px;color:#f1ecdc}
-  .key span{display:flex;align-items:center;gap:8px}
-  .key svg{width:18px;height:18px;flex:none}
-
-  .paper{position:relative;container-type:inline-size;filter:drop-shadow(0 12px 18px rgba(0,0,0,.45))}
-  .paper img{display:block;width:100%;height:auto}
-  .paper .paper-text{position:absolute;margin:0}
-  .paper a{color:#24306b}
-  .paper-notebook{width:min(500px,100%);margin-top:22px;transform:rotate(1deg)}
-  .paper-notebook .paper-text{left:24%;right:5%;top:23.6%;font-family:'Inter',monospace;font-size:clamp(12px,2.75cqw,15px);line-height:5.18cqw;color:#2b2620}
-
-  /* the language card is the clipped paper stack */
-  .patch{width:min(440px,100%);margin-top:30px;transform:rotate(-1.5deg)}
-  .patch .paper-text{left:16%;right:14%;top:20%;bottom:9%;color:#3b3415;display:flex;flex-direction:column}
-  .patch .swap{display:flex;flex-direction:column;height:100%}
-  .patch .kind{font-family:'Reenie Beanie',cursive;font-size:clamp(20px,6cqw,26px);color:#8a3d52;line-height:1;display:flex;align-items:center;gap:8px}
-  .patch .kind svg{width:16px;height:16px}
-  .patch h2{font-family:'DM Serif Display',Georgia,serif;font-style:italic;font-weight:400;font-size:clamp(36px,13cqw,58px);line-height:1;color:#24306b;margin:4px 0 8px}
-  .patch .hello{display:inline-block;align-self:flex-start;font-family:'Reenie Beanie',cursive;font-size:clamp(28px,9cqw,40px);line-height:1;color:#c2456b;padding:0 2px 2px;margin-bottom:10px;border-bottom:2px solid rgba(194,69,107,.35);min-height:1.1em}
-  .patch .hello.code{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:clamp(12px,3.6cqw,15px);padding-top:6px;color:#24306b}
-  .patch p{font-size:clamp(13px,3.7cqw,15px);line-height:1.55;color:#2b2620}
-  .patch nav{display:flex;justify-content:space-between;margin-top:auto;padding-top:10px}
-  .patch button{font-family:'Reenie Beanie',cursive;font-size:clamp(22px,7cqw,28px);line-height:1;color:#24306b;background:transparent;border:0;border-bottom:2px solid transparent;padding:2px 2px 2px;cursor:pointer}
-  .patch button:hover,.patch button:focus-visible{border-bottom-color:#c2456b;color:#c2456b;outline:none}
-
-  /* the ending: a sticky note and the pink grid scrap, like the bottom of Notes */
-  .ending{grid-column:1 / -1;display:flex;justify-content:center;align-items:flex-start;gap:clamp(24px,5vw,70px);flex-wrap:wrap;margin:40px 0 0}
-  .sticky{position:relative;max-width:340px;padding:22px 20px 28px;background:#f2df72;font-family:'Reenie Beanie',cursive;font-size:clamp(24px,2.2vw,29px);line-height:1.05;color:#3b3415;box-shadow:0 12px 22px rgba(0,0,0,.45);transform:rotate(-3deg)}
-  .sticky::before{content:"";position:absolute;top:-12px;left:50%;width:96px;height:26px;margin-left:-48px;background:rgba(236,226,198,.55);box-shadow:0 1px 2px rgba(0,0,0,.2);transform:rotate(-3deg)}
-  .bye{width:min(260px,70vw);transform:rotate(4deg);margin-top:30px}
-  .bye .paper-text{left:18%;right:8%;top:18%;font-family:'Reenie Beanie',cursive;font-size:clamp(22px,12cqw,32px);line-height:1.1;color:#4a1f2c}
-  .bye a{color:#24306b}
-  footer{padding-bottom:clamp(90px,14vh,150px)}
-  #tether{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:11;overflow:visible}
-  #tether path{fill:none;stroke:#e3b45a;stroke-width:1.6;stroke-dasharray:6 4;stroke-linecap:round;opacity:.85;filter:drop-shadow(0 0 3px rgba(242,207,107,.45))}
-  @media (max-width:900px){#tether{display:none}}
-  .hint{color:#f1ecdc !important}
+  .quote{grid-column:1 / -1;max-width:760px;margin:30px auto 0;text-align:center;font-family:'Bodoni Moda',Georgia,serif;font-style:italic;font-size:clamp(22px,2.4vw,30px);line-height:1.35;color:var(--cream)}
+  .quote::before,.quote::after{content:"";display:block;width:180px;height:0;border-top:2px dashed var(--thread);margin:18px auto}
+  .quote::after{border-top-color:var(--pinkthread);opacity:.7}
+  .bye{grid-column:1 / -1;display:flex;justify-content:center;gap:26px;flex-wrap:wrap;margin-top:14px;font-family:'Reenie Beanie',cursive;font-size:26px}
+  .bye a{color:var(--gold2);text-decoration:none;border-bottom:1.5px dashed var(--pinkthread)}
+  .bye a:hover,.bye a:focus-visible{color:var(--cream);outline:none}
   .rays{transform-box:fill-box;transform-origin:center;animation:turn 90s linear infinite}
   .core{transform-box:fill-box;transform-origin:center;animation:breathe 4s ease-in-out infinite}
   .glint{animation:glint 3.2s ease-in-out infinite}
@@ -98,6 +83,7 @@
   .planet.on .name{filter:drop-shadow(0 0 6px rgba(242,207,107,.7))}
   .patch .hello::after{content:"";display:inline-block;width:1px;height:1em;margin-left:2px;vertical-align:-2px;background:currentColor;animation:caret 1s steps(1) infinite}
   @keyframes caret{50%{opacity:0}}
+  #tether{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:2;overflow:visible}
   #tether path{fill:none;stroke:#e3b45a;stroke-width:1.6;stroke-dasharray:6 4;stroke-linecap:round;opacity:.85;filter:drop-shadow(0 0 3px rgba(242,207,107,.45))}
   @media (max-width:900px){#tether{display:none}}
   .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
@@ -107,35 +93,25 @@
     .sky{grid-row:auto;order:2}
     .intro{order:1}
     .side{order:3}
-    .ending{order:4}
+    .quote,.bye{order:4}
     .hint{position:static;display:block;text-align:center;margin:-6px 0 4px;font-size:22px;transform:none}
   }
-  .patch .hello::after{content:"";display:inline-block;width:1px;height:.8em;margin-left:2px;vertical-align:-1px;background:currentColor;animation:caret 1s steps(1) infinite}
   @media (prefers-reduced-motion:reduce){.patch .swap,.rays,.core,.glint,.patch .hello::after{animation:none}}
-  /* night look */
-  body.night{background:#0b1633 !important}
-  body.night main{position:relative;z-index:10}
-  body.night .sheet{box-shadow:0 22px 40px rgba(0,0,0,.45)}
-  body.night .sheet:nth-child(odd){transform:rotate(-.6deg)}body.night .sheet:nth-child(even){transform:rotate(.5deg)}
-  body.night header{position:relative;z-index:30}
 </style>
 </head>
 <body>
 <canvas id="night" aria-hidden="true"></canvas>
 <header>
-  <nav aria-label="Site">
-    <a href="../index.html">./home</a><a href="../about.html">./about</a><a href="../research.html">./research</a><a href="../projects.html">./projects</a><a href="cards.html">./cards</a><a href="notes.html">./notes</a><a href="skills.html" aria-current="page">./languages</a><a href="wonderland.html">./wonderland</a><a href="flipbook.html">./flipbook</a><a href="sofia-is.html">./sofia-is</a><a href="arts.html">./arts</a><a href="globe.html">./globe</a><a href="lace.html">./tilt</a><a href="../contact.html">./contact</a>
-  </nav>
-  <span class="coords">41.3083° N 72.9279° W</span>
+  <a class="brand" href="../index.html">Sofia Grimm</a>
+  <nav aria-label="Site"><a href="../index.html">./home</a><a href="../about.html">./about</a><a href="../research.html">./research</a><a href="../projects.html">./projects</a><a href="skills.html" aria-current="page">./languages</a><a href="wonderland.html">./wonderland</a><a href="flipbook.html">./flip-book</a><a href="cards.html">./cards</a><a href="notes.html">./notes</a><a href="sofia-is.html">./sofia-is</a><a href="arts.html">./arts</a><a href="globe.html">./globe</a><a href="lace.html">./tilt</a><a href="../contact.html">./contact</a></nav>
 </header>
 
 <main>
   <section class="intro" aria-labelledby="t">
-    <h1 id="t"><span lang="en">hello,</span> <span lang="es">hola,</span><br><span lang="zh">你好</span> <span lang="la">viator</span></h1>
+    <h1 id="t"><span lang="en">hello,</span> <span lang="es">hola,</span> <span lang="zh">你好</span> <span lang="la">viator</span></h1>
     <p class="hi">since you're new here, let me take you through</p>
     <p class="hi orbit">my orbit of languages!</p>
-    <div class="paper paper-notebook"><img src="img/paper-notebook.webp" alt="" width="647" height="673">
-      <p class="paper-text">Grew up in Hong Kong, moved to the Chicago suburbs, and picked up Spanish and Chinese along the way. Lately, a few languages computers understand too. Every planet on the mobile is one of them.</p></div>
+    <p>Grew up in Hong Kong, moved to the Chicago suburbs, and picked up Spanish and Chinese along the way. Lately, a few languages computers understand too.</p>
     <div class="key" aria-hidden="true"><span><svg viewBox="0 0 18 18"><circle cx="9" cy="9" r="7" fill="#3462c4" stroke="#d9a944" stroke-width="1.4" stroke-dasharray="2 1.6"/></svg>ones I speak</span><span class="code"><svg viewBox="0 0 18 18"><circle cx="9" cy="11" r="6" fill="#c99a4e" stroke="#d9a944" stroke-width="1.4" stroke-dasharray="2 1.6"/><rect x="6.6" y="0.6" width="4.8" height="4.8" fill="#f2cf6b" transform="rotate(45 9 3)"/></svg>ones I code in</span></div>
   </section>
 
@@ -146,13 +122,11 @@
 
   <svg id="tether" aria-hidden="true"><path/></svg>
   <aside class="side">
-    <section class="paper paper-stack patch" aria-live="polite"><img src="img/paper-stack.webp" alt="" width="513" height="562"><div class="paper-text" id="card"></div></section>
+    <section class="patch" id="card" aria-live="polite"></section>
   </aside>
 
-  <div class="ending">
-    <p class="sticky quote">a language is just a way of being understood, whether it's a grandmother in Spanish, a friend in Chinese, or a browser in JavaScript. every one of them rewards the same thing: paying attention.</p>
-    <aside class="paper paper-grid bye"><img src="img/paper-grid.webp" alt="" width="385" height="407"><p class="paper-text">say hi!<br><a href="../contact.html">email me</a><br><a href="https://www.linkedin.com/in/sofia-grimm/">linkedin</a><br><a href="https://github.com/sofiagrimm" data-gh>github</a></p></aside>
-  </div>
+  <p class="quote">A language is just a way of being understood, whether it's a grandmother in Spanish, a friend in Chinese, or a browser in JavaScript. Every one of them rewards the same thing: paying attention.</p>
+  <div class="bye"><a href="../contact.html">write me a letter</a><a href="https://www.linkedin.com/in/sofia-grimm/">linkedin</a><a href="https://github.com/sofiagrimm" data-gh>github</a></div>
 
   <ul class="sr" id="list"></ul>
 </main>
@@ -200,9 +174,37 @@
     cv.width = W * DPR; cv.height = H * DPR;
     const BW = W + 2 * M, BH = H + 2 * M;
     base = mk(BW * DPR, BH * DPR); const b = base.getContext('2d'); b.scale(DPR, DPR);
+    // deep blue night, a little lighter where the galaxy runs
+    let g = b.createLinearGradient(0, 0, 0, BH); g.addColorStop(0, '#0b1740'); g.addColorStop(.55, '#08112f'); g.addColorStop(1, '#050a1f');
+    b.fillStyle = g; b.fillRect(0, 0, BW, BH);
+    // the milky way: hundreds of soft clouds along the band, then darker dust lanes through it
+    b.globalCompositeOperation = 'lighter';
+    const bk = Math.max(.4, Math.min(1, W / 1300)); // narrow screens get a proportionally smaller, fainter galaxy
+    for (let k = 0; k < 360 * bk; k++) {
+      const t = r(), [cx, cy] = band(t), off = gauss() * W * .17, rad = (70 + r() * 220) * bk;
+      const col = r() < .18 ? '140,115,220' : r() < .55 ? '95,125,215' : '150,170,235';
+      const gg = b.createRadialGradient(cx + off, cy, 0, cx + off, cy, rad); gg.addColorStop(0, `rgba(${col},${.005 + r() * .008})`); gg.addColorStop(1, `rgba(${col},0)`);
+      b.fillStyle = gg; b.beginPath(); b.arc(cx + off, cy, rad, 0, 7); b.fill();
+    }
+    b.globalCompositeOperation = 'source-over';
+    for (let k = 0; k < 120; k++) {
+      const t = r(), [cx, cy] = band(t), off = gauss() * W * .05 + W * .02, rad = 20 + r() * 70;
+      const gg = b.createRadialGradient(cx + off, cy, 0, cx + off, cy, rad); gg.addColorStop(0, 'rgba(4,7,22,.07)'); gg.addColorStop(1, 'rgba(4,7,22,0)');
+      b.fillStyle = gg; b.beginPath(); b.arc(cx + off, cy, rad, 0, 7); b.fill();
+    }
+    // stars: thousands of points, crowding into the band
+    const n = Math.round(BW * BH / 520);
     tw = [];
+    for (let k = 0; k < n; k++) {
+      let x = r() * BW, y = r() * BH;
+      if (r() < .45) { const [cx, cy] = band(y / BH); x = cx + gauss() * W * .16; }
+      const m = r(), rad = m < .9 ? .35 + r() * .55 : m < .985 ? .9 + r() * .6 : 1.5 + r() * .8;
+      const col = r() < .7 ? '#ffffff' : r() < .6 ? '#bcd3ff' : '#ffe2b0';
+      if ((rad > 1.2 && r() < .8) || (rad > .7 && r() < .22)) tw.push({x, y, rad: rad * 1.15, col, ph: r() * 7, sp: .7 + r() * 2.6, flare: r() < .09, fsp: .25 + r() * .5});
+      else star(b, x, y, rad, col, .45 + r() * .55);
+    }
     // a handful of brilliant ones with flares
-    for (let k = 0; k < 6; k++) { const x = r() * BW, y = r() * BH; spikes(b, x, y, 12 + r() * 16, ['#ffffff', '#cfe0ff', '#ffd9b8'][k % 3], .9); }
+    for (let k = 0; k < 9; k++) { const x = r() * BW, y = r() * BH; spikes(b, x, y, 12 + r() * 16, ['#ffffff', '#cfe0ff', '#ffd9b8'][k % 3], .9); }
     b.globalAlpha = 1;
     // constellations: their stars are always there; their lines appear when you come close
     cons = CONS.map(C => ({...C, x: C.at[0] * W + M, y: C.at[1] * H + M, a: 0}));
@@ -239,7 +241,6 @@
     const t = now / 1000;
     px += (tpx - px) * .06; py += (tpy - py) * .06;
     ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
-    ctx.clearRect(0, 0, W, H);
     const ox = -M + px, oy = -M + py;
     ctx.drawImage(base, ox, oy, W + 2 * M, H + 2 * M);
     // the atlas, faint everywhere
@@ -585,9 +586,7 @@
   requestAnimationFrame(frame);
 })();
 </script>
-<script src="../sky.js"></script>
 <script src="../gh.js"></script>
-<script src="../night.js"></script>
 <script src="../nav.js" defer></script>
 </body>
 </html>
